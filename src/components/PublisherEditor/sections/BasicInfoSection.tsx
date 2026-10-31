@@ -270,7 +270,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-6">
       {/* BLOQUE 1: CABECERA DEMOGRÁFICA Y CINTA DE IDENTIDAD */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl overflow-hidden shadow-xs">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs">
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-base shrink-0 border border-indigo-200/50 dark:border-indigo-500/20">
@@ -650,7 +650,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
       </section>
 
       {/* BLOQUE 2: NÚCLEO FAMILIAR Y MOTOR DE REUNIONES (MISMA NOCHE) */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -795,7 +795,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
       </section>
 
       {/* BLOQUE 3: OCUPACIÓN, IDIOMAS Y HABILIDADES PRÁCTICAS (LDC / SALÓN) */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-6">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2 block">

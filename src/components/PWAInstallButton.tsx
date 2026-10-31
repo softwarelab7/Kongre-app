@@ -64,7 +64,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
       return (
         <button
           onClick={install}
-          className={`w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md transition-all active:scale-95 ${className}`}
+          className={`w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs transition-all active:scale-95 ${className}`}
         >
           <Download className="w-4 h-4" />
           <span>Instalar Kongre en este dispositivo</span>
@@ -75,7 +75,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
     return (
       <button
         onClick={install}
-        className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 shrink-0 ${className}`}
+        className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs transition-all active:scale-95 shrink-0 ${className}`}
         title="Instalar aplicación en tu pantalla de inicio para uso offline"
       >
         <Download className="w-3.5 h-3.5" />
@@ -91,54 +91,54 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
         {variant === 'drawer' ? (
           <button
             onClick={() => setShowIOSGuide(true)}
-            className={`w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all ${className}`}
+            className={`w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all ${className}`}
           >
-            <Smartphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <Smartphone className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
             <span>Instalar en iPhone / iPad (Icono Oficial)</span>
           </button>
         ) : (
           <button
             onClick={() => setShowIOSGuide(true)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold transition-colors shrink-0 ${className}`}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-colors shrink-0 ${className}`}
             title="Instrucciones para añadir a la pantalla de inicio de iPhone o iPad con el icono oficial de Kongre"
           >
-            <Download className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <Download className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
             <span className="hidden sm:inline">Instalar App</span>
           </button>
         )}
 
         {showIOSGuide && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
+            <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#121216] p-5 sm:p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between pb-3.5 border-b border-zinc-100 dark:border-[#27272A]">
                 <div className="flex items-center gap-3">
                   <img
                     src={KONGRE_OFFICIAL_IOS_ICON_DATA_URI}
                     alt="Kongre"
-                    className="w-11 h-11 rounded-[11px] shadow-md ring-1 ring-indigo-500/20 shrink-0"
+                    className="w-11 h-11 rounded-[11px] shadow-md ring-1 ring-zinc-300 dark:ring-zinc-700 shrink-0"
                   />
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                    <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
                       Instalar Kongre en iPhone
                     </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                       Icono oficial de pantalla de inicio (iOS)
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowIOSGuide(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A]"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {isInsideIframe && (
-                <div className="mt-3.5 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/70 space-y-2.5">
+                <div className="mt-3.5 p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-2.5">
                   <div className="flex items-start gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                    <p className="text-[11.5px] leading-snug text-amber-900 dark:text-amber-200">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-[11.5px] leading-snug text-zinc-700 dark:text-zinc-300">
                       <strong>¡Importante!</strong> Estás dentro del editor (<code>aistudio.google.com</code>). Si agregas esta pestaña directamente, iPhone usará el icono de Google AI Studio. Abre primero el enlace directo de Kongre en Safari:
                     </p>
                   </div>
@@ -147,7 +147,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                       href={directAppUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs transition-all"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       <span>Abrir enlace directo</span>
@@ -155,48 +155,48 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                     <button
                       type="button"
                       onClick={handleCopyDirectUrl}
-                      className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold"
+                      className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-semibold"
                       title="Copiar URL directa de Kongre"
                     >
-                      {copiedUrl ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedUrl ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
                       <span>{copiedUrl ? 'Copiado' : 'Copiar'}</span>
                     </button>
                   </div>
                 </div>
               )}
 
-              <div className="mt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
-                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                  <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">
+              <div className="mt-4 space-y-2.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-100 dark:border-[#27272A]">
+                  <div className="w-6 h-6 rounded-lg bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 flex items-center justify-center shrink-0 font-bold text-xs">
                     1
                   </div>
                   <p className="leading-snug">
-                    En la barra inferior de <strong className="text-slate-900 dark:text-white">Safari</strong>, toca el botón <strong className="text-slate-900 dark:text-white">Compartir</strong> (cuadro con flecha hacia arriba).
+                    En la barra inferior de <strong className="text-zinc-900 dark:text-white">Safari</strong>, toca el botón <strong className="text-zinc-900 dark:text-white">Compartir</strong> (cuadro con flecha hacia arriba).
                   </p>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                  <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-100 dark:border-[#27272A]">
+                  <div className="w-6 h-6 rounded-lg bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 flex items-center justify-center shrink-0 font-bold text-xs">
                     2
                   </div>
                   <p className="leading-snug">
-                    Desliza hacia abajo y selecciona <strong className="text-slate-900 dark:text-white">Agregar a inicio</strong> (verás el icono violeta oficial <strong className="text-indigo-600 dark:text-indigo-400">K</strong> de Kongre).
+                    Desliza hacia abajo y selecciona <strong className="text-zinc-900 dark:text-white">Agregar a inicio</strong> (verás el icono oficial <strong className="text-zinc-900 dark:text-white">K</strong> de Kongre).
                   </p>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                  <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-100 dark:border-[#27272A]">
+                  <div className="w-6 h-6 rounded-lg bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 flex items-center justify-center shrink-0 font-bold text-xs">
                     3
                   </div>
                   <p className="leading-snug">
-                    Activa <strong className="text-slate-900 dark:text-white">Abrir como app web</strong> y toca <strong className="text-indigo-600 dark:text-indigo-400">Agregar</strong> arriba a la derecha.
+                    Activa <strong className="text-zinc-900 dark:text-white">Abrir como app web</strong> y toca <strong className="text-zinc-900 dark:text-white">Agregar</strong> arriba a la derecha.
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setShowIOSGuide(false)}
-                className="mt-4 w-full rounded-2xl bg-slate-900 dark:bg-indigo-600 py-2.5 text-xs font-bold text-white hover:bg-slate-800 dark:hover:bg-indigo-500 transition-colors"
+                className="mt-4 w-full rounded-2xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 py-2.5 text-xs font-bold transition-colors shadow-xs"
               >
                 Entendido
               </button>

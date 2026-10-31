@@ -65,18 +65,18 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
       role="dialog"
       aria-modal="true"
       aria-label="Código QR para el Tablero"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs"
     >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 text-center">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100 gap-2">
+        <div className="flex items-center justify-between pb-2 border-b border-zinc-100 gap-2">
           <div className="flex items-center gap-2 text-left">
             <button
               type="button"
               data-mobile-back-btn="true"
               onClick={onClose}
               aria-label="Volver"
-              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 text-slate-800 shrink-0 cursor-pointer active:scale-95"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 text-zinc-800 shrink-0 cursor-pointer active:scale-95"
             >
               <ArrowLeft className="w-4 h-4 text-indigo-600" />
             </button>
@@ -84,30 +84,30 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
               <QrCode className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900">Código QR para el Tablero</h3>
-              <p className="text-xs text-slate-500">Acceso móvil para publicadores</p>
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900">Código QR para el Tablero</h3>
+              <p className="text-xs text-zinc-500">Acceso móvil para publicadores</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar código QR"
-            className="hidden sm:flex p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="hidden sm:flex p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Printable Card Area */}
-        <div className="p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center space-y-3">
-          <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-900">
+        <div className="p-6 rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 flex flex-col items-center justify-center space-y-3">
+          <h4 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900">
             {settings.congregationName}
           </h4>
-          <p className="text-xs text-slate-500 max-w-xs">
+          <p className="text-xs text-zinc-500 max-w-xs">
             Escanea este código con la cámara de tu celular para consultar tus asignaciones en tiempo real:
           </p>
 
-          <div className="bg-white p-3 rounded-2xl shadow-md border border-slate-200">
+          <div className="bg-white p-3 rounded-2xl shadow-md border border-zinc-200">
             <canvas ref={canvasRef} className="rounded-lg" />
           </div>
 
@@ -118,11 +118,11 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
 
         {/* Actions */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-100 text-xs text-slate-600">
+          <div className="flex items-center gap-2 p-2 rounded-xl bg-zinc-100 text-xs text-zinc-600">
             <span className="truncate flex-1 text-left font-mono">{currentUrl}</span>
             <button
               onClick={handleCopyLink}
-              className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 hover:bg-slate-50 flex items-center gap-1 shrink-0"
+              className="px-2.5 py-1 rounded-lg bg-white border border-zinc-300 font-semibold text-zinc-800 hover:bg-zinc-50 flex items-center gap-1 shrink-0"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copiado' : 'Copiar'}</span>
@@ -132,15 +132,15 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button
               onClick={handleDownloadQr}
-              className="py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+              className="py-2.5 px-3 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-50 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
             >
-              <Download className="w-4 h-4 text-slate-600" />
+              <Download className="w-4 h-4 text-zinc-600" />
               <span>Descargar Imagen</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              className="py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimir Cartel</span>

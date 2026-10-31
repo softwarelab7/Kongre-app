@@ -87,45 +87,43 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
     setPinConfirm('');
     setSavedFeedback(true);
     setTimeout(() => setSavedFeedback(false), 2000);
-  };
-
-  return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
+  };  return (
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A] gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Seguridad y Privacidad Teocrática
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Protección de datos y bloqueo de pantalla teocrática
             </p>
           </div>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 self-start sm:self-auto">
           <Lock className="w-3.5 h-3.5" />
           <span>Cifrado Local AES-256</span>
         </span>
       </div>
 
       {/* Banner de acceso directo a Roles Teocráticos */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-indigo-50/80 dark:from-[#18181F] dark:via-[#18181F] dark:to-[#18181F] border border-indigo-200/80 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
               Roles Teocráticos y PINs de Acceso
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
                 Vista Dedicada
               </span>
             </h4>
-            <p className="text-xs text-slate-600 dark:text-slate-300">
+            <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
               Asigna responsabilidades teocráticas, gestiona PINs individuales por hermano y administra solicitudes de cuentas vinculadas a pantalla completa.
             </p>
           </div>
@@ -145,10 +143,10 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
       {/* PIN Security Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Card: PIN de Bloqueo */}
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between space-y-3">
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-1.5">
                 <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 PIN de Bloqueo de Sesión
               </span>
@@ -157,28 +155,28 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
                   Desactivado en Modo Prueba
                 </span>
               ) : isPinEnabled ? (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200">
                   PIN Activado
                 </span>
               ) : (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-[#27272A] text-zinc-600 dark:text-[#A1A1AA]">
                   Sin PIN
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               {isDemoMode
                 ? 'En modo prueba el bloqueo de sesión por PIN está desactivado para permitir una navegación fluida sin interrupciones.'
                 : 'Bloquea la aplicación con un código numérico para proteger la confidencialidad en computadoras compartidas del Salón del Reino o cabina de audio.'}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200 dark:border-[#27272A]">
             {!isDemoMode && isPinEnabled && (
               <button
                 type="button"
                 onClick={lockSession}
-                className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-3 py-1.5 rounded-xl bg-zinc-900 dark:bg-[#27272A] hover:bg-zinc-800 dark:hover:bg-[#3F3F46] text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Lock className="w-3.5 h-3.5 text-amber-400" />
                 <span>Bloquear Ahora</span>
@@ -189,7 +187,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
               type="button"
               disabled={isDemoMode}
               onClick={openPinModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
             >
               {isPinEnabled ? 'Cambiar o Quitar PIN' : 'Configurar PIN de Seguridad'}
             </button>
@@ -201,12 +199,12 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
       </div>
 
       {/* Privacy Mode (PII Masking) */}
-      <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 flex items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-indigo-50/40 dark:bg-[#18181F] border border-indigo-100 dark:border-[#27272A] flex items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200 block mb-0.5">
+          <span className="text-xs font-bold text-indigo-950 dark:text-[#F4F4F5] block mb-0.5">
             Modo Privacidad Teocrática de Publicadores (RGPD / PII)
           </span>
-          <p className="text-xs text-indigo-900/70 dark:text-indigo-300/70">
+          <p className="text-xs text-indigo-900/70 dark:text-[#A1A1AA]">
             Enmascara los números de teléfono, direcciones y notas de publicadores para evitar que queden expuestos en pantallas públicas o proyectores.
           </p>
         </div>
@@ -218,21 +216,21 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
             onChange={(e) => setPrivacyModeEnabled(e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+          <div className="w-11 h-6 bg-zinc-200 dark:bg-[#27272A] peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-zinc-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
         </label>
       </div>
 
       {/* Rotación Cero Conocimiento de Credenciales */}
-      <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-amber-50/40 dark:bg-[#18181F] border border-amber-200/60 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
             <RefreshCw className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-amber-950 dark:text-amber-200 block mb-0.5">
+            <span className="text-xs font-bold text-amber-950 dark:text-[#F4F4F5] block mb-0.5">
               Rotación Cero Conocimiento de Credenciales en la Nube
             </span>
-            <p className="text-xs text-amber-900/70 dark:text-amber-300/70">
+            <p className="text-xs text-amber-900/70 dark:text-[#A1A1AA]">
               Cambia el PIN que conocen los publicadores o el PIN maestro del coordinador. Las credenciales anteriores quedan invalidadas de inmediato en Supabase.
             </p>
           </div>
@@ -250,21 +248,21 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
 
       {/* SETUP PIN MODAL */}
       {showPinSetupModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <KeyRound className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                   {isPinEnabled ? 'Modificar PIN de Seguridad' : 'Configurar PIN de Seguridad'}
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPinSetupModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -279,7 +277,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
 
               {isPinEnabled && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     PIN Actual:
                   </label>
                   <input
@@ -289,14 +287,14 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
                     value={pinCurrent}
                     onChange={(e) => setPinCurrent(e.target.value.replace(/\D/g, ''))}
                     placeholder="Ingrese su PIN actual"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center tracking-widest text-base"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-center tracking-widest text-base"
                     required
                   />
                 </div>
               )}
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Nuevo PIN (4 a 8 dígitos numéricos):
                 </label>
                 <input
@@ -306,9 +304,9 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
                   value={pinNew}
                   onChange={(e) => setPinNew(e.target.value.replace(/\D/g, ''))}
                   placeholder={isPinEnabled ? 'Dejar en blanco para desactivar PIN' : 'Ej: 1234'}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center tracking-widest text-base"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-center tracking-widest text-base"
                 />
-                <span className="text-[10px] text-slate-400 mt-1 block">
+                <span className="text-[10px] text-zinc-400 dark:text-[#71717A] mt-1 block">
                   {isPinEnabled
                     ? 'Si deja el campo vacío, se eliminará el PIN y la aplicación no se bloqueará.'
                     : 'Use un PIN fácil de recordar para los hermanos autorizados en el Salón.'}
@@ -317,7 +315,7 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
 
               {pinNew && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Confirmar Nuevo PIN:
                   </label>
                   <input
@@ -327,17 +325,17 @@ export const SecuritySection: React.FC<SecuritySectionProps> = ({
                     value={pinConfirm}
                     onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ''))}
                     placeholder="Repita el nuevo PIN"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center tracking-widest text-base"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-center tracking-widest text-base"
                     required
                   />
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setShowPinSetupModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>

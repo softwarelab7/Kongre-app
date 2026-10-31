@@ -387,25 +387,25 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
       aria-modal="true"
       aria-label="Consejero de la sala auxiliar"
     >
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-white/10 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
         {/* ── HEADER DEL MODAL ── */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
+        <div className="px-6 py-4 border-b border-zinc-200 dark:border-white/[0.08] flex items-center justify-between bg-zinc-50/80 dark:bg-[#18181F]/50">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
                   Consejero de la Sala Auxiliar
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                   Sala Auxiliar
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 {programa.rango_semana || programa.semana_fecha} • Lectura:{' '}
-                <span className="font-semibold text-slate-700 dark:text-zinc-200">
+                <span className="font-semibold text-zinc-700 dark:text-zinc-200">
                   {programa.lectura_semana || 'Jeremías'}
                 </span>
               </p>
@@ -415,7 +415,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
             title="Cerrar"
             aria-label="Cerrar panel del consejero de la sala auxiliar"
           >
@@ -424,19 +424,19 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
         </div>
 
         {/* ── PESTAÑAS INTERNAS ── */}
-        <div className="flex items-center border-b border-slate-200 dark:border-white/[0.08] px-6 bg-white dark:bg-slate-900 text-xs font-semibold">
+        <div className="flex items-center border-b border-zinc-200 dark:border-white/[0.08] px-6 bg-white dark:bg-[#121216] text-xs font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab('counselor')}
             className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === 'counselor'
                 ? 'border-amber-500 text-amber-600 dark:text-amber-400 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-white'
             }`}
           >
             <UserCheck size={14} />
             <span>Consejero y Estudiantes</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-white/10 text-[10px]">
+            <span className="px-1.5 py-0.2 rounded-full bg-zinc-100 dark:bg-white/10 text-[10px]">
               {auxStudentParts.length}
             </span>
           </button>
@@ -447,7 +447,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
             className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === 'worksheet'
                 ? 'border-amber-500 text-amber-600 dark:text-amber-400 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-white'
             }`}
           >
             <BookOpen size={14} />
@@ -460,7 +460,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
             className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === 'balance'
                 ? 'border-amber-500 text-amber-600 dark:text-amber-400 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-white'
             }`}
           >
             <ArrowRightLeft size={14} />
@@ -483,10 +483,10 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                       <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                         Consejero de la Sala Auxiliar (Esta Semana)
                       </span>
-                      <h4 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                      <h4 className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">
                         {counselorPart?.asignado_nombre || 'Ningún consejero asignado todavía'}
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                         {currentCounselor ? (
                           <>
                             {currentCounselor.role === 'elder' || currentCounselor.privilege === 'anciano'
@@ -526,7 +526,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                     <button
                       type="button"
                       onClick={handleCopyWhatsApp}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs font-medium hover:bg-slate-100 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-[#D4D4D8] text-xs font-medium hover:bg-zinc-100 transition-all cursor-pointer"
                       title="Copiar texto del mensaje para el consejero"
                     >
                       <Copy size={13} />
@@ -547,10 +547,10 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
                 {/* Selector de Consejero con rotación */}
                 <div className="mt-4 pt-4 border-t border-amber-200/80 dark:border-amber-900/30">
-                  <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-semibold text-zinc-700 dark:text-[#D4D4D8] mb-1.5">
                     Cambiar Consejero Auxiliar (Lista filtrada por privilegios y rotación):
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-36 overflow-y-auto p-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-white/10">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-36 overflow-y-auto p-1 bg-white dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-white/10">
                     {eligibleCounselors.map(({ publisher, timesAsCounselor, isElder, hasConflict }) => {
                       const pId = publisher.nid || publisher.id;
                       const isSelected = counselorPart?.asignado_nid === pId;
@@ -563,14 +563,14 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                           className={`p-2 rounded-lg text-left text-xs transition-all flex items-center justify-between border cursor-pointer ${
                             isSelected
                               ? 'bg-amber-100 dark:bg-amber-900/50 border-amber-400 text-amber-900 dark:text-amber-200 font-bold'
-                              : 'bg-slate-50/50 dark:bg-slate-800/40 border-transparent hover:bg-slate-100 dark:hover:bg-slate-700/60 text-slate-700 dark:text-zinc-200'
+                              : 'bg-zinc-50/50 dark:bg-[#18181F]/40 border-transparent hover:bg-zinc-100 dark:hover:bg-[#27272A]/60 text-zinc-700 dark:text-zinc-200'
                           }`}
                         >
                           <div className="truncate pr-1">
                             <span className="truncate block font-medium">
                               {publisher.full_name || publisher.name}
                             </span>
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                            <span className="text-[10px] text-zinc-400 dark:text-[#71717A]">
                               {isElder ? 'Anciano' : 'Siervo'} • {timesAsCounselor} veces consejero
                             </span>
                           </div>
@@ -593,13 +593,13 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                       <span>Asignaciones de Estudiantes en Sala Auxiliar</span>
                       <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                         {auxStudentParts.length} partes
                       </span>
                     </h4>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-zinc-400">
                       Evaluación teocrática del folleto <em>Seamos mejores maestros</em> (20 lecciones).
                     </p>
                   </div>
@@ -617,12 +617,12 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                 </div>
 
                 {auxStudentParts.length === 0 ? (
-                  <div className="p-8 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/30">
-                    <Users size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-                    <p className="text-sm font-bold text-slate-700 dark:text-zinc-300">
+                  <div className="p-8 text-center rounded-2xl border-2 border-dashed border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-[#18181F]/30">
+                    <Users size={32} className="mx-auto text-zinc-300 dark:text-[#71717A] mb-2" />
+                    <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
                       No hay estudiantes asignados a la Sala Auxiliar esta semana
                     </p>
-                    <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                    <p className="text-xs text-zinc-400 mt-1 max-w-md mx-auto">
                       Puedes crear réplicas automáticas de las partes del auditorio o transferir estudiantes usando el botón de abajo.
                     </p>
                     <button
@@ -651,7 +651,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                       return (
                         <div
                           key={part.id}
-                          className="p-4 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-slate-850 shadow-2xs hover:border-slate-300 transition-all space-y-3"
+                          className="p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-850 shadow-2xs hover:border-zinc-300 transition-all space-y-3"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                             <div className="flex items-start gap-3">
@@ -659,13 +659,13 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                                 {index + 1}
                               </span>
                               <div>
-                                <h5 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                                <h5 className="text-sm font-bold text-zinc-900 dark:text-white leading-snug">
                                   {part.titulo} ({part.duracion_min} min)
                                 </h5>
-                                <div className="flex items-center gap-2 text-xs text-slate-500 mt-1 flex-wrap">
+                                <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1 flex-wrap">
                                   <span>
                                     Estudiante:{' '}
-                                    <strong className="text-slate-800 dark:text-zinc-200">
+                                    <strong className="text-zinc-800 dark:text-zinc-200">
                                       {part.asignado_nombre || 'Sin asignar'}
                                     </strong>
                                   </span>
@@ -674,7 +674,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                                       <span>•</span>
                                       <span>
                                         Ayudante:{' '}
-                                        <strong className="text-slate-800 dark:text-zinc-200">
+                                        <strong className="text-zinc-800 dark:text-zinc-200">
                                           {part.asignado_auxiliar_nombre}
                                         </strong>
                                       </span>
@@ -697,7 +697,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                                   <span>Repetir Lección</span>
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-400">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-zinc-100 text-zinc-600 dark:bg-white/10 dark:text-[#A1A1AA]">
                                   <Clock size={12} />
                                   <span>Pendiente</span>
                                 </span>
@@ -706,10 +706,10 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                           </div>
 
                           {/* Selector de lección y botones de evaluación para el Consejero */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-white/5">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-zinc-100 dark:border-white/5">
                             {/* Selector de Lección */}
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold text-slate-500 shrink-0">
+                              <span className="text-xs font-semibold text-zinc-500 shrink-0">
                                 Lección:
                               </span>
                               <select
@@ -717,7 +717,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                                 onChange={(e) =>
                                   handleUpdateLesson(part.id, Number(e.target.value))
                                 }
-                                className="text-xs py-1.5 px-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium max-w-[260px] truncate"
+                                className="text-xs py-1.5 px-2.5 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-white font-medium max-w-[260px] truncate"
                               >
                                 {OFFICIAL_STUDENT_LESSONS.map((l) => (
                                   <option key={l.number} value={l.number}>
@@ -786,7 +786,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                               <button
                                 type="button"
                                 onClick={() => handleToggleRoom(part.id)}
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 text-xs font-medium transition-all cursor-pointer"
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 text-xs font-medium transition-all cursor-pointer"
                                 title="Transferir esta parte al Auditorio Principal"
                               >
                                 <ArrowRightLeft size={13} />
@@ -807,10 +807,10 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                     Hoja de Observaciones del Consejero
                   </h4>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-zinc-400">
                     Anotaciones privadas para preparar el consejo constructivo individual.
                   </p>
                 </div>
@@ -826,7 +826,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                   <button
                     type="button"
                     onClick={handlePrintWorksheet}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-white text-xs font-semibold cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 text-zinc-800 dark:text-white text-xs font-semibold cursor-pointer"
                   >
                     <Printer size={13} />
                     <span>Imprimir</span>
@@ -835,7 +835,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
               </div>
 
               {auxStudentParts.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">
+                <p className="text-xs text-zinc-400 italic">
                   No hay estudiantes en la sala auxiliar para evaluar.
                 </p>
               ) : (
@@ -843,10 +843,10 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                   {auxStudentParts.map((sp, idx) => (
                     <div
                       key={sp.id}
-                      className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 space-y-2.5"
+                      className="p-4 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-[#18181F]/40 space-y-2.5"
                     >
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-800 dark:text-white">
+                        <span className="font-bold text-zinc-800 dark:text-white">
                           {idx + 1}. {sp.titulo}
                         </span>
                         <span className="font-semibold text-amber-600 dark:text-amber-400">
@@ -862,7 +862,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                           })
                         }
                         placeholder={`Escriba notas para felicitar y aconsejar a ${sp.asignado_nombre || 'el estudiante'} sobre el punto de oratoria...`}
-                        className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-850 text-slate-800 dark:text-white resize-y min-h-[75px]"
+                        className="w-full text-xs p-3 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-850 text-zinc-800 dark:text-white resize-y min-h-[75px]"
                       />
                     </div>
                   ))}
@@ -874,17 +874,17 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
           {activeTab === 'balance' && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                   Distribución de Partes entre Salas
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   Transfiere asignaciones de estudiantes entre el Auditorio Principal y la Sala Auxiliar según las necesidades teocráticas.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Columna Auditorio Principal */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10">
+                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200 dark:border-white/10">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
@@ -896,13 +896,13 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                     {mainStudentParts.map((mp) => (
                       <div
                         key={mp.id}
-                        className="p-3 rounded-xl bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-white/5 flex items-center justify-between text-xs"
+                        className="p-3 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-white/5 flex items-center justify-between text-xs"
                       >
                         <div className="truncate pr-2">
-                          <p className="font-bold text-slate-800 dark:text-white truncate">
+                          <p className="font-bold text-zinc-800 dark:text-white truncate">
                             {mp.titulo}
                           </p>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="text-[11px] text-zinc-500">
                             {mp.asignado_nombre || 'Sin asignar'}
                           </p>
                         </div>
@@ -933,13 +933,13 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
                     {auxStudentParts.map((ap) => (
                       <div
                         key={ap.id}
-                        className="p-3 rounded-xl bg-white dark:bg-slate-850 border border-slate-200/80 dark:border-white/5 flex items-center justify-between text-xs"
+                        className="p-3 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-200/80 dark:border-white/5 flex items-center justify-between text-xs"
                       >
                         <div className="truncate pr-2">
-                          <p className="font-bold text-slate-800 dark:text-white truncate">
+                          <p className="font-bold text-zinc-800 dark:text-white truncate">
                             {ap.titulo}
                           </p>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="text-[11px] text-zinc-500">
                             {ap.asignado_nombre || 'Sin asignar'}
                           </p>
                         </div>
@@ -962,7 +962,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
         </div>
 
         {/* ── FOOTER DEL MODAL ── */}
-        <div className="px-6 py-3.5 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+        <div className="px-6 py-3.5 border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/80 flex items-center justify-between text-xs text-zinc-500">
           <span>
             {counselorPart?.asignado_nombre
               ? `Consejero asignado: ${counselorPart.asignado_nombre}`
@@ -971,7 +971,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-xs font-semibold text-slate-800 dark:text-white transition-all cursor-pointer"
+            className="px-4 py-1.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-white/10 dark:hover:bg-white/20 text-xs font-semibold text-zinc-800 dark:text-white transition-all cursor-pointer"
           >
             Cerrar
           </button>

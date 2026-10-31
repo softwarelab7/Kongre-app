@@ -161,23 +161,22 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
+         aria-modal="true"
       aria-label={sheet ? 'Editar ficha de mantenimiento' : 'Nueva ficha de mantenimiento'}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-[#131d2e] rounded-3xl shadow-2xl w-full max-w-4xl max-h-[92vh] border border-zinc-200 dark:border-white/[0.08] flex flex-col overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] rounded-2xl w-full max-w-4xl max-h-[92vh] border border-zinc-200 dark:border-[#27272A] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-white/[0.08] bg-zinc-50/70 dark:bg-white/[0.02]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
               <Wrench size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+              <h2 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {sheet ? 'Editar Ficha de Mantenimiento' : 'Nueva Ficha de Mantenimiento'}
               </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Plan preventivo del Salón del Reino y lista de tareas
               </p>
             </div>
@@ -186,7 +185,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana de ficha de mantenimiento"
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors"
           >
             <X size={20} />
           </button>
@@ -198,7 +197,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
             {/* Columna Izquierda: Información General */}
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Nombre de la Tarea / Ficha *
                 </label>
                 <input
@@ -208,12 +207,12 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                   value={formData.label || ''}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                   placeholder="Ej. Revisión Trimestral de Extintores"
-                  className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Descripción del Procedimiento
                 </label>
                 <textarea
@@ -221,19 +220,19 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Detalles sobre lo que se debe inspeccionar o limpiar..."
                   rows={2}
-                  className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Categoría
                   </label>
                   <select
                     value={formData.category || 'seguridad'}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as MaintenanceCategory })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -244,13 +243,13 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Frecuencia
                   </label>
                   <select
                     value={formData.frequency || 'mensual'}
                     onChange={(e) => setFormData({ ...formData, frequency: e.target.value as MaintenanceFrequency })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                   >
                     {FREQUENCIES.map((f) => (
                       <option key={f.id} value={f.id}>
@@ -263,13 +262,13 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Estado Actual
                   </label>
                   <select
                     value={formData.status || 'pendiente'}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as MaintenanceStatus })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                   >
                     {STATUSES.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -280,7 +279,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Tiempo Estimado (minutos)
                   </label>
                   <input
@@ -289,43 +288,43 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                     step={5}
                     value={formData.estimatedMinutes || 60}
                     onChange={(e) => setFormData({ ...formData, estimatedMinutes: Number(e.target.value) })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono tabular-nums"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Última Realización
                   </label>
                   <input
                     type="date"
                     value={formData.lastCompletedDate || ''}
                     onChange={(e) => setFormData({ ...formData, lastCompletedDate: e.target.value })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono tabular-nums"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                     Próxima Fecha Programada
                   </label>
                   <input
                     type="date"
                     value={formData.nextDueDate || ''}
                     onChange={(e) => setFormData({ ...formData, nextDueDate: e.target.value })}
-                    className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono tabular-nums"
                   />
                 </div>
               </div>
 
               {/* Publicadores Asignados */}
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Publicadores / Colaboradores Asignados
                 </label>
-                <div className="max-h-36 overflow-y-auto border border-zinc-200 dark:border-white/[0.08] rounded-xl p-2 bg-zinc-50/50 dark:bg-black/20 space-y-1">
+                <div className="max-h-36 overflow-y-auto border border-zinc-200 dark:border-[#27272A] rounded-xl p-2 bg-zinc-50 dark:bg-[#18181F]/40 space-y-1">
                   {publishers.length === 0 ? (
                     <div className="text-xs text-zinc-400 p-2 text-center">No hay publicadores registrados</div>
                   ) : (
@@ -339,7 +338,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                           className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors ${
                             isSelected
                               ? 'bg-indigo-600 text-white font-semibold'
-                              : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
+                              : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                           }`}
                         >
                           <span>{pub.name}</span>
@@ -356,7 +355,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
             <div className="space-y-4">
               {/* Checklist Section */}
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Lista de Verificación / Pasos ({formData.checklist?.length || 0})
                 </label>
                 <div className="flex gap-2 mb-2">
@@ -371,18 +370,18 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                       }
                     }}
                     placeholder="Escribe un paso y presiona Añadir..."
-                    className="flex-1 bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="flex-1 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                   />
                   <button
                     type="button"
                     onClick={handleAddChecklistItem}
-                    className="px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 text-xs font-bold transition-colors"
+                    className="px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 text-xs font-bold transition-colors cursor-pointer"
                   >
                     Añadir
                   </button>
                 </div>
 
-                <div className="max-h-48 overflow-y-auto space-y-1.5 border border-zinc-200 dark:border-white/[0.08] rounded-xl p-2 bg-zinc-50/50 dark:bg-black/20">
+                <div className="max-h-48 overflow-y-auto space-y-1.5 border border-zinc-200 dark:border-[#27272A] rounded-xl p-2 bg-zinc-50 dark:bg-[#18181F]/40">
                   {(!formData.checklist || formData.checklist.length === 0) ? (
                     <div className="text-xs text-zinc-400 p-3 text-center italic">
                       Sin pasos de verificación. Agrega uno arriba.
@@ -391,15 +390,15 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                     formData.checklist.map((item, idx) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between gap-2 p-2 rounded-lg bg-white dark:bg-[#162032] border border-zinc-200/80 dark:border-white/[0.05] text-xs"
+                        className="flex items-center justify-between gap-2 p-2 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-xs"
                       >
-                        <span className="text-zinc-400 font-mono text-[10px] w-4">{idx + 1}.</span>
+                        <span className="text-zinc-400 font-mono text-[10px] w-4 tabular-nums">{idx + 1}.</span>
                         <span className="flex-1 text-zinc-800 dark:text-zinc-200">{item.text}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveChecklistItem(item.id)}
                           aria-label={`Quitar paso: ${item.text}`}
-                          className="p-1 text-zinc-400 hover:text-rose-500 transition-colors"
+                          className="p-1 text-zinc-400 hover:text-rose-500 transition-colors cursor-pointer"
                           title="Quitar paso"
                         >
                           <Trash2 size={13} />
@@ -412,7 +411,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
 
               {/* Equipo de Protección Personal (EPP) */}
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Equipo de Protección y Seguridad Recomendado
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -423,10 +422,10 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                         key={gear}
                         type="button"
                         onClick={() => handleToggleSafetyGear(gear)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30 ring-1 ring-amber-500/30'
-                            : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:bg-zinc-200'
+                            : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200'
                         }`}
                       >
                         {isSelected ? '✓ ' : '+ '}
@@ -439,7 +438,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
 
               {/* Observaciones y Notas */}
               <div>
-                <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                   Notas Técnicas / Historial
                 </label>
                 <textarea
@@ -447,24 +446,24 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Detalles sobre herramientas necesarias, repuestos, marcas de filtros..."
                   rows={3}
-                  className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2 text-zinc-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2 text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-white/[0.08]">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-[#27272A]">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-white/[0.1] text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05] transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all"
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
             >
               {sheet ? 'Guardar Cambios' : 'Crear Ficha de Mantenimiento'}
             </button>

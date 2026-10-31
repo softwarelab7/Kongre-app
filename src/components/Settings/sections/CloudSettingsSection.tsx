@@ -173,17 +173,17 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A] flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold">
+          <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/50 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold">
             <Cloud className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Respaldo Automático en la Nube
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Sincronización segura de la congregación con Supabase (Cifrado AES-256)
             </p>
           </div>
@@ -192,8 +192,8 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
             user
-              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-              : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+              : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60'
           }`}
         >
           <span
@@ -222,16 +222,16 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
           <button
             type="button"
             onClick={() => setCloudActionStatus(null)}
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs cursor-pointer"
+            className="text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] text-xs cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <p className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-2">
             {user ? (
               <>
                 <span>Conectado como:</span>
@@ -243,7 +243,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
               <span>Modo Local / Sincronización por ID de Congregación</span>
             )}
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] leading-relaxed max-w-xl">
             {user
               ? 'Tus datos de la congregación (publicadores, reuniones, programas CLM, asignaciones y ajustes) se respaldan automáticamente en la nube bajo el ID de tu congregación, sin importar la cuenta con la que entres.'
               : 'Tus datos de la congregación (ID y PIN) se respaldan automáticamente en la nube bajo el ID de la congregación en cada cambio guardado.'}
@@ -267,7 +267,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
                 type="button"
                 onClick={handleDownloadFromGoogle}
                 disabled={isSyncingCloud}
-                className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-60"
+                className="px-3.5 py-2 rounded-xl bg-zinc-200 dark:bg-[#27272A] hover:bg-zinc-300 dark:hover:bg-[#3F3F46] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-60"
                 title="Descargar y restaurar datos teocráticos desde Google Firestore"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -276,7 +276,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
               <button
                 type="button"
                 onClick={signOutUser}
-                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-zinc-600 hover:text-rose-600 dark:text-[#A1A1AA] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                 title="Desconectar cuenta de Google"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -298,23 +298,23 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
       </div>
 
       {/* PANEL FASE 4: SINCRONIZACIÓN GRANULAR COLABORATIVA POR SUBCOLECCIONES */}
-      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-5">
+      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-[#27272A] space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
               <Layers className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   Fase 4: Sincronización Granular Colaborativa
                 </h4>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Subcolecciones en Vivo
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Cada departamento teocrático sincroniza su propia subcolección en Firestore sin sobreescribir el trabajo de otros hermanos.
               </p>
             </div>
@@ -325,7 +325,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
               type="button"
               onClick={handleCheckGranular}
               disabled={isCheckingGranular || isMigratingSubcollections}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Verifica el número de documentos reales sincronizados en cada subcolección de Firestore"
             >
               {isCheckingGranular ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
@@ -365,7 +365,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
             <button
               type="button"
               onClick={() => setGranularStatusMessage(null)}
-              className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] text-xs cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -375,121 +375,121 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
         {/* Grid con las 6 subcolecciones modulares */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* Subcolección 1: Publicadores */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
                 <Users className="w-4 h-4" />
                 <span>/publishers</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                 {granularSyncStats?.publishersCount ?? publishers.length} docs
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Publicadores y Tarjetas S-21
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Coordinador & Secretario • Escucha y guarda independientemente.
             </p>
           </div>
 
           {/* Subcolección 2: Semanas VyM */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
                 <Calendar className="w-4 h-4" />
                 <span>/weeks</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
                 {granularSyncStats?.weeksCount ?? weeks.length} semanas
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Vida y Ministerio & Deberes
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Supt. VyM & Coordinador • Cada semana es un documento aislado.
             </p>
           </div>
 
           {/* Subcolección 3: Territorios */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs">
                 <MapPin className="w-4 h-4" />
                 <span>/territories</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
                 {granularSyncStats?.territoriesCount ?? territories.length} territorios
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Territorios y Manzanas S-13
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Siervo de Territorios • Actualizaciones sin bloqueo concurrente.
             </p>
           </div>
 
           {/* Subcolección 4: Tablero de Anuncios */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 font-bold text-xs">
                 <Bell className="w-4 h-4" />
                 <span>/notices</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
                 {granularSyncStats?.noticesCount ?? notices.length} anuncios
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Tablero de Anuncios Oficial
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Lectura congregacional y redacción exclusiva de ancianos.
             </p>
           </div>
 
           {/* Subcolección 5: Cuentas */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-bold text-xs">
                 <CreditCard className="w-4 h-4" />
                 <span>/accounts</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
                 {transactions.length} txs
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Libro de Cuentas S-26 y Auditorías
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Siervo de Cuentas • Privacidad garantizada por reglas de seguridad.
             </p>
           </div>
 
           {/* Subcolección 6: Literatura */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400 font-bold text-xs">
                 <BookOpen className="w-4 h-4" />
                 <span>/literature</span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300">
                 {literatureItems.length} items
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+            <p className="text-[11px] text-zinc-700 dark:text-[#F4F4F5] font-medium">
               Almacén de Literatura e Inventario
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-zinc-400 dark:text-[#71717A]">
               Siervo de Literatura • Pedidos y recuentos físicos aislados.
             </p>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 text-[11px] text-indigo-900 dark:text-indigo-200 flex items-start gap-2.5 leading-relaxed">
+        <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-[#18181F] border border-indigo-100 dark:border-[#27272A] text-[11px] text-indigo-900 dark:text-indigo-200 flex items-start gap-2.5 leading-relaxed">
           <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
           <div>
             <span className="font-bold">Colaboración Concurrente Segura:</span> Gracias a la Fase 4, si varios hermanos (coordinador, secretario, siervos) editan el sistema simultáneamente desde distintas computadoras o teléfonos, no hay riesgo de sobreescribir el trabajo ajeno.
@@ -498,23 +498,23 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
       </div>
 
       {/* PANEL SUPABASE: SINCRONIZACIÓN CIFRADA DE CERO CONOCIMIENTO (AES-256-GCM) */}
-      <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-5">
+      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-[#27272A] space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   Cero Conocimiento: Supabase (AES-256-GCM)
                 </h4>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Cifrado Militar en Dispositivo
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Los datos se cifran con tu PIN antes de enviarse a Supabase. Nadie en internet ni en los servidores puede leer tus registros teocráticos.
               </p>
             </div>
@@ -547,7 +547,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
                 type="button"
                 onClick={() => handleSyncSupabase(true)}
                 disabled={isSupabaseSyncing}
-                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 title="Fuerza la subida del snapshot local cifrado a Supabase"
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -557,7 +557,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
                 type="button"
                 onClick={onOpenRotateModal}
                 disabled={isSupabaseSyncing}
-                className="px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800/60 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 title="Rotar PIN de congregación o PIN maestro con revocación inmediata en la nube"
               >
                 <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -586,7 +586,7 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
             <button
               type="button"
               onClick={() => setSupabaseSyncFeedback(null)}
-              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs cursor-pointer"
+              className="text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] text-xs cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -594,9 +594,9 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Última Sincronización</p>
-            <p className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1">
+            <p className="text-[10px] font-bold text-zinc-400 dark:text-[#71717A] uppercase tracking-wider">Última Sincronización</p>
+            <p className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5 font-mono tabular-nums">
               <Clock className="w-3.5 h-3.5 text-emerald-500" />
               <span>
                 {lastSupabaseSyncAt
@@ -609,17 +609,17 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cifrado de Payload</p>
-            <p className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1">
+            <p className="text-[10px] font-bold text-zinc-400 dark:text-[#71717A] uppercase tracking-wider">Cifrado de Payload</p>
+            <p className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5 font-mono tabular-nums">
               <KeyRound className="w-3.5 h-3.5 text-indigo-500" />
               <span>AES-256-GCM (100k PBKDF2)</span>
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Resolución de Conflictos</p>
-            <p className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1">
+            <p className="text-[10px] font-bold text-zinc-400 dark:text-[#71717A] uppercase tracking-wider">Resolución de Conflictos</p>
+            <p className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-sky-500" />
               <span>Fusión Inteligente No Destructiva</span>
             </p>

@@ -260,7 +260,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
@@ -269,18 +269,18 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Centro de Notificaciones y Hoja Unificada por WhatsApp"
-        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92dvh] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
+        className="relative w-full max-w-4xl bg-white dark:bg-[#121216] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[92dvh] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
       >
         {/* Mobile Bottom Sheet Handle */}
         <div
           onClick={onClose}
-          className="sm:hidden w-full pt-2.5 pb-0.5 flex justify-center items-center cursor-pointer shrink-0 bg-emerald-50/70 dark:bg-slate-800"
+          className="sm:hidden w-full pt-2.5 pb-0.5 flex justify-center items-center cursor-pointer shrink-0 bg-emerald-50/70 dark:bg-[#18181F]"
         >
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+          <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
         </div>
 
         {/* Header */}
-        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-200 dark:border-slate-800 bg-linear-to-r from-emerald-50 via-teal-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-zinc-200 dark:border-[#27272A] bg-linear-to-r from-emerald-50 via-teal-50 to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
               <MessageCircle className="w-5 h-5" />
@@ -290,13 +290,13 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full">
                   Hoja Unificada + WhatsApp
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
                   {dispatchMode === 'mensual_unificado'
                     ? `Mes: ${formatSpanishMonthLabel(selectedMonthKey)}`
                     : `Semana ${week.weekStartDate} al ${week.weekEndDate}`}
                 </span>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight">
                 Envío de Asignaciones, Resumen Mensual y Calendario (.ics)
               </h3>
             </div>
@@ -306,22 +306,22 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar recordatorios de WhatsApp"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Selector de Modo Principal: Resumen Mensual Unificado vs Por Asignación Individual */}
-        <div className="px-4 sm:px-5 py-2.5 bg-slate-100/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
-          <div className="inline-flex p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xs">
+        <div className="px-4 sm:px-5 py-2.5 bg-zinc-100/80 dark:bg-[#18181F]/70 border-b border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-2">
+          <div className="inline-flex p-1 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xs">
             <button
               type="button"
               onClick={() => setDispatchMode('mensual_unificado')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 dispatchMode === 'mensual_unificado'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  : 'text-zinc-600 dark:text-[#D4D4D8] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -333,7 +333,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 dispatchMode === 'semanal'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  : 'text-zinc-600 dark:text-[#D4D4D8] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
@@ -344,7 +344,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           <button
             type="button"
             onClick={handleCopyAll}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-colors cursor-pointer"
           >
             {allCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{allCopied ? '¡Todos Copiados!' : 'Copiar Todos'}</span>
@@ -355,13 +355,13 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         {dispatchMode === 'mensual_unificado' ? (
           <>
             {/* Barra de Filtros del Mes */}
-            <div className="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="px-4 sm:px-5 py-3 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50/60 dark:bg-[#121216]/50 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 flex-wrap">
-                <label className="font-bold text-slate-700 dark:text-slate-300">Mes:</label>
+                <label className="font-bold text-zinc-700 dark:text-[#D4D4D8]">Mes:</label>
                 <select
                   value={selectedMonthKey}
                   onChange={(e) => setSelectedMonthKey(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-800 dark:text-white focus:outline-hidden"
+                  className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-bold text-zinc-800 dark:text-white focus:outline-hidden"
                 >
                   {availableMonths.map((mKey) => (
                     <option key={mKey} value={mKey}>
@@ -379,19 +379,19 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
               </div>
 
               <div className="relative min-w-[210px] flex-1 sm:flex-initial">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={publisherSearch}
                   onChange={(e) => setPublisherSearch(e.target.value)}
                   placeholder="Buscar hermano o hermana..."
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-white focus:outline-hidden"
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-xs text-zinc-800 dark:text-white focus:outline-hidden"
                 />
               </div>
             </div>
 
             {/* Lista de Hermanos con su Hoja Unificada del Mes */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 bg-slate-50/50 dark:bg-slate-950/40">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 bg-zinc-50/50 dark:bg-zinc-950/40">
               {filteredMonthlyBundles.length > 0 ? (
                 filteredMonthlyBundles.map((bundle) => {
                   const isSent = sentMonthlyPubIds.has(bundle.publisher.id);
@@ -405,16 +405,16 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                       className={`rounded-2xl border transition-all overflow-hidden ${
                         isSent
                           ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs'
+                          : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] shadow-2xs'
                       }`}
                     >
                       <div className="p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                         <div className="min-w-0 flex-1 space-y-1.5">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                            <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                               {bundle.publisher.name}
                             </h4>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                            <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                               {hasPhone ? bundle.publisher.phone : '⚠️ Sin teléfono'}
                             </span>
                             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300">
@@ -446,7 +446,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                               </span>
                             )}
                             {bundle.countsByCategory.deberes > 0 && (
-                              <span className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                              <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] font-semibold">
                                 🎧 {bundle.countsByCategory.deberes} Deberes/Audio/Acomodador
                               </span>
                             )}
@@ -475,7 +475,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                             onClick={() =>
                               setExpandedPublisherId(isExpanded ? null : bundle.publisher.id)
                             }
-                            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                             title="Ver lista detallada del mes"
                           >
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -492,7 +492,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                                 settings
                               )
                             }
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] transition-colors cursor-pointer"
                             title="Descargar Calendario .ics del mes para este hermano"
                           >
                             <Download className="w-4 h-4" />
@@ -508,7 +508,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                                 settings
                               )
                             }
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] transition-colors cursor-pointer"
                             title="Imprimir Hoja Personal del Mes"
                           >
                             <Printer className="w-4 h-4" />
@@ -517,7 +517,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleCopyUnifiedBundle(bundle)}
-                            className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                             title="Copiar el resumen mensual para WhatsApp"
                           >
                             {isCopied ? (
@@ -542,26 +542,26 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
 
                       {/* Vista previa desplegable de todas las asignaciones del hermano en el mes */}
                       {isExpanded && (
-                        <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                        <div className="px-4 py-3 bg-zinc-50 dark:bg-[#18181F]/50 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {bundle.assignments.map((asig) => (
                               <div
                                 key={asig.id}
-                                className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 text-xs space-y-0.5"
+                                className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A]/80 text-xs space-y-0.5"
                               >
                                 <div className="flex items-center justify-between gap-2">
                                   <span className="font-bold text-indigo-700 dark:text-indigo-300">
                                     📅 {formatShortSpanishDate(asig.date)} • {asig.time}
                                   </span>
-                                  <span className="text-[10px] font-bold uppercase px-2 py-0.2 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                  <span className="text-[10px] font-bold uppercase px-2 py-0.2 rounded-md bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8]">
                                     {asig.categoryLabel}
                                   </span>
                                 </div>
-                                <p className="font-bold text-slate-900 dark:text-white">
+                                <p className="font-bold text-zinc-900 dark:text-white">
                                   {asig.title}
                                 </p>
                                 {(asig.partnerName || asig.room || asig.subtitle) && (
-                                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                                     {[
                                       asig.room
                                         ? asig.room === 'auxiliar'
@@ -591,11 +591,11 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                 })
               ) : (
                 <div className="text-center py-12 px-4">
-                  <MessageCircle className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  <MessageCircle className="w-12 h-12 text-zinc-300 mx-auto mb-2" />
+                  <h4 className="text-sm font-bold text-zinc-800 dark:text-[#E4E4E7]">
                     No se encontraron asignaciones para este mes
                   </h4>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-zinc-500 mt-1">
                     Selecciona otro mes o asigna partes en el programa mensual.
                   </p>
                 </div>
@@ -606,9 +606,9 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           /* MODO 2: POR ASIGNACIÓN INDIVIDUAL (SEMANA ACTUAL) */
           <>
             {/* Toolbar: Stats & Mode toggle */}
-            <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
+            <div className="px-5 py-3 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/60 dark:bg-[#121216]/50 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-xs flex-wrap">
-                <span className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
+                <span className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-bold text-zinc-800 dark:text-[#E4E4E7] shadow-2xs">
                   {totalCount} partes totales
                 </span>
                 <span className="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
@@ -625,17 +625,17 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">
+                <span className="text-xs text-zinc-600 dark:text-[#A1A1AA] font-semibold">
                   Tipo de mensaje:
                 </span>
-                <div className="inline-flex p-0.5 bg-slate-200/80 dark:bg-slate-800 rounded-xl text-xs font-semibold">
+                <div className="inline-flex p-0.5 bg-zinc-200/80 dark:bg-[#18181F] rounded-xl text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => setIsReminderMode(false)}
                     className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                       !isReminderMode
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        ? 'bg-white dark:bg-[#121216] text-zinc-900 dark:text-white shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
                     }`}
                   >
                     Nueva Asignación
@@ -646,7 +646,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                     className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                       isReminderMode
                         ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
                     }`}
                   >
                     Recordatorio
@@ -656,13 +656,13 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             </div>
 
             {/* Filters row */}
-            <div className="px-5 py-2.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="px-5 py-2.5 border-b border-zinc-100 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
                 <select
                   value={meetingFilter}
                   onChange={(e) => setMeetingFilter(e.target.value as any)}
                   aria-label="Filtrar por tipo de reunión"
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-200 focus:outline-hidden"
+                  className="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-medium text-zinc-700 dark:text-[#E4E4E7] focus:outline-hidden"
                 >
                   <option value="todas">Todas las reuniones</option>
                   <option value="midweek">Entre semana (Vida y Min.)</option>
@@ -673,7 +673,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as any)}
                   aria-label="Filtrar por estado de confirmación"
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-200 focus:outline-hidden"
+                  className="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-medium text-zinc-700 dark:text-[#E4E4E7] focus:outline-hidden"
                 >
                   <option value="todos">Todos los estados</option>
                   <option value="pendientes">Pendientes ({pendingCount})</option>
@@ -684,7 +684,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             </div>
 
             {/* Assignments List */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5 bg-slate-50/50 dark:bg-slate-950/40">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5 bg-zinc-50/50 dark:bg-zinc-950/40">
               {filteredAssignments.length > 0 ? (
                 filteredAssignments.map((entry) => {
                   const isSent = sentItemIds.has(entry.id);
@@ -699,13 +699,13 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                           ? 'bg-emerald-50/50 border-emerald-200'
                           : entry.status === 'rechazada'
                           ? 'bg-rose-50/70 border-rose-200'
-                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs'
+                          : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] shadow-2xs'
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]">
                               {entry.section}
                             </span>
 
@@ -733,10 +733,10 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                           </div>
 
                           <div className="flex items-baseline gap-2">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                            <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate">
                               {entry.publisher.name}
                             </h4>
-                            <span className="text-xs text-slate-500 font-medium">
+                            <span className="text-xs text-zinc-500 font-medium">
                               {hasPhone ? entry.publisher.phone : '⚠️ Sin número de teléfono'}
                             </span>
                           </div>
@@ -748,7 +748,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                             {entry.lessonNumber && ` • Lección #${entry.lessonNumber}`}
                           </p>
 
-                          <p className="text-[11px] text-slate-500 mt-0.5">
+                          <p className="text-[11px] text-zinc-500 mt-0.5">
                             📅 {entry.meetingDate} •{' '}
                             {entry.meetingType === 'midweek' ? 'Entre semana' : 'Fin de semana'}
                             {entry.timeMinutes ? ` • ${entry.timeMinutes} minutos` : ''}
@@ -759,7 +759,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleCopySingle(entry)}
-                            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-700 dark:text-[#E4E4E7] text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                           >
                             {isCopied ? (
                               <Check className="w-4 h-4 text-emerald-600" />
@@ -788,11 +788,11 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                 })
               ) : (
                 <div className="text-center py-12 px-4">
-                  <MessageCircle className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  <MessageCircle className="w-12 h-12 text-zinc-300 mx-auto mb-2" />
+                  <h4 className="text-sm font-bold text-zinc-800 dark:text-[#E4E4E7]">
                     No hay asignaciones para los filtros seleccionados
                   </h4>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-zinc-500 mt-1">
                     Cambia el filtro de reunión o estado para ver a los hermanos participantes.
                   </p>
                 </div>
@@ -802,7 +802,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         )}
 
         {/* Footer info notice */}
-        <div className="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="px-5 py-3 bg-zinc-50 dark:bg-[#121216] border-t border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-500">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             <span>
@@ -812,7 +812,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold hover:bg-slate-800 transition-colors ml-auto cursor-pointer"
+            className="px-4 py-1.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold hover:bg-zinc-800 transition-colors ml-auto cursor-pointer"
           >
             Listo
           </button>

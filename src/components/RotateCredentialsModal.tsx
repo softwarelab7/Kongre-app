@@ -218,28 +218,28 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-xl bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Cabecera */}
-        <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
+        <div className="p-6 pb-4 border-b border-zinc-100 dark:border-[#27272A] flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <RefreshCw className={`w-6 h-6 ${isSubmitting ? 'animate-spin' : ''}`} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
                   Rotación Segura de Credenciales
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                   Cero Conocimiento
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                 {congregationName ? `${congregationName} · ` : ''}
                 ID: {congregationId || 'Congregación Activa'}
               </p>
@@ -249,7 +249,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer disabled:opacity-50"
             title="Cerrar"
           >
             <X className="w-5 h-5" />
@@ -265,10 +265,10 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                 <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                <h4 className="text-base font-bold text-zinc-900 dark:text-white">
                   ¡Rotación Aplicada Exitosamente!
                 </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+                <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] max-w-md mx-auto">
                   {successInfo.message}
                 </p>
               </div>
@@ -300,10 +300,10 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         )}
                       </button>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/60 font-mono text-base font-black text-center text-indigo-700 dark:text-indigo-300 tracking-wider">
+                    <div className="p-3 rounded-xl bg-white dark:bg-[#121216] border border-indigo-100 dark:border-indigo-900/60 font-mono text-base font-black text-center text-indigo-700 dark:text-indigo-300 tracking-wider">
                       {successInfo.congPin}
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                       Comparte este nuevo PIN con los publicadores para que puedan sincronizar la cartelera y programas en sus dispositivos.
                     </p>
                   </div>
@@ -334,7 +334,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         )}
                       </button>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/60 font-mono text-base font-black text-center text-amber-700 dark:text-amber-300 tracking-widest">
+                    <div className="p-3 rounded-xl bg-white dark:bg-[#121216] border border-amber-100 dark:border-amber-900/60 font-mono text-base font-black text-center text-amber-700 dark:text-amber-300 tracking-widest">
                       {successInfo.masterPin}
                     </div>
                     <p className="text-[11px] text-amber-800 dark:text-amber-300 font-semibold">
@@ -348,7 +348,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="w-full py-3 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   Entendido y Finalizar
                 </button>
@@ -369,13 +369,13 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
               </div>
 
               {/* Campo: PIN Maestro Actual */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-200 dark:border-[#27272A] space-y-2">
+                <label className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <KeyRound className="w-3.5 h-3.5 text-indigo-500" />
                     PIN Maestro Actual del Coordinador:
                   </span>
-                  <span className="text-[10px] text-slate-400 font-normal">Requerido para autorizar</span>
+                  <span className="text-[10px] text-zinc-400 font-normal">Requerido para autorizar</span>
                 </label>
                 <div className="relative">
                   <input
@@ -383,13 +383,13 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                     value={currentMasterPin}
                     onChange={(e) => setCurrentMasterPin(e.target.value)}
                     placeholder="Ingresa el PIN Maestro actual..."
-                    className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-mono tracking-wider"
+                    className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-white dark:bg-[#121216] border border-zinc-300 dark:border-[#27272A] text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-mono tracking-wider"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentMaster(!showCurrentMaster)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer"
                   >
                     {showCurrentMaster ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -409,7 +409,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                     value={currentCongPin}
                     onChange={(e) => setCurrentCongPin(e.target.value)}
                     placeholder="Ingresa el PIN de congregación vigente..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-mono tracking-wider"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#121216] border border-amber-300 dark:border-amber-700 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-mono tracking-wider"
                     required
                   />
                 </div>
@@ -417,7 +417,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
 
               {/* Selector de qué rotar */}
               <div className="space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                <p className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-[#71717A]">
                   Selecciona qué credencial deseas rotar:
                 </p>
 
@@ -426,7 +426,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                   className={`p-4 rounded-2xl border transition-all ${
                     rotateCongPin
                       ? 'bg-indigo-50/50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800'
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-80'
+                      : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] opacity-80'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -435,10 +435,10 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         <Users className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-xs font-bold text-zinc-900 dark:text-white">
                           Rotar PIN de la Congregación
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                           Acceso de publicadores, cartelera y programas
                         </p>
                       </div>
@@ -450,7 +450,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         onChange={(e) => setRotateCongPin(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-10 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
+                      <div className="w-10 h-5 bg-zinc-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
                     </label>
                   </div>
 
@@ -478,12 +478,12 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                           }
                           placeholder="Ej: 8X4W-9M2K"
                           maxLength={9}
-                          className="w-full px-3.5 py-2 pr-10 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-sm font-mono font-bold text-indigo-950 dark:text-indigo-200 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-3.5 py-2 pr-10 rounded-xl bg-white dark:bg-[#121216] border border-indigo-200 dark:border-indigo-800 text-sm font-mono font-bold text-indigo-950 dark:text-indigo-200 placeholder:text-zinc-400 focus:ring-2 focus:ring-indigo-500"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewCongPin(!showNewCongPin)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer"
                         >
                           {showNewCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -501,7 +501,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                           }
                           placeholder="Repite el nuevo PIN..."
                           maxLength={9}
-                          className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-sm font-mono font-bold text-indigo-950 dark:text-indigo-200 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#121216] border border-indigo-200 dark:border-indigo-800 text-sm font-mono font-bold text-indigo-950 dark:text-indigo-200 placeholder:text-zinc-400 focus:ring-2 focus:ring-indigo-500"
                         />
                       </div>
                     </div>
@@ -513,7 +513,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                   className={`p-4 rounded-2xl border transition-all ${
                     rotateMasterPin
                       ? 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-80'
+                      : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] opacity-80'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -522,10 +522,10 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         <Lock className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-xs font-bold text-zinc-900 dark:text-white">
                           Rotar PIN Maestro (Coordinador)
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                           Cifrado completo de datos de ancianos y administración
                         </p>
                       </div>
@@ -537,7 +537,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                         onChange={(e) => setRotateMasterPin(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-10 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600" />
+                      <div className="w-10 h-5 bg-zinc-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600" />
                     </label>
                   </div>
 
@@ -562,12 +562,12 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                           value={newMasterPin}
                           onChange={(e) => setNewMasterPin(e.target.value)}
                           placeholder="Nuevo PIN Maestro de 12 dígitos..."
-                          className="w-full px-3.5 py-2 pr-10 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 text-sm font-mono font-bold text-amber-950 dark:text-amber-200 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 tracking-wider"
+                          className="w-full px-3.5 py-2 pr-10 rounded-xl bg-white dark:bg-[#121216] border border-amber-200 dark:border-amber-800 text-sm font-mono font-bold text-amber-950 dark:text-amber-200 placeholder:text-zinc-400 focus:ring-2 focus:ring-amber-500 tracking-wider"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewMasterPin(!showNewMasterPin)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer"
                         >
                           {showNewMasterPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -582,7 +582,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                           value={confirmMasterPin}
                           onChange={(e) => setConfirmMasterPin(e.target.value)}
                           placeholder="Repite el nuevo PIN Maestro..."
-                          className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 text-sm font-mono font-bold text-amber-950 dark:text-amber-200 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 tracking-wider"
+                          className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#121216] border border-amber-200 dark:border-amber-800 text-sm font-mono font-bold text-amber-950 dark:text-amber-200 placeholder:text-zinc-400 focus:ring-2 focus:ring-amber-500 tracking-wider"
                         />
                       </div>
                     </div>
@@ -599,12 +599,12 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
               )}
 
               {/* Botones de acción */}
-              <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancelar
                 </button>

@@ -72,8 +72,8 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl text-center">
+        <div className="min-h-screen bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-zinc-800 border border-zinc-700 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl text-center">
             <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
               <ShieldAlert className="w-8 h-8" />
             </div>
@@ -82,20 +82,20 @@ export class ErrorBoundary extends Component<Props, State> {
               <h2 className="text-xl font-bold text-white tracking-tight">
                 Se ha detectado un problema al cargar Kongre
               </h2>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Ha ocurrido un error inesperado en la interfaz. Puedes reiniciar la aplicación o limpiar la memoria caché temporal para restablecer la vista.
               </p>
             </div>
 
             {this.state.error && (
               <div className="space-y-2">
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left overflow-x-auto text-[11px] font-mono text-rose-300">
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-left overflow-x-auto text-[11px] font-mono text-rose-300">
                   {this.state.error.toString()}
                 </div>
                 {this.state.errorInfo?.componentStack && (
-                  <details className="text-left text-[10px] text-slate-400 font-mono bg-slate-950/40 border border-slate-800/60 rounded-xl p-2.5 cursor-pointer">
-                    <summary className="hover:text-slate-300 select-none">Detalles técnicos del fallo</summary>
-                    <pre className="mt-2 whitespace-pre-wrap max-h-40 overflow-y-auto text-slate-400">
+                  <details className="text-left text-[10px] text-zinc-400 font-mono bg-zinc-950/40 border border-zinc-800/60 rounded-xl p-2.5 cursor-pointer">
+                    <summary className="hover:text-zinc-300 select-none">Detalles técnicos del fallo</summary>
+                    <pre className="mt-2 whitespace-pre-wrap max-h-40 overflow-y-auto text-zinc-400">
                       {this.state.errorInfo.componentStack}
                     </pre>
                   </details>
@@ -116,7 +116,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={this.handleResetCache}
-                className="py-2.5 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                className="py-2.5 px-4 rounded-xl bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 title="Limpia datos en caché corruptos"
               >
                 <Trash2 className="w-3.5 h-3.5" />

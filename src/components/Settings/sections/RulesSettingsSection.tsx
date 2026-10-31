@@ -41,17 +41,17 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
   isSaving,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
+      <div className="pb-3 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400 font-bold">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/50 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 font-bold">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Reglas de Detección de Cruces y Conflictos
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Define qué asignaciones simultáneas están prohibidas para que el sistema emita alertas en tiempo real
             </p>
           </div>
@@ -60,7 +60,7 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
 
       <div className="space-y-3 text-xs">
         {/* Rule 1: Part + Duty clash */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/40 transition-colors">
           <SplashCheckbox
             checked={allowPartAndDuty}
             onChange={(e) => setAllowPartAndDuty(e.target.checked)}
@@ -70,7 +70,7 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
         </div>
 
         {/* Rule 2: Audio + Mic clash */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/40 transition-colors">
           <SplashCheckbox
             checked={allowAudioAndMics}
             onChange={(e) => setAllowAudioAndMics(e.target.checked)}
@@ -80,7 +80,7 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
         </div>
 
         {/* Rule 3: President clash */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/40 transition-colors">
           <SplashCheckbox
             checked={allowPresAndPart}
             onChange={(e) => setAllowPresAndPart(e.target.checked)}
@@ -90,7 +90,7 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
         </div>
 
         {/* Rule 4: Sister demonstrations */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/40 transition-colors">
           <SplashCheckbox
             checked={enforceSisters}
             onChange={(e) => setEnforceSisters(e.target.checked)}
@@ -100,15 +100,15 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
         </div>
 
         {/* Consecutive weeks control */}
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+            <label className="block font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1">
               Límite de semanas seguidas con deberes:
             </label>
             <select
               value={maxConsecutiveDuty}
               onChange={(e) => setMaxConsecutiveDuty(Number(e.target.value))}
-              className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+              className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums cursor-pointer"
             >
               <option value={1}>1 semana (Rotación semanal estricta)</option>
               <option value={2}>2 semanas seguidas (Recomendado)</option>
@@ -118,13 +118,13 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
           </div>
 
           <div>
-            <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+            <label className="block font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1">
               Límite de semanas seguidas con partes:
             </label>
             <select
               value={maxConsecutivePart}
               onChange={(e) => setMaxConsecutivePart(Number(e.target.value))}
-              className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+              className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums cursor-pointer"
             >
               <option value={1}>1 semana</option>
               <option value={2}>2 semanas seguidas (Recomendado)</option>
@@ -133,13 +133,13 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+            <label className="block font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1">
               Alerta de repetición de Bosquejos Públicos:
             </label>
             <select
               value={warnOutlineMonths}
               onChange={(e) => setWarnOutlineMonths(Number(e.target.value))}
-              className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+              className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums cursor-pointer"
             >
               <option value={6}>No repetir el mismo bosquejo antes de 6 meses</option>
               <option value={9}>No repetir el mismo bosquejo antes de 9 meses</option>
@@ -150,7 +150,7 @@ export const RulesSettingsSection: React.FC<RulesSettingsSectionProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex justify-end pt-3 border-t border-zinc-100 dark:border-[#27272A]">
         <button
           type="button"
           onClick={() => onSave()}

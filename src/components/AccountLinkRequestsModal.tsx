@@ -105,16 +105,16 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
       aria-modal="true"
       aria-label="Vinculación de cuentas Google"
     >
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden">
+      <div className="w-full max-w-2xl bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[90vh] overflow-hidden">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/70">
+        <div className="px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/70 dark:bg-[#121216]/70">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 flex items-center justify-center border border-amber-300 dark:border-amber-700 shadow-2xs">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                   Vinculación de Cuentas Google
                 </h3>
                 {pendingRequests.length > 0 && (
@@ -123,7 +123,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Aprobación teocrática requerida para que los publicadores accedan con su correo.
               </p>
             </div>
@@ -132,22 +132,22 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
             type="button"
             onClick={onClose}
             aria-label="Cerrar solicitudes de vinculación de cuentas"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab switcher and search bar */}
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
+        <div className="p-4 border-b border-zinc-100 dark:border-[#27272A]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121216]">
+          <div className="flex items-center gap-1.5 p-1 bg-zinc-100 dark:bg-[#18181F] rounded-xl w-fit">
             <button
               type="button"
               onClick={() => setActiveTab('pending')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'pending'
-                  ? 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  ? 'bg-white dark:bg-[#121216] text-amber-700 dark:text-amber-400 shadow-xs'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
@@ -158,8 +158,8 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
               onClick={() => setActiveTab('history')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'history'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 shadow-xs'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -168,14 +168,14 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
           </div>
 
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por nombre o correo..."
               aria-label="Buscar solicitudes por nombre o correo"
-              className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20"
+              className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#E4E4E7] focus:outline-hidden focus:ring-2 focus:ring-amber-500/20"
             />
           </div>
         </div>
@@ -184,15 +184,15 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
           {filteredList.length === 0 ? (
             <div className="text-center py-12 px-4">
-              <div className="w-14 h-14 mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 mb-3">
+              <div className="w-14 h-14 mx-auto rounded-3xl bg-zinc-100 dark:bg-[#18181F]/80 flex items-center justify-center text-zinc-400 mb-3">
                 {activeTab === 'pending' ? <CheckCircle2 className="w-7 h-7 text-emerald-500" /> : <Clock className="w-7 h-7" />}
               </div>
-              <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              <h4 className="text-sm font-bold text-zinc-700 dark:text-[#D4D4D8]">
                 {activeTab === 'pending'
                   ? 'No hay solicitudes pendientes de aprobación'
                   : 'No hay solicitudes en el historial'}
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 max-w-sm mx-auto">
                 {activeTab === 'pending'
                   ? 'Cuando un publicador intente vincular un correo de Google usando su PIN personal, aparecerá aquí para que los ancianos lo aprueben.'
                   : 'Aquí aparecerán las vinculaciones que hayan sido aprobadas o rechazadas.'}
@@ -202,7 +202,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
             filteredList.map((req) => {
               const roleInfo = THEOCRATIC_ROLES[req.role as TheocraticRole] || {
                 name: req.role,
-                badgeColor: 'bg-slate-100 text-slate-700',
+                badgeColor: 'bg-zinc-100 text-zinc-700',
               };
 
               const formattedDate = new Date(req.requestedAt).toLocaleString([], {
@@ -220,19 +220,19 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                     req.status === 'pending'
                       ? 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/60'
                       : req.status === 'approved'
-                      ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
+                      ? 'bg-zinc-50 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A]'
                       : 'bg-red-50/40 dark:bg-red-950/20 border-red-200 dark:border-red-900/40'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     {/* Left: Info */}
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-700 dark:text-slate-200 shrink-0 shadow-2xs">
+                      <div className="w-10 h-10 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center font-bold text-zinc-700 dark:text-[#E4E4E7] shrink-0 shadow-2xs">
                         <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-bold text-slate-900 dark:text-white">
+                          <span className="text-sm font-bold text-zinc-900 dark:text-white">
                             {req.brotherName}
                           </span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${roleInfo.badgeColor}`}>
@@ -258,13 +258,13 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                           )}
                         </div>
 
-                        <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-600 dark:text-slate-400 flex-wrap">
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-600 dark:text-[#A1A1AA] flex-wrap">
                           <span className="flex items-center gap-1">
-                            <Mail className="w-3.5 h-3.5 text-slate-400" />
-                            <strong className="text-slate-800 dark:text-slate-200">{req.email}</strong>
+                            <Mail className="w-3.5 h-3.5 text-zinc-400" />
+                            <strong className="text-zinc-800 dark:text-[#E4E4E7]">{req.email}</strong>
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            <Clock className="w-3.5 h-3.5 text-zinc-400" />
                             <span>{formattedDate}</span>
                           </span>
                         </div>
@@ -275,7 +275,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                           </p>
                         )}
                         {req.status === 'approved' && req.reviewedBy && (
-                          <p className="mt-1 text-[11px] text-slate-400">
+                          <p className="mt-1 text-[11px] text-zinc-400">
                             Aprobado por: {req.reviewedBy} ({new Date(req.reviewedAt || '').toLocaleDateString()})
                           </p>
                         )}
@@ -298,7 +298,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                           type="button"
                           disabled={processingId === req.id}
                           onClick={() => setRejectingId(req.id)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 dark:bg-slate-800 dark:hover:bg-red-950/60 dark:text-slate-300 dark:hover:text-red-300 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-red-50 text-zinc-600 hover:text-red-600 dark:bg-[#18181F] dark:hover:bg-red-950/60 dark:text-[#D4D4D8] dark:hover:text-red-300 font-bold text-xs border border-zinc-200 dark:border-[#27272A] transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
                         >
                           <X className="w-3.5 h-3.5" />
                           <span>Rechazar</span>
@@ -313,7 +313,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between text-xs text-slate-500">
+        <div className="p-4 border-t border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216]/60 flex items-center justify-between text-xs text-zinc-500">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Los hermanos aprobados podrán ingresar directamente con su cuenta de Google.</span>
@@ -321,7 +321,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#E4E4E7] font-bold text-xs transition-colors cursor-pointer"
           >
             Cerrar
           </button>
@@ -331,11 +331,11 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
       {/* Submodal for Rejection Reason */}
       {rejectingId && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-2xl border border-slate-200 dark:border-slate-800">
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] rounded-2xl p-5 shadow-2xl border border-zinc-200 dark:border-[#27272A]">
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-white mb-2">
               Rechazar Solicitud de Vinculación
             </h4>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+            <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] mb-3">
               Indica el motivo por el cual no se aprueba la vinculación de este correo:
             </p>
             <textarea
@@ -343,7 +343,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Ej: El correo no corresponde al publicador / PIN incorrecto..."
               rows={3}
-              className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-red-500/20 mb-4"
+              className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-800 dark:text-[#E4E4E7] focus:ring-2 focus:ring-red-500/20 mb-4"
             />
             <div className="flex items-center justify-end gap-2">
               <button
@@ -352,7 +352,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
                   setRejectingId(null);
                   setRejectionReason('');
                 }}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#27272A]"
               >
                 Cancelar
               </button>

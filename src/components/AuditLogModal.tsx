@@ -114,7 +114,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
       case 'supabase':
         return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300';
       default:
-        return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
+        return 'bg-zinc-100 text-zinc-800 dark:bg-[#18181F] dark:text-[#D4D4D8]';
     }
   };
 
@@ -125,16 +125,16 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
       aria-modal="true"
       aria-label="Registro de auditoría teocrática"
     >
-      <div className="flex flex-col w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="flex flex-col w-full max-w-4xl max-h-[90vh] bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216]/50">
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
               <Shield className="w-6 h-6" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
                   Registro de Auditoría Teocrática
                 </h3>
                 <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full">
@@ -152,7 +152,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Historial encadenado criptográficamente de accesos, inicios de sesión y modificaciones
               </p>
             </div>
@@ -162,14 +162,14 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               onClick={fetchLogs}
               title="Refrescar"
               aria-label="Actualizar registro de auditoría"
-              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 text-zinc-500 hover:text-zinc-700 dark:text-[#A1A1AA] dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-[#27272A] transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
               aria-label="Cerrar registro de auditoría"
-              className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-[#27272A] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -177,16 +177,16 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
         </div>
 
         {/* Filter Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 border-b border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216]">
           <div className="flex items-center flex-1 min-w-[200px] space-x-2">
-            <Filter className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+            <Filter className="w-4 h-4 text-zinc-400 dark:text-[#D4D4D8]" />
             <input
               type="text"
               placeholder="Buscar por hermano, acción o detalle..."
               aria-label="Buscar en el registro de auditoría por hermano, acción o detalle"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white placeholder-slate-400"
+              className="w-full px-3 py-1.5 text-sm bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200 dark:border-[#27272A] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white placeholder-zinc-400"
             />
           </div>
 
@@ -195,7 +195,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               value={selectedModule}
               onChange={(e) => setSelectedModule(e.target.value)}
               aria-label="Filtrar eventos por módulo"
-              className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
+              className="px-3 py-1.5 text-sm bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200 dark:border-[#27272A] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white"
             >
               <option value="all">Todos los módulos</option>
               {modules.map((m) => (
@@ -215,7 +215,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
                 </button>
                 <button
                   onClick={() => setConfirmAction(null)}
-                  className="px-2 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  className="px-2 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-700 dark:text-[#A1A1AA]"
                 >
                   Cancelar
                 </button>
@@ -225,7 +225,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
                 onClick={() => setConfirmAction('prune')}
                 title="Purgar registros mayores a 30 días"
                 aria-label="Purgar registros de auditoría anteriores a 30 días"
-                className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center space-x-1"
+                className="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-[#D4D4D8] bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] rounded-lg transition-colors flex items-center space-x-1"
               >
                 <Clock className="w-3.5 h-3.5" />
                 <span>Purgar &gt; 30d</span>
@@ -242,7 +242,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
                 </button>
                 <button
                   onClick={() => setConfirmAction(null)}
-                  className="px-2 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  className="px-2 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-700 dark:text-[#A1A1AA]"
                 >
                   Cancelar
                 </button>
@@ -269,43 +269,43 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
         {/* List Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-2.5">
           {filteredLogs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center text-slate-400">
-              <AlertCircle className="w-12 h-12 mb-3 stroke-[1.5] text-slate-300 dark:text-slate-600" />
+            <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-400">
+              <AlertCircle className="w-12 h-12 mb-3 stroke-[1.5] text-zinc-300 dark:text-[#71717A]" />
               <p className="text-sm font-medium">No hay registros de auditoría que coincidan con la búsqueda.</p>
-              <p className="text-xs text-slate-500 mt-1">Los nuevos inicios de sesión y acciones quedarán registrados aquí automáticamente.</p>
+              <p className="text-xs text-zinc-500 mt-1">Los nuevos inicios de sesión y acciones quedarán registrados aquí automáticamente.</p>
             </div>
           ) : (
             filteredLogs.map((item) => (
               <div
                 key={item.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-slate-50/70 dark:bg-slate-800/40 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 rounded-xl border border-slate-100 dark:border-slate-800/80 transition-all gap-2"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50/70 dark:bg-[#18181F]/40 hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/70 rounded-xl border border-zinc-100 dark:border-[#27272A]/80 transition-all gap-2"
               >
                 <div className="flex items-start space-x-3 min-w-0">
-                  <div className="mt-0.5 p-1.5 rounded-lg bg-white dark:bg-slate-800 shadow-2xs border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300">
+                  <div className="mt-0.5 p-1.5 rounded-lg bg-white dark:bg-[#18181F] shadow-2xs border border-zinc-200/50 dark:border-[#27272A]/50 text-zinc-600 dark:text-[#D4D4D8]">
                     <UserCheck className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                      <span className="text-sm font-semibold text-zinc-900 dark:text-white">
                         {item.hermano_nombre || item.hermano_nid}
                       </span>
                       <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${getModuleBadgeColor(item.modulo)}`}>
                         {item.modulo}
                       </span>
-                      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-[#D4D4D8]">
                         • {item.accion}
                       </span>
                     </div>
                     {item.detalles && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 break-words">
                         {item.detalles}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center self-end sm:self-center text-xs text-slate-400 font-mono shrink-0">
-                  <Clock className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                <div className="flex items-center self-end sm:self-center text-xs text-zinc-400 font-mono shrink-0">
+                  <Clock className="w-3.5 h-3.5 mr-1 text-zinc-400" />
                   {item.fecha ? new Date(item.fecha).toLocaleString() : 'Reciente'}
                 </div>
               </div>
@@ -314,11 +314,11 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-xs text-slate-500">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216]/50 text-xs text-zinc-500">
           <span>Solo visible para ancianos y administradores de la congregación</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+            className="px-4 py-1.5 font-medium text-zinc-700 dark:text-[#E4E4E7] bg-white dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A] rounded-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors shadow-2xs"
           >
             Cerrar
           </button>

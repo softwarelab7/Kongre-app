@@ -805,13 +805,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      {/* =========================================================================
-          1. SLIM LEFT VERTICAL SIDEBAR (DESKTOP / TABLET - CATEGORIES JW LIBRARY)
-         ========================================================================= */}
+      {/* =================================================================          ========================================================================= */}
       {isSidebarVisible && (
         <aside
           aria-label="Barra lateral de navegación por departamentos"
-          className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible"
+          className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-[#09090B] border-r border-zinc-200 dark:border-[#27272A] py-3 select-none transition-all duration-200 overflow-visible"
         >
           {/* Top Brand Squircle Logo Button - Fixed, firmly anchored at top */}
           <button
@@ -850,8 +848,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     aria-current={isCatActive ? 'page' : undefined}
                     className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
                       isCatActive
-                        ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shadow-2xs font-bold'
-                        : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs font-bold'
+                        : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                     }`}
                     title={cat.title}
                   >
@@ -859,12 +857,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                     {/* Badge count indicator */}
                     {cat.badge && (
-                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#09090B] animate-pulse" />
                     )}
 
                     {/* Active Accent Indicator (JW Library Purple/Indigo vertical bar on left edge) */}
                     {isCatActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none" />
                     )}
                   </button>
                 </div>
@@ -873,7 +871,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Bottom Quick Settings, Profile & Sidebar Collapse Button */}
-          <div className="mt-auto pt-2 flex flex-col items-center gap-1.5 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
+          <div className="mt-auto pt-2 flex flex-col items-center gap-1.5 border-t border-zinc-200 dark:border-[#27272A] w-full shrink-0">
             <button
               type="button"
               onClick={() => handleSelectTab('perfil')}
@@ -881,8 +879,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               aria-current={activeTab === 'perfil' ? 'page' : undefined}
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 activeTab === 'perfil'
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
-                  : 'text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-[#18181F] dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs'
+                  : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
               }`}
               title="Mi Perfil y Contacto"
             >
@@ -896,8 +894,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-current={activeTab === 'ajustes' ? 'page' : undefined}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'ajustes'
-                    ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
-                    : 'text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    ? 'bg-indigo-50 text-indigo-600 dark:bg-[#18181F] dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs'
+                    : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                 }`}
                 title="Ajustes de la Congregación"
               >
@@ -911,7 +909,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 type="button"
                 onClick={onToggleSidebar}
                 aria-label="Ocultar barra lateral"
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-all cursor-pointer group"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group"
                 title="Ocultar barra lateral (Ctrl+B / ⌘B)"
               >
                 <PanelLeftClose className="w-4 h-4 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform" />
@@ -923,11 +921,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 type="button"
                 onClick={onOpenVersionModal}
                 aria-label={`Versión actual Kongre v${CURRENT_APP_VERSION} (Alfa), ver historial de versiones`}
-                className="flex items-center gap-1 px-1.5 py-0.5 mt-0.5 rounded text-[10px] font-mono font-bold text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors cursor-pointer select-none"
+                className="flex items-center gap-1.5 px-2 py-0.5 mt-0.5 rounded-md text-[10px] font-mono tabular-nums font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer select-none border border-transparent hover:border-zinc-200 dark:hover:border-[#27272A]"
                 title={`Kongre v${CURRENT_APP_VERSION} (Alfa) - Clic para ver historial de versiones y cambios`}
               >
                 <span>v{CURRENT_APP_VERSION}</span>
-                <span className="px-1 py-0.2 rounded text-[8px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[8px] font-sans font-medium uppercase bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                  <span className="w-1 h-1 rounded-full bg-amber-500 shrink-0" />
                   Alfa
                 </span>
               </button>
@@ -939,7 +938,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* =========================================================================
           2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
          ========================================================================= */}
-      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-all duration-200`}>
+      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-md border-b border-zinc-200 dark:border-[#27272A] transition-all duration-200`}>
         <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-3">
           {/* 1. LEFT: Sidebar Toggle & Structured Breadcrumb Context */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
@@ -960,7 +959,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-all cursor-pointer shrink-0 ${
                   activeTab === 'menu'
                     ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                 }`}
                 title={activeTab === 'menu' ? 'Volver a la vista anterior' : 'Catálogo general de módulos (JW Library)'}
               >
@@ -999,7 +998,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     type="button"
                     onClick={onToggleSidebar}
                     aria-label="Mostrar barra lateral"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/90 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 transition-all cursor-pointer shadow-2xs group"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-700 dark:text-[#F4F4F5] hover:text-indigo-600 dark:hover:text-indigo-400 bg-zinc-100 dark:bg-[#18181F] hover:bg-indigo-50 dark:hover:bg-[#121216] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs group"
                     title="Mostrar barra lateral (Ctrl+B / ⌘B)"
                   >
                     <PanelLeftOpen className="w-4 h-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
@@ -1023,14 +1022,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSelectTab('panorama_general')}
-                  className="inline-flex items-center gap-1.5 text-[10px] sm:text-sm font-medium sm:font-bold text-slate-500 sm:text-slate-800 dark:text-slate-400 sm:dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 leading-tight truncate transition-colors cursor-pointer text-left"
+                  className="inline-flex items-center gap-1.5 text-[10px] sm:text-sm font-medium sm:font-bold text-zinc-500 sm:text-zinc-800 dark:text-[#A1A1AA] sm:dark:text-[#F4F4F5] hover:text-indigo-600 dark:hover:text-indigo-400 leading-tight truncate transition-colors cursor-pointer text-left"
                   title="Ir a Mi Congregación"
                 >
-                  <Building2 className="hidden lg:inline-block w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                  <Building2 className="hidden lg:inline-block w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA] shrink-0" />
                   <span className="truncate">{displayCongregationName}</span>
                 </button>
 
-                <ChevronRight className="hidden sm:inline-block w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" />
+                <ChevronRight className="hidden sm:inline-block w-3.5 h-3.5 text-zinc-300 dark:text-zinc-600 shrink-0" />
 
                 <div className="inline-flex items-center gap-1.5 min-w-0">
                   {(() => {
@@ -1039,7 +1038,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : null;
                     const ActiveModIcon = selectedCatObj ? selectedCatObj.icon : (NAV_ICONS[activeTab] || Compass);
                     return (
-                      <span className="hidden md:inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shrink-0">
+                      <span className="hidden md:inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-[#27272A] shrink-0">
                         <ActiveModIcon className="w-3.5 h-3.5 stroke-[2]" />
                       </span>
                     );
@@ -1071,15 +1070,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onOpenSearchModal}
               aria-label="Buscar en la congregación (Ctrl+K)"
               title="Buscar publicador, semana o módulo (Ctrl+K / ⌘K)"
-              className="h-9 px-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/50 text-slate-500 dark:text-slate-400 flex items-center justify-between gap-3 w-48 lg:w-64 xl:w-72 transition-all cursor-pointer group shadow-2xs"
+              className="h-9 px-3 rounded-xl bg-zinc-100/80 dark:bg-[#121216] hover:bg-white dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/40 text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-between gap-3 w-48 lg:w-64 xl:w-72 transition-all cursor-pointer group shadow-2xs"
             >
               <span className="flex items-center gap-2 min-w-0">
-                <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-500 transition-colors shrink-0" />
-                <span className="text-xs font-medium truncate group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+                <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-indigo-500 transition-colors shrink-0" />
+                <span className="text-xs font-medium truncate group-hover:text-zinc-700 dark:group-hover:text-[#F4F4F5] transition-colors">
                   Buscar en congregación...
                 </span>
               </span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-md border border-slate-200/80 dark:border-slate-700 shrink-0">
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-400 dark:text-[#A1A1AA] bg-white dark:bg-[#18181F] rounded-md border border-zinc-200 dark:border-[#27272A] shrink-0">
                 Ctrl K
               </kbd>
             </button>
@@ -1092,7 +1091,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               onClick={onOpenSearchModal}
               aria-label="Buscar en la congregación"
-              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-200 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-zinc-500 dark:text-[#F4F4F5] hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-[#18181F] transition cursor-pointer"
               title="Buscar en la congregación"
             >
               <Search className="w-4 h-4" />
@@ -1110,7 +1109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Unified System Utility Dock (sm+): Todos solo icono (Calendario, Publicadores, QR, PINs, Alertas, Tema) */}
-            <div className="hidden sm:flex items-center gap-0.5 p-1 h-9 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 shadow-2xs">
+            <div className="hidden sm:flex items-center gap-0.5 p-1 h-9 rounded-xl bg-zinc-100/80 dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xs">
               {/* Calendario Quick Access (Solo icono) */}
               <button
                 type="button"
@@ -1119,8 +1118,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-current={activeTab === 'calendario' ? 'page' : undefined}
                 className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'calendario'
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
-                    : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                    : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F]'
                 }`}
                 title="Calendario de la Congregación"
               >
@@ -1136,8 +1135,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-current={activeTab === 'publicadores' ? 'page' : undefined}
                   className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                     activeTab === 'publicadores'
-                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
-                      : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                      : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F]'
                   }`}
                   title="Directorio de Publicadores"
                 >
@@ -1151,7 +1150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   type="button"
                   onClick={onOpenQrModal}
                   aria-label="App Móvil y Código QR"
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all cursor-pointer"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F] transition-all cursor-pointer"
                   title="App Móvil y Código QR"
                 >
                   <Smartphone className="w-3.5 h-3.5" />
@@ -1168,7 +1167,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   type="button"
                   onClick={onOpenPinsModal}
                   aria-label="Directorio de PINs de los Publicadores y la Congregación"
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all cursor-pointer"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-[#18181F] transition-all cursor-pointer"
                   title="Directorio de PINs y Accesos"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
@@ -1182,16 +1181,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-label={`Notificaciones y cruces de horario${conflicts.length > 0 ? ` (${conflicts.length} alertas)` : ''}`}
                 className={`relative w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'conflictos'
-                    ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-2xs'
+                    ? 'bg-white dark:bg-[#18181F] text-amber-600 dark:text-amber-400 shadow-2xs font-bold'
                     : conflicts.length > 0
-                    ? 'text-amber-600 dark:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
-                    : 'text-slate-500 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                    ? 'text-amber-600 dark:text-amber-400 hover:bg-white dark:hover:bg-[#18181F]'
+                    : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-[#18181F]'
                 }`}
                 title={conflicts.length > 0 ? `Notificaciones y Cruces (${conflicts.length} alertas)` : 'Notificaciones y Cruces'}
               >
                 <Bell className="w-3.5 h-3.5" />
                 {conflicts.length > 0 && (
-                  <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500 ring-1 ring-white dark:ring-slate-800 animate-pulse" />
+                  <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500 ring-1 ring-white dark:ring-[#121216] animate-pulse" />
                 )}
               </button>
 
@@ -1205,7 +1204,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                     isInspectorOpen
                       ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                      : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                      : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F]'
                   }`}
                   title="Panel de Estudio e Inspector (Referencias cruzadas y Notas)"
                 >
@@ -1214,7 +1213,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
 
               {/* Dark Mode Moon / Sun Toggle Integrated in Dock */}
-              <div className="flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all">
+              <div className="flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-[#18181F] transition-all">
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={26} />
               </div>
             </div>
@@ -1229,7 +1228,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                     isInspectorOpen
                       ? 'bg-indigo-600 text-white'
-                      : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-zinc-500 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
@@ -1247,10 +1246,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 aria-label="Menú de cuenta, perfil y cerrar sesión"
                 aria-expanded={openDropdown === 'user'}
-                className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-zinc-100/80 dark:bg-[#121216] hover:bg-white dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
                 title="Mi Perfil, Cuenta y Cerrar Sesión"
               >
-                <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-[11px] shadow-2xs overflow-hidden shrink-0">
+                <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-[11px] shadow-2xs overflow-hidden shrink-0">
                   {(() => {
                     const effectiveAvatar = isDemoMode
                       ? userProfile?.photoURL || null
@@ -1283,11 +1282,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     );
                   })()}
                 </div>
-                <span className="hidden md:inline-block max-w-[110px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
+                <span className="hidden md:inline-block max-w-[110px] truncate text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] text-left">
                   {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
                 </span>
                 <ChevronDown
-                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400 dark:text-slate-300 shrink-0 transition-transform duration-150 ${
+                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-400 dark:text-[#A1A1AA] shrink-0 transition-transform duration-150 ${
                     openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
                   }`}
                 />
@@ -1295,14 +1294,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Redesigned User Profile Panel Popover (Mobile & Desktop) */}
               {openDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-2.5 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-slate-200/80 dark:border-slate-800 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 top-full mt-2.5 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#121216] rounded-2xl shadow-xl border border-zinc-200 dark:border-[#27272A] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                   {/* Modern Identity Header Card */}
-                  <div className="relative overflow-hidden rounded-2xl p-3.5 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-slate-100/70 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-800/60 border border-indigo-100/80 dark:border-indigo-900/50 mb-2.5">
-                    {/* Decorative ambient blur */}
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/15 dark:bg-indigo-400/10 rounded-full blur-xl pointer-events-none" />
-
-                    <div className="relative flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center text-base shadow-md ring-2 ring-white dark:ring-slate-800 overflow-hidden shrink-0">
+                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mb-2.5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs shrink-0 overflow-hidden">
                         {(() => {
                           const effectiveAvatar = isDemoMode
                             ? userProfile?.photoURL || null
@@ -1334,14 +1330,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate tracking-tight">
+                        <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight">
                           {effectiveDisplayName || 'Usuario'}
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate flex items-center gap-1 mt-0.5">
-                          <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate flex items-center gap-1 mt-0.5">
+                          <Building2 className="w-3 h-3 text-zinc-400 shrink-0" />
                           <span className="truncate">{displayCongregationName}</span>
                         </p>
-                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-indigo-100/80 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
                           <ShieldCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
                           <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
                         </div>
@@ -1357,18 +1353,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setOpenDropdown(null);
                         handleSelectTab('perfil');
                       }}
-                      className={`group flex items-center gap-2.5 p-2.5 rounded-2xl border transition-all cursor-pointer text-left ${
+                      className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
                         activeTab === 'perfil'
-                          ? 'bg-indigo-50/90 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 shadow-2xs ring-2 ring-indigo-500/20'
-                          : 'bg-slate-50/80 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 border-slate-200/70 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:shadow-xs'
+                          ? 'bg-indigo-50/90 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 shadow-2xs'
+                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#18181F]/80 border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+                      <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold leading-tight truncate">Mi Perfil</span>
-                        <span className="block text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">Cuenta y avisos</span>
+                        <span className="block text-[10px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">Cuenta y avisos</span>
                       </div>
                     </button>
 
@@ -1378,31 +1374,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setOpenDropdown(null);
                         handleSelectTab('mi_vista');
                       }}
-                      className={`group flex items-center gap-2.5 p-2.5 rounded-2xl border transition-all cursor-pointer text-left ${
+                      className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
                         activeTab === 'mi_vista'
-                          ? 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 shadow-2xs ring-2 ring-emerald-500/20'
-                          : 'bg-slate-50/80 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 border-slate-200/70 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:shadow-xs'
+                          ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 shadow-2xs'
+                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#18181F]/80 border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                         <UserCheck className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold leading-tight truncate">Mi Portal</span>
-                        <span className="block text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">Partes e informe</span>
+                        <span className="block text-[10px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">Partes e informe</span>
                       </div>
                     </button>
                   </div>
 
                   {/* Management & Security List */}
-                  <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                  <div className="space-y-1 pt-1 border-t border-zinc-200 dark:border-[#27272A]">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenDropdown(null);
                         handleSelectTab('roles');
                       }}
-                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 rounded-xl transition cursor-pointer text-left group"
+                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                     >
                       <span className="flex items-center gap-2.5 min-w-0">
                         <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
@@ -1410,7 +1406,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </div>
                         <span className="truncate">{canManageRoles ? 'Roles y Permisos' : 'Cambiar Rol / PIN'}</span>
                       </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                     </button>
 
                     {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
@@ -1420,15 +1416,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           handleSelectTab('ajustes');
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] flex items-center justify-center shrink-0">
                             <Settings className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Ajustes de la Congregación</span>
                         </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                       </button>
                     )}
 
@@ -1439,15 +1435,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenAuditLog();
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] flex items-center justify-center shrink-0">
                             <ClipboardList className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Registro de Auditoría</span>
                         </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                       </button>
                     )}
 
@@ -1458,7 +1454,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           lockSession();
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
                           <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -1466,7 +1462,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           </div>
                           <span className="truncate">Bloquear Sesión con PIN</span>
                         </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                       </button>
                     )}
 
@@ -1488,8 +1484,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
 
                     {/* iOS-Style Theme Switcher Row (Claro / Sepia / AMOLED) */}
-                    <div className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 mt-1">
-                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <div className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mt-1">
+                      <span className="text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] flex items-center gap-2">
                         {themeMode === 'dark' ? (
                           <Moon className="w-4 h-4 text-indigo-400" />
                         ) : themeMode === 'sepia' ? (
@@ -1499,14 +1495,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                         )}
                         <span>Tema visual</span>
                       </span>
-                      <div className="inline-flex items-center p-0.5 rounded-lg bg-slate-200/70 dark:bg-slate-900 border border-slate-300/60 dark:border-slate-700/80 gap-0.5">
+                      <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-200/80 dark:bg-[#09090B] border border-zinc-300/60 dark:border-[#27272A] gap-0.5">
                         <button
                           type="button"
                           onClick={() => setThemeMode('light')}
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'light'
-                              ? 'bg-white text-slate-900 shadow-xs'
-                              : 'text-slate-400 hover:text-slate-800'
+                              ? 'bg-white text-zinc-900 shadow-xs'
+                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800'
                           }`}
                           title="Modo Claro"
                         >
@@ -1519,7 +1515,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'sepia'
                               ? 'bg-[#EAE0C8] text-[#2C221E] shadow-xs'
-                              : 'text-slate-400 hover:text-amber-800'
+                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-800'
                           }`}
                           title="Modo Sepia (Lectura Prolongada)"
                         >
@@ -1531,8 +1527,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                           onClick={() => setThemeMode('dark')}
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'dark'
-                              ? 'bg-slate-800 text-white shadow-xs'
-                              : 'text-slate-400 hover:text-slate-200'
+                              ? 'bg-[#18181F] text-white border border-[#27272A] shadow-xs'
+                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-white'
                           }`}
                           title="Modo AMOLED"
                         >
@@ -1544,7 +1540,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
 
                   {/* Clean Footer with Version & Sign Out */}
-                  <div className="border-t border-slate-100 dark:border-slate-800/80 mt-2.5 pt-2 flex items-center justify-between gap-2">
+                  <div className="border-t border-zinc-200 dark:border-[#27272A] mt-2.5 pt-2 flex items-center justify-between gap-2">
                     {onOpenVersionModal ? (
                       <button
                         type="button"
@@ -1552,7 +1548,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenVersionModal();
                         }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10.5px] font-mono font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10.5px] font-mono tabular-nums font-semibold text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition cursor-pointer"
                       >
                         <span>v{CURRENT_APP_VERSION}</span>
                         <span className="px-1.5 py-0.2 rounded-full text-[9px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
@@ -1560,7 +1556,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </span>
                       </button>
                     ) : (
-                      <span className="px-2 text-[10.5px] font-mono text-slate-400">
+                      <span className="px-2 text-[10.5px] font-mono tabular-nums text-zinc-400">
                         v{CURRENT_APP_VERSION} (Alfa)
                       </span>
                     )}
@@ -1589,7 +1585,7 @@ export const Navbar: React.FC<NavbarProps> = ({
          ========================================================================= */}
       <nav
         aria-label="Navegación Móvil Principal"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[calc(env(safe-area-inset-bottom,0px)+4px)] pt-1.5 px-2 select-none"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-xl border-t border-zinc-200 dark:border-[#27272A] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[calc(env(safe-area-inset-bottom,0px)+4px)] pt-1.5 px-2 select-none"
       >
         <div className="grid grid-cols-5 items-center justify-around max-w-md mx-auto gap-1">
           {/* 1. Ministerio (Menú Principal del Publicador) */}
@@ -1603,8 +1599,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               activeTab === 'cronometro_ministerio' ||
               activeTab === 'revisitas' ||
               activeTab === 'estudios_biblicos'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <Compass className="w-5 h-5 stroke-[2]" />
@@ -1619,14 +1615,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-current={activeTab === 'panorama_general' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'panorama_general'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <div className="relative">
               <LayoutDashboard className="w-5 h-5 stroke-[2]" />
               {conflicts.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#09090B] animate-pulse" />
               )}
             </div>
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Congregación</span>
@@ -1640,8 +1636,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-current={activeTab === 'programacion' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'hospitalidad'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <ClipboardList className="w-5 h-5 stroke-[2]" />
@@ -1656,8 +1652,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-current={activeTab === 'calendario' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'calendario'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <div className="relative">
@@ -1677,14 +1673,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-current={activeTab === 'menu' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'menu'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <div className="relative">
               <Menu className="w-5 h-5 stroke-[2]" />
               {activeTab !== 'menu' && (pendingRequestsCount > 0 || pinnedNoticesCount > 0 || overdueTerritoriesCount > 0) && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white dark:ring-slate-900" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white dark:ring-[#09090B]" />
               )}
             </div>
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">

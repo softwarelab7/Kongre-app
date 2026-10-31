@@ -840,7 +840,7 @@ export const PersonalViewTab: React.FC = () => {
   if (!isAuthenticatedPublisher) {
     return (
       <div className="w-full max-w-lg mx-auto py-8 sm:py-14 px-4 animate-in fade-in zoom-in-95 duration-300">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center">
           {/* Logo / Badge */}
           <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
             <KeyRound size={32} />
@@ -850,10 +850,10 @@ export const PersonalViewTab: React.FC = () => {
             <span className="text-[10px] uppercase font-bold tracking-widest text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
               PORTAL DEL PUBLICADOR • KONGRE
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white pt-1">
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white pt-1">
               Bienvenido a tu Portal Teocrático
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto leading-relaxed">
               Introduce tu PIN Personal único de 4 dígitos para consultar tus partes, enviar tu informe de servicio y reportar ausencias.
             </p>
           </div>
@@ -869,7 +869,7 @@ export const PersonalViewTab: React.FC = () => {
             )}
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                 PIN Personal del Publicador
               </label>
               <div className={`relative max-w-xs mx-auto ${isShaking ? 'animate-shake' : ''}`}>
@@ -892,10 +892,10 @@ export const PersonalViewTab: React.FC = () => {
                     setEnteredPin(clean);
                     setPinError(null);
                   }}
-                  className={`w-full text-center text-3xl font-mono tracking-widest py-3 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 ${
-                    isShaking ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-200 dark:border-slate-700 focus:border-purple-600 dark:focus:border-purple-500'
-                  } focus:outline-hidden text-slate-900 dark:text-white transition-all shadow-inner ${
-                    lockoutSeconds > 0 ? 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800' : ''
+                  className={`w-full text-center text-3xl font-mono tracking-widest py-3 px-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border-2 ${
+                    isShaking ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-zinc-200 dark:border-[#27272A] focus:border-purple-600 dark:focus:border-purple-500'
+                  } focus:outline-hidden text-zinc-900 dark:text-white transition-all shadow-inner ${
+                    lockoutSeconds > 0 ? 'opacity-50 cursor-not-allowed bg-zinc-100 dark:bg-[#18181F]' : ''
                   }`}
                   autoFocus
                 />
@@ -936,8 +936,8 @@ export const PersonalViewTab: React.FC = () => {
                     k === '✓'
                       ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-xs'
                       : k === 'C'
-                      ? 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
-                      : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-white border border-slate-200/60 dark:border-slate-700/60'
+                      ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#D4D4D8]'
+                      : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-white border border-zinc-200/60 dark:border-[#27272A]'
                   }`}
                 >
                   {k}
@@ -964,7 +964,7 @@ export const PersonalViewTab: React.FC = () => {
           </form>
 
           {/* Ayuda */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 space-y-2 text-center">
+          <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] text-xs text-zinc-500 space-y-2 text-center">
             <p className="italic">
               ¿No tienes tu PIN o lo extraviaste? Solicita a los ancianos tu <strong>papeleta de credenciales</strong> o nuevo enlace de acceso.
             </p>
@@ -978,21 +978,21 @@ export const PersonalViewTab: React.FC = () => {
   return (
     <div className="w-full space-y-5 animate-in fade-in duration-300">
       {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (COMPACTA) */}
-      <div className="bg-white dark:bg-slate-900 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+      <div className="bg-white dark:bg-[#121216] px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
             {selectedPublisher?.name ? selectedPublisher.name[0].toUpperCase() : 'P'}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
+              <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white leading-tight truncate">
                 {selectedPublisher?.name || 'Publicador'}
               </h2>
               <span className="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.2 rounded-full border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
                 <CheckCircle2 size={9} /> PIN Verificado
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 leading-tight">
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5 leading-tight">
               {settings.congregationName || 'Central'}{myPreachingGroup ? ` • Grupo ${myPreachingGroup.number}` : ''}
             </p>
           </div>
@@ -1004,7 +1004,7 @@ export const PersonalViewTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowSupervisorSelect(!showSupervisorSelect)}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Users size={14} className="text-indigo-600 dark:text-indigo-400" />
               <span>{showSupervisorSelect ? 'Ocultar Selector' : 'Consultar otro hermano'}</span>
@@ -1081,16 +1081,16 @@ export const PersonalViewTab: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
                     Suscripción Push en Segundo Plano
                   </span>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
                     {notifPermission === 'denied'
                       ? 'Permiso bloqueado en navegador'
                       : 'Funciona incluso con la app cerrada'}
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white mt-0.5">
                   Recibe recordatorios automáticos de tus asignaciones sin abrir la app
                 </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] max-w-xl">
                   Suscríbete a las notificaciones push del navegador para que tu dispositivo te avise automáticamente antes de tus partes estudiantiles, discursos, turnos de audio/micrófonos, aseo o carritos aunque tengas Kongre cerrado.
                 </p>
               </div>
@@ -1109,14 +1109,14 @@ export const PersonalViewTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsPushModalOpen(true)}
-                className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer"
+                className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all cursor-pointer"
               >
                 Configurar
               </button>
               <button
                 type="button"
                 onClick={handleDismissBanner}
-                className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 transition-all cursor-pointer"
+                className="p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-500 hover:text-zinc-700 dark:text-[#A1A1AA] transition-all cursor-pointer"
                 title="Cerrar por ahora"
               >
                 <X size={16} />
@@ -1138,7 +1138,7 @@ export const PersonalViewTab: React.FC = () => {
               setSelectedPublisherId(e.target.value);
               setIdentifiedPublisher(e.target.value);
             }}
-            className="w-full text-xs font-semibold p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-indigo-200 dark:border-indigo-800 focus:outline-hidden"
+            className="w-full text-xs font-semibold p-2.5 rounded-xl bg-white dark:bg-[#121216] text-zinc-900 dark:text-white border border-indigo-200 dark:border-indigo-800 focus:outline-hidden"
           >
             {publishers.map((p) => (
               <option key={p.id} value={p.id}>
@@ -1150,14 +1150,14 @@ export const PersonalViewTab: React.FC = () => {
       )}
 
       {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
         <button
           type="button"
           onClick={() => setActiveModule('asignaciones')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'asignaciones'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <Calendar size={14} className="shrink-0" />
@@ -1174,8 +1174,8 @@ export const PersonalViewTab: React.FC = () => {
           onClick={() => setActiveModule('informe')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'informe'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <CalendarDays size={14} className="shrink-0" />
@@ -1190,8 +1190,8 @@ export const PersonalViewTab: React.FC = () => {
           onClick={() => setActiveModule('ausencias')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'ausencias'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <Plane size={14} className="shrink-0" />
@@ -1208,8 +1208,8 @@ export const PersonalViewTab: React.FC = () => {
           onClick={() => setActiveModule('grupo')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'grupo'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <Users size={14} className="shrink-0" />
@@ -1221,8 +1221,8 @@ export const PersonalViewTab: React.FC = () => {
           onClick={() => setActiveModule('avisos')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'avisos'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <Bell size={14} className="shrink-0" />
@@ -1239,8 +1239,8 @@ export const PersonalViewTab: React.FC = () => {
           onClick={() => setActiveModule('seguridad_2fa')}
           className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'seguridad_2fa'
-              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           <ShieldCheck size={14} className="shrink-0" />
@@ -1248,7 +1248,7 @@ export const PersonalViewTab: React.FC = () => {
           {isCurrentPublisher2FAEnabled ? (
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="2FA Activado" />
           ) : (
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold shrink-0">
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-[#D4D4D8] font-semibold shrink-0">
               Opcional
             </span>
           )}
@@ -1261,18 +1261,18 @@ export const PersonalViewTab: React.FC = () => {
       {activeModule === 'asignaciones' && (
         <div className="space-y-4">
           {/* BARRA MAESTRA: HOJA UNIFICADA DE MIS ASIGNACIONES DEL MES */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5">
+          <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3.5">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
                     <Layers size={11} /> Hoja Personal Unificada
                   </span>
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">
                     VMC • Fin de Semana • Audio/Acomodadores • Limpieza • Carritos
                   </span>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
                   Mis Asignaciones del Mes ({myUnifiedAssignmentsAll.length})
                 </h3>
               </div>
@@ -1305,7 +1305,7 @@ export const PersonalViewTab: React.FC = () => {
                   type="button"
                   onClick={handleCopyUnifiedMonthlySummary}
                   disabled={myUnifiedAssignmentsAll.length === 0}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-40 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] disabled:opacity-40 text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all cursor-pointer"
                   title="Copiar resumen mensual al portapapeles"
                 >
                   {copiedSummaryToast ? (
@@ -1320,7 +1320,7 @@ export const PersonalViewTab: React.FC = () => {
                   type="button"
                   onClick={handlePrintUnifiedMonthlySheet}
                   disabled={myUnifiedAssignmentsAll.length === 0}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-40 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] disabled:opacity-40 text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all cursor-pointer"
                   title="Imprimir o guardar en PDF tu Hoja Personal de Asignaciones del Mes"
                 >
                   <Printer size={14} />
@@ -1330,7 +1330,7 @@ export const PersonalViewTab: React.FC = () => {
             </div>
 
             {/* Filtros por Mes y por Área Teocrática */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
                 {(
                   [
@@ -1350,7 +1350,7 @@ export const PersonalViewTab: React.FC = () => {
                     className={`px-2.5 py-1 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
                       unifiedCategoryFilter === cat.id
                         ? 'bg-purple-600 text-white shadow-2xs'
-                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                        : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8]'
                     }`}
                   >
                     {cat.label}
@@ -1359,11 +1359,11 @@ export const PersonalViewTab: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
-                <label className="text-[11px] font-bold text-slate-500">Periodo:</label>
+                <label className="text-[11px] font-bold text-zinc-500">Periodo:</label>
                 <select
                   value={unifiedMonthFilter}
                   onChange={(e) => setUnifiedMonthFilter(e.target.value)}
-                  className="px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-slate-800 dark:text-white focus:outline-hidden"
+                  className="px-2.5 py-1 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] font-bold text-zinc-800 dark:text-white focus:outline-hidden"
                 >
                   <option value="all_upcoming">Todas las semanas cargadas</option>
                   {availableAssignmentMonths.map((mKey) => (
@@ -1377,25 +1377,25 @@ export const PersonalViewTab: React.FC = () => {
           </div>
 
           {myAssignments.length === 0 ? (
-            <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+            <div className="p-8 sm:p-12 text-center bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
               <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white">
                 No tienes asignaciones en el filtro seleccionado
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto">
                 Prueba seleccionando «Todas las áreas» o «Todas las semanas cargadas» para ver el programa completo.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-between px-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                   Mostrando {myAssignments.length}{' '}
                   {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
                 </p>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-zinc-400">
                   Sincroniza con tu calendario o confirma asistencia en 1 clic
                 </span>
               </div>
@@ -1408,7 +1408,7 @@ export const PersonalViewTab: React.FC = () => {
                   return (
                     <div
                       key={item.id}
-                      className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
+                      className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
                     >
                       <div className="space-y-2">
                         {/* Cabecera de la tarjeta */}
@@ -1417,7 +1417,7 @@ export const PersonalViewTab: React.FC = () => {
                             <Calendar className="w-3.5 h-3.5" />
                             {item.date} {item.time ? `• ${item.time}` : ''}
                           </span>
-                          <span className="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                          <span className="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]">
                             {item.categoryLabel || item.meetingName}
                           </span>
                           {item.room && (
@@ -1429,14 +1429,14 @@ export const PersonalViewTab: React.FC = () => {
 
                         {/* Título de la parte */}
                         <div>
-                          <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
+                          <h4 className="text-base font-bold text-zinc-900 dark:text-white leading-snug">
                             {item.assignmentTitle}
                           </h4>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                          <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium mt-0.5">
                             {item.meetingName}
                           </p>
                           {item.subtitle && (
-                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                            <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] mt-1">
                               {item.subtitle}
                             </p>
                           )}
@@ -1455,7 +1455,7 @@ export const PersonalViewTab: React.FC = () => {
                             </p>
                           )}
                           {item.timeMinutes && (
-                            <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                            <p className="text-[11px] text-zinc-400 mt-1 flex items-center gap-1">
                               <Clock size={12} />
                               <span>Duración estimada: {item.timeMinutes} minutos</span>
                             </p>
@@ -1491,7 +1491,7 @@ export const PersonalViewTab: React.FC = () => {
                       </div>
 
                       {/* Botones de acción rápida */}
-                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
+                      <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2 flex-wrap">
                         {/* Confirmar / Rechazar */}
                         {item.canConfirmInPortal ? (
                           <div className="flex items-center gap-1.5">
@@ -1508,7 +1508,7 @@ export const PersonalViewTab: React.FC = () => {
                               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
                                 isConfirmed
                                   ? 'bg-emerald-600 text-white shadow-xs'
-                                  : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                  : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]'
                               }`}
                             >
                               <Check size={12} />
@@ -1527,7 +1527,7 @@ export const PersonalViewTab: React.FC = () => {
                               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
                                 isRejected
                                   ? 'bg-rose-600 text-white shadow-xs'
-                                  : 'bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400'
+                                  : 'bg-zinc-100 hover:bg-rose-50 dark:bg-[#18181F] dark:hover:bg-rose-950/40 text-zinc-600 hover:text-rose-600 dark:text-[#A1A1AA]'
                               }`}
                             >
                               <XCircle size={12} />
@@ -1535,7 +1535,7 @@ export const PersonalViewTab: React.FC = () => {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 font-medium">
+                          <span className="text-[11px] text-zinc-400 font-medium">
                             Programación general
                           </span>
                         )}
@@ -1546,7 +1546,7 @@ export const PersonalViewTab: React.FC = () => {
                             href={getGoogleCalLink(item)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all"
+                            className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] transition-all"
                             title="Añadir a Google Calendar"
                           >
                             <Calendar size={14} />
@@ -1555,7 +1555,7 @@ export const PersonalViewTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDownloadIcs(item)}
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] transition-all cursor-pointer"
                             title="Descargar archivo .ics para iCal/Outlook"
                           >
                             <ExternalLink size={14} />
@@ -1573,7 +1573,7 @@ export const PersonalViewTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => copyAssignmentDetails(item)}
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] transition-all cursor-pointer"
                             title="Copiar detalles"
                           >
                             {copiedId === item.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
@@ -1594,14 +1594,14 @@ export const PersonalViewTab: React.FC = () => {
         <div className="w-full space-y-4 sm:space-y-5">
           {/* 1. CABECERA Y META ANUAL DEL AÑO DE SERVICIO (SEPTIEMBRE - AGOSTO) */}
           {personalS21Summary && (
-            <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+            <div className="bg-white dark:bg-[#121216] p-4 sm:p-6 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-zinc-100 dark:border-[#27272A]">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
                       <Calendar size={11} /> Año de Servicio (Septiembre – Agosto)
                     </span>
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
                       {personalS21Summary.isRegularPioneer
                         ? 'Precursor Regular (Meta oficial: 600 h/año)'
                         : personalS21Summary.isSpecialPioneer
@@ -1609,18 +1609,18 @@ export const PersonalViewTab: React.FC = () => {
                         : `Meta anual de horas: ${personalS21Summary.annualGoalHours} h/año`}
                     </span>
                   </div>
-                  <h3 className="text-base sm:text-xl font-black text-slate-900 dark:text-white mt-1">
+                  <h3 className="text-base sm:text-xl font-black text-zinc-900 dark:text-white mt-1">
                     Mi Historial Mensual y Meta Anual de Horas
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Revisa tu progreso mes a mes y toca cualquier mes de la lista para completar o actualizar tu actividad.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 self-start lg:self-auto">
-                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
                     <Calendar size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Periodo:</span>
+                    <span className="text-xs font-bold text-zinc-600 dark:text-[#D4D4D8]">Periodo:</span>
                     <select
                       value={selectedServiceYear}
                       onChange={(e) => setSelectedServiceYear(e.target.value)}
@@ -1643,10 +1643,10 @@ export const PersonalViewTab: React.FC = () => {
                     Horas en el Año
                   </span>
                   <div className="flex items-baseline gap-1.5 mt-1 tabular-nums">
-                    <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white">
                       {personalS21Summary.card.totalHours} h
                     </span>
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <span className="text-xs font-bold text-zinc-500 dark:text-[#A1A1AA]">
                       / {personalS21Summary.annualGoalHours} h
                     </span>
                   </div>
@@ -1655,41 +1655,41 @@ export const PersonalViewTab: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                     Promedio por Mes
                   </span>
-                  <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                  <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-1 tabular-nums">
                     {personalS21Summary.card.avgHoursPerMonth} h
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block">
                     Promedio en meses activos
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                     Meses Informados
                   </span>
                   <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
                     {personalS21Summary.card.totalMonthsActive}{' '}
-                    <span className="text-xs font-bold text-slate-400">de 12</span>
+                    <span className="text-xs font-bold text-zinc-400">de 12</span>
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block">
                     Septiembre a Agosto
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                     Faltan para la Meta
                   </span>
-                  <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                  <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-1 tabular-nums">
                     {personalS21Summary.remainingAnnualHours === 0
                       ? '¡Lograda! 🎉'
                       : `${personalS21Summary.remainingAnnualHours} h`}
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block">
                     {personalS21Summary.card.totalBibleStudies} estudios acumulados
                   </span>
                 </div>
@@ -1698,14 +1698,14 @@ export const PersonalViewTab: React.FC = () => {
               {/* Barra de Progreso Anual */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] font-bold">
-                  <span className="text-slate-600 dark:text-slate-300">
+                  <span className="text-zinc-600 dark:text-[#D4D4D8]">
                     Avance acumulado del año de servicio {selectedServiceYear}
                   </span>
                   <span className="text-indigo-600 dark:text-indigo-400 tabular-nums">
                     {personalS21Summary.card.totalHours} h completadas ({personalS21Summary.progressPct}%)
                   </span>
                 </div>
-                <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700/60">
+                <div className="w-full h-3 rounded-full bg-zinc-100 dark:bg-[#18181F] overflow-hidden p-0.5 border border-zinc-200/60 dark:border-[#27272A]">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 transition-all duration-500"
                     style={{ width: `${personalS21Summary.progressPct}%` }}
@@ -1719,13 +1719,13 @@ export const PersonalViewTab: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
             {/* IZQUIERDA (7 cols): LISTA INTERACTIVA DE LOS 12 MESES */}
             {personalS21Summary && (
-              <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5">
-                <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+              <div className="lg:col-span-7 bg-white dark:bg-[#121216] rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3.5">
+                <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-[#27272A]">
                   <div>
-                    <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                    <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
                       Mis 12 Meses ({selectedServiceYear})
                     </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                       Toca cualquier mes para ver o editar tus horas, cursos bíblicos y notas.
                     </p>
                   </div>
@@ -1746,16 +1746,16 @@ export const PersonalViewTab: React.FC = () => {
                         className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                           isSelected
                             ? 'bg-purple-50/80 dark:bg-purple-950/40 border-purple-500 dark:border-purple-500 ring-2 ring-purple-500/20 shadow-xs'
-                            : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                            : 'bg-white dark:bg-[#121216] border-zinc-200/80 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]/50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2 w-full">
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                              <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white">
                                 {m.monthName}
                               </span>
-                              <span className="text-[11px] font-semibold text-slate-400">
+                              <span className="text-[11px] font-semibold text-zinc-400">
                                 {m.monthKey.slice(0, 4)}
                               </span>
                               {isSelected && (
@@ -1775,7 +1775,7 @@ export const PersonalViewTab: React.FC = () => {
                                   Sin actividad
                                 </span>
                               ) : (
-                                <span className="text-[10px] font-medium text-slate-400">
+                                <span className="text-[10px] font-medium text-zinc-400">
                                   Pendiente
                                 </span>
                               )}
@@ -1791,27 +1791,27 @@ export const PersonalViewTab: React.FC = () => {
                             <div className="text-sm sm:text-base font-black text-indigo-600 dark:text-indigo-400">
                               {m.hours !== undefined ? `${m.hours} h` : '0 h'}
                             </div>
-                            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block">
+                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-[#A1A1AA] block">
                               {m.bibleStudies ? `${m.bibleStudies} est.` : '0 est.'}
                             </span>
                           </div>
                         </div>
 
                         <div className="w-full space-y-1">
-                          <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-[#18181F] overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all ${
                                 monthPct >= 100
                                   ? 'bg-emerald-500'
                                   : m.participated
                                   ? 'bg-indigo-500'
-                                  : 'bg-slate-300 dark:bg-slate-700'
+                                  : 'bg-zinc-300 dark:bg-zinc-700'
                               }`}
                               style={{ width: `${m.participated ? Math.max(6, monthPct) : 0}%` }}
                             />
                           </div>
                           {m.notes && (
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate">
                               {m.notes}
                             </p>
                           )}
@@ -1824,13 +1824,13 @@ export const PersonalViewTab: React.FC = () => {
             )}
 
             {/* DERECHA (5 cols): REGISTRO Y ENVÍO DEL MES SELECCIONADO */}
-            <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 lg:sticky lg:top-20">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="lg:col-span-5 bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 lg:sticky lg:top-20">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                 <div>
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400">
                     Detalle y Cierre del Mes
                   </span>
-                  <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5 capitalize">
+                  <h4 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5 capitalize">
                     {formatSpanishMonthLabel(selectedReportMonth)}
                   </h4>
                 </div>
@@ -1840,7 +1840,7 @@ export const PersonalViewTab: React.FC = () => {
                     type="month"
                     value={selectedReportMonth}
                     onChange={(e) => setSelectedReportMonth(e.target.value)}
-                    className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white cursor-pointer"
                   />
                 </div>
               </div>
@@ -1859,10 +1859,10 @@ export const PersonalViewTab: React.FC = () => {
                     <Clock size={14} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                       Cronómetro de Ministerio
                     </p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate">
                       Registra tus salidas en vivo
                     </p>
                   </div>
@@ -1882,7 +1882,7 @@ export const PersonalViewTab: React.FC = () => {
               </div>
 
               {/* 1. Participación */}
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200 dark:border-[#27272A]">
                 <SplashCheckbox
                   checked={reportForm.participated}
                   onChange={(e) =>
@@ -1895,8 +1895,8 @@ export const PersonalViewTab: React.FC = () => {
 
               {/* 2. Horas y Cursos Bíblicos en cuadrícula de 2 columnas */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200 dark:border-[#27272A] space-y-2">
+                  <span className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] block">
                     Horas del Mes
                   </span>
                   <div className="flex items-center justify-between gap-1.5">
@@ -1908,7 +1908,7 @@ export const PersonalViewTab: React.FC = () => {
                           hours: Math.max(0, reportForm.hours - 1),
                         })
                       }
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-black hover:bg-zinc-100 cursor-pointer"
                     >
                       -
                     </button>
@@ -1923,7 +1923,7 @@ export const PersonalViewTab: React.FC = () => {
                           hours: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white tabular-nums"
+                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white tabular-nums"
                     />
                     <button
                       type="button"
@@ -1933,15 +1933,15 @@ export const PersonalViewTab: React.FC = () => {
                           hours: reportForm.hours + 1,
                         })
                       }
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-black hover:bg-zinc-100 cursor-pointer"
                     >
                       +
                     </button>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200 dark:border-[#27272A] space-y-2">
+                  <span className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] block">
                     Cursos Bíblicos
                   </span>
                   <div className="flex items-center justify-between gap-1.5">
@@ -1953,7 +1953,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: Math.max(0, reportForm.bibleStudies - 1),
                         })
                       }
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-black hover:bg-zinc-100 cursor-pointer"
                     >
                       -
                     </button>
@@ -1968,7 +1968,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white tabular-nums"
+                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white tabular-nums"
                     />
                     <button
                       type="button"
@@ -1978,7 +1978,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: reportForm.bibleStudies + 1,
                         })
                       }
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-black hover:bg-zinc-100 cursor-pointer"
                     >
                       +
                     </button>
@@ -1988,7 +1988,7 @@ export const PersonalViewTab: React.FC = () => {
 
               {/* 3. Notas */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                <label className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] block">
                   Notas o comentarios del mes (opcional)
                 </label>
                 <textarea
@@ -1996,7 +1996,7 @@ export const PersonalViewTab: React.FC = () => {
                   value={reportForm.notes}
                   onChange={(e) => setReportForm({ ...reportForm, notes: e.target.value })}
                   placeholder="Ej. Precursor auxiliar este mes (15h o 30h)..."
-                  className="w-full text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
+                  className="w-full text-xs p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] focus:outline-hidden text-zinc-900 dark:text-white placeholder:text-zinc-400"
                 />
               </div>
 
@@ -2028,16 +2028,16 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 3: MIS AUSENCIAS PLANIFICADAS */}
       {activeModule === 'ausencias' && (
         <div className="w-full space-y-4">
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-white dark:bg-[#121216] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full">
                   DISPONIBILIDAD TEOCRÁTICA
                 </span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white mt-1">
                   Mis Ausencias Planificadas
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500">
                   Notifica con antelación viajes, vacaciones o convalecencias para no ser asignado en reuniones.
                 </p>
               </div>
@@ -2054,12 +2054,12 @@ export const PersonalViewTab: React.FC = () => {
 
             {/* Listado de ausencias */}
             {(!selectedPublisher?.ausencias || selectedPublisher.ausencias.length === 0) ? (
-              <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
-                <Plane className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="p-8 text-center rounded-2xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-200/80 dark:border-[#27272A] space-y-2">
+                <Plane className="w-8 h-8 text-zinc-300 dark:text-zinc-600 mx-auto" />
+                <p className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   No tienes ausencias registradas actualmente
                 </p>
-                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                <p className="text-[11px] text-zinc-500 max-w-xs mx-auto">
                   Estás marcado como disponible para asignaciones de entre semana y fin de semana.
                 </p>
               </div>
@@ -2068,24 +2068,24 @@ export const PersonalViewTab: React.FC = () => {
                 {selectedPublisher.ausencias.map((abs) => (
                   <div
                     key={abs.id}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3"
+                    className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3"
                   >
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        <span className="text-xs font-bold text-zinc-900 dark:text-white">
                           📅 {abs.start_date} al {abs.end_date}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-semibold">
                           Ausente
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500">{abs.reason || 'Sin motivo especificado'}</p>
+                      <p className="text-xs text-zinc-500">{abs.reason || 'Sin motivo especificado'}</p>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => handleDeleteAbsence(abs.id)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                       title="Eliminar ausencia"
                     >
                       <Trash2 size={16} />
@@ -2101,15 +2101,15 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 4: MI GRUPO DE SERVICIO */}
       {activeModule === 'grupo' && (
         <div className="w-full space-y-4">
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+          <div className="bg-white dark:bg-[#121216] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full">
                 MINISTERIO DEL CAMPO
               </span>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mt-1">
                 {myPreachingGroup ? `Grupo de Servicio #${myPreachingGroup.number}: ${myPreachingGroup.name}` : 'Mi Grupo de Predicación'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-zinc-500">
                 Información de contacto de los encargados de tu grupo y compañeros de servicio.
               </p>
             </div>
@@ -2123,11 +2123,11 @@ export const PersonalViewTab: React.FC = () => {
                     <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                       Superintendente de Grupo
                     </span>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                    <p className="text-sm font-bold text-zinc-900 dark:text-white">
                       {groupOverseer?.name || 'No asignado'}
                     </p>
                     {groupOverseer?.phone && (
-                      <p className="text-xs text-slate-600 dark:text-slate-300">
+                      <p className="text-xs text-zinc-600 dark:text-[#D4D4D8]">
                         📞 {groupOverseer.phone}
                       </p>
                     )}
@@ -2145,15 +2145,15 @@ export const PersonalViewTab: React.FC = () => {
                   </div>
 
                   {/* Auxiliar */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">
+                  <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-200 dark:border-[#27272A] space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA]">
                       Auxiliar de Grupo
                     </span>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                    <p className="text-sm font-bold text-zinc-900 dark:text-white">
                       {groupAssistant?.name || 'No asignado'}
                     </p>
                     {groupAssistant?.phone && (
-                      <p className="text-xs text-slate-600 dark:text-slate-300">
+                      <p className="text-xs text-zinc-600 dark:text-[#D4D4D8]">
                         📞 {groupAssistant.phone}
                       </p>
                     )}
@@ -2162,7 +2162,7 @@ export const PersonalViewTab: React.FC = () => {
 
                 {/* Integrantes del grupo */}
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                     Integrantes del Grupo ({myPreachingGroup.memberIds.length})
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2177,7 +2177,7 @@ export const PersonalViewTab: React.FC = () => {
                           className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
                             isMe
                               ? 'bg-purple-50 dark:bg-purple-950/40 border-purple-200 dark:border-purple-800 font-bold text-purple-900 dark:text-purple-200'
-                              : 'bg-white dark:bg-slate-800/60 border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                              : 'bg-white dark:bg-[#18181F] border-zinc-100 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8]'
                           }`}
                         >
                           <span className="truncate">{pub.name}</span>
@@ -2193,12 +2193,12 @@ export const PersonalViewTab: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 space-y-2">
-                <Users className="w-8 h-8 text-slate-300 mx-auto" />
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="p-8 text-center rounded-2xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-200 space-y-2">
+                <Users className="w-8 h-8 text-zinc-300 mx-auto" />
+                <p className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Aún no estás asignado a un grupo de servicio
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-zinc-500">
                   Consulta al superintendente de servicio para tu asignación de grupo.
                 </p>
               </div>
@@ -2206,12 +2206,12 @@ export const PersonalViewTab: React.FC = () => {
 
             {/* Salidas de Predicación del Grupo y Congregación */}
             {fieldServiceMeetings.length > 0 && (
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     🧭 Programa de Salidas al Servicio del Campo
                   </h4>
-                  <span className="text-[10px] font-semibold text-slate-400">
+                  <span className="text-[10px] font-semibold text-zinc-400">
                     Tu grupo y salidas generales
                   </span>
                 </div>
@@ -2230,7 +2230,7 @@ export const PersonalViewTab: React.FC = () => {
                       return (
                         <div
                           key={fsm.id}
-                          className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 text-xs space-y-1"
+                          className="p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-xs space-y-1"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-extrabold text-indigo-700 dark:text-indigo-300">
@@ -2240,10 +2240,10 @@ export const PersonalViewTab: React.FC = () => {
                               {fsm.groupNumber ? `Grupo ${fsm.groupNumber}` : 'General'}
                             </span>
                           </div>
-                          <p className="text-slate-700 dark:text-slate-200 font-semibold">
+                          <p className="text-zinc-700 dark:text-[#E4E4E7] font-semibold">
                             📍 {fsm.location}
                           </p>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="text-[11px] text-zinc-500">
                             👤 Conductor: <strong>{cond?.name || 'Por asignar'}</strong>
                             {fsm.territoryNumber ? ` • 🗺 #${fsm.territoryNumber}` : ''}
                           </p>
@@ -2262,8 +2262,8 @@ export const PersonalViewTab: React.FC = () => {
         <div className="space-y-4">
           {/* Tablero de anuncios */}
           {notices.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 sm:p-6 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-purple-600" />
                 <span>Tablero Oficial de Anuncios</span>
               </h3>
@@ -2271,13 +2271,13 @@ export const PersonalViewTab: React.FC = () => {
                 {notices.map((n) => (
                   <div
                     key={n.id}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5"
+                    className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-100 dark:border-[#27272A] space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-slate-900 dark:text-white text-xs">{n.title}</h4>
-                      <span className="text-[10px] text-slate-400">{n.date}</span>
+                      <h4 className="font-bold text-zinc-900 dark:text-white text-xs">{n.title}</h4>
+                      <span className="text-[10px] text-zinc-400">{n.date}</span>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                       {n.content}
                     </p>
                   </div>
@@ -2288,8 +2288,8 @@ export const PersonalViewTab: React.FC = () => {
 
           {/* Pedidos especiales de literatura */}
           {specialOrders.filter((o) => o.publisherId === selectedPublisherId).length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 sm:p-6 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                 <Package className="w-5 h-5 text-blue-600" />
                 <span>Mis Pedidos Especiales de Literatura</span>
               </h3>
@@ -2299,17 +2299,17 @@ export const PersonalViewTab: React.FC = () => {
                   .map((order) => (
                     <div
                       key={order.id}
-                      className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5"
+                      className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-1.5"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-900 dark:text-white text-xs">
+                        <span className="font-bold text-zinc-900 dark:text-white text-xs">
                           {order.itemTitle}
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300">
                           {order.status}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-zinc-500">
                         Cantidad: {order.quantity} • Solicitado: {order.requestDate}
                       </p>
                     </div>
@@ -2323,8 +2323,8 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 6: SEGURIDAD Y VERIFICACIÓN EN DOS PASOS (2FA) */}
       {activeModule === 'seguridad_2fa' && (
         <div className="space-y-5">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-6 sm:p-7 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-[#27272A]">
               <div className="flex items-start sm:items-center gap-3.5">
                 <div
                   className={`p-3 rounded-2xl ${
@@ -2337,20 +2337,20 @@ export const PersonalViewTab: React.FC = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
                       Verificación en Dos Pasos (2FA)
                     </h3>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                         isCurrentPublisher2FAEnabled
                           ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                          : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA]'
                       }`}
                     >
                       {isCurrentPublisher2FAEnabled ? '✓ Activada' : 'Desactivada'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                     Compatible con <strong>Microsoft Authenticator</strong>, Google Authenticator y apps estándar (RFC 6238).
                   </p>
                 </div>
@@ -2370,7 +2370,7 @@ export const PersonalViewTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShow2FASetupModal(true)}
-                    className="py-2 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="py-2 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#E4E4E7] text-xs font-semibold hover:bg-zinc-50 transition-colors cursor-pointer"
                   >
                     Reconfigurar
                   </button>
@@ -2388,32 +2388,32 @@ export const PersonalViewTab: React.FC = () => {
 
             {/* Tarjetas de características y funcionamiento */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-100 dark:border-[#27272A] space-y-1.5">
+                <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
                   <Smartphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Sin conexión requerida</span>
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] leading-relaxed">
                   Los códigos temporales de 6 dígitos se calculan con el reloj de tu teléfono. Funcionan incluso dentro del Salón del Reino sin señal móvil o en modo avión.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-100 dark:border-[#27272A] space-y-1.5">
+                <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Solo en nuevos dispositivos</span>
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] leading-relaxed">
                   Puedes marcar «Recordar este dispositivo por 30 días» en tu teléfono habitual para no tener que escribir el código en cada reunión.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-100 dark:border-[#27272A] space-y-1.5">
+                <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
                   <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   <span>Códigos de respaldo</span>
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] leading-relaxed">
                   Al configurar 2FA recibes 8 códigos de respaldo de emergencia. Si alguna vez pierdes o cambias de teléfono, puedes utilizarlos para acceder sin quedarte fuera.
                 </p>
               </div>
@@ -2430,17 +2430,17 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MODAL: NOTIFICAR AUSENCIA */}
       {showAddAbsenceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400">
                 <Plane size={20} />
               </div>
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                <h4 className="text-base font-bold text-zinc-900 dark:text-white">
                   Notificar Próxima Ausencia
                 </h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500">
                   Informa las fechas en las que no estarás disponible.
                 </p>
               </div>
@@ -2448,37 +2448,37 @@ export const PersonalViewTab: React.FC = () => {
 
             <div className="space-y-3 pt-2">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                   Fecha de Inicio:
                 </label>
                 <input
                   type="date"
                   value={absenceStartDate}
                   onChange={(e) => setAbsenceStartDate(e.target.value)}
-                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                   Fecha de Término:
                 </label>
                 <input
                   type="date"
                   value={absenceEndDate}
                   onChange={(e) => setAbsenceEndDate(e.target.value)}
-                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                   Motivo:
                 </label>
                 <select
                   value={absenceReason}
                   onChange={(e) => setAbsenceReason(e.target.value)}
-                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-white focus:outline-hidden"
                 >
                   <option value="Vacaciones familiares">Vacaciones familiares</option>
                   <option value="Viaje de trabajo">Viaje de trabajo</option>
@@ -2490,11 +2490,11 @@ export const PersonalViewTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowAddAbsenceModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
               >
                 Cancelar
               </button>
@@ -2513,28 +2513,28 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MODAL: NO PODRÉ ASISTIR / SOLICITAR SUSTITUTO */}
       {declineModalState.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950 flex items-center justify-center text-rose-600 dark:text-rose-400">
                 <AlertCircle size={20} />
               </div>
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                <h4 className="text-base font-bold text-zinc-900 dark:text-white">
                   Solicitud de Sustituto
                 </h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500">
                   {declineModalState.assignment?.assignmentTitle}
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
               ¿Confirmas que no podrás atender esta parte el <strong>{declineModalState.assignment?.date}</strong>? Se notificará al coordinador y hermanos encargados del programa para coordinar un reemplazo.
             </p>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                 Motivo para los hermanos encargados (Opcional):
               </label>
               <textarea
@@ -2547,17 +2547,17 @@ export const PersonalViewTab: React.FC = () => {
                   })
                 }
                 placeholder="Ej. Fiebre, turno imprevisto de trabajo..."
-                className="w-full text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
+                className="w-full text-xs p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] focus:outline-hidden text-zinc-900 dark:text-white placeholder:text-zinc-400"
               />
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() =>
                   setDeclineModalState({ isOpen: false, assignment: null, reason: '' })
                 }
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
               >
                 Volver
               </button>

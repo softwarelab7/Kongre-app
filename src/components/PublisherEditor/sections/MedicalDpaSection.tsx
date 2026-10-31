@@ -77,7 +77,7 @@ export const MedicalDpaSection: React.FC<MedicalDpaSectionProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-6">
       {/* BLOQUE 1: ESTADO DE LA DIRECTRIZ DPA Y CINTA DE VIGENCIA */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl overflow-hidden shadow-xs">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs">
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="w-11 h-11 bg-rose-50 dark:bg-rose-500/10 rounded-2xl text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200/50 dark:border-rose-500/20">
@@ -233,7 +233,7 @@ export const MedicalDpaSection: React.FC<MedicalDpaSectionProps> = ({
       </section>
 
       {/* BLOQUE 2: REPRESENTANTES DE ATENCIÓN MÉDICA DESIGNADOS */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
             2. Representantes de Atención Médica Designados en el DPA
@@ -432,7 +432,7 @@ export const MedicalDpaSection: React.FC<MedicalDpaSectionProps> = ({
       </section>
 
       {/* BLOQUE 3: ALERGIAS Y CONSIDERACIONES MÉDICAS */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-4">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-4">
         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">
           3. Alergias y Condiciones Crónicas (Apoyo de Emergencia y CLH)
         </span>

@@ -512,7 +512,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         {/* Pestañas de categorías con diseño Pill Container */}
         <div
           ref={tabsRef}
-          className="p-1.5 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] backdrop-blur-md flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs flex-1 min-w-0"
+          className="p-1.5 bg-zinc-100 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0"
         >
           {tabKeys.map((tabKey) => {
             const config = SETTINGS_TABS_CONFIG[tabKey];
@@ -527,21 +527,21 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                 onClick={() => setActiveTab(tabKey)}
                 className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold border border-slate-200/60 dark:border-transparent'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.04]'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A]'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/50 dark:hover:bg-[#18181F]'
                 }`}
               >
                 <Icon
                   size={14}
-                  className={isActive ? 'text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}
+                  className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-[#71717A]'}
                 />
                 <span>{config.label}</span>
                 {tabKey === 'all' && (
                   <span
                     className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
                       isActive
-                        ? 'bg-indigo-50 text-indigo-600 dark:bg-white/20 dark:text-white'
-                        : 'bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-300'
+                        ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300'
+                        : 'bg-zinc-200 text-zinc-600 dark:bg-[#27272A] dark:text-[#A1A1AA]'
                     }`}
                   >
                     HUB
@@ -559,7 +559,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border ${
               isFormDirty
                 ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                : 'bg-slate-100/90 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 border-zinc-200/80 dark:border-white/[0.08]'
+                : 'bg-zinc-100 dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
             }`}
             title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
           >
@@ -577,10 +577,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             <button
               type="button"
               onClick={onNavigateToProfile}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-900/60 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/[0.08] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-zinc-50 dark:bg-[#121216] dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
               title="Configurar foto, teléfono y contacto personal"
             >
-              <User size={14} className="text-slate-500 dark:text-slate-400" />
+              <User size={14} className="text-zinc-500 dark:text-[#A1A1AA]" />
               <span className="hidden sm:inline">Mi Perfil</span>
             </button>
           )}
@@ -662,13 +662,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
-                className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 shrink-0"
+                className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer active:scale-95 shrink-0"
                 title="Volver al Panel de Tarjetas"
                 aria-label="Volver al Panel de Tarjetas"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-semibold">
                 Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
               </span>
             </div>

@@ -357,20 +357,20 @@ export const LiteraturaTab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Barra Unificada de Sub-pestañas y Acciones de Literatura */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
         {/* Sub-tab Navigation - 2-column grid on mobile so nothing clips */}
-        <div className="grid grid-cols-2 sm:flex rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-slate-100 dark:bg-slate-800/90 p-1.5 gap-1">
+        <div className="grid grid-cols-2 sm:flex rounded-xl border border-zinc-200/70 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1.5 gap-1">
           <button
             onClick={() => setActiveSubTab('inventario')}
             className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'inventario'
                 ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Catálogo S-14</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold tabular-nums shrink-0 ${
               activeSubTab === 'inventario'
                 ? 'bg-white/20 text-white'
                 : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200'
@@ -384,13 +384,13 @@ export const LiteraturaTab: React.FC = () => {
             className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'pedidos'
                 ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <Truck className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Pedidos</span>
             {stats.pendingOrdersCount > 0 && (
-              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold tabular-nums shrink-0 ${
                 activeSubTab === 'pedidos'
                   ? 'bg-white text-indigo-700'
                   : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200'
@@ -405,7 +405,7 @@ export const LiteraturaTab: React.FC = () => {
             className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'grupos'
                 ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <Users className="w-3.5 h-3.5 shrink-0" />
@@ -417,7 +417,7 @@ export const LiteraturaTab: React.FC = () => {
             className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'recuento_s14'
                 ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
@@ -432,7 +432,7 @@ export const LiteraturaTab: React.FC = () => {
               const msg = buildLowStockReportWhatsApp(literatureItems);
               handleOpenWhatsApp(msg);
             }}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-200/80 dark:border-slate-700 transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs rounded-xl border border-zinc-200/80 dark:border-[#27272A] transition-all active:scale-95 cursor-pointer"
             title="Enviar solicitud sugerida de stock bajo por WhatsApp"
           >
             <Share2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -461,46 +461,46 @@ export const LiteraturaTab: React.FC = () => {
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
             Títulos en Catálogo
           </span>
-          <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.totalItems}</div>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">Biblias, libros y revistas</span>
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1">{stats.totalItems}</div>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">Biblias, libros y revistas</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
             Unidades en Existencia
           </span>
-          <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalUnits}</div>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">En mostrador y almacén</span>
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalUnits}</div>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">En mostrador y almacén</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
             Stock Bajo / Agotado
           </span>
           <div
-            className={`text-xl sm:text-2xl font-black mt-1 ${
+            className={`text-xl sm:text-2xl font-black font-mono tabular-nums mt-1 ${
               stats.lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
             }`}
           >
             {stats.lowStockCount}
           </div>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">
             {stats.lowStockCount > 0 ? 'Requiere pedido a Betel' : 'Existencias saludables'}
           </span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
             Pedidos Pendientes
           </span>
-          <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1">
             {stats.pendingOrdersCount}
           </div>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">Solicitudes de publicadores</span>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">Solicitudes de publicadores</span>
         </div>
       </div>
 
@@ -510,17 +510,17 @@ export const LiteraturaTab: React.FC = () => {
       {activeSubTab === 'inventario' && (
         <div className="space-y-4">
           {/* Controls Bar: Search, Category Filter, and Add Button */}
-          <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 flex-1">
               {/* Search input */}
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Buscar por código, título o estante..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -529,7 +529,7 @@ export const LiteraturaTab: React.FC = () => {
                 <select
                   value={categoryFilter}
                   onChange={e => setCategoryFilter(e.target.value)}
-                  className="text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500"
+                  className="text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 >
                   <option value="todos">Todas las Categorías</option>
                   <option value="biblia">Biblias</option>
@@ -547,7 +547,7 @@ export const LiteraturaTab: React.FC = () => {
                   checked={onlyLowStock}
                   onChange={e => setOnlyLowStock(e.target.checked)}
                   label={
-                    <span className={onlyLowStock ? 'text-amber-800 dark:text-amber-400 font-bold text-xs' : 'text-xs'}>
+                    <span className={onlyLowStock ? 'text-amber-800 dark:text-amber-400 font-bold text-xs' : 'text-xs text-zinc-700 dark:text-[#A1A1AA]'}>
                       Stock Bajo
                     </span>
                   }
@@ -565,15 +565,15 @@ export const LiteraturaTab: React.FC = () => {
           </div>
 
           {/* Literature Inventory: Mobile Card List + Desktop Table */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs overflow-hidden">
             {/* Mobile Card List (No horizontal clipping on phones) */}
-            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="md:hidden divide-y divide-zinc-100 dark:divide-[#27272A]">
               {filteredItems.map(item => {
                 const isOut = item.currentStock === 0;
                 const isLow = item.currentStock <= item.minimumStock && !isOut;
                 const catInfo = LITERATURE_CATEGORY_LABELS[item.category] || {
                   label: item.category,
-                  color: 'bg-slate-100 text-slate-700',
+                  color: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-[#27272A]',
                 };
 
                 return (
@@ -581,45 +581,45 @@ export const LiteraturaTab: React.FC = () => {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                          <span className="px-2 py-0.5 rounded-md font-mono font-bold text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700">
+                          <span className="px-2 py-0.5 rounded-md font-mono font-bold text-[11px] bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200/70 dark:border-[#27272A]">
                             {item.code}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${catInfo.color}`}>
                             {catInfo.label}
                           </span>
                           {isOut ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60">
                               Agotado
                             </span>
                           ) : isLow ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60">
                               Stock Bajo
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/60">
                               Óptimo
                             </span>
                           )}
                         </div>
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                        <p className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
                           {item.title}
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                          Ubicación: <strong className="text-slate-700 dark:text-slate-300">{item.locationBox || 'Mostrador'}</strong> • Mínimo: {item.minimumStock}
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                          Ubicación: <strong className="text-zinc-700 dark:text-zinc-300">{item.locationBox || 'Mostrador'}</strong> • Mínimo: <span className="font-mono tabular-nums">{item.minimumStock}</span>
                         </p>
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => setEditingItem(item)}
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                          className="p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                           title="Editar publicación"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => deleteLiteratureItem(item.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
+                          className="p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                           title="Eliminar del catálogo"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -627,24 +627,24 @@ export const LiteraturaTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-[#27272A]">
+                      <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
                         Existencias en stock:
                       </span>
-                      <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
+                      <div className="inline-flex items-center gap-2 bg-zinc-100 dark:bg-[#18181F] px-2.5 py-1 rounded-xl border border-zinc-200/80 dark:border-[#27272A]">
                         <button
                           onClick={() => handleAdjustStock(item, -1)}
-                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#323238] font-bold flex items-center justify-center shadow-2xs cursor-pointer"
                           title="Restar 1"
                         >
                           -
                         </button>
-                        <span className="w-8 font-black text-slate-900 dark:text-white text-sm text-center">
+                        <span className="w-8 font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] text-sm text-center">
                           {item.currentStock}
                         </span>
                         <button
                           onClick={() => handleAdjustStock(item, 1)}
-                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#323238] font-bold flex items-center justify-center shadow-2xs cursor-pointer"
                           title="Sumar 1"
                         >
                           +
@@ -659,7 +659,7 @@ export const LiteraturaTab: React.FC = () => {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider">
+                <thead className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] font-bold uppercase tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Código</th>
                     <th className="py-3 px-4">Título de la Publicación</th>
@@ -671,23 +671,23 @@ export const LiteraturaTab: React.FC = () => {
                     <th className="py-3 px-4 text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                   {filteredItems.map(item => {
                     const isOut = item.currentStock === 0;
                     const isLow = item.currentStock <= item.minimumStock && !isOut;
                     const catInfo = LITERATURE_CATEGORY_LABELS[item.category] || {
                       label: item.category,
-                      color: 'bg-slate-100 text-slate-700',
+                      color: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-[#27272A]',
                     };
 
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">
+                      <tr key={item.id} className="hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/60 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold tabular-nums text-zinc-800 dark:text-[#F4F4F5]">
                           {item.code}
                         </td>
                         <td className="py-3 px-4">
-                          <span className="font-bold text-slate-900 dark:text-white block">{item.title}</span>
-                          <span className="text-[11px] text-slate-400">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{item.title}</span>
+                          <span className="text-[11px] text-zinc-400 dark:text-[#71717A]">
                             Idioma: {item.language} {item.notes && `• ${item.notes}`}
                           </span>
                         </td>
@@ -698,44 +698,44 @@ export const LiteraturaTab: React.FC = () => {
                             {catInfo.label}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
+                        <td className="py-3 px-4 text-zinc-600 dark:text-[#A1A1AA] font-medium">
                           {item.locationBox || 'Mostrador'}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                          <div className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] px-2 py-1 rounded-lg border border-zinc-200/80 dark:border-[#27272A]">
                             <button
                               onClick={() => handleAdjustStock(item, -1)}
-                              className="w-5 h-5 rounded bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                              className="w-5 h-5 rounded bg-white dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#323238] font-bold flex items-center justify-center shadow-2xs cursor-pointer"
                               title="Restar 1"
                             >
                               -
                             </button>
-                            <span className="w-8 font-black text-slate-900 dark:text-white text-sm text-center">
+                            <span className="w-8 font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] text-sm text-center">
                               {item.currentStock}
                             </span>
                             <button
                               onClick={() => handleAdjustStock(item, 1)}
-                              className="w-5 h-5 rounded bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                              className="w-5 h-5 rounded bg-white dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#323238] font-bold flex items-center justify-center shadow-2xs cursor-pointer"
                               title="Sumar 1"
                             >
                               +
                             </button>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-center text-slate-500 dark:text-slate-400 font-semibold">
+                        <td className="py-3 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums font-semibold">
                           {item.minimumStock}
                         </td>
                         <td className="py-3 px-4 text-center">
                           {isOut ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60">
                               Agotado
                             </span>
                           ) : isLow ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60">
                               Stock Bajo
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/60">
                               Óptimo
                             </span>
                           )}
@@ -744,14 +744,14 @@ export const LiteraturaTab: React.FC = () => {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => setEditingItem(item)}
-                              className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                              className="p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                               title="Editar publicación"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => deleteLiteratureItem(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
+                              className="p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                               title="Eliminar del catálogo"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -766,7 +766,7 @@ export const LiteraturaTab: React.FC = () => {
             </div>
 
             {filteredItems.length === 0 && (
-              <div className="p-8 text-center text-slate-400 text-xs">
+              <div className="p-8 text-center text-zinc-400 dark:text-zinc-500 text-xs">
                 No se encontraron publicaciones con los filtros aplicados.
               </div>
             )}
@@ -774,17 +774,17 @@ export const LiteraturaTab: React.FC = () => {
 
           {/* Asistente de Reposición S-14 / S-28 para Artículos con Stock Bajo */}
           {inventoryAnalysis.suggestedReorderList.length > 0 && (
-            <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-3">
+            <div className="bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-xs font-extrabold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                  <h3 className="text-xs font-extrabold text-amber-950 dark:text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span>
                       Asistente de Reposición a la Sucursal (S-14) •{' '}
-                      {inventoryAnalysis.suggestedReorderList.length} Publicaciones por Debajo del Mínimo
+                      <span className="font-mono tabular-nums">{inventoryAnalysis.suggestedReorderList.length}</span> Publicaciones por Debajo del Mínimo
                     </span>
                   </h3>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
+                  <p className="text-[11px] text-amber-800 dark:text-amber-300/80 mt-0.5">
                     Cantidades sugeridas para restablecer el inventario mensual (S-28) al doble del stock mínimo de seguridad.
                   </p>
                 </div>
@@ -804,25 +804,25 @@ export const LiteraturaTab: React.FC = () => {
                 {inventoryAnalysis.suggestedReorderList.map(({ item, suggestedOrderQty }) => (
                   <div
                     key={item.id}
-                    className="bg-white p-3 rounded-xl border border-amber-200/80 flex items-center justify-between gap-2 shadow-2xs"
+                    className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-amber-200/80 dark:border-amber-900/40 flex items-center justify-between gap-2 shadow-2xs"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-[11px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">
+                        <span className="font-mono font-bold text-[11px] text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 px-1.5 py-0.5 rounded">
                           {item.code}
                         </span>
-                        <span className="text-xs font-bold text-slate-900 truncate">
+                        <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate">
                           {item.title}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        Actual: <strong className="text-rose-600">{item.currentStock}</strong> / Mín:{' '}
-                        {item.minimumStock} • Sugerido: <strong>+{suggestedOrderQty}</strong>
+                      <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                        Actual: <strong className="text-rose-600 dark:text-rose-400 font-mono tabular-nums">{item.currentStock}</strong> / Mín:{' '}
+                        <span className="font-mono tabular-nums">{item.minimumStock}</span> • Sugerido: <strong className="font-mono tabular-nums">+{suggestedOrderQty}</strong>
                       </div>
                     </div>
                     <button
                       onClick={() => handleReceiveSuggestedShipment(item, suggestedOrderQty)}
-                      className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold whitespace-nowrap cursor-pointer"
+                      className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-bold font-mono tabular-nums whitespace-nowrap cursor-pointer transition-colors"
                       title="Registrar recepción de este envío en el inventario S-28"
                     >
                       +{suggestedOrderQty} Recibir
@@ -840,13 +840,13 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'pedidos' && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Truck className="w-5 h-5 text-indigo-600" />
+              <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Truck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Solicitudes Especiales de Literatura por Grupo (S-14)</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                 Control de Biblias de estudio, letra grande, publicaciones en otros idiomas y despacho por Grupo de Predicación.
               </p>
             </div>
@@ -855,7 +855,7 @@ export const LiteraturaTab: React.FC = () => {
               <select
                 value={orderGroupFilter}
                 onChange={e => setOrderGroupFilter(e.target.value)}
-                className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold text-slate-700"
+                className="text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5]"
               >
                 <option value="todos">Todos los Grupos</option>
                 {preachingGroups.map(g => (
@@ -868,7 +868,7 @@ export const LiteraturaTab: React.FC = () => {
               <select
                 value={orderStatusFilter}
                 onChange={e => setOrderStatusFilter(e.target.value)}
-                className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold text-slate-700"
+                className="text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5]"
               >
                 <option value="todos">Todos los Estados</option>
                 <option value="solicitado">1. Solicitado</option>
@@ -892,25 +892,25 @@ export const LiteraturaTab: React.FC = () => {
             {inventoryAnalysis.ordersByGroup.map(gSummary => (
               <div
                 key={gSummary.groupNumber}
-                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between gap-2"
+                className="bg-white dark:bg-[#121216] p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col justify-between gap-2"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-indigo-900">
+                    <span className="text-xs font-extrabold text-indigo-900 dark:text-indigo-300">
                       Grupo {gSummary.groupNumber} • {gSummary.groupName}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                    <span className="text-[10px] font-mono font-bold tabular-nums px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200/50 dark:border-[#27272A]">
                       {gSummary.totalOrders} pedidos
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                    Sup.: <strong className="text-slate-700">{gSummary.overseerName}</strong>
+                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 truncate">
+                    Sup.: <strong className="text-zinc-700 dark:text-zinc-300">{gSummary.overseerName}</strong>
                   </p>
                   <div className="flex items-center gap-2 mt-2 text-[11px]">
-                    <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40 font-mono font-bold tabular-nums">
                       En mostrador: {gSummary.readyToDeliverCount}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 font-semibold">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40 font-mono font-semibold tabular-nums">
                       En trámite: {gSummary.pendingCount}
                     </span>
                   </div>
@@ -920,7 +920,7 @@ export const LiteraturaTab: React.FC = () => {
                     const msg = buildGroupSpecialOrdersWhatsApp(gSummary);
                     handleOpenWhatsApp(msg, gSummary.overseerPhone);
                   }}
-                  className="w-full mt-1 py-1.5 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full mt-1 py-1.5 px-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Send className="w-3 h-3" />
                   <span>Avisar a Sup. de Grupo</span>
@@ -936,23 +936,23 @@ export const LiteraturaTab: React.FC = () => {
               const groupBadge = pub?.groupNumber ? `G${pub.groupNumber}` : null;
               const statusCfg = SPECIAL_ORDER_STATUS_CONFIG[order.status] || {
                 label: order.status,
-                badgeClass: 'bg-slate-100 text-slate-700',
+                badgeClass: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]',
               };
 
               return (
                 <div
                   key={order.id}
-                  className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between"
+                  className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {groupBadge && (
-                          <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-[10px] font-black shrink-0">
+                          <span className="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 text-[10px] font-mono font-black shrink-0">
                             {groupBadge}
                           </span>
                         )}
-                        <span className="text-xs font-bold text-slate-900 truncate block">
+                        <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate block">
                           {pubName}
                         </span>
                       </div>
@@ -964,36 +964,36 @@ export const LiteraturaTab: React.FC = () => {
                     </div>
 
                     <div>
-                      <h4 className="text-sm font-extrabold text-indigo-950">
+                      <h4 className="text-sm font-extrabold text-indigo-950 dark:text-indigo-200">
                         {order.itemTitle}
                       </h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Cantidad: <strong>{order.quantity} ejemplar(es)</strong>{' '}
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                        Cantidad: <strong className="font-mono tabular-nums text-zinc-800 dark:text-zinc-200">{order.quantity} ejemplar(es)</strong>{' '}
                         {order.language && `• Idioma: ${order.language}`}
                       </p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#71717A] font-mono tabular-nums">
                         Fecha solicitud: {order.requestDate}
                         {order.deliveredDate ? ` • Entregado: ${order.deliveredDate}` : ''}
                       </p>
                     </div>
 
                     {order.notes && (
-                      <p className="text-[11px] text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-2 rounded-lg border border-zinc-200 dark:border-[#27272A]">
                         💡 {order.notes}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 space-y-2">
+                  <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
                     {/* Status updater */}
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-slate-500">Cambiar Estado:</span>
+                      <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">Cambiar Estado:</span>
                       <select
                         value={order.status}
                         onChange={e =>
                           handleUpdateOrderStatus(order, e.target.value as SpecialOrderStatus)
                         }
-                        className="text-xs p-1.5 rounded-lg border border-slate-300 bg-white"
+                        className="text-xs p-1.5 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                       >
                         <option value="solicitado">1. Solicitado</option>
                         <option value="pedido_a_betel">2. Pedido a Sucursal</option>
@@ -1010,7 +1010,7 @@ export const LiteraturaTab: React.FC = () => {
                           const msg = buildSpecialOrderArrivedWhatsApp(order, pubName);
                           handleOpenWhatsApp(msg, pub?.phone);
                         }}
-                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>Avisar al publicador (WhatsApp)</span>
@@ -1018,7 +1018,7 @@ export const LiteraturaTab: React.FC = () => {
 
                       <button
                         onClick={() => deleteSpecialOrder(order.id)}
-                        className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
+                        className="text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 p-1 cursor-pointer transition-colors"
                         title="Eliminar pedido"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1031,7 +1031,7 @@ export const LiteraturaTab: React.FC = () => {
           </div>
 
           {filteredSpecialOrders.length === 0 && (
-            <div className="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200 text-xs">
+            <div className="p-8 text-center text-zinc-400 dark:text-zinc-500 bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] text-xs">
               No hay pedidos especiales que coincidan con los filtros seleccionados.
             </div>
           )}
@@ -1043,12 +1043,12 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'grupos' && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-purple-600" />
+          <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+            <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               <span>Distribución Periódica de Revistas y Tratados a los Grupos</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
               Paquetes de predicación preparados para cada grupo de servicio del campo para las salidas
               semanales.
             </p>
@@ -1069,26 +1069,26 @@ export const LiteraturaTab: React.FC = () => {
               return (
                 <div
                   key={group.number}
-                  className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 flex flex-col justify-between"
+                  className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-extrabold flex items-center justify-center text-sm">
+                      <span className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-extrabold flex items-center justify-center text-sm">
                         G{group.number}
                       </span>
-                      <span className="text-xs font-bold text-slate-700">{group.name}</span>
+                      <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">{group.name}</span>
                     </div>
 
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                       <span>Superintendente: </span>
-                      <strong className="text-slate-800 block truncate">
+                      <strong className="text-zinc-800 dark:text-zinc-200 block truncate">
                         {overseer?.name || 'Por designar'}
                       </strong>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs">
+                    <div className="bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-2 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">📰 Revistas:</span>
+                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📰 Revistas:</span>
                         <input
                           type="number"
                           value={dist.magazinesCount}
@@ -1098,11 +1098,11 @@ export const LiteraturaTab: React.FC = () => {
                               magazinesCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-bold p-1 rounded border border-slate-300 bg-white"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">📑 Tratados:</span>
+                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📑 Tratados:</span>
                         <input
                           type="number"
                           value={dist.tractsCount}
@@ -1112,11 +1112,11 @@ export const LiteraturaTab: React.FC = () => {
                               tractsCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-bold p-1 rounded border border-slate-300 bg-white"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">📖 Folletos:</span>
+                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📖 Folletos:</span>
                         <input
                           type="number"
                           value={dist.brochuresCount}
@@ -1126,13 +1126,13 @@ export const LiteraturaTab: React.FC = () => {
                               brochuresCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-bold p-1 rounded border border-slate-300 bg-white"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
                     <button
                       onClick={() => {
                         const msg = buildGroupDistributionWhatsApp(
@@ -1143,7 +1143,7 @@ export const LiteraturaTab: React.FC = () => {
                         );
                         handleOpenWhatsApp(msg, overseer?.phone);
                       }}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Notificar por WhatsApp</span>
@@ -1161,13 +1161,13 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'recuento_s14' && (
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#121216] p-6 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 <span>Actas de Recuento Físico Oficial de Literatura (S-14)</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                 Conteo físico anual de inventario para la visita del Superintendente de Circuito y
                 cuadre con los registros de la sucursal.
               </p>
@@ -1175,7 +1175,7 @@ export const LiteraturaTab: React.FC = () => {
 
             <button
               onClick={() => setIsCountModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Registrar Nuevo Recuento S-14</span>
@@ -1190,32 +1190,32 @@ export const LiteraturaTab: React.FC = () => {
               return (
                 <div
                   key={rec.id}
-                  className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-xs space-y-3"
+                  className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 shadow-xs space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <span className="text-xs font-mono font-bold tabular-nums text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
                       Año de Servicio {rec.serviceYear}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">Fecha: {rec.countDate}</span>
+                    <span className="text-xs text-zinc-400 dark:text-[#71717A] font-mono tabular-nums font-medium">Fecha: {rec.countDate}</span>
                   </div>
 
-                  <div className="text-2xl font-black text-slate-900">
+                  <div className="text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {rec.totalItemsCounted} Unidades Recontadas
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-300 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Siervo de Literatura</span>
-                      <strong className="text-slate-800">{servant?.name || 'Designado'}</strong>
+                      <span className="text-[10px] text-zinc-400 dark:text-[#71717A] block">Siervo de Literatura</span>
+                      <strong className="text-zinc-800 dark:text-zinc-200">{servant?.name || 'Designado'}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Anciano Supervisor</span>
-                      <strong className="text-slate-800">{overseer?.name || 'Designado'}</strong>
+                      <span className="text-[10px] text-zinc-400 dark:text-[#71717A] block">Anciano Supervisor</span>
+                      <strong className="text-zinc-800 dark:text-zinc-200">{overseer?.name || 'Designado'}</strong>
                     </div>
                   </div>
 
                   {rec.notes && (
-                    <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200 italic">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] italic">
                       "{rec.notes}"
                     </p>
                   )}
@@ -1230,16 +1230,16 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: AGREGAR PUBLICACIÓN AL CATÁLOGO                    */}
       {/* ========================================================= */}
       {isAddItemModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Agregar Publicación al Fichero S-14</span>
               </h3>
               <button
                 onClick={() => setIsAddItemModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1248,24 +1248,24 @@ export const LiteraturaTab: React.FC = () => {
             <form onSubmit={handleCreateItem} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Código Oficial</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Código Oficial</label>
                   <input
                     type="text"
                     required
                     placeholder="Ej. bi12, lff, T-36"
                     value={newItem.code}
                     onChange={e => setNewItem({ ...newItem, code: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Categoría</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Categoría</label>
                   <select
                     value={newItem.category}
                     onChange={e =>
                       setNewItem({ ...newItem, category: e.target.value as LiteratureCategory })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   >
                     <option value="biblia">Biblia</option>
                     <option value="libro">Libro de Estudio</option>
@@ -1279,57 +1279,57 @@ export const LiteraturaTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Título de la Publicación</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Título de la Publicación</label>
                 <input
                   type="text"
                   required
                   placeholder="Ej. ¡Disfrute de la vida para siempre!"
                   value={newItem.title}
                   onChange={e => setNewItem({ ...newItem, title: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Idioma</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Idioma</label>
                   <input
                     type="text"
                     value={newItem.language}
                     onChange={e => setNewItem({ ...newItem, language: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Stock Actual</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Stock Actual</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.currentStock}
                     onChange={e => setNewItem({ ...newItem, currentStock: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Mínimo</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Mínimo</label>
                   <input
                     type="number"
                     min="0"
                     value={newItem.minimumStock}
                     onChange={e => setNewItem({ ...newItem, minimumStock: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Ubicación / Estante</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Ubicación / Estante</label>
                 <input
                   type="text"
                   placeholder="Ej. Estante B1 (Mostrador)"
                   value={newItem.locationBox}
                   onChange={e => setNewItem({ ...newItem, locationBox: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -1337,13 +1337,13 @@ export const LiteraturaTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddItemModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   Guardar Publicación
                 </button>
@@ -1357,16 +1357,16 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: EDITAR PUBLICACIÓN                                 */}
       {/* ========================================================= */}
       {editingItem && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-600" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Editar Publicación</span>
               </h3>
               <button
                 onClick={() => setEditingItem(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1375,17 +1375,17 @@ export const LiteraturaTab: React.FC = () => {
             <form onSubmit={handleSaveEditItem} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Código</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Código</label>
                   <input
                     type="text"
                     required
                     value={editingItem.code}
                     onChange={e => setEditingItem({ ...editingItem, code: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Categoría</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Categoría</label>
                   <select
                     value={editingItem.category}
                     onChange={e =>
@@ -1394,7 +1394,7 @@ export const LiteraturaTab: React.FC = () => {
                         category: e.target.value as LiteratureCategory,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   >
                     <option value="biblia">Biblia</option>
                     <option value="libro">Libro de Estudio</option>
@@ -1408,28 +1408,28 @@ export const LiteraturaTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Título</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Título</label>
                 <input
                   type="text"
                   required
                   value={editingItem.title}
                   onChange={e => setEditingItem({ ...editingItem, title: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Idioma</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Idioma</label>
                   <input
                     type="text"
                     value={editingItem.language}
                     onChange={e => setEditingItem({ ...editingItem, language: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Stock Actual</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Stock Actual</label>
                   <input
                     type="number"
                     min="0"
@@ -1437,11 +1437,11 @@ export const LiteraturaTab: React.FC = () => {
                     onChange={e =>
                       setEditingItem({ ...editingItem, currentStock: Number(e.target.value) })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Mínimo</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Mínimo</label>
                   <input
                     type="number"
                     min="0"
@@ -1449,18 +1449,18 @@ export const LiteraturaTab: React.FC = () => {
                     onChange={e =>
                       setEditingItem({ ...editingItem, minimumStock: Number(e.target.value) })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Ubicación</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Ubicación</label>
                 <input
                   type="text"
                   value={editingItem.locationBox || ''}
                   onChange={e => setEditingItem({ ...editingItem, locationBox: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -1468,13 +1468,13 @@ export const LiteraturaTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingItem(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   Guardar Cambios
                 </button>
@@ -1488,16 +1488,16 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: REGISTRAR PEDIDO ESPECIAL                         */}
       {/* ========================================================= */}
       {isAddOrderModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Truck className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Truck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Registrar Pedido Especial de Publicador</span>
               </h3>
               <button
                 onClick={() => setIsAddOrderModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1505,12 +1505,12 @@ export const LiteraturaTab: React.FC = () => {
 
             <form onSubmit={handleCreateSpecialOrder} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Publicador Solicitante</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Publicador Solicitante</label>
                 <select
                   required
                   value={newOrder.publisherId}
                   onChange={e => setNewOrder({ ...newOrder, publisherId: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 >
                   <option value="">Seleccionar Publicador...</option>
                   {activePublishers.map(p => (
@@ -1522,7 +1522,7 @@ export const LiteraturaTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Publicación Solicitada
                 </label>
                 <input
@@ -1531,40 +1531,40 @@ export const LiteraturaTab: React.FC = () => {
                   placeholder="Ej. Biblia Traducción del Nuevo Mundo (Letra Grande)"
                   value={newOrder.itemTitle}
                   onChange={e => setNewOrder({ ...newOrder, itemTitle: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Idioma</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Idioma</label>
                   <input
                     type="text"
                     value={newOrder.language}
                     onChange={e => setNewOrder({ ...newOrder, language: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Cantidad</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Cantidad</label>
                   <input
                     type="number"
                     min="1"
                     value={newOrder.quantity}
                     onChange={e => setNewOrder({ ...newOrder, quantity: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Notas o Motivo</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Notas o Motivo</label>
                 <input
                   type="text"
                   placeholder="Ej. Para estudiante de la Biblia que no tiene ejemplar propio"
                   value={newOrder.notes}
                   onChange={e => setNewOrder({ ...newOrder, notes: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -1572,13 +1572,13 @@ export const LiteraturaTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddOrderModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   Guardar Pedido
                 </button>
@@ -1592,16 +1592,16 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: RECUENTO FÍSICO S-14                               */}
       {/* ========================================================= */}
       {isCountModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <span>Registrar Recuento Físico S-14</span>
               </h3>
               <button
                 onClick={() => setIsCountModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1609,25 +1609,25 @@ export const LiteraturaTab: React.FC = () => {
 
             <form onSubmit={handleSavePhysicalCount} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Año de Servicio</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Año de Servicio</label>
                 <input
                   type="text"
                   required
                   value={newCount.serviceYear}
                   onChange={e => setNewCount({ ...newCount, serviceYear: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Siervo de Literatura</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Siervo de Literatura</label>
                 <select
                   required
                   value={newCount.servantPublisherId}
                   onChange={e =>
                     setNewCount({ ...newCount, servantPublisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 >
                   <option value="">Seleccionar Hermano Nombrado...</option>
                   {brothers.map(b => (
@@ -1639,14 +1639,14 @@ export const LiteraturaTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Anciano Supervisor</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Anciano Supervisor</label>
                 <select
                   required
                   value={newCount.overseerPublisherId}
                   onChange={e =>
                     setNewCount({ ...newCount, overseerPublisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 >
                   <option value="">Seleccionar Anciano...</option>
                   {publishers
@@ -1659,18 +1659,18 @@ export const LiteraturaTab: React.FC = () => {
                 </select>
               </div>
 
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-950 font-medium">
-                Se registrará un conteo total de <strong>{stats.totalUnits} publicaciones</strong> en
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 rounded-xl text-emerald-950 dark:text-emerald-300 font-medium">
+                Se registrará un conteo total de <strong className="font-mono tabular-nums">{stats.totalUnits} publicaciones</strong> en
                 el Salón del Reino con fecha de hoy.
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Notas de Verificación</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">Notas de Verificación</label>
                 <input
                   type="text"
                   value={newCount.notes}
                   onChange={e => setNewCount({ ...newCount, notes: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -1678,13 +1678,13 @@ export const LiteraturaTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsCountModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   Completar Recuento S-14
                 </button>

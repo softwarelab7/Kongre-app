@@ -114,7 +114,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
       case 'indigo':
         return 'bg-indigo-500 shadow-indigo-500/50';
       case 'slate':
-        return 'bg-slate-500 shadow-slate-500/50';
+        return 'bg-zinc-500 shadow-zinc-500/50';
       default:
         return 'bg-blue-500 shadow-blue-500/50';
     }
@@ -187,8 +187,8 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
       onDragEnd={onDragEnd}
       className={`relative flex flex-col sm:flex-row items-stretch justify-between rounded-2xl border transition-all duration-200 overflow-hidden group select-none ${
         isOff
-          ? 'bg-zinc-100/70 dark:bg-[#121926]/70 border-zinc-200 dark:border-white/[0.04] opacity-75'
-          : 'bg-white dark:bg-[#162032] border-zinc-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md dark:shadow-black/20'
+          ? 'bg-zinc-100 dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A] opacity-75'
+          : 'bg-white dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A]'
       } ${
         !isReadOnly
           ? 'cursor-grab active:cursor-grabbing hover:border-indigo-400 dark:hover:border-indigo-500/50'
@@ -202,7 +202,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
       <div className="flex flex-1 items-start sm:items-center p-3.5 sm:p-4 gap-3.5 min-w-0">
         {/* Circuit Position Number & Icon */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <span className="w-6 text-center text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">
+          <span className="w-6 text-center text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono tabular-nums">
             {index + 1}
           </span>
           <div
@@ -218,22 +218,22 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
             <h4
               className={`font-bold text-[14px] sm:text-[15px] truncate leading-tight ${
                 isOff
-                  ? 'text-zinc-600 dark:text-zinc-400 line-through decoration-zinc-400'
-                  : 'text-zinc-900 dark:text-zinc-100'
+                  ? 'text-zinc-600 dark:text-[#A1A1AA] line-through decoration-zinc-400'
+                  : 'text-zinc-900 dark:text-[#F4F4F5]'
               }`}
             >
               {breaker.name}
             </h4>
 
             {breaker.amperage && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wider bg-zinc-100 dark:bg-white/[0.06] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08]">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tabular-nums tracking-wider bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A]">
                 {breaker.amperage}A
               </span>
             )}
           </div>
 
           {breaker.descripcion ? (
-            <p className="text-[12px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1 leading-snug">
+            <p className="text-[12px] text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-1 leading-snug">
               {breaker.descripcion}
             </p>
           ) : (
@@ -245,7 +245,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
       </div>
 
       {/* Right Controls & Status Pill */}
-      <div className="flex items-center justify-between sm:justify-end gap-3 px-4 py-2.5 sm:py-3 border-t sm:border-t-0 sm:border-l border-zinc-100 dark:border-white/[0.06] bg-zinc-50/50 dark:bg-white/[0.01] shrink-0 sm:min-w-[200px]">
+      <div className="flex items-center justify-between sm:justify-end gap-3 px-4 py-2.5 sm:py-3 border-t sm:border-t-0 sm:border-l border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] shrink-0 sm:min-w-[200px]">
         {/* Status Badge */}
         <div className="flex items-center gap-1.5">
           {breaker.status === 'always' && (
@@ -292,11 +292,11 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
               ? 'Encender circuito'
               : 'Desconectar circuito'
           }
-          className={`p-2 rounded-xl border transition-all flex items-center justify-center ${
+          className={`p-2 rounded-xl border transition-all flex items-center justify-center cursor-pointer active:scale-95 ${
             isLocked
-              ? 'opacity-40 cursor-not-allowed bg-zinc-100 dark:bg-white/[0.02] border-zinc-200 dark:border-white/[0.05] text-zinc-400'
+              ? 'opacity-40 cursor-not-allowed bg-zinc-100 dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A] text-zinc-400'
               : isOff
-              ? 'bg-zinc-200/70 hover:bg-emerald-500 hover:text-white border-zinc-300 dark:bg-white/[0.05] dark:border-white/[0.1] text-zinc-500 hover:border-emerald-500'
+              ? 'bg-zinc-200/70 hover:bg-emerald-500 hover:text-white border-zinc-300 dark:bg-[#18181F] dark:border-[#27272A] text-zinc-500 hover:border-emerald-500'
               : 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300'
           }`}
         >
@@ -315,7 +315,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
                   e.stopPropagation();
                   onMoveUp(breaker.id);
                 }}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-20 transition-colors"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] disabled:opacity-20 transition-colors cursor-pointer"
                 title="Subir de posición"
               >
                 <ChevronUp size={15} />
@@ -329,7 +329,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
                   e.stopPropagation();
                   onMoveDown(breaker.id);
                 }}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-20 transition-colors"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] disabled:opacity-20 transition-colors cursor-pointer"
                 title="Bajar de posición"
               >
                 <ChevronDown size={15} />
@@ -343,7 +343,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
                 e.stopPropagation();
                 onEdit(breaker);
               }}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors cursor-pointer"
               title="Editar circuito"
             >
               <Edit2 size={14} />
@@ -356,7 +356,7 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
                 e.stopPropagation();
                 onDelete(breaker.id);
               }}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
               title="Eliminar breaker"
             >
               <Trash2 size={14} />

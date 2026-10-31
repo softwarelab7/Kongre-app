@@ -52,19 +52,19 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="fixed sm:absolute top-14 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 sm:w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-start gap-2.5 pb-2.5 mb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+          <div className="fixed sm:absolute top-14 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 sm:w-72 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-lg p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-2.5 pb-2.5 mb-2 border-b border-zinc-200 dark:border-[#27272A]">
+              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] flex items-center justify-center shrink-0">
                 <Shield className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                <h4 className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate">
                   Entorno de Demostración
                 </h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate">
                   {settings.congregationName || 'Congregación Central (Demo)'}
                 </p>
-                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
+                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-1.5 py-0.5 rounded-md">
                   <Shield className="w-2.5 h-2.5" />
                   <span>Rol: {effectiveRoleInfo?.name || activeRole}</span>
                 </div>
@@ -79,9 +79,9 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                     setIsOpen(false);
                     onOpenRoleModal();
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white font-medium transition cursor-pointer text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] hover:text-zinc-900 dark:hover:text-white font-medium transition cursor-pointer text-left"
                 >
-                  <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <Shield className="w-4 h-4 text-zinc-400 dark:text-[#A1A1AA]" />
                   <span>Cambiar rol de prueba</span>
                 </button>
               )}
@@ -93,9 +93,9 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                     setIsOpen(false);
                     onResetDemo();
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition cursor-pointer text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-medium transition cursor-pointer text-left"
                 >
-                  <RotateCcw className="w-4 h-4 text-slate-400" />
+                  <RotateCcw className="w-4 h-4 text-zinc-400 dark:text-[#A1A1AA]" />
                   <span>Restablecer datos de prueba</span>
                 </button>
               )}
@@ -107,7 +107,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                     setIsOpen(false);
                     onOpenRegisterModal();
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 font-semibold transition cursor-pointer text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-indigo-700 dark:text-indigo-400 hover:bg-indigo-500/10 dark:hover:bg-indigo-950/30 font-semibold transition cursor-pointer text-left"
                 >
                   <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Registrar mi congregación real</span>
@@ -121,7 +121,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                     setIsOpen(false);
                     onExitDemo();
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 font-medium transition cursor-pointer text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 dark:hover:bg-rose-950/30 font-medium transition cursor-pointer text-left"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Salir del modo de prueba</span>

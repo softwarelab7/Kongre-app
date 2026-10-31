@@ -302,14 +302,14 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label={`Registro oficial S-38 e historial de ${publisher.full_name || publisher.name}`}
     >
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden">
         {/* CABECERA */}
-        <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 flex items-start justify-between gap-4">
+        <div className="px-6 py-5 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/60 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center font-bold text-lg border border-indigo-200 dark:border-indigo-800 shrink-0">
               {publisher.name.charAt(0).toUpperCase()}
@@ -319,15 +319,15 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
                   Registro Oficial S-38 / Folleto Maestros
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   {publisher.gender === 'hermana' ? 'Hermana' : 'Hermano'} •{' '}
                   {publisher.privilege || 'Publicador'}
                 </span>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">
+              <h3 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mt-0.5">
                 {publisher.full_name || publisher.name}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 flex items-center gap-2 flex-wrap">
                 {publisher.phone && <span>📞 {publisher.phone}</span>}
                 {publisher.groupNumber && <span>👥 Grupo {publisher.groupNumber}</span>}
                 <span className="text-indigo-600 dark:text-indigo-400 font-medium">
@@ -340,7 +340,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
             aria-label="Cerrar modal"
           >
             <X size={20} />
@@ -348,62 +348,62 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
         </div>
 
         {/* TARJETAS DE ESTADÍSTICAS RÁPIDAS */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 sm:px-6 bg-slate-100/60 dark:bg-slate-800/30 border-b border-slate-200 dark:border-white/[0.06]">
-          <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 sm:px-6 bg-zinc-100/60 dark:bg-[#18181F]/30 border-b border-zinc-200 dark:border-white/[0.06]">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <BookOpen size={13} className="text-indigo-500" />
               Lección Activa
             </span>
-            <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
-              #{currentLessonNum} <span className="text-xs font-normal text-slate-400">/ 20</span>
+            <div className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-1">
+              #{currentLessonNum} <span className="text-xs font-normal text-zinc-400">/ 20</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               {currentLessonObj?.title}
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <Award size={13} className="text-emerald-500" />
               Aprobadas (S-38)
             </span>
             <div className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-              {stats.completedCount} <span className="text-xs font-normal text-slate-400">({stats.progressPercent}%)</span>
+              {stats.completedCount} <span className="text-xs font-normal text-zinc-400">({stats.progressPercent}%)</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               {20 - stats.completedCount} pendientes
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <History size={13} className="text-blue-500" />
               Intervenciones
             </span>
-            <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
+            <div className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-1">
               {stats.totalAll}
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               {stats.totalMain} titular • {stats.totalAssistant} ayudante
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <Clock size={13} className="text-amber-500" />
               Rotación / Última
             </span>
-            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-1.5 truncate">
+            <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white mt-1.5 truncate">
               {stats.weeksAgoText}
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               {stats.lastAssignment ? `📅 ${stats.lastAssignment.date}` : 'Sin datos'}
             </p>
           </div>
         </div>
 
         {/* NAVEGACIÓN DE PESTAÑAS */}
-        <div className="px-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between gap-2 overflow-x-auto">
+        <div className="px-6 border-b border-zinc-200 dark:border-white/10 flex items-center justify-between gap-2 overflow-x-auto">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -411,7 +411,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
               className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 's38'
                   ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Award size={15} />
@@ -424,7 +424,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
               className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'history'
                   ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <History size={15} />
@@ -437,7 +437,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
               className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'print'
                   ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Printer size={15} />
@@ -454,14 +454,14 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
               {/* Barra de progreso visual */}
               <div>
                 <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                  <span className="font-semibold text-zinc-700 dark:text-[#D4D4D8]">
                     Progreso general del folleto
                   </span>
                   <span className="font-bold text-indigo-600 dark:text-indigo-400">
                     {stats.completedCount} de 20 lecciones completadas ({stats.progressPercent}%)
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700/60 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-zinc-200 dark:bg-zinc-700/60 rounded-full h-2.5 overflow-hidden">
                   <div
                     className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${stats.progressPercent}%` }}
@@ -489,7 +489,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                           ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700 shadow-xs'
                           : isCompleted
                           ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
-                          : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-white/[0.06] hover:border-slate-300 dark:hover:border-white/20'
+                          : 'bg-white dark:bg-[#18181F]/60 border-zinc-200 dark:border-white/[0.06] hover:border-zinc-300 dark:hover:border-white/20'
                       }`}
                     >
                       <div className="min-w-0 flex-1">
@@ -500,7 +500,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                                 ? 'bg-indigo-600 text-white'
                                 : isCompleted
                                 ? 'bg-emerald-600 text-white'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-[#D4D4D8]'
                             }`}
                           >
                             {lesson.number}
@@ -511,7 +511,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                                 ? 'text-indigo-900 dark:text-indigo-200'
                                 : isCompleted
                                 ? 'text-emerald-900 dark:text-emerald-200'
-                                : 'text-slate-800 dark:text-slate-200'
+                                : 'text-zinc-800 dark:text-[#E4E4E7]'
                             }`}
                           >
                             {lesson.title}
@@ -535,13 +535,13 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                               <RotateCcw size={11} /> Practicar de nuevo
                             </span>
                           ) : !isCurrent ? (
-                            <span className="text-slate-400 dark:text-slate-500">
+                            <span className="text-zinc-400 dark:text-[#71717A]">
                               Pendiente
                             </span>
                           ) : null}
 
                           {completedRecord?.notes && (
-                            <span className="text-slate-500 dark:text-slate-400 italic text-[10px]">
+                            <span className="text-zinc-500 dark:text-[#A1A1AA] italic text-[10px]">
                               «{completedRecord.notes}»
                             </span>
                           )}
@@ -554,7 +554,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleSelectCurrentLesson(lesson.number)}
-                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
                             title="Fijar como lección activa"
                           >
                             Fijar activa
@@ -576,8 +576,8 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
 
                       {/* Panel de evaluación inline si está seleccionado */}
                       {selectedLessonForDetail === lesson.number && (
-                        <div className="col-span-full w-full mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
-                          <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                        <div className="col-span-full w-full mt-2 pt-2 border-t border-zinc-200 dark:border-white/10">
+                          <label className="text-[10px] font-bold text-zinc-500 uppercase block mb-1">
                             Comentario del Consejero (opcional):
                           </label>
                           <input
@@ -585,7 +585,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                             value={customNote}
                             onChange={(e) => setCustomNote(e.target.value)}
                             placeholder="Ej. Buen contacto visual y lectura clara..."
-                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-slate-900 dark:text-white mb-2"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#121216] text-zinc-900 dark:text-white mb-2"
                           />
                           <div className="flex items-center gap-2">
                             <button
@@ -618,17 +618,17 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           {activeTab === 'history' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Todas las participaciones registradas en el programa de Vida y Ministerio Cristianos.
                 </p>
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <span className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Total: {assignmentHistory.length}
                 </span>
               </div>
 
               {assignmentHistory.length === 0 ? (
-                <div className="py-16 text-center text-slate-400 dark:text-slate-500">
-                  <BookOpen size={36} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                <div className="py-16 text-center text-zinc-400 dark:text-[#71717A]">
+                  <BookOpen size={36} className="mx-auto text-zinc-300 dark:text-[#71717A] mb-2" />
                   <p className="text-sm font-semibold">No hay intervenciones registradas todavía</p>
                   <p className="text-xs mt-1">
                     Las asignaciones futuras y pasadas se recopilan automáticamente de las semanas guardadas.
@@ -639,11 +639,11 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                   {assignmentHistory.map((item) => (
                     <div
                       key={item.id}
-                      className="p-4 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-white/20 transition-all"
+                      className="p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-[#18181F]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-white/20 transition-all"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                          <span className="text-[11px] font-bold text-zinc-900 dark:text-white flex items-center gap-1">
                             <Calendar size={12} className="text-indigo-500" />
                             {item.date}
                           </span>
@@ -652,7 +652,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                             className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                               item.role === 'titular'
                                 ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
-                                : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-300'
+                                : 'bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-300'
                             }`}
                           >
                             {item.role === 'titular' ? '👤 Titular' : '🤝 Ayudante'}
@@ -669,15 +669,15 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                           </span>
                         </div>
 
-                        <h4 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-zinc-100 mt-1">
+                        <h4 className="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100 mt-1">
                           {item.title}
                         </h4>
 
-                        <div className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                        <div className="mt-1 flex items-center gap-3 text-xs text-zinc-500 dark:text-[#A1A1AA] flex-wrap">
                           {item.partnerName && (
                             <span>
                               {item.role === 'titular' ? 'Ayudante: ' : 'Titular: '}
-                              <strong className="text-slate-700 dark:text-slate-300">{item.partnerName}</strong>
+                              <strong className="text-zinc-700 dark:text-[#D4D4D8]">{item.partnerName}</strong>
                             </span>
                           )}
 
@@ -699,7 +699,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                             <RotateCcw size={12} /> Continuar
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-[#A1A1AA]">
                             Realizada
                           </span>
                         )}
@@ -715,13 +715,13 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           {activeTab === 'print' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Formato oficial S-38 para archivo teocrático del superintendente de reunión.
                 </span>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
                 >
                   <Printer size={13} />
                   <span>Imprimir Registro S-38</span>
@@ -729,19 +729,19 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
               </div>
 
               {/* Contenedor imprimible */}
-              <div className="p-6 rounded-2xl border border-slate-300 bg-white text-slate-900 font-sans shadow-xs printable-s38-card">
-                <div className="border-b-2 border-slate-900 pb-3 mb-4 flex items-start justify-between">
+              <div className="p-6 rounded-2xl border border-zinc-300 bg-white text-zinc-900 font-sans shadow-xs printable-s38-card">
+                <div className="border-b-2 border-zinc-900 pb-3 mb-4 flex items-start justify-between">
                   <div>
                     <h2 className="text-base font-extrabold uppercase tracking-wide">
                       REGISTRO DE ASIGNACIONES DE LA REUNIÓN VIDA Y MINISTERIO CRISTIANOS (S-38)
                     </h2>
-                    <p className="text-xs text-slate-600 mt-0.5">
+                    <p className="text-xs text-zinc-600 mt-0.5">
                       Folleto: <em>Seamos mejores lectores y maestros</em> (th) / <em>Una guía para nuestro ministerio</em> (lmd)
                     </p>
                   </div>
                   <div className="text-right text-xs">
                     <p className="font-bold">Estudiante: {publisher.full_name || publisher.name}</p>
-                    <p className="text-slate-600">
+                    <p className="text-zinc-600">
                       {publisher.gender === 'hermana' ? 'Hermana' : 'Hermano'} • {publisher.privilege || 'Publicador'}
                     </p>
                   </div>
@@ -750,7 +750,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                 {/* Tabla de 20 Lecciones */}
                 <table className="w-full text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-100 border-b border-slate-300">
+                    <tr className="bg-zinc-100 border-b border-zinc-300">
                       <th className="p-2 text-left w-12 font-bold">Nº</th>
                       <th className="p-2 text-left font-bold">Punto de Consejo (Lección)</th>
                       <th className="p-2 text-center w-28 font-bold">Fecha Asignada</th>
@@ -766,7 +766,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                       const isCur = currentLessonNum === l.number;
 
                       return (
-                        <tr key={l.number} className="border-b border-slate-200 hover:bg-slate-50">
+                        <tr key={l.number} className="border-b border-zinc-200 hover:bg-zinc-50">
                           <td className="p-2 font-bold">{l.number}</td>
                           <td className="p-2">
                             <span className="font-medium">{l.title}</span>
@@ -776,14 +776,14 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                               </span>
                             )}
                           </td>
-                          <td className="p-2 text-center text-slate-600 font-mono text-[11px]">
+                          <td className="p-2 text-center text-zinc-600 font-mono text-[11px]">
                             {/* Buscar si hay asignación asignada */}
                             {assignmentHistory.find((a) => a.lessonNumber === l.number)?.date || '-'}
                           </td>
                           <td className="p-2 text-center font-bold font-mono text-[11px] text-emerald-700">
                             {completed ? completed.date : '-'}
                           </td>
-                          <td className="p-2 text-slate-600 italic text-[11px]">
+                          <td className="p-2 text-zinc-600 italic text-[11px]">
                             {completed?.notes || '-'}
                           </td>
                         </tr>
@@ -792,7 +792,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                   </tbody>
                 </table>
 
-                <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-4 pt-3 border-t border-zinc-200 flex items-center justify-between text-[11px] text-zinc-500">
                   <span>S-38-S (Registro Teocrático)</span>
                   <span>Generado el: {new Date().toLocaleDateString('es-ES')}</span>
                 </div>
@@ -802,14 +802,14 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
         </div>
 
         {/* PIE DE PÁGINA DEL MODAL */}
-        <div className="px-6 py-3.5 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between">
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+        <div className="px-6 py-3.5 border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/80 flex items-center justify-between">
+          <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
             {stats.completedCount} de 20 lecciones completadas • {stats.weeksAgoText}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            className="px-4 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
           >
             Cerrar
           </button>

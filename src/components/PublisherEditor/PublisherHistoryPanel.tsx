@@ -261,22 +261,22 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
   if (!publisherNid) return null;
 
   return (
-    <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-100 dark:border-white/[0.06]">
+    <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl shadow-xs overflow-hidden">
+      <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-100 dark:border-[#27272A]">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <History size={20} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Historial de Auditoría y Cambios
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/40">
                 {history.length} {history.length === 1 ? 'registro' : 'registros'}
               </span>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
               Registro cronológico de modificaciones en la ficha del publicador con opción de reversión
             </p>
           </div>
@@ -285,7 +285,7 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
 
       <div>
         {loading && (
-          <div className="flex items-center justify-center py-10 gap-3 text-zinc-400">
+          <div className="flex items-center justify-center py-10 gap-3 text-zinc-400 dark:text-[#A1A1AA]">
             <Clock size={18} className="animate-spin" />
             <span className="text-sm font-semibold">Cargando historial…</span>
           </div>
@@ -299,12 +299,12 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
         )}
 
         {!loading && !error && history.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 gap-2 text-zinc-400 dark:text-zinc-500">
+          <div className="flex flex-col items-center justify-center py-12 gap-2 text-zinc-400 dark:text-[#A1A1AA]">
             <CheckCircle2 size={28} strokeWidth={1.5} className="text-emerald-500/70" />
-            <p className="text-xs font-bold text-zinc-600 dark:text-zinc-300">
+            <p className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">
               Sin cambios registrados todavía
             </p>
-            <p className="text-[11px] text-zinc-400 max-w-md text-center">
+            <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] max-w-md text-center">
               Cada vez que guardes cambios en el rol, grupo, bautismo, DPA o estado del publicador, aparecerán aquí para futura referencia o reversión.
             </p>
           </div>
@@ -314,41 +314,41 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-zinc-50/70 dark:bg-white/[0.02]">
-                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                <tr className="bg-zinc-50/70 dark:bg-[#18181F]/70 border-b border-zinc-100 dark:border-[#27272A]">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
                     Fecha
                   </th>
-                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
                     Campo Modificado
                   </th>
-                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
                     Valor Anterior
                   </th>
-                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
                     Valor Nuevo
                   </th>
-                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 text-right">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA] text-right">
                     Acción
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.04]">
+              <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                 {history.map((row) => {
                   const label = FIELD_LABELS[row.campo] ?? row.campo;
                   const reverted = isRevert(row);
                   return (
                     <tr
                       key={row.id}
-                      className={`transition-colors hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] ${
+                      className={`transition-colors hover:bg-zinc-50/60 dark:hover:bg-[#18181F]/60 ${
                         reverted ? 'opacity-65' : ''
                       }`}
                     >
                       <td className="px-6 py-3.5 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                          <span className="text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             {formatDate(row.fecha)}
                           </span>
-                          <span className="text-[10px] font-medium text-zinc-400 mt-0.5">
+                          <span className="text-[10px] font-medium text-zinc-400 dark:text-[#A1A1AA] mt-0.5">
                             {reverted ? '↩ Restauración' : row.cambiado_por ?? 'Secretaría'}
                           </span>
                         </div>
@@ -363,12 +363,12 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
                         </span>
                       </td>
                       <td className="px-6 py-3.5 max-w-[180px]">
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 break-words">
+                        <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] line-clamp-2 break-words">
                           {formatValue(row.campo, row.valor_ant)}
                         </span>
                       </td>
                       <td className="px-6 py-3.5 max-w-[180px]">
-                        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 line-clamp-2 break-words">
+                        <span className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] line-clamp-2 break-words">
                           {formatValue(row.campo, row.valor_new)}
                         </span>
                       </td>
@@ -378,7 +378,7 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
                             type="button"
                             onClick={() => handleRevert(row)}
                             title={`Revertir "${label}" al valor anterior`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] hover:border-rose-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] hover:border-rose-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
                           >
                             <RotateCcw size={12} />
                             Revertir

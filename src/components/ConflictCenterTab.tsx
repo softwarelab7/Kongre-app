@@ -58,54 +58,66 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
   return (
     <div className="space-y-6">
       {/* Barra de Acciones y Filtros del Centro de Conflictos (Unified Container) */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-              Detección en Tiempo Real
-            </span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-              Supervisión integral de asignaciones duplicadas, ausencias y descansos
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-zinc-600 dark:text-[#A1A1AA] shrink-0">
+              <ShieldCheck className="w-4 h-4 text-indigo-500" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                  Auditoría de Cruces y Conflictos
+                </h2>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
+                  En tiempo real
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] hidden sm:block">
+                Supervisión integral de asignaciones duplicadas, ausencias y descansos
+              </p>
+            </div>
           </div>
 
-          {/* Counters */}
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
-            <div className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 flex items-center justify-between sm:justify-start gap-2 shadow-2xs">
-              <span className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400">Cruces Críticos:</span>
-              <span className="text-sm font-black">{criticalErrors.length}</span>
+          {/* Counters: Clean neutral pills with subtle indicator dots */}
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center gap-2 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA]">Cruces Críticos:</span>
+              <span className="text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{criticalErrors.length}</span>
             </div>
 
-            <div className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center justify-between sm:justify-start gap-2 shadow-2xs">
-              <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Advertencias:</span>
-              <span className="text-sm font-black">{warnings.length}</span>
+            <div className="px-3 py-1.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center gap-2 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA]">Advertencias:</span>
+              <span className="text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{warnings.length}</span>
             </div>
           </div>
         </div>
 
         {/* Filter and search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-[#71717A]" />
             <input
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Buscar por hermano o descripción..."
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Severidad:</span>
+            <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-semibold">Severidad:</span>
             <select
               value={filterSeverity}
               onChange={e => setFilterSeverity(e.target.value as any)}
-              className="text-xs py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+              className="text-xs py-1.5 px-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] font-semibold cursor-pointer"
             >
-              <option value="all">Todos ({allWeeksConflicts.length})</option>
-              <option value="error">Solo Cruces Críticos ({criticalErrors.length})</option>
-              <option value="warning">Solo Advertencias ({warnings.length})</option>
+              <option value="all" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">Todos ({allWeeksConflicts.length})</option>
+              <option value="error" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">Solo Cruces Críticos ({criticalErrors.length})</option>
+              <option value="warning" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">Solo Advertencias ({warnings.length})</option>
             </select>
           </div>
         </div>
@@ -114,14 +126,14 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
       {/* List */}
       <div className="space-y-3">
         {filteredConflicts.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 shadow-xs space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+          <div className="p-12 text-center bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">
+            <h3 className="text-lg font-bold text-zinc-800 dark:text-[#F4F4F5]">
               ¡Cero Cruces y Cero Conflictos!
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-md mx-auto">
               Todas las asignaciones registradas para todas las semanas respetan las ausencias, roles habilitados y no generan sobrecarga.
             </p>
           </div>
@@ -131,49 +143,38 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
             return (
               <div
                 key={item.id}
-                className={`p-4 sm:p-5 rounded-3xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                  isError
-                    ? 'border-rose-200 bg-rose-50/40 text-rose-950'
-                    : 'border-amber-200 bg-amber-50/40 text-amber-950'
-                }`}
+                className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5 ${
-                      isError ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
-                    }`}
-                  >
-                    {isError ? <AlertOctagon className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                <div className="flex items-start gap-3.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+                    {isError ? <AlertOctagon className="w-4.5 h-4.5 text-rose-500" /> : <AlertTriangle className="w-4.5 h-4.5 text-amber-500" />}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm sm:text-base text-slate-900">
+                      <span className="font-bold text-sm sm:text-base text-zinc-900 dark:text-[#F4F4F5]">
                         {item.publisherName}
                       </span>
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          isError ? 'bg-rose-200 text-rose-900' : 'bg-amber-200 text-amber-900'
-                        }`}
-                      >
-                        {isError ? 'CRUCE CRÍTICO' : 'ADVERTENCIA'}
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8]">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isError ? 'bg-rose-500' : 'bg-amber-500'}`} />
+                        {isError ? 'Cruce Crítico' : 'Advertencia'}
                       </span>
-                      <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <span className="text-xs text-zinc-400 dark:text-[#71717A] flex items-center gap-1 font-mono tabular-nums">
                         <Calendar className="w-3.5 h-3.5" />
                         Semana del {item.weekStartDate}
                       </span>
                     </div>
 
-                    <p className="text-xs font-medium text-slate-700 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] leading-relaxed">
                       {item.description}
                     </p>
 
                     {item.assignmentTitles.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-1">
                         {item.assignmentTitles.map((t, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 rounded-md text-[10px] bg-white border border-slate-200 text-slate-700 font-semibold"
+                            className="px-2.5 py-1 rounded-lg text-[11px] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] font-medium"
                           >
                             {t}
                           </span>
@@ -183,13 +184,14 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
+                <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 dark:border-[#27272A]">
                   <button
+                    type="button"
                     onClick={() => onNavigateToWeek(item.weekId)}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-all"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-semibold border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer active:scale-95 shadow-2xs"
                   >
                     <span>Ver Semana</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400 dark:text-[#71717A]" />
                   </button>
                 </div>
               </div>

@@ -180,7 +180,7 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
       className={`rounded-2xl border transition-all ${
         isSubscribed
           ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/50'
-          : 'bg-gradient-to-br from-violet-50/90 via-indigo-50/60 to-purple-50/80 dark:from-violet-950/40 dark:via-indigo-950/30 dark:to-slate-900 border-violet-300/80 dark:border-violet-700/60 shadow-xs'
+          : 'bg-gradient-to-br from-violet-50/90 via-indigo-50/60 to-purple-50/80 dark:from-violet-950/40 dark:via-indigo-950/30 dark:to-zinc-900 border-violet-300/80 dark:border-violet-700/60 shadow-xs'
       } ${compact ? 'p-3.5 sm:p-4' : 'p-4 sm:p-5'} space-y-3.5`}
     >
       {/* CABECERA PRINCIPAL Y BOTÓN DE ACCIÓN */}
@@ -222,18 +222,18 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
                 )}
               </span>
 
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+              <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] truncate">
                 {subscription?.deviceLabel || deviceLabel}
               </span>
             </div>
 
-            <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1">
+            <h4 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white mt-1">
               {isSubscribed
                 ? `Notificaciones Push activadas para ${publisherName}`
                 : '¿Aún no recibes alertas Push en tu móvil o computadora?'}
             </h4>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+            <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] mt-0.5 leading-relaxed">
               {isSubscribed
                 ? `El Service Worker de Kongre mantiene ${
                     subscription?.scheduledCount || 0
@@ -274,7 +274,7 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
           <button
             type="button"
             onClick={() => setShowVisualGuide((prev) => !prev)}
-            className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+            className="px-3 py-2 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] border border-zinc-200/90 dark:border-[#27272A] text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
           >
             <HelpCircle className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
             <span>{showVisualGuide ? 'Ocultar Guía' : 'Guía Visual'}</span>
@@ -323,15 +323,15 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
 
       {/* PASO A PASO VISUAL EN TIEMPO REAL (Visible siempre si no está suscrito, o al abrir Guía Visual) */}
       {(!isSubscribed || showVisualGuide) && (
-        <div className="pt-2 border-t border-violet-200/60 dark:border-slate-800 space-y-3 animate-in fade-in duration-200">
+        <div className="pt-2 border-t border-violet-200/60 dark:border-[#27272A] space-y-3 animate-in fade-in duration-200">
           {/* 3 PASOS DE ACTIVACIÓN */}
           <div className={`grid grid-cols-1 ${compact ? 'xl:grid-cols-3' : 'sm:grid-cols-3'} gap-2.5`}>
             {/* Paso 1 */}
             <div
               className={`p-3 rounded-xl border flex items-start gap-2.5 ${
                 step1Done
-                  ? 'bg-white/90 dark:bg-slate-900/80 border-emerald-300/80 dark:border-emerald-800/60'
-                  : 'bg-white/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800'
+                  ? 'bg-white/90 dark:bg-[#121216]/80 border-emerald-300/80 dark:border-emerald-800/60'
+                  : 'bg-white/70 dark:bg-[#121216]/50 border-zinc-200 dark:border-[#27272A]'
               }`}
             >
               <div
@@ -344,12 +344,12 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
                 {step1Done ? '✓' : '1'}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 dark:text-white">
+                <div className="text-xs font-bold text-zinc-900 dark:text-white">
                   1. Vincula tu Nombre
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] leading-snug mt-0.5">
                   Publicador activo:{' '}
-                  <strong className="text-slate-800 dark:text-slate-200">
+                  <strong className="text-zinc-800 dark:text-[#E4E4E7]">
                     {publisherName || 'Seleccionar'}
                   </strong>
                 </p>
@@ -360,10 +360,10 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
             <div
               className={`p-3 rounded-xl border flex items-start gap-2.5 ${
                 step2Done
-                  ? 'bg-white/90 dark:bg-slate-900/80 border-emerald-300/80 dark:border-emerald-800/60'
+                  ? 'bg-white/90 dark:bg-[#121216]/80 border-emerald-300/80 dark:border-emerald-800/60'
                   : permission === 'denied'
                   ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800'
-                  : 'bg-white/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800'
+                  : 'bg-white/70 dark:bg-[#121216]/50 border-zinc-200 dark:border-[#27272A]'
               }`}
             >
               <div
@@ -378,10 +378,10 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
                 {step2Done ? '✓' : '2'}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 dark:text-white">
+                <div className="text-xs font-bold text-zinc-900 dark:text-white">
                   2. Permiso del Dispositivo
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] leading-snug mt-0.5">
                   {step2Done
                     ? 'Permiso concedido correctamente.'
                     : permission === 'denied'
@@ -395,8 +395,8 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
             <div
               className={`p-3 rounded-xl border flex items-start gap-2.5 ${
                 step3Done
-                  ? 'bg-white/90 dark:bg-slate-900/80 border-emerald-300/80 dark:border-emerald-800/60'
-                  : 'bg-white/70 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800'
+                  ? 'bg-white/90 dark:bg-[#121216]/80 border-emerald-300/80 dark:border-emerald-800/60'
+                  : 'bg-white/70 dark:bg-[#121216]/50 border-zinc-200 dark:border-[#27272A]'
               }`}
             >
               <div
@@ -409,10 +409,10 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
                 {step3Done ? '✓' : '3'}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 dark:text-white">
+                <div className="text-xs font-bold text-zinc-900 dark:text-white">
                   3. Cola en Segundo Plano
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] leading-snug mt-0.5">
                   {step3Done
                     ? `Service Worker activo (${subscription?.scheduledCount || 0} recordatorios).`
                     : 'Sincroniza tus asignaciones para avisarte con la app cerrada.'}
@@ -423,9 +423,9 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
 
           {/* GUÍA VISUAL DETALLADA POR PLATAFORMA (ANDROID / IPHONE / PC) */}
           {showVisualGuide && (
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <span className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                   <span>Guía Visual según tu Dispositivo:</span>
                 </span>
@@ -446,7 +446,7 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-all ${
                           active
                             ? 'bg-violet-600 text-white shadow-2xs'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                            : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200'
                         }`}
                       >
                         <PlatIcon className="w-3 h-3" />
@@ -459,27 +459,27 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
 
               {selectedPlatform === 'android' && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5">
                       Paso A • Toca Suscribirme
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Pulsa el botón morado <strong>&quot;Suscribirme a Notificaciones Push&quot;</strong> de esta tarjeta.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5">
                       Paso B • Confirma en Chrome
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Cuando aparezca el cuadro del navegador, toca <strong>&quot;Permitir&quot;</strong>.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5">
                       Paso C • Instala la App (Opcional)
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Para máxima fiabilidad en Android, instala Kongre en tu pantalla de inicio desde el menú del navegador.
                     </p>
                   </div>
@@ -488,30 +488,30 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
 
               {selectedPlatform === 'ios' && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5 flex items-center gap-1">
                       <Share className="w-3.5 h-3.5" />
                       <span>Paso A • Botón Compartir</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       En Safari (iOS 16.4+), toca el icono <strong>Compartir</strong> en la barra inferior.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5 flex items-center gap-1">
                       <PlusSquare className="w-3.5 h-3.5" />
                       <span>Paso B • Pantalla de Inicio</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Selecciona <strong>&quot;Agregar a la pantalla de inicio&quot;</strong> y abre Kongre desde el nuevo icono.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5 flex items-center gap-1">
                       <BellRing className="w-3.5 h-3.5" />
                       <span>Paso C • Activa el Push</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Vuelve aquí en Ajustes y pulsa <strong>&quot;Suscribirme a Notificaciones Push&quot;</strong>.
                     </p>
                   </div>
@@ -520,28 +520,28 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
 
               {selectedPlatform === 'desktop' && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5">
                       Paso A • Haz clic en Suscribirme
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Haz clic en <strong>&quot;Suscribirme a Notificaciones Push&quot;</strong> arriba a la derecha.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5 flex items-center gap-1">
                       <Lock className="w-3.5 h-3.5" />
                       <span>Paso B • Si estaba bloqueado</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Haz clic en el icono de ajustes/candado junto a la barra de direcciones URL y cambia Notificaciones a <strong>&quot;Permitir&quot;</strong>.
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
                     <div className="font-bold text-violet-700 dark:text-violet-300 mb-0.5">
                       Paso C • Prueba en 5 segundos
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
                       Usa <strong>&quot;Cola y Ajustes Push&quot;</strong> para probar una alerta real con la ventana minimizada.
                     </p>
                   </div>

@@ -248,21 +248,21 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
   const currentHoverPoint = hoveredIdx !== null ? hourPoints[hoveredIdx] : null;
 
   return (
-    <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between">
+    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight">
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               Actividad de Servicio del Campo
             </h3>
             {stats.totalHours > 0 && (
-              <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md">
+              <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-md font-mono tabular-nums">
                 {stats.totalHours} hrs totales
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium mt-0.5">
             Registro dinámico de horas de predicación y estudios bíblicos
           </p>
         </div>
@@ -270,14 +270,14 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
         {/* CONTROLS: METRICS & RANGE */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Metric Selector */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl text-xs font-semibold">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs font-semibold">
             <button
               type="button"
               onClick={() => setActiveMetric('ambos')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                 activeMetric === 'ambos'
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
               Ambos
@@ -285,10 +285,10 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setActiveMetric('horas')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                 activeMetric === 'horas'
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
               Horas
@@ -296,10 +296,10 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setActiveMetric('estudios')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                 activeMetric === 'estudios'
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
               Estudios
@@ -307,14 +307,14 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
           </div>
 
           {/* Range Selector */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl text-xs font-semibold">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs font-semibold">
             <button
               type="button"
               onClick={() => setRange('6')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                 range === '6'
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
+                  : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
               6 meses
@@ -322,10 +322,10 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setRange('12')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                 range === '12'
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
+                  : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
               12 meses
@@ -335,17 +335,17 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
       </div>
 
       {/* LEGEND INDICATORS */}
-      <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
+      <div className="flex items-center gap-4 text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mb-2">
         {(activeMetric === 'horas' || activeMetric === 'ambos') && (
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 ring-2 ring-indigo-200 dark:ring-indigo-900 inline-block" />
-            <span className="text-slate-700 dark:text-slate-200">Horas de Predicación</span>
+            <span className="text-zinc-700 dark:text-[#E4E4E7]">Horas de Predicación</span>
           </span>
         )}
         {(activeMetric === 'estudios' || activeMetric === 'ambos') && (
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-200 dark:ring-amber-900 inline-block" />
-            <span className="text-slate-700 dark:text-slate-200">Estudios Bíblicos</span>
+            <span className="text-zinc-700 dark:text-[#E4E4E7]">Estudios Bíblicos</span>
           </span>
         )}
       </div>
@@ -387,13 +387,13 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
                 stroke="currentColor"
                 strokeDasharray={i === yTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={i === yTicks.length - 1 ? 1.5 : 1}
-                className="text-slate-200 dark:text-slate-700/60"
+                className="text-zinc-200 dark:text-zinc-700/60"
               />
               <text
                 x={padding.left - 8}
                 y={tick.y + 4}
                 textAnchor="end"
-                className="text-[10px] font-semibold fill-slate-400 dark:fill-slate-500 font-mono"
+                className="text-[10px] font-semibold fill-zinc-400 dark:fill-zinc-500 font-mono"
               >
                 {tick.value}h
               </text>
@@ -449,7 +449,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
                   className={`text-[10px] font-semibold transition-colors ${
                     isHovered
                       ? 'fill-indigo-600 dark:fill-indigo-400 font-bold'
-                      : 'fill-slate-400 dark:fill-slate-500'
+                      : 'fill-zinc-400 dark:fill-zinc-500'
                   }`}
                 >
                   {d.label}
@@ -528,10 +528,10 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
               top: `${Math.max(padding.top + 30, currentHoverPoint.y)}px`,
             }}
           >
-            <div className="bg-slate-900/95 dark:bg-slate-950/95 text-white backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/10 text-xs min-w-[150px]">
-              <div className="font-bold text-slate-200 border-b border-white/10 pb-1 mb-1.5 flex items-center justify-between">
+            <div className="bg-zinc-900/95 dark:bg-zinc-950/95 text-white backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/10 text-xs min-w-[150px]">
+              <div className="font-bold text-zinc-200 border-b border-white/10 pb-1 mb-1.5 flex items-center justify-between">
                 <span>{currentHover.fullLabel}</span>
-                <span className="text-[10px] font-normal text-slate-400">
+                <span className="text-[10px] font-normal text-zinc-400">
                   {currentHover.publishersCount} publ.
                 </span>
               </div>
@@ -557,27 +557,27 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
       </div>
 
       {/* FOOTER METRICS SUMMARY */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 mt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 mt-1 border-t border-zinc-200 dark:border-[#27272A] text-xs">
         <div>
-          <span className="text-slate-400 block text-[11px]">Promedio mensual</span>
-          <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+          <span className="text-zinc-500 dark:text-[#A1A1AA] block text-[11px]">Promedio mensual</span>
+          <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-[#F4F4F5] text-sm">
             {stats.avgHours} hrs
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[11px]">Estudios activos</span>
-          <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+          <span className="text-zinc-500 dark:text-[#A1A1AA] block text-[11px]">Estudios activos</span>
+          <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-[#F4F4F5] text-sm">
             {stats.totalStudies} bibl.
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[11px]">Mes más activo</span>
-          <span className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate block">
+          <span className="text-zinc-500 dark:text-[#A1A1AA] block text-[11px]">Mes más activo</span>
+          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm truncate block">
             {stats.peakMonth}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[11px]">Tendencia</span>
+          <span className="text-zinc-500 dark:text-[#A1A1AA] block text-[11px]">Tendencia</span>
           <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" />
             {stats.totalHours > 0 ? 'Activo' : 'Sin datos'}

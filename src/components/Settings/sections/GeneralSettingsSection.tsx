@@ -40,17 +40,17 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
   isSaving,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
+      <div className="pb-3 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/50 dark:border-blue-800/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Información y Horarios de Reunión
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Parámetros oficiales del Salón del Reino y agenda semanal
             </p>
           </div>
@@ -59,7 +59,7 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] uppercase tracking-wider mb-1">
             Nombre de la Congregación
           </label>
           <input
@@ -71,15 +71,15 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
               onUserEdit();
             }}
             placeholder="Ej. Congregación Central"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
           />
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-1 block">
             Este nombre oficial es el que se mostrará en el banner superior, programas y hojas S-89.
           </span>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] uppercase tracking-wider mb-1">
             Dirección del Salón del Reino
           </label>
           <input
@@ -90,14 +90,14 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
               onUserEdit();
             }}
             placeholder="Ej. Av. Las Palmeras 450"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
           />
         </div>
 
         {/* Reunión Entre Semana */}
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1.5">
               Día Entre Semana
             </label>
             <Select
@@ -118,7 +118,7 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1.5">
               Hora de Inicio
             </label>
             <IosTimePicker
@@ -135,9 +135,9 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
         </div>
 
         {/* Reunión Fin de Semana */}
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1.5">
               Día Fin de Semana
             </label>
             <Select
@@ -155,7 +155,7 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1.5">
               Hora de Inicio
             </label>
             <IosTimePicker
@@ -173,7 +173,7 @@ export const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
       </div>
 
       {/* Botón de Guardado dentro del contenedor */}
-      <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex justify-end pt-3 border-t border-zinc-100 dark:border-[#27272A]">
         <button
           type="button"
           onClick={() => onSave()}

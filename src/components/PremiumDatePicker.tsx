@@ -144,24 +144,24 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
   return (
     <div className={`relative ${size === 'sm' ? 'w-auto' : 'w-full'}`} ref={containerRef}>
       {label && (
-        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block ml-1">
+        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1 block ml-1">
           {label}
         </label>
       )}
       
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl font-bold outline-none cursor-pointer transition-all hover:bg-white dark:hover:bg-slate-800 shadow-xs ${size === 'sm' ? 'py-1.5 px-3 text-[10px] min-h-[32px]' : 'py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm min-h-[40px]'} ${isOpen ? `ring-2 ${ringColors[accentColor]}` : ''}`}
+        className={`flex items-center gap-2 w-full bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A]/80 rounded-xl font-bold outline-none cursor-pointer transition-all hover:bg-white dark:hover:bg-[#27272A] shadow-xs ${size === 'sm' ? 'py-1.5 px-3 text-[10px] min-h-[32px]' : 'py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm min-h-[40px]'} ${isOpen ? `ring-2 ${ringColors[accentColor]}` : ''}`}
       >
-        <CalendarIcon size={size === 'sm' ? 12 : 14} className={value ? textColors[accentColor] : 'text-slate-400'} />
-        <span className={`flex-1 truncate ${!value ? 'text-slate-400' : 'text-slate-800 dark:text-slate-200'}`}>
+        <CalendarIcon size={size === 'sm' ? 12 : 14} className={value ? textColors[accentColor] : 'text-zinc-400'} />
+        <span className={`flex-1 truncate ${!value ? 'text-zinc-400' : 'text-zinc-800 dark:text-[#E4E4E7]'}`}>
           {displayDate || placeholder}
         </span>
         {value && (
           <button 
             type="button"
             onClick={(e) => { e.stopPropagation(); onChange(''); }}
-            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1 hover:bg-zinc-200 dark:hover:bg-[#27272A] rounded-lg text-zinc-400 hover:text-zinc-600 transition-colors"
           >
             <X size={size === 'sm' ? 10 : 12} />
           </button>
@@ -169,32 +169,32 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-[100] top-full mt-2 left-0 w-[280px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200 origin-top">
+        <div className="absolute z-[100] top-full mt-2 left-0 w-[280px] bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200 origin-top">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex flex-col">
               <button 
                 type="button"
                 onClick={() => setViewMode(viewMode === 'days' ? 'years' : 'days')}
-                className="text-xs font-black text-slate-800 dark:text-slate-100 hover:text-indigo-600 transition-colors text-left flex items-center gap-1 group"
+                className="text-xs font-black text-zinc-800 dark:text-zinc-100 hover:text-indigo-600 transition-colors text-left flex items-center gap-1 group"
               >
                 {MONTHS[viewDate.getMonth()]}
-                <ChevronDown size={12} className={`text-slate-400 group-hover:text-indigo-600 transition-transform ${viewMode === 'years' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={12} className={`text-zinc-400 group-hover:text-indigo-600 transition-transform ${viewMode === 'years' ? 'rotate-180' : ''}`} />
               </button>
               <button 
                 type="button"
                 onClick={() => setViewMode(viewMode === 'days' ? 'years' : 'days')}
-                className="text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors text-left"
+                className="text-[10px] font-bold text-zinc-400 hover:text-zinc-600 transition-colors text-left"
               >
                 {viewDate.getFullYear()}
               </button>
             </div>
             {viewMode === 'days' && (
               <div className="flex gap-1">
-                <button type="button" onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors">
+                <button type="button" onClick={() => changeMonth(-1)} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 transition-colors">
                   <ChevronLeft size={16} />
                 </button>
-                <button type="button" onClick={() => changeMonth(1)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors">
+                <button type="button" onClick={() => changeMonth(1)} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 transition-colors">
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -206,7 +206,7 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
               {/* Days Header */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {DAYS.map(day => (
-                  <div key={day} className="text-[9px] font-black text-slate-400 text-center uppercase py-1">
+                  <div key={day} className="text-[9px] font-black text-zinc-400 text-center uppercase py-1">
                     {day}
                   </div>
                 ))}
@@ -233,7 +233,7 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
                           ? activeAccentClasses[accentColor] 
                           : today 
                             ? todayClasses[accentColor] 
-                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'}
+                            : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-zinc-900 dark:hover:text-zinc-100'}
                       `}
                     >
                       {day}
@@ -253,7 +253,7 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
                     py-2 rounded-lg text-xs font-bold transition-all cursor-pointer
                     ${viewDate.getFullYear() === year 
                       ? activeAccentClasses[accentColor] 
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#27272A]'}
                   `}
                 >
                   {year}
@@ -263,7 +263,7 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
           )}
 
           {/* Footer */}
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+          <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-[#27272A] flex justify-between">
             <button 
               type="button"
               onClick={() => { setViewDate(new Date()); setViewMode('days'); }}
@@ -274,7 +274,7 @@ export const PremiumDatePicker: React.FC<PremiumDatePickerProps> = ({
             <button 
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 cursor-pointer"
+              className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-600 cursor-pointer"
             >
               Cerrar
             </button>

@@ -83,12 +83,12 @@ export const SplashCheckbox = React.forwardRef<HTMLInputElement, SplashCheckboxP
         {(label || description) && (
           <label htmlFor={inputId} className={`flex flex-col justify-center text-left ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
             {label && (
-              <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-none">
+              <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-100 leading-none">
                 {label}
               </span>
             )}
             {description && (
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-normal">
                 {description}
               </span>
             )}

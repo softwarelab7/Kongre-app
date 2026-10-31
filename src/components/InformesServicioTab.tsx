@@ -243,20 +243,20 @@ export const InformesServicioTab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Barra Unificada de Mes de Servicio, Progreso y Acción S-4 */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col gap-3.5">
+      <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col gap-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center justify-between sm:justify-start gap-2">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Mes de Servicio:</span>
+              <span className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">Mes de Servicio:</span>
             </div>
             <input
               type="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 focus:bg-white"
+              className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] bg-zinc-50 dark:bg-[#18181F] focus:bg-white dark:focus:bg-[#121216] font-mono tabular-nums"
             />
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 hidden md:inline">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] hidden md:inline">
               ({formatMonthName(selectedMonth)})
             </span>
           </div>
@@ -264,7 +264,7 @@ export const InformesServicioTab: React.FC = () => {
           {/* Action button */}
           <button
             onClick={handleCopyCongregationSummary}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer active:scale-95"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors cursor-pointer active:scale-95"
           >
             {copiedSummary ? (
               <>
@@ -281,9 +281,9 @@ export const InformesServicioTab: React.FC = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center gap-3 w-full pt-2 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">Recepción:</span>
-          <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+        <div className="flex items-center gap-3 w-full pt-2 border-t border-zinc-100 dark:border-[#27272A]">
+          <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] shrink-0">Recepción:</span>
+          <div className="flex-1 bg-zinc-100 dark:bg-[#18181F] rounded-full h-2.5 overflow-hidden border border-zinc-200/50 dark:border-[#27272A]">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 summary.completionPercent >= 90
@@ -295,7 +295,7 @@ export const InformesServicioTab: React.FC = () => {
               style={{ width: `${summary.completionPercent}%` }}
             />
           </div>
-          <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 shrink-0">
+          <span className="text-xs font-extrabold text-zinc-800 dark:text-[#F4F4F5] shrink-0 font-mono tabular-nums">
             {summary.completionPercent}% ({summary.reportedCount}/{summary.totalPublishers})
           </span>
         </div>
@@ -303,86 +303,92 @@ export const InformesServicioTab: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 block uppercase">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] block uppercase">
             Publicadores Activos
           </span>
-          <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
             {summary.totalPublishers}
           </span>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5 uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             Informaron
           </span>
           <div className="flex items-baseline gap-1 flex-wrap">
-            <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+            <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
               {summary.reportedCount}
             </span>
-            <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">
+            <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-semibold font-mono tabular-nums">
               ({summary.pendingCount} pend.)
             </span>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5 uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             Cursos Bíblicos
           </span>
-          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
+          <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
             {summary.totalStudies}
           </span>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 block uppercase">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5 uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
             Promedio Precursores
           </span>
-          <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">
+          <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
             {summary.avgPioneerHours} hrs
           </span>
         </div>
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <button
             onClick={() => setFilterStatus('todos')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               filterStatus === 'todos'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
             }`}
           >
-            Todos ({activePublishers.length})
+            Todos <span className="font-mono tabular-nums">({activePublishers.length})</span>
           </button>
           <button
             onClick={() => setFilterStatus('pendientes')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               filterStatus === 'pendientes'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
             }`}
           >
-            Pendientes ({summary.pendingCount})
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            Pendientes <span className="font-mono tabular-nums">({summary.pendingCount})</span>
           </button>
           <button
             onClick={() => setFilterStatus('informaron')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               filterStatus === 'informaron'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
             }`}
           >
-            Informaron ({summary.reportedCount})
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Informaron <span className="font-mono tabular-nums">({summary.reportedCount})</span>
           </button>
           <button
             onClick={() => setFilterStatus('precursores')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               filterStatus === 'precursores'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
             }`}
           >
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             Precursores
           </button>
         </div>
@@ -393,34 +399,34 @@ export const InformesServicioTab: React.FC = () => {
             onChange={(e) =>
               setFilterGroup(e.target.value === 'todos' ? 'todos' : Number(e.target.value))
             }
-            className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50"
+            className="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
           >
-            <option value="todos">Todos los grupos</option>
+            <option value="todos" className="bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5]">Todos los grupos</option>
             {preachingGroups.map((g) => (
-              <option key={g.number} value={g.number}>
+              <option key={g.number} value={g.number} className="bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5]">
                 {g.name}
               </option>
             ))}
           </select>
 
           <div className="relative min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5 pointer-events-none" />
             <input
               type="text"
               placeholder="Buscar publicador..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white"
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs bg-zinc-50 dark:bg-[#18181F] focus:bg-white dark:focus:bg-[#121216] text-zinc-800 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#71717A]"
             />
           </div>
         </div>
       </div>
 
       {/* Publisher Reports Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+          <table className="w-full text-left text-xs text-zinc-700 dark:text-[#E4E4E7]">
+            <thead className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">
               <tr>
                 <th className="p-3.5 pl-5">Publicador</th>
                 <th className="p-3.5 text-center">Grupo</th>
@@ -430,10 +436,10 @@ export const InformesServicioTab: React.FC = () => {
                 <th className="p-3.5 text-right pr-5">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
               {filteredPublishers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-slate-400 italic text-xs">
+                  <td colSpan={6} className="text-center py-10 text-zinc-400 dark:text-[#A1A1AA] italic text-xs">
                     No se encontraron publicadores con los filtros seleccionados.
                   </td>
                 </tr>
@@ -448,9 +454,7 @@ export const InformesServicioTab: React.FC = () => {
                   return (
                     <tr
                       key={pub.id}
-                      className={`hover:bg-slate-50/70 transition-colors ${
-                        !participated ? 'bg-amber-50/30' : ''
-                      }`}
+                      className="hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/50 transition-colors"
                     >
                       {/* Publisher name and privileges */}
                       <td className="p-3.5 pl-5">
@@ -461,20 +465,20 @@ export const InformesServicioTab: React.FC = () => {
                             }`}
                           />
                           <div>
-                            <span className="font-bold text-slate-900 block">{pub.name}</span>
+                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{pub.name}</span>
                             <div className="flex items-center gap-1.5 flex-wrap">
                               {isPioneer && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                                   Precursor/a
                                 </span>
                               )}
                               {pub.privilege === 'anciano' && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-blue-100 text-blue-800">
+                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                                   Anciano
                                 </span>
                               )}
                               {pub.privilege === 'siervo_ministerial' && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-800">
+                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                                   Siervo min.
                                 </span>
                               )}
@@ -484,7 +488,7 @@ export const InformesServicioTab: React.FC = () => {
                       </td>
 
                       {/* Group */}
-                      <td className="p-3.5 text-center font-bold text-slate-600">
+                      <td className="p-3.5 text-center font-bold text-zinc-600 dark:text-[#A1A1AA]">
                         {pub.groupNumber ? `G-${pub.groupNumber}` : '—'}
                       </td>
 
@@ -492,10 +496,10 @@ export const InformesServicioTab: React.FC = () => {
                       <td className="p-3.5 text-center">
                         <button
                           onClick={() => handleToggleParticipated(pub.id, participated)}
-                          className={`px-3 py-1 rounded-xl text-xs font-extrabold transition-all ${
+                          className={`px-3 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
                             participated
-                              ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                              ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/25'
+                              : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                           }`}
                         >
                           {participated ? '✓ Sí informó' : 'Pendiente'}
@@ -514,37 +518,37 @@ export const InformesServicioTab: React.FC = () => {
                               onChange={(e) =>
                                 handleUpdateHours(pub.id, parseInt(e.target.value, 10) || 0)
                               }
-                              className="w-16 p-1 text-center font-bold rounded-lg border border-slate-200 bg-white text-xs focus:ring-1 focus:ring-emerald-500"
+                              className="w-16 p-1 text-center font-bold rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-xs focus:ring-1 focus:ring-emerald-500"
                             />
-                            <span className="text-[11px] text-slate-400">hrs</span>
+                            <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">hrs</span>
                           </div>
                         ) : (
-                          <span className="text-slate-300 italic">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600 italic">—</span>
                         )}
                       </td>
 
                       {/* Bible Studies Stepper */}
                       <td className="p-3.5 text-center">
                         {participated ? (
-                          <div className="inline-flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-lg">
+                          <div className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] px-2 py-0.5 rounded-lg border border-zinc-200/50 dark:border-[#27272A]">
                             <button
                               onClick={() => handleUpdateStudies(pub.id, -1)}
-                              className="w-5 h-5 rounded hover:bg-white text-slate-600 font-bold flex items-center justify-center"
+                              className="w-5 h-5 rounded hover:bg-white dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#F4F4F5] font-bold flex items-center justify-center cursor-pointer"
                             >
                               -
                             </button>
-                            <span className="font-bold text-slate-900 min-w-[18px] text-center">
+                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] min-w-[18px] text-center font-mono tabular-nums">
                               {rep?.bibleStudies || 0}
                             </span>
                             <button
                               onClick={() => handleUpdateStudies(pub.id, 1)}
-                              className="w-5 h-5 rounded hover:bg-white text-slate-600 font-bold flex items-center justify-center"
+                              className="w-5 h-5 rounded hover:bg-white dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#F4F4F5] font-bold flex items-center justify-center cursor-pointer"
                             >
                               +
                             </button>
                           </div>
                         ) : (
-                          <span className="text-slate-300 italic">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600 italic">—</span>
                         )}
                       </td>
 
@@ -553,10 +557,10 @@ export const InformesServicioTab: React.FC = () => {
                         {!participated && (
                           <button
                             onClick={() => handleSendReminderWhatsApp(pub)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-[11px] font-bold transition-colors"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-[11px] font-bold transition-colors cursor-pointer"
                             title="Enviar recordatorio amistoso para solicitar informe mensual"
                           >
-                            <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                            <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
                             <span>Recordar</span>
                           </button>
                         )}

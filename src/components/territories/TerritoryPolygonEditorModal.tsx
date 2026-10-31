@@ -401,21 +401,21 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
       aria-label={`Delimitar polígono del territorio ${territory.name}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
     >
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121216]/70">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg">
               #{territory.number}
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
                 Delimitar Polígono: {territory.name}
-                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] font-medium">
                   {territory.zone}
                 </span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Haz clic en el mapa para añadir vértices. Arrastra los puntos para ajustar manzanas o calles.
               </p>
             </div>
@@ -427,7 +427,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               onClick={() => setShowHelp(!showHelp)}
               aria-label="Instrucciones y ayuda para delimitar territorio"
               aria-expanded={showHelp}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
               title="Instrucciones y ayuda"
             >
               <HelpCircle className="w-5 h-5" />
@@ -436,7 +436,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               type="button"
               onClick={onClose}
               aria-label="Cerrar editor de polígono de territorio"
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -468,24 +468,24 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
         )}
 
         {/* Toolbar & Search */}
-        <div className="p-3 bg-white dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="p-3 bg-white dark:bg-[#121216]/90 border-b border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-3 text-xs">
           {/* Search box */}
           <form onSubmit={handleSearchAddress} className="flex items-center gap-2 flex-1 min-w-[240px] max-w-md">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input
                 type="text"
                 aria-label="Buscar calle, barrio o ciudad en el mapa"
                 placeholder="Buscar calle, barrio o ciudad..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-100 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
             <button
               type="submit"
               disabled={isSearching}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-medium transition-colors disabled:opacity-50"
             >
               {isSearching ? 'Buscando...' : 'Ir'}
             </button>
@@ -493,7 +493,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
 
           {/* Color Presets */}
           <div className="flex items-center gap-1.5">
-            <span className="text-slate-500 dark:text-slate-400 font-medium mr-1">Color:</span>
+            <span className="text-zinc-500 dark:text-[#A1A1AA] font-medium mr-1">Color:</span>
             {PRESET_COLORS.map((c) => (
               <button
                 key={c.value}
@@ -510,7 +510,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
           </div>
 
           {/* Map Layer Switcher */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl">
             {(Object.keys(MAP_TILE_PROVIDERS) as MapTileLayerKey[]).map((key) => {
               const prov = MAP_TILE_PROVIDERS[key];
               const isActive = activeTile === key;
@@ -521,8 +521,8 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
                   onClick={() => handleChangeTile(key)}
                   className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all ${
                     isActive
-                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-zinc-200'
                   }`}
                 >
                   <span>{prov.icon}</span>
@@ -537,7 +537,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
             <button
               type="button"
               onClick={() => setShowGeoJsonModal(true)}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium transition-colors"
+              className="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] flex items-center gap-1 font-medium transition-colors"
               title="Importar o exportar coordenadas GeoJSON"
             >
               <Upload className="w-3.5 h-3.5" />
@@ -547,7 +547,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               type="button"
               onClick={handleLocateMe}
               disabled={isLocating}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium transition-colors disabled:opacity-50"
+              className="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] flex items-center gap-1 font-medium transition-colors disabled:opacity-50"
               title="Centrar en mi ubicación GPS"
             >
               <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
@@ -573,7 +573,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               onClick={handleUndo}
               disabled={vertices.length === 0}
               aria-label="Deshacer último punto del polígono"
-              className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-md backdrop-blur-md border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-40"
+              className="p-2.5 rounded-xl bg-white/90 dark:bg-[#18181F]/90 text-zinc-700 dark:text-[#E4E4E7] shadow-md backdrop-blur-md border border-zinc-200 dark:border-[#27272A] hover:bg-white dark:hover:bg-[#27272A] transition-colors disabled:opacity-40"
               title="Deshacer último punto"
             >
               <Undo2 className="w-4 h-4" />
@@ -583,7 +583,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               onClick={handleFitBounds}
               disabled={vertices.length === 0}
               aria-label="Centrar mapa en el polígono"
-              className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-md backdrop-blur-md border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-40"
+              className="p-2.5 rounded-xl bg-white/90 dark:bg-[#18181F]/90 text-zinc-700 dark:text-[#E4E4E7] shadow-md backdrop-blur-md border border-zinc-200 dark:border-[#27272A] hover:bg-white dark:hover:bg-[#27272A] transition-colors disabled:opacity-40"
               title="Centrar en polígono"
             >
               <Maximize2 className="w-4 h-4" />
@@ -593,7 +593,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               onClick={handleClear}
               disabled={vertices.length === 0}
               aria-label="Limpiar todo el polígono"
-              className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-rose-600 dark:text-rose-400 shadow-md backdrop-blur-md border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors disabled:opacity-40"
+              className="p-2.5 rounded-xl bg-white/90 dark:bg-[#18181F]/90 text-rose-600 dark:text-rose-400 shadow-md backdrop-blur-md border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors disabled:opacity-40"
               title="Limpiar todo el polígono"
             >
               <Trash2 className="w-4 h-4" />
@@ -602,20 +602,20 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
         </div>
 
         {/* Footer Statistics & Save Actions */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-900/95 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-4 bg-zinc-50 dark:bg-[#121216]/95 border-t border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-4">
           {/* Live Metrics */}
           <div className="flex items-center gap-4 text-xs">
-            <div className="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-slate-400 mr-1.5">Vértices:</span>
-              <strong className="text-slate-800 dark:text-slate-100 font-bold">{vertices.length}</strong>
+            <div className="bg-white dark:bg-[#18181F] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-sm">
+              <span className="text-zinc-400 mr-1.5">Vértices:</span>
+              <strong className="text-zinc-800 dark:text-zinc-100 font-bold">{vertices.length}</strong>
             </div>
-            <div className="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-slate-400 mr-1.5">Perímetro:</span>
-              <strong className="text-slate-800 dark:text-slate-100 font-bold">{formatDistance(perimeter)}</strong>
+            <div className="bg-white dark:bg-[#18181F] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-sm">
+              <span className="text-zinc-400 mr-1.5">Perímetro:</span>
+              <strong className="text-zinc-800 dark:text-zinc-100 font-bold">{formatDistance(perimeter)}</strong>
             </div>
-            <div className="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-slate-400 mr-1.5">Área aprox:</span>
-              <strong className="text-slate-800 dark:text-slate-100 font-bold">{formatArea(area)}</strong>
+            <div className="bg-white dark:bg-[#18181F] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-sm">
+              <span className="text-zinc-400 mr-1.5">Área aprox:</span>
+              <strong className="text-zinc-800 dark:text-zinc-100 font-bold">{formatArea(area)}</strong>
             </div>
           </div>
 
@@ -624,7 +624,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-xs transition-colors"
+              className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] font-medium text-xs transition-colors"
             >
               Cancelar
             </button>
@@ -647,22 +647,22 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
             aria-label="Importar o exportar coordenadas GeoJSON"
             className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
           >
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-lg w-full shadow-2xl space-y-4">
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-5 max-w-lg w-full shadow-2xl space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm">
                   Importar o Exportar GeoJSON
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowGeoJsonModal(false)}
                   aria-label="Cerrar ventana de GeoJSON"
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Pega aquí las coordenadas o un objeto GeoJSON de Google Earth, QGIS o tu congregación para cargar el polígono:
               </p>
 
@@ -671,7 +671,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
                 onChange={(e) => setGeoJsonInput(e.target.value)}
                 placeholder='{"type": "Polygon", "coordinates": [[[...]]]}'
                 rows={6}
-                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-mono text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-mono text-zinc-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
 
               <div className="flex items-center justify-between">
@@ -699,7 +699,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
                   <button
                     type="button"
                     onClick={() => setShowGeoJsonModal(false)}
-                    className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium"
+                    className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-medium"
                   >
                     Cerrar
                   </button>

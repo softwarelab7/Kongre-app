@@ -70,7 +70,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
 
   return (
     <div className="relative w-full" ref={containerRef}>
-      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+      <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1 flex items-center gap-1.5">
         <span>{label}</span>
         {required && <span className="text-rose-500">*</span>}
       </label>
@@ -92,7 +92,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
           required={required}
           list={datalistId}
           autoComplete="off"
-          className="w-full px-3 py-1.5 sm:py-2 pr-14 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full px-3 py-1.5 sm:py-2 pr-14 rounded-xl border border-zinc-200 dark:border-[#27272A]/80 bg-white dark:bg-[#18181F]/90 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-semibold text-xs sm:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
         />
 
         {/* Browser native datalist fallback for accessibility */}
@@ -107,7 +107,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
               title="Borrar texto"
             >
               <X className="w-3.5 h-3.5" />
@@ -117,7 +117,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
             type="button"
             disabled={disabled}
             onClick={() => setIsOpen(!isOpen)}
-            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
             title="Mostrar opciones"
           >
             <ChevronDown
@@ -128,14 +128,14 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
       </div>
 
       {helperText && (
-        <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block leading-tight">
+        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block leading-tight">
           {helperText}
         </span>
       )}
 
       {/* Lista desplegable interactiva con filtro en tiempo real */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 left-0 right-0 mt-1.5 max-h-56 overflow-y-auto rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-900/10 py-1 text-xs sm:text-sm animate-in fade-in-50 duration-150">
+        <div className="absolute z-50 left-0 right-0 mt-1.5 max-h-56 overflow-y-auto rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-xl shadow-zinc-900/10 py-1 text-xs sm:text-sm animate-in fade-in-50 duration-150">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => {
               const isSelected = option.toLowerCase() === value.trim().toLowerCase();
@@ -147,7 +147,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
                   className={`w-full text-left px-3 py-2 flex items-center justify-between transition-colors cursor-pointer text-xs sm:text-sm ${
                     isSelected
                       ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold'
-                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
                   }`}
                 >
                   <span className="truncate">{option}</span>
@@ -156,7 +156,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
               );
             })
           ) : (
-            <div className="px-3 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+            <div className="px-3 py-2.5 text-xs text-zinc-500 dark:text-[#A1A1AA]">
               <p>{emptyMessage}</p>
               {value.trim() && (
                 <button

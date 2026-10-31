@@ -443,7 +443,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               ? 'bg-blue-100 text-blue-800'
               : p.privilege?.includes('precursor')
               ? 'bg-emerald-100 text-emerald-800'
-              : 'bg-slate-100 text-slate-700',
+              : 'bg-zinc-100 text-zinc-700',
             icon: Users,
             action: () => {
               onNavigate('publicadores');
@@ -624,7 +624,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-3 pb-6">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
@@ -633,11 +633,11 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Buscador global de la congregación"
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-2xl bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
         onKeyDown={handleKeyDown}
       >
         {/* Top Search Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]">
           <Search className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
           <input
             ref={inputRef}
@@ -646,26 +646,26 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar publicador, territorio, bosquejo de discurso (#1..200), fecha o módulo..."
             aria-label="Buscar publicador, territorio, bosquejo de discurso, fecha o módulo"
-            className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-sm sm:text-base focus:outline-hidden"
+            className="w-full bg-transparent text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] font-medium text-sm sm:text-base focus:outline-hidden"
           />
           {query ? (
             <button
               type="button"
               onClick={() => setQuery('')}
               aria-label="Limpiar búsqueda"
-              className="p-1 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-600 dark:hover:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded shadow-2xs">
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-semibold font-mono text-zinc-500 dark:text-[#A1A1AA] bg-white dark:bg-[#121216] border border-zinc-300 dark:border-[#27272A] rounded">
               ESC
             </kbd>
           )}
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none bg-white dark:bg-slate-900 text-xs">
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 dark:border-[#27272A] overflow-x-auto scrollbar-none bg-white dark:bg-[#121216] text-xs">
           {[
             { id: 'todos', label: 'Todos' },
             { id: 'publicadores', label: 'Publicadores' },
@@ -677,16 +677,16 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id as SearchCategory)}
-              className={`px-2.5 py-1 rounded-full font-medium transition-colors whitespace-nowrap cursor-pointer ${
+              className={`px-2.5 py-1 rounded-full font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                 activeCategory === cat.id
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
               }`}
             >
               {cat.label}
             </button>
           ))}
-          <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-400 font-normal pl-2 shrink-0">
+          <span className="ml-auto text-[11px] text-zinc-400 dark:text-[#A1A1AA] font-normal font-mono tabular-nums pl-2 shrink-0">
             {filteredResults.length} {filteredResults.length === 1 ? 'resultado' : 'resultados'}
           </span>
         </div>
@@ -694,7 +694,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         {/* Results List */}
         <div
           ref={resultsContainerRef}
-          className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/60"
+          className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-zinc-100 dark:divide-[#27272A]/60"
         >
           {filteredResults.length > 0 ? (
             filteredResults.map((item, index) => {
@@ -706,18 +706,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                   data-search-item
                   onClick={() => item.action()}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors text-left ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors text-left border ${
                     isSelected
-                      ? 'bg-indigo-50/90 dark:bg-indigo-950/60 text-indigo-950 dark:text-indigo-200 ring-1 ring-indigo-200 dark:ring-indigo-800'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
+                      ? 'bg-indigo-50/90 dark:bg-[#18181F] text-indigo-950 dark:text-[#F4F4F5] border-indigo-200 dark:border-[#27272A]'
+                      : 'hover:bg-zinc-50 dark:hover:bg-[#18181F]/60 text-zinc-800 dark:text-[#F4F4F5] border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 pr-2">
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? 'bg-indigo-600 text-white shadow-xs'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200'
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -730,15 +730,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         {item.badge && (
                           <span
                             className={`px-1.5 py-0.2 rounded-md text-[10px] font-semibold ${
-                              item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                              item.badgeColor || 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]'
                             }`}
                           >
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-semibold truncate leading-snug text-slate-900 dark:text-white">{item.title}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{item.subtitle}</p>
+                      <p className="text-sm font-semibold truncate leading-snug text-zinc-900 dark:text-[#F4F4F5]">{item.title}</p>
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] truncate">{item.subtitle}</p>
                     </div>
                   </div>
 
@@ -751,7 +751,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     )}
                     <ChevronRight
                       className={`w-4 h-4 ${
-                        isSelected ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600'
+                        isSelected ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5' : 'text-zinc-300 dark:text-[#71717A]'
                       } transition-transform`}
                     />
                   </div>
@@ -760,9 +760,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             })
           ) : (
             <div className="text-center py-12 px-4">
-              <Search className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">No se encontraron resultados</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              <Search className="w-10 h-10 text-zinc-300 dark:text-[#71717A] mx-auto mb-2" />
+              <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-100">No se encontraron resultados</h4>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 max-w-sm mx-auto">
                 No hay coincidencias para &ldquo;{query}&rdquo;. Prueba buscando por nombre de publicador, número de territorio o bosquejo de discurso.
               </p>
             </div>
@@ -770,25 +770,25 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </div>
 
         {/* Footer shortcuts hint */}
-        <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950/80 border-t border-zinc-200 dark:border-[#27272A] flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A] rounded font-semibold text-zinc-700 dark:text-[#D4D4D8] shadow-2xs">
                 ↑
               </kbd>
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A] rounded font-semibold text-zinc-700 dark:text-[#D4D4D8] shadow-2xs">
                 ↓
               </kbd>
               <span>Navegar</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A] rounded font-semibold text-zinc-700 dark:text-[#D4D4D8] shadow-2xs">
                 ↵
               </kbd>
               <span>Abrir</span>
             </span>
           </div>
-          <span className="hidden sm:inline text-slate-400 dark:text-slate-500">
+          <span className="hidden sm:inline text-zinc-400 dark:text-[#71717A]">
             Consejo: Escribe <span className="font-semibold text-indigo-600 dark:text-indigo-400">#12</span> para el discurso 12
           </span>
         </div>

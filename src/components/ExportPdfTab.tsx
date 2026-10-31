@@ -408,16 +408,16 @@ export const ExportPdfTab: React.FC = () => {
       </style>
 
       {/* Barra de Navegación de Exportación y Plantillas (Unified Container) */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
         {/* Tab switch between Monthly Program, S-89 Slips, Local Official Forms, and WhatsApp Center */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 p-1 rounded-xl text-xs font-semibold w-full lg:w-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-[#27272A]/80 p-1 rounded-xl text-xs font-semibold w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab('programa')}
             className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'programa'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <FileText className="w-4 h-4 shrink-0" />
@@ -430,7 +430,7 @@ export const ExportPdfTab: React.FC = () => {
             className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's89'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <FileCheck className="w-4 h-4 shrink-0" />
@@ -443,7 +443,7 @@ export const ExportPdfTab: React.FC = () => {
             className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's21'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <User className="w-4 h-4 shrink-0" />
@@ -470,7 +470,7 @@ export const ExportPdfTab: React.FC = () => {
             className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'whatsapp'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -479,7 +479,7 @@ export const ExportPdfTab: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden md:inline">
+          <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA] hidden md:inline">
             100% Local • Sin servidores externos
           </span>
         </div>
@@ -494,15 +494,15 @@ export const ExportPdfTab: React.FC = () => {
       {activeTab === 'programa' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Controls Column */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 no-print self-start">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
               <Sliders className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               <span>Configuración del Documento</span>
             </h3>
 
             {/* 1. Template Selector */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 1. Estilo de Plantilla (5 Diseños)
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -523,19 +523,19 @@ export const ExportPdfTab: React.FC = () => {
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                       activeTemplate === t.id
                         ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/50 ring-1 ring-indigo-600'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 bg-white dark:bg-slate-900'
+                        : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-200 dark:hover:border-indigo-800 bg-white dark:bg-[#121216]'
                     }`}
                   >
-                    <p className="font-bold text-xs text-slate-900 dark:text-white">{t.name}</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{t.desc}</p>
+                    <p className="font-bold text-xs text-zinc-900 dark:text-white">{t.name}</p>
+                    <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">{t.desc}</p>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* 2. Page Size & Page Orientation */}
-            <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="space-y-3 pt-4 border-t border-zinc-100 dark:border-[#27272A]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 2. Tamaño y Orientación de Página
               </label>
 
@@ -550,7 +550,7 @@ export const ExportPdfTab: React.FC = () => {
                   className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     pageSize === 'letter'
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                   }`}
                 >
                   Tamaño Carta (Letter)
@@ -564,7 +564,7 @@ export const ExportPdfTab: React.FC = () => {
                   className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     pageSize === 'a4'
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                   }`}
                 >
                   Tamaño A4 (ISO)
@@ -573,7 +573,7 @@ export const ExportPdfTab: React.FC = () => {
 
               {/* Page Orientation Selector */}
               <div>
-                <span className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                <span className="block text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] mb-1.5">
                   Orientación de la Hoja ({dimensionsLabel}):
                 </span>
                 <div className="grid grid-cols-2 gap-2">
@@ -586,13 +586,13 @@ export const ExportPdfTab: React.FC = () => {
                     className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
                       pageOrientation === 'portrait'
                         ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
-                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                        : 'border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#D4D4D8] hover:border-indigo-300'
                     }`}
                   >
                     <RectangleVertical className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                     <div className="min-w-0">
                       <span className="block text-xs font-bold leading-tight">Vertical</span>
-                      <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+                      <span className="block text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
                         Retrato estándar
                       </span>
                     </div>
@@ -607,13 +607,13 @@ export const ExportPdfTab: React.FC = () => {
                     className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
                       pageOrientation === 'landscape'
                         ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
-                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                        : 'border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#D4D4D8] hover:border-indigo-300'
                     }`}
                   >
                     <RectangleHorizontal className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                     <div className="min-w-0">
                       <span className="block text-xs font-bold leading-tight">Horizontal</span>
-                      <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+                      <span className="block text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
                         Paisaje panorámico
                       </span>
                     </div>
@@ -622,7 +622,7 @@ export const ExportPdfTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] mb-1">
                   Encabezado de la Congregación:
                 </label>
                 <input
@@ -630,14 +630,14 @@ export const ExportPdfTab: React.FC = () => {
                   value={pdfCongregationName}
                   onChange={e => setPdfCongregationName(e.target.value)}
                   placeholder="Ej. Congregación Central"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white"
                 />
               </div>
             </div>
 
             {/* 3. Sections toggle */}
-            <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            <div className="space-y-2 pt-4 border-t border-zinc-100 dark:border-[#27272A] text-xs">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] mb-2">
                 3. Secciones a Incluir
               </label>
               <div className="flex flex-col gap-2 pt-1">
@@ -669,7 +669,7 @@ export const ExportPdfTab: React.FC = () => {
             </div>
 
             {/* 4. Preview & Download Actions */}
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
               <button
                 type="button"
                 onClick={() => handleOpenPreviewBeforeDownload('programa')}
@@ -693,7 +693,7 @@ export const ExportPdfTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handlePrint}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 dark:hover:bg-[#27272A] text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>Imprimir Hoja Actual</span>
@@ -713,10 +713,10 @@ export const ExportPdfTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleDownloadIcs}
-                  className="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-bold border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="py-2 px-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 text-zinc-700 dark:text-[#D4D4D8] text-xs font-bold border border-zinc-200 dark:border-[#27272A] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   title="Exportar calendario para Google Calendar, Apple Calendar o Outlook"
                 >
-                  <CalendarDays className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 shrink-0" />
+                  <CalendarDays className="w-3.5 h-3.5 text-zinc-600 dark:text-[#A1A1AA] shrink-0" />
                   <span className="truncate">Calendario (.ics)</span>
                 </button>
               </div>
@@ -726,10 +726,10 @@ export const ExportPdfTab: React.FC = () => {
           {/* Interactive Live Preview Area */}
           <div className="lg:col-span-2 space-y-3">
             {/* Preview Toolbar */}
-            <div className="bg-white dark:bg-slate-900 p-3 sm:px-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-2xs">
+            <div className="bg-white dark:bg-[#121216] p-3 sm:px-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-2xs">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span className="font-bold text-slate-800 dark:text-slate-200">
+                <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
                   Vista Previa ({pageSize.toUpperCase()} •{' '}
                   {pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'} • {dimensionsLabel})
                 </span>
@@ -737,14 +737,14 @@ export const ExportPdfTab: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-2">
                 {/* Switch between Interactive Paper Sheet and Real PDF Document */}
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                   <button
                     type="button"
                     onClick={() => setPreviewMode('sheet')}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       previewMode === 'sheet'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
                     }`}
                   >
                     Hoja Interactiva
@@ -754,8 +754,8 @@ export const ExportPdfTab: React.FC = () => {
                     onClick={() => setPreviewMode('pdf')}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       previewMode === 'pdf'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
                     }`}
                   >
                     Documento PDF Real
@@ -764,22 +764,22 @@ export const ExportPdfTab: React.FC = () => {
 
                 {/* Zoom controls when in Sheet mode */}
                 {previewMode === 'sheet' && (
-                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                  <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] px-1.5 py-0.5 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                     <button
                       type="button"
                       onClick={() => setPreviewZoom(z => Math.max(75, z - 10))}
-                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      className="p-1 text-zinc-600 dark:text-[#D4D4D8] hover:text-indigo-600 cursor-pointer"
                       title="Reducir zoom"
                     >
                       <ZoomOut className="w-3.5 h-3.5" />
                     </button>
-                    <span className="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300 min-w-[38px] text-center">
+                    <span className="text-[11px] font-mono font-bold text-zinc-700 dark:text-[#D4D4D8] min-w-[38px] text-center">
                       {previewZoom}%
                     </span>
                     <button
                       type="button"
                       onClick={() => setPreviewZoom(z => Math.min(120, z + 10))}
-                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      className="p-1 text-zinc-600 dark:text-[#D4D4D8] hover:text-indigo-600 cursor-pointer"
                       title="Aumentar zoom"
                     >
                       <ZoomIn className="w-3.5 h-3.5" />
@@ -788,7 +788,7 @@ export const ExportPdfTab: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setPreviewZoom(100)}
-                        className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+                        className="p-1 text-zinc-500 hover:text-zinc-800 cursor-pointer"
                         title="Restablecer zoom 100%"
                       >
                         <RotateCcw className="w-3 h-3" />
@@ -811,8 +811,8 @@ export const ExportPdfTab: React.FC = () => {
 
             {/* MODE A: EMBEDDED GENERATED PDF VIEWER */}
             {previewMode === 'pdf' ? (
-              <div className="rounded-3xl bg-slate-800 border border-slate-300 dark:border-slate-700 shadow-lg overflow-hidden flex flex-col min-h-[680px] no-print">
-                <div className="px-4 py-2.5 bg-slate-900 text-slate-200 text-xs flex items-center justify-between border-b border-slate-700">
+              <div className="rounded-3xl bg-zinc-800 border border-zinc-300 dark:border-[#27272A] shadow-lg overflow-hidden flex flex-col min-h-[680px] no-print">
+                <div className="px-4 py-2.5 bg-zinc-900 text-zinc-200 text-xs flex items-center justify-between border-b border-zinc-700">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                     <span className="font-semibold">
@@ -833,29 +833,29 @@ export const ExportPdfTab: React.FC = () => {
                   <iframe
                     src={pdfBlobUrl}
                     title="Vista previa del PDF del Programa"
-                    className="w-full flex-1 min-h-[640px] bg-slate-700"
+                    className="w-full flex-1 min-h-[640px] bg-zinc-700"
                   />
                 ) : (
-                  <div className="flex-1 flex items-center justify-center text-slate-300 text-sm p-8">
+                  <div className="flex-1 flex items-center justify-center text-zinc-300 text-sm p-8">
                     Generando documento PDF...
                   </div>
                 )}
               </div>
             ) : (
               /* MODE B: PROPORTIONAL PAPER SHEET PREVIEW (PORTRAIT vs LANDSCAPE) */
-              <div className="bg-slate-200/70 dark:bg-slate-950/80 p-3 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-x-auto flex justify-center">
+              <div className="bg-zinc-200/70 dark:bg-zinc-950/80 p-3 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] overflow-x-auto flex justify-center">
                 <div
                   style={{
                     transform: `scale(${previewZoom / 100})`,
                     transformOrigin: 'top center',
                   }}
-                  className={`w-full transition-all duration-300 bg-white border border-slate-300 shadow-xl text-slate-900 rounded-xl p-6 sm:p-8 ${
+                  className={`w-full transition-all duration-300 bg-white border border-zinc-300 shadow-xl text-zinc-900 rounded-xl p-6 sm:p-8 ${
                     pageOrientation === 'landscape'
                       ? 'max-w-[1040px] min-h-[540px]'
                       : 'max-w-[740px] min-h-[760px]'
                   } ${
                     activeTemplate === 'clasica'
-                      ? 'font-serif border-t-8 border-t-slate-800'
+                      ? 'font-serif border-t-8 border-t-zinc-800'
                       : activeTemplate === 'minimalista'
                       ? 'font-sans border-t-4 border-t-black'
                       : activeTemplate === 'moderna'
@@ -864,14 +864,14 @@ export const ExportPdfTab: React.FC = () => {
                   }`}
                 >
                   {/* Document Header */}
-                  <div className="text-center pb-5 border-b border-slate-200">
-                    <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-slate-900">
+                  <div className="text-center pb-5 border-b border-zinc-200">
+                    <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-900">
                       {pdfCongregationName.trim() || settings.congregationName || 'CONGREGACIÓN LOCAL'}
                     </h1>
                     <p className="text-xs uppercase tracking-widest text-indigo-700 font-bold mt-1">
                       Programa de Asignaciones Teocráticas
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="text-[11px] text-zinc-500 mt-0.5">
                       {settings.midweekMeetingDay} {settings.midweekMeetingTime} •{' '}
                       {settings.weekendMeetingDay} {settings.weekendMeetingTime} • Hoja{' '}
                       {pageSize.toUpperCase()} ({pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'})
@@ -891,17 +891,17 @@ export const ExportPdfTab: React.FC = () => {
                         key={w.id}
                         className={`rounded-2xl border p-4 transition-all ${
                           activeTemplate === 'color'
-                            ? 'border-indigo-100 bg-slate-50/50'
+                            ? 'border-indigo-100 bg-zinc-50/50'
                             : activeTemplate === 'minimalista'
                             ? 'border-black/20 bg-white'
                             : activeTemplate === 'clasica'
-                            ? 'border-slate-300 bg-amber-50/20'
-                            : 'border-slate-200 bg-white'
+                            ? 'border-zinc-300 bg-amber-50/20'
+                            : 'border-zinc-200 bg-white'
                         }`}
                       >
                         {/* Week Title Bar */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-200 gap-1">
-                          <h3 className="font-extrabold text-sm text-slate-900 uppercase">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-200 gap-1">
+                          <h3 className="font-extrabold text-sm text-zinc-900 uppercase">
                             Semana del {w.weekStartDate} al {w.weekEndDate}
                           </h3>
                           {w.specialEvent?.isSpecial && (
@@ -928,7 +928,7 @@ export const ExportPdfTab: React.FC = () => {
                                   <span className="w-2 h-2 rounded-full bg-indigo-600" />
                                   <span>Vida y Ministerio Cristianos ({w.midweek.date})</span>
                                 </div>
-                                <div className="pl-4 text-slate-700 space-y-0.5">
+                                <div className="pl-4 text-zinc-700 space-y-0.5">
                                   <p>
                                     <strong>Presidente:</strong>{' '}
                                     {publishersMap.get(w.midweek.presidentId || '')?.name || '---'} |{' '}
@@ -986,12 +986,12 @@ export const ExportPdfTab: React.FC = () => {
 
                             {/* Weekend section */}
                             {showWeekend && !w.specialEvent?.noMeetingWeekend && (
-                              <div className="space-y-1 pt-2 border-t border-slate-100">
+                              <div className="space-y-1 pt-2 border-t border-zinc-100">
                                 <div className="flex items-center gap-2 font-bold text-emerald-900">
                                   <span className="w-2 h-2 rounded-full bg-emerald-600" />
                                   <span>Reunión Fin de Semana ({w.weekend.date})</span>
                                 </div>
-                                <div className="pl-4 text-slate-700 space-y-0.5">
+                                <div className="pl-4 text-zinc-700 space-y-0.5">
                                   <p>
                                     <strong>Presidente:</strong>{' '}
                                     {publishersMap.get(w.weekend.presidentId || '')?.name || '---'} |{' '}
@@ -1034,9 +1034,9 @@ export const ExportPdfTab: React.FC = () => {
 
                             {/* Duties section */}
                             {showDuties && (
-                              <div className="pt-2 border-t border-slate-100 text-slate-600">
+                              <div className="pt-2 border-t border-zinc-100 text-zinc-600">
                                 <p>
-                                  <strong className="text-slate-800">Deberes:</strong> Audio y
+                                  <strong className="text-zinc-800">Deberes:</strong> Audio y
                                   Video:{' '}
                                   {Array.from(
                                     new Set([
@@ -1063,7 +1063,7 @@ export const ExportPdfTab: React.FC = () => {
 
                             {/* Cleaning */}
                             {showCleaning && (
-                              <div className="pt-1 text-slate-500 italic">
+                              <div className="pt-1 text-zinc-500 italic">
                                 Limpieza Salón del Reino: Grupo(s) #
                                 {w.cleaningGroupNumbers.join(', #')}
                               </div>
@@ -1101,14 +1101,14 @@ export const ExportPdfTab: React.FC = () => {
 
       {/* TAB 3: CENTRO WHATSAPP */}
       {activeTab === 'whatsapp' && (
-        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-[#121216] p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-emerald-600" />
                 <span>Centro de Mensajes Masivos y Recordatorios por WhatsApp</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Semana del {currentWeek?.weekStartDate} al {currentWeek?.weekEndDate}. Notifica a
                 cada hermano individualmente o copia el resumen general.
               </p>
@@ -1117,7 +1117,7 @@ export const ExportPdfTab: React.FC = () => {
             <button
               type="button"
               onClick={handleCopyWeekSummary}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-md transition-all shrink-0 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold shadow-md transition-all shrink-0 cursor-pointer"
             >
               {copiedSummary ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -1295,7 +1295,7 @@ export const ExportPdfTab: React.FC = () => {
                       className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
                         isNotified
                           ? 'bg-emerald-50/40 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70'
-                          : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800'
+                          : 'bg-zinc-50 dark:bg-[#18181F]/50 border-zinc-200 dark:border-[#27272A]'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -1307,7 +1307,7 @@ export const ExportPdfTab: React.FC = () => {
                         />
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-bold text-slate-900 dark:text-white">
+                            <span className="font-bold text-zinc-900 dark:text-white">
                               {pub.name}
                             </span>
                             {isNotified && (
@@ -1316,7 +1316,7 @@ export const ExportPdfTab: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-slate-600 dark:text-slate-300 mt-0.5">
+                          <p className="text-zinc-600 dark:text-[#D4D4D8] mt-0.5">
                             {item.title} • {item.date}{' '}
                             {item.room
                               ? `(${
@@ -1325,7 +1325,7 @@ export const ExportPdfTab: React.FC = () => {
                               : ''}
                           </p>
                           {assistant && (
-                            <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                            <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px]">
                               Ayudante: {assistant}
                             </p>
                           )}
@@ -1377,7 +1377,7 @@ export const ExportPdfTab: React.FC = () => {
                             );
                             openWhatsAppLink(pub.phone || '', msg);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-semibold transition-all cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] border border-zinc-300 dark:border-[#27272A] font-semibold transition-all cursor-pointer"
                         >
                           Recordar
                         </button>
@@ -1395,24 +1395,24 @@ export const ExportPdfTab: React.FC = () => {
          ========================================================================= */}
       {isPreviewModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-3 sm:p-5 animate-fade-in no-print"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-3 sm:p-5 animate-fade-in no-print"
           onClick={() => setIsPreviewModalOpen(false)}
         >
           <div
-            className="w-full max-w-6xl h-[90dvh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"
+            className="w-full max-w-6xl h-[90dvh] rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xl flex flex-col overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header with Live Orientation & Page Size Controls */}
-            <div className="px-5 py-3.5 sm:px-6 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900 shrink-0">
+            <div className="px-5 py-3.5 sm:px-6 border-b border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-3 bg-zinc-50 dark:bg-[#121216] shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                   <Eye className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate">
+                  <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate">
                     Vista Previa del Documento antes de la Descarga
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] truncate">
                     {previewModalDocType === 's89'
                       ? `Papeletas de Asignación S-89 (Semana ${s89Week?.weekStartDate || ''})`
                       : previewModalDocType === 's21'
@@ -1425,7 +1425,7 @@ export const ExportPdfTab: React.FC = () => {
 
               {/* Quick Orientation & Page Size Switchers inside Preview Modal */}
               <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <div className="flex items-center bg-zinc-200/70 dark:bg-[#18181F] p-1 rounded-xl text-xs font-bold">
                   <button
                     type="button"
                     onClick={() => {
@@ -1434,8 +1434,8 @@ export const ExportPdfTab: React.FC = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                       pageOrientation === 'portrait'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA]'
                     }`}
                   >
                     <RectangleVertical className="w-3.5 h-3.5" />
@@ -1449,8 +1449,8 @@ export const ExportPdfTab: React.FC = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                       pageOrientation === 'landscape'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA]'
                     }`}
                   >
                     <RectangleHorizontal className="w-3.5 h-3.5" />
@@ -1458,7 +1458,7 @@ export const ExportPdfTab: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center bg-slate-200/70 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <div className="flex items-center bg-zinc-200/70 dark:bg-[#18181F] p-1 rounded-xl text-xs font-bold">
                   <button
                     type="button"
                     onClick={() => {
@@ -1467,8 +1467,8 @@ export const ExportPdfTab: React.FC = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                       pageSize === 'letter'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA]'
                     }`}
                   >
                     Carta
@@ -1481,8 +1481,8 @@ export const ExportPdfTab: React.FC = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                       pageSize === 'a4'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA]'
                     }`}
                   >
                     A4
@@ -1492,7 +1492,7 @@ export const ExportPdfTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                   title="Cerrar vista previa"
                 >
                   <X className="w-5 h-5" />
@@ -1501,7 +1501,7 @@ export const ExportPdfTab: React.FC = () => {
             </div>
 
             {/* Embedded PDF Preview Body */}
-            <div className="flex-1 bg-slate-800 relative flex flex-col overflow-hidden">
+            <div className="flex-1 bg-zinc-800 relative flex flex-col overflow-hidden">
               {pdfBlobUrl ? (
                 <iframe
                   src={pdfBlobUrl}
@@ -1509,27 +1509,27 @@ export const ExportPdfTab: React.FC = () => {
                   className="w-full h-full border-0"
                 />
               ) : (
-                <div className="flex-1 flex items-center justify-center text-slate-300 text-sm">
+                <div className="flex-1 flex items-center justify-center text-zinc-300 text-sm">
                   Generando vista previa del PDF...
                 </div>
               )}
             </div>
 
             {/* Modal Footer with Confirm & Download CTA */}
-            <div className="px-5 py-3.5 sm:px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-              <div className="text-xs text-slate-500 dark:text-slate-400">
+            <div className="px-5 py-3.5 sm:px-6 border-t border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216] flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+              <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Orientación seleccionada:{' '}
-                <strong className="text-slate-800 dark:text-slate-200">
+                <strong className="text-zinc-800 dark:text-[#E4E4E7]">
                   {pageOrientation === 'landscape' ? 'Horizontal (Paisaje)' : 'Vertical (Retrato)'}
                 </strong>{' '}
-                • Formato <strong className="text-slate-800 dark:text-slate-200">{pageSize.toUpperCase()}</strong>
+                • Formato <strong className="text-zinc-800 dark:text-[#E4E4E7]">{pageSize.toUpperCase()}</strong>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <button
                   type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-xs font-bold transition-colors cursor-pointer"
                 >
                   Seguir Editando
                 </button>
@@ -1537,7 +1537,7 @@ export const ExportPdfTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Imprimir</span>

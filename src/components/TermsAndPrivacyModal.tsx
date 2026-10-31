@@ -76,14 +76,14 @@ export const ProfessionalTermsContent: React.FC = () => (
       </div>
       <div className="space-y-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">
+          <h3 className="font-extrabold text-zinc-900 dark:text-white text-sm sm:text-base">
             Marco Normativo de Uso Ordenado, Ético y Confidencial
           </h3>
           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300">
             Documento Vinculante
           </span>
         </div>
-        <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
+        <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
           Los presentes Términos y Condiciones regulan el acceso, configuración y utilización de la plataforma <strong>Kongre — Gestor Teocrático Integral</strong> (<span className="font-mono">https://kongre-app.com</span>). Al registrar una congregación, vincular una cuenta o ingresar mediante credenciales de acceso, el usuario manifiesta haber leído, comprendido y aceptado íntegramente este marco normativo.
         </p>
       </div>
@@ -91,35 +91,35 @@ export const ProfessionalTermsContent: React.FC = () => (
 
     {/* Key Highlights Grid */}
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block mb-1">
           Propósito Exclusivo
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           Organización auxiliar de reuniones, asignaciones S-89, territorios y servicio del campo.
         </p>
       </div>
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-1">
           Control Teocrático
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           Acceso jerárquico por roles (RBAC), PINs cifrados y verificación en dos pasos (2FA).
         </p>
       </div>
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 block mb-1">
           Independencia Legal
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           Herramienta auxiliar sin fines comerciales; no sustituye sitios ni formularios oficiales.
         </p>
       </div>
     </div>
 
     {/* Clause 1 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <span>1. Naturaleza del Servicio y Declaración de Independencia Institucional</span>
       </h4>
@@ -132,15 +132,15 @@ export const ProfessionalTermsContent: React.FC = () => (
     </section>
 
     {/* Clause 2 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <KeyRound className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <span>2. Gobernanza de Accesos, Roles Teocráticos (RBAC) y Custodia de Credenciales</span>
       </h4>
       <p>
         El acceso a la información de cada congregación se rige estrictamente por el principio de privilegio mínimo (<em>Least Privilege</em>) y control de acceso basado en roles (RBAC):
       </p>
-      <ul className="list-disc list-inside space-y-2 pl-1 text-slate-600 dark:text-slate-300">
+      <ul className="list-disc list-inside space-y-2 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
         <li>
           <strong>Administración por el Cuerpo de Ancianos:</strong> El Coordinador y los ancianos designados son los únicos facultados para registrar la congregación, generar o rotar claves de seguridad, auditar el registro de actividad y autorizar o revocar el acceso de nuevos dispositivos o usuarios.
         </li>
@@ -157,8 +157,8 @@ export const ProfessionalTermsContent: React.FC = () => (
     </section>
 
     {/* Clause 3 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <UserCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <span>3. Obligaciones de Confidencialidad, Ética Cristiana y Uso Aceptable</span>
       </h4>
@@ -168,7 +168,7 @@ export const ProfessionalTermsContent: React.FC = () => (
       <p>
         <strong>Conductas Expresamente Prohibidas:</strong>
       </p>
-      <ul className="list-disc list-inside space-y-1.5 pl-1 text-slate-600 dark:text-slate-300">
+      <ul className="list-disc list-inside space-y-1.5 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
         <li>Extraer, copiar o exportar el directorio de la congregación para fines comerciales, laborales, políticos, promocionales o ajenos a las actividades teocráticas.</li>
         <li>Enviar cadenas de mensajes masivos no solicitados (<em>spam</em>) utilizando la información de contacto registrada en el sistema.</li>
         <li>Intentar eludir los controles de acceso por roles, realizar ingeniería inversa o ejecutar pruebas de fuerza bruta contra los puntos de sincronización.</li>
@@ -176,8 +176,8 @@ export const ProfessionalTermsContent: React.FC = () => (
     </section>
 
     {/* Clause 4 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <WifiOff className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <span>4. Operación Offline-First (PWA), Sincronización y Copias de Respaldo</span>
       </h4>
@@ -190,8 +190,8 @@ export const ProfessionalTermsContent: React.FC = () => (
     </section>
 
     {/* Clause 5 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <AlertTriangle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
         <span>5. Disponibilidad del Servicio, Limitación de Responsabilidad y Baja Definitiva</span>
       </h4>
@@ -214,14 +214,14 @@ export const ProfessionalPrivacyContent: React.FC = () => (
       </div>
       <div className="space-y-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">
+          <h3 className="font-extrabold text-zinc-900 dark:text-white text-sm sm:text-base">
             Arquitectura de Cero Conocimiento (Zero-Knowledge) y Privacidad por Diseño
           </h3>
           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/70 text-emerald-700 dark:text-emerald-300">
             AES-256-GCM • PBKDF2
           </span>
         </div>
-        <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
+        <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
           En <strong>Kongre</strong> la privacidad y protección de los datos de los hermanos es un pilar arquitectónico innegociable. Toda la información sensible de la congregación se cifra localmente en tu dispositivo antes de transmitirse a la nube, cumpliendo con los principios internacionales de protección de datos (<strong>RGPD / GDPR, LOPDGDD, CCPA, LGPD</strong>) y la <strong>Política de Datos de Usuario de los Servicios de las APIs de Google</strong>.
         </p>
       </div>
@@ -229,35 +229,35 @@ export const ProfessionalPrivacyContent: React.FC = () => (
 
     {/* Cryptographic Specifications Grid */}
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-1">
           Cifrado Extremo a Extremo
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           AES-256-GCM autenticado en cliente con IV aleatorio de 96 bits.
         </p>
       </div>
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block mb-1">
           Derivación OWASP
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           PBKDF2-HMAC-SHA256 con hasta 600.000 iteraciones y sal criptográfica única.
         </p>
       </div>
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/70">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400 block mb-1">
           Cero Venta o Rastreo
         </span>
-        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
           Sin publicidad, sin corredores de datos y sin entrenamiento de modelos de IA.
         </p>
       </div>
     </div>
 
     {/* Section 1 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Server className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>1. Responsable del Tratamiento y Modelo de Cero Conocimiento</span>
       </h4>
@@ -270,15 +270,15 @@ export const ProfessionalPrivacyContent: React.FC = () => (
     </section>
 
     {/* Section 2 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Database className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>2. Principio de Minimización e Inventario de Datos Tratados</span>
       </h4>
       <p>
         Kongre recopila y procesa únicamente los datos estrictamente necesarios para el funcionamiento de los módulos teocráticos:
       </p>
-      <ul className="list-disc list-inside space-y-2 pl-1 text-slate-600 dark:text-slate-300">
+      <ul className="list-disc list-inside space-y-2 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
         <li>
           <strong>Datos Institucionales de la Congregación:</strong> Nombre de la congregación, identificador único (<span className="font-mono">KGR-XXXX-XXXX</span>), número de circuito, ciudad, país, dirección del Salón del Reino y horarios de reuniones semanales.
         </li>
@@ -295,15 +295,15 @@ export const ProfessionalPrivacyContent: React.FC = () => (
     </section>
 
     {/* Section 3 - Google API User Data Policy */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>3. Política de Datos de Usuario de Google API (Google OAuth 2.0 & Limited Use)</span>
       </h4>
       <p>
         Kongre ofrece autenticación opcional mediante <strong>Google Sign-In</strong> (OAuth 2.0) con el único propósito de verificar la identidad del usuario de manera segura sin requerir contraseñas adicionales. En cumplimiento expreso de la <em>Google API Services User Data Policy</em>:
       </p>
-      <ul className="list-disc list-inside space-y-2 pl-1 text-slate-600 dark:text-slate-300">
+      <ul className="list-disc list-inside space-y-2 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
         <li>
           <strong>Alcances Solicitados (Scopes Mínimos):</strong> Kongre solicita únicamente los alcances básicos de identidad: nombre visible (<code>name</code>), dirección de correo electrónico (<code>email</code>), imagen de perfil (<code>picture</code>) e identificador único de cuenta (<code>sub</code>).
         </li>
@@ -332,8 +332,8 @@ export const ProfessionalPrivacyContent: React.FC = () => (
     </section>
 
     {/* Section 4 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Fingerprint className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>4. Seguridad en el Dispositivo, Retención y Supresión Definitiva</span>
       </h4>
@@ -355,17 +355,17 @@ export const ProfessionalPrivacyContent: React.FC = () => (
     </section>
 
     {/* Section 5 */}
-    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shadow-2xs">
-      <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+    <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
+      <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>5. Ejercicio de Derechos ARCO+ y Canal Oficial de Privacidad</span>
       </h4>
       <p>
         Todo usuario titular de datos tiene derecho a ejercer en cualquier momento sus derechos de <strong>Acceso, Rectificación, Cancelación (Supresión), Oposición y Portabilidad</strong> sobre su información personal directamente ante el Cuerpo de Ancianos de su congregación o a través de nuestro canal oficial de privacidad y soporte técnico:
       </p>
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+      <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/70 border border-zinc-200/80 dark:border-[#27272A]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
         <div>
-          <span className="font-bold text-slate-900 dark:text-white">Contacto Oficial de Privacidad y Seguridad:</span>{' '}
+          <span className="font-bold text-zinc-900 dark:text-white">Contacto Oficial de Privacidad y Seguridad:</span>{' '}
           <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">soporte@kongre-app.com</span>
         </div>
         <div className="flex items-center gap-3">
@@ -425,21 +425,21 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
 
   const pageContent = (
     <div
-      className="fixed inset-0 z-[100] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] block sm:py-6 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
+      className="fixed inset-0 z-[100] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] block sm:py-6 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
       role="region"
       aria-label="Términos de uso y política de privacidad"
     >
       <div className="w-full max-w-4xl xl:max-w-5xl mx-auto pb-10">
         {/* Full-Page Main Card */}
-        <div className="w-full sm:rounded-3xl bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 sm:shadow-xl">
+        <div className="w-full sm:rounded-3xl bg-white dark:bg-[#121216] sm:border border-zinc-200 dark:border-[#27272A] sm:shadow-xl">
           {/* Page Header */}
-          <div className="sticky top-0 z-20 px-4 py-3.5 sm:px-7 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sm:rounded-t-3xl">
+          <div className="sticky top-0 z-20 px-4 py-3.5 sm:px-7 sm:py-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-3 bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md sm:rounded-t-3xl">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
                 data-mobile-back-btn="true"
                 onClick={onClose}
-                className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer shrink-0 active:scale-95"
+                className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] transition-colors cursor-pointer shrink-0 active:scale-95"
                 title="Volver"
                 aria-label="Volver"
               >
@@ -454,7 +454,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-base sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
+                  <h1 className="text-base sm:text-xl font-extrabold text-zinc-900 dark:text-white tracking-tight truncate">
                     {activeTab === 'terms'
                       ? 'Términos y Condiciones de Uso Teocrático'
                       : 'Política de Privacidad, Protección de Datos y Seguridad'}
@@ -463,27 +463,27 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
                     v{CURRENT_APP_VERSION}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] truncate">
                   Kongre • Gestor Teocrático Integral • Vigencia: {BUILD_DATE}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] shrink-0">
               <Logo variant="isotipo" className="w-4 h-4 object-contain" />
               <span className="hidden sm:inline">Kongre • Marco Legal</span>
             </div>
           </div>
 
           {/* Tab Selector Bar */}
-          <div className="px-5 pt-3.5 pb-3 sm:px-7 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2.5 shrink-0">
+          <div className="px-5 pt-3.5 pb-3 sm:px-7 border-b border-zinc-100 dark:border-[#27272A] bg-white dark:bg-[#121216] flex items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => handleSelectTab('terms')}
               className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'terms'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800'
+                  : 'bg-zinc-100 dark:bg-[#18181F]/80 text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200/70 dark:hover:bg-[#27272A]'
               }`}
             >
               <ScrollText className="w-4 h-4 shrink-0" />
@@ -496,7 +496,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'privacy'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800'
+                  : 'bg-zinc-100 dark:bg-[#18181F]/80 text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200/70 dark:hover:bg-[#27272A]'
               }`}
             >
               <ShieldCheck className="w-4 h-4 shrink-0" />
@@ -505,13 +505,13 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
           </div>
 
           {/* Full-Page Content Body */}
-          <div className="p-5 sm:p-7 text-xs sm:text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+          <div className="p-5 sm:p-7 text-xs sm:text-[13.5px] leading-relaxed text-zinc-600 dark:text-[#D4D4D8]">
             {activeTab === 'terms' ? <ProfessionalTermsContent /> : <ProfessionalPrivacyContent />}
           </div>
 
           {/* Page Footer */}
-          <div className="px-5 py-4 sm:px-7 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="px-5 py-4 sm:px-7 border-t border-zinc-100 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121216]/80 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-[#A1A1AA]">
               <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>Cifrado de Conocimiento Cero AES-256-GCM • Cumplimiento Google API Limited Use</span>
             </div>
@@ -520,7 +520,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Volver</span>
@@ -577,7 +577,7 @@ export const LegalConsentCheckbox: React.FC<LegalConsentCheckboxProps> = ({
         className={`p-3 rounded-xl border transition-all ${
           checked
             ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70'
-            : 'bg-slate-50/90 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80'
+            : 'bg-zinc-50/90 dark:bg-[#18181F]/60 border-zinc-200 dark:border-[#27272A]/80'
         } ${className}`}
       >
         <label className="flex items-start gap-2.5 cursor-pointer select-none">
@@ -591,9 +591,9 @@ export const LegalConsentCheckbox: React.FC<LegalConsentCheckboxProps> = ({
                 recordLegalTermsAcceptance();
               }
             }}
-            className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
+            className="mt-0.5 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
           />
-          <span className="text-[11.5px] leading-snug text-slate-700 dark:text-slate-200">
+          <span className="text-[11.5px] leading-snug text-zinc-700 dark:text-[#E4E4E7]">
             He leído y acepto los{' '}
             <button
               type="button"
@@ -659,41 +659,41 @@ export const FirstTimeLegalConsentModal: React.FC<FirstTimeLegalConsentModalProp
 
   const pageContent = (
     <div
-      className="fixed inset-0 z-[100] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-y-auto flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
+      className="fixed inset-0 z-[100] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-y-auto flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
       role="region"
       aria-label="Aceptación obligatoria de términos de uso y política de privacidad"
     >
       <div className="w-full max-w-4xl xl:max-w-5xl mx-auto flex-1 flex flex-col justify-center">
-        <div className="w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col overflow-hidden">
+        <div className="w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-xl flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 flex items-center gap-3 shrink-0">
+          <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/80 dark:bg-[#121216]/90 flex items-center gap-3 shrink-0">
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-base sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <h1 className="text-base sm:text-xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
                   Bienvenido a Kongre • Términos de Uso y Privacidad
                 </h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                   Consentimiento de Primer Ingreso
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Antes de utilizar la plataforma por primera vez, revisa y acepta el Marco Normativo de Uso y la Política de Privacidad.
               </p>
             </div>
           </div>
 
           {/* Tab Selector */}
-          <div className="px-5 pt-3.5 pb-3 sm:px-7 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2.5 shrink-0">
+          <div className="px-5 pt-3.5 pb-3 sm:px-7 border-b border-zinc-100 dark:border-[#27272A] bg-white dark:bg-[#121216] flex items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('terms')}
               className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'terms'
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70'
+                  : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200/70'
               }`}
             >
               <ScrollText className="w-4 h-4" />
@@ -705,7 +705,7 @@ export const FirstTimeLegalConsentModal: React.FC<FirstTimeLegalConsentModalProp
               className={`flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'privacy'
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70'
+                  : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200/70'
               }`}
             >
               <ShieldCheck className="w-4 h-4" />
@@ -714,20 +714,20 @@ export const FirstTimeLegalConsentModal: React.FC<FirstTimeLegalConsentModalProp
           </div>
 
           {/* Full Content */}
-          <div className="p-5 sm:p-7 text-xs sm:text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+          <div className="p-5 sm:p-7 text-xs sm:text-[13.5px] leading-relaxed text-zinc-600 dark:text-[#D4D4D8]">
             {activeTab === 'terms' ? <ProfessionalTermsContent /> : <ProfessionalPrivacyContent />}
           </div>
 
           {/* Footer with Checkbox & Confirm Button */}
-          <div className="px-5 py-4 sm:px-7 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 space-y-3.5 shrink-0">
+          <div className="px-5 py-4 sm:px-7 border-t border-zinc-100 dark:border-[#27272A] bg-zinc-50/80 dark:bg-[#121216]/90 space-y-3.5 shrink-0">
             <label className="flex items-start gap-2.5 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => setChecked(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
+                className="mt-0.5 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
               />
-              <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">
+              <span className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#E4E4E7] leading-snug">
                 He leído, comprendido y acepto expresamente los Términos y Condiciones de Uso y la Política de Privacidad de Kongre para continuar.
               </span>
             </label>

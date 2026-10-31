@@ -36,7 +36,7 @@ export const AutoLockTimerChip: React.FC = () => {
           ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300'
           : autoLockState === 'warn'
           ? 'border-amber-400 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
-          : 'border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-700'
+          : 'border-zinc-200/80 dark:border-white/[0.08] bg-zinc-100/90 dark:bg-[#18181F]/70 text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-200/70 dark:hover:bg-[#27272A]'
       }`}
       data-state={autoLockState}
       title={`Bloqueo automático en ${timeLabel} por inactividad. Clic para reiniciar tiempo.`}

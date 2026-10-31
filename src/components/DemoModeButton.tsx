@@ -41,7 +41,7 @@ export const DemoModeButton: React.FC<DemoModeButtonProps> = ({
       type="button"
       onClick={onClick}
       title={title}
-      className={`${displayClass} items-center justify-center shrink-0 whitespace-nowrap rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 ${sizeClasses} ${className}`}
+      className={`${displayClass} items-center justify-center shrink-0 whitespace-nowrap rounded-xl border border-zinc-200 dark:border-[#27272A]/80 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 ${sizeClasses} ${className}`}
     >
       <span>Modo Demo</span>
     </button>

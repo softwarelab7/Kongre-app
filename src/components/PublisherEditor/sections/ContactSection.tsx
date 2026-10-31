@@ -78,7 +78,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-6">
       {/* BLOQUE 1: CABECERA, ACCIONES RÁPIDAS Y CINTA DE LOCALIZACIÓN */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl overflow-hidden shadow-xs">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs">
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="w-11 h-11 bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200/50 dark:border-cyan-500/20">
@@ -310,7 +310,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
       </section>
 
       {/* BLOQUE 2: DOMICILIO, REFERENCIAS DE PASTOREO Y COORDENADAS GPS */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div className="flex items-center gap-2">
             <MapPin size={17} className="text-cyan-500" />
@@ -424,7 +424,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.02] border border-zinc-200/70 dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1">
             <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1 block">
               Enlace Exacto de Google Maps o Coordenadas GPS
@@ -450,7 +450,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
       </section>
 
       {/* BLOQUE 3: TRANSPORTE Y PUBLICACIONES IMPRESAS */}
-      <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">
           3. Apoyo de Transporte, Evacuación y Literatura Impresa
         </span>

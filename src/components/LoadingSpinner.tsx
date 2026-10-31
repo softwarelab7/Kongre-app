@@ -81,10 +81,10 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       role="status"
       aria-live="polite"
       aria-busy="true"
-      className="relative overflow-hidden rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-indigo-200/80 dark:border-indigo-800/70 shadow-2xl shadow-indigo-500/15 dark:shadow-black/50 px-6 py-5 sm:px-8 sm:py-6 max-w-sm w-[92%] sm:w-auto backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
+      className="relative overflow-hidden rounded-3xl bg-white/95 dark:bg-[#121216]/95 border border-indigo-200/80 dark:border-indigo-800/70 shadow-2xl shadow-indigo-500/15 dark:shadow-black/50 px-6 py-5 sm:px-8 sm:py-6 max-w-sm w-[92%] sm:w-auto backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
     >
       {/* Barra superior luminosa animada */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-zinc-100 dark:bg-[#18181F] overflow-hidden">
         <div className="h-full w-1/2 bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400 rounded-full animate-pulse" />
       </div>
 
@@ -100,13 +100,13 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
           {/* Anillo exterior rotatorio */}
           <div
-            className="absolute inset-0 rounded-full border-[3px] border-slate-200/70 dark:border-slate-800/80 border-t-indigo-600 border-r-violet-500 dark:border-t-indigo-400 dark:border-r-violet-400 animate-spin"
+            className="absolute inset-0 rounded-full border-[3px] border-zinc-200/70 dark:border-[#27272A]/80 border-t-indigo-600 border-r-violet-500 dark:border-t-indigo-400 dark:border-r-violet-400 animate-spin"
             style={{ animationDuration: '1s' }}
           />
 
           {/* Anillo interior en rotación inversa */}
           <div
-            className="absolute inset-2 rounded-full border-2 border-slate-200/40 dark:border-slate-800/50 border-b-emerald-500 border-l-indigo-400 dark:border-b-emerald-400 dark:border-l-indigo-300 animate-spin"
+            className="absolute inset-2 rounded-full border-2 border-zinc-200/40 dark:border-[#27272A]/50 border-b-emerald-500 border-l-indigo-400 dark:border-b-emerald-400 dark:border-l-indigo-300 animate-spin"
             style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}
           />
 
@@ -119,7 +119,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         {/* Textos de estado */}
         <div className="space-y-1">
           <div className="flex items-center justify-center gap-1.5">
-            <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
               {message}
             </h4>
             <span className="inline-flex items-center gap-0.5 pt-1" aria-hidden="true">
@@ -135,7 +135,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
             </p>
           )}
 
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1 pt-0.5">
+          <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1 pt-0.5">
             <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{submessage}</span>
           </p>
@@ -160,7 +160,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   if (mode === 'fullscreen') {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-900/35 dark:bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-300">
+      <div className="fixed inset-0 z-50 bg-zinc-900/35 dark:bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-300">
         {spinnerCard}
       </div>
     );
@@ -174,7 +174,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       </div>
       <div
         data-testid="supabase-tab-loading-overlay"
-        className="hidden md:flex absolute inset-0 z-30 bg-slate-50/65 dark:bg-slate-950/65 backdrop-blur-[2px] items-start justify-center pt-20 sm:pt-28 transition-all duration-300 pointer-events-auto rounded-2xl"
+        className="hidden md:flex absolute inset-0 z-30 bg-zinc-50/65 dark:bg-zinc-950/65 backdrop-blur-[2px] items-start justify-center pt-20 sm:pt-28 transition-all duration-300 pointer-events-auto rounded-2xl"
       >
         <div className="sticky top-28 sm:top-36 flex justify-center w-full">
           {spinnerCard}

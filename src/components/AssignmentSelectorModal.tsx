@@ -123,17 +123,17 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
       role="dialog"
       aria-modal="true"
       aria-label={`Asignar participante: ${title}`}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
+      <div className="bg-white dark:bg-[#121216] rounded-t-2xl sm:rounded-xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-[#27272A] pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2.5 shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2.5 shrink-0">
           <button
             type="button"
             data-mobile-back-btn="true"
             onClick={onClose}
             aria-label="Volver al programa"
-            className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 shrink-0 cursor-pointer active:scale-95"
+            className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] shrink-0 cursor-pointer active:scale-95 border border-zinc-200 dark:border-[#27272A]"
           >
             <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </button>
@@ -141,8 +141,8 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2 py-0.5 rounded-full">
               Asignar Participante
             </span>
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1 truncate">{title}</h3>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] mt-1 truncate">{title}</h3>
+            <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] truncate">
               {isStudentRole
                 ? 'Sugiere automáticamente la lección del folleto Maestros pendiente de trabajar.'
                 : 'Solo se muestran personas activas, sin ausencias y con el rol habilitado.'}
@@ -152,16 +152,16 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
             type="button"
             onClick={onClose}
             aria-label="Cerrar selector de participante"
-            className="hidden sm:flex w-8 h-8 rounded-xl items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+            className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search & Actions */}
-        <div className="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
+        <div className="p-3 sm:p-4 border-b border-zinc-100 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               autoFocus
@@ -169,7 +169,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Buscar entre candidatos disponibles..."
               aria-label="Buscar entre candidatos disponibles"
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
           </div>
           {onClearAssignment && (
@@ -180,7 +180,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                 onClose();
               }}
               aria-label="Quitar asignación actual y dejar vacante"
-              className="px-3.5 py-2 text-xs font-bold rounded-xl text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs min-h-[40px]"
+              className="px-3.5 py-2 text-xs font-semibold rounded-lg text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px]"
               title="Quitar asignación actual y dejar libre"
             >
               <UserMinus className="w-3.5 h-3.5" />
@@ -192,7 +192,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
         {/* Candidates List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {filteredCandidates.length === 0 ? (
-            <div className="text-center py-8 text-slate-400 text-xs">
+            <div className="text-center py-8 text-zinc-400 dark:text-[#A1A1AA] text-xs">
               No hay publicadores disponibles que cumplan los requisitos para este rol en esta fecha.
             </div>
           ) : (
@@ -210,17 +210,17 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                     onSelectPublisher(c.publisher.id, currentLessonNum);
                     onClose();
                   }}
-                  className={`w-full text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 min-h-[48px] ${
+                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between gap-3 min-h-[48px] cursor-pointer ${
                     isSelected
-                      ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/60 shadow-xs ring-1 ring-indigo-500'
+                      ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/60 ring-1 ring-indigo-500'
                       : c.hasConflictWarning
-                      ? 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40'
-                      : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      ? 'border-amber-200 dark:border-amber-900/50 bg-amber-50/30 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                      : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-zinc-50 dark:hover:bg-[#18181F]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                         c.publisher.gender === 'hermana'
                           ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
                           : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
@@ -230,13 +230,13 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate">
+                        <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] text-xs sm:text-sm truncate">
                           {c.publisher.name}
                         </span>
 
                         {c.isRecommended && (
-                          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                            <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                             Recomendado
                           </span>
                         )}
@@ -248,8 +248,8 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                         )}
 
                         {c.hasConflictWarning && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">
-                            <AlertTriangle className="w-3 h-3 text-amber-600" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                            <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                             {c.hasConflictWarning}
                           </span>
                         )}
@@ -258,22 +258,22 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                       {/* Smart Student Lesson Suggestion Badge */}
                       {isStudentRole && currentLessonNum && (
                         <div className="mt-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            <BookOpen className="w-3 h-3 text-indigo-600" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800/40">
+                            <BookOpen className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                             Lección #{currentLessonNum}: {lessonObj?.title || ''}
                           </span>
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 flex-wrap">
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-zinc-500 dark:text-[#A1A1AA] flex-wrap">
                         <span>Grupo {c.publisher.groupNumber || 1}</span>
                         <span>•</span>
-                        <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-                          Carga Ponderada: {c.weightedPoints ?? 0} pts ({c.totalHistoricalAssignments} asig.)
+                        <span className="font-semibold text-indigo-700 dark:text-indigo-400">
+                          Carga Ponderada: <span className="font-mono tabular-nums">{c.weightedPoints ?? 0}</span> pts (<span className="font-mono tabular-nums">{c.totalHistoricalAssignments}</span> asig.)
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-slate-400" />
+                          <Clock className="w-3 h-3 text-zinc-400 dark:text-[#A1A1AA]" />
                           {c.lastAssignedDate
                             ? `Última: ${c.lastAssignedDate} (${c.daysSinceLastAssignment}d)`
                             : 'Sin participaciones previas'}
@@ -288,7 +288,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                         <Check className="w-4 h-4" />
                       </div>
                     ) : (
-                      <span className="text-xs font-semibold text-indigo-600 hover:underline">
+                      <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                         Asignar
                       </span>
                     )}

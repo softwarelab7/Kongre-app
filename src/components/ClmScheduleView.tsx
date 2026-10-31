@@ -66,15 +66,15 @@ import type { DrillDownLevel, HighlightColor, UserAnnotation, ReferenceItem } fr
 const SECTION_BANNERS = {
   tesoros: {
     label: 'TESOROS DE LA BIBLIA',
-    bgColor: '#0D9488', // Teal 600 semántico JW
+    bgColor: '#5A6B7C', // Gris acero / Slate semántico JW
   },
   maestros: {
     label: 'SEAMOS MEJORES MAESTROS',
-    bgColor: '#D97706', // Ámbar 600 semántico JW
+    bgColor: '#C67D0A', // Ámbar dorado / Ocre semántico JW
   },
   vida_cristiana: {
     label: 'NUESTRA VIDA CRISTIANA',
-    bgColor: '#E11D48', // Carmesí 600 semántico JW
+    bgColor: '#962828', // Carmesí / Granate semántico JW
   },
 };
 
@@ -1306,25 +1306,25 @@ export default function ClmScheduleView({
     if (isSong) {
       badgeContent = (
         <div className="w-6 h-6 flex items-center justify-center shrink-0">
-          <Music className="w-4 h-4 text-indigo-500" />
+          <Music className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
         </div>
       );
     } else if (isPrayer) {
       badgeContent = (
         <div className="w-6 h-6 flex items-center justify-center shrink-0">
-          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" />
+          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-indigo-400 inline-block" />
         </div>
       );
     } else if (isCounselor) {
       badgeContent = (
-        <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300/60 dark:border-amber-800/60 text-xs font-bold font-mono tabular-nums flex items-center justify-center shrink-0">
           C.
         </div>
       );
     } else {
       currentPartNumber++;
       badgeContent = (
-        <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/30 text-xs font-bold font-mono tabular-nums flex items-center justify-center shrink-0">
           {currentPartNumber}.
         </div>
       );
@@ -1358,15 +1358,15 @@ export default function ClmScheduleView({
       : '';
 
     return (
-      <div key={part.id} className={`group/row border-b border-slate-100 dark:border-white/[0.04] transition-colors ${highlightClass}`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+      <div key={part.id} className={`group/row border-b border-zinc-100 dark:border-[#27272A]/70 transition-colors ${highlightClass}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
           {/* Lado izquierdo: Ícono/Número + Título + Subtítulo */}
           <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
             {badgeContent}
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-snug">
+                <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5] leading-snug">
                   {part.titulo}
                 </h4>
                 {part.duracion_min && !part.titulo.includes('min') && (
@@ -1378,7 +1378,7 @@ export default function ClmScheduleView({
                       setIsTimerModalOpen(true);
                     }}
                     title="Abrir esta intervención en Modo Atril y Cronómetro de Presidencia"
-                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-mono tabular-nums shrink-0 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 font-mono tabular-nums shrink-0 cursor-pointer transition-colors"
                   >
                     <Clock size={11} />
                     <span>({part.duracion_min} min)</span>
@@ -1387,7 +1387,7 @@ export default function ClmScheduleView({
               </div>
 
               {part.descripcion && (
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight leading-relaxed">
+                <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight leading-relaxed">
                   {part.descripcion}
                 </p>
               )}
@@ -1395,7 +1395,7 @@ export default function ClmScheduleView({
               {/* Distintivo de Consejero de la Sala Auxiliar */}
               {isCounselor && (
                 <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/60">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800/60">
                     <UserCheck size={11} />
                     <span>Consejero de Sala Auxiliar</span>
                   </span>
@@ -1421,7 +1421,7 @@ export default function ClmScheduleView({
                     }}
                     onSelectReference={(ref) => openReference(ref)}
                   />
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-[11px] text-indigo-900 dark:text-indigo-200">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/80 dark:border-indigo-500/30 text-[11px] text-indigo-900 dark:text-indigo-300 font-mono tabular-nums">
                     <span className="truncate max-w-[170px] sm:max-w-[240px]">
                       {part.leccion_titulo || assignedLessonObj?.title || `Lección ${assignedLessonNum}`}
                     </span>
@@ -1429,15 +1429,15 @@ export default function ClmScheduleView({
 
                   {/* Estado de lección */}
                   {part.leccion_estado === 'completada' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/60">
                       <CheckCircle2 size={11} /> Aprobada
                     </span>
                   ) : part.leccion_estado === 'continuar' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800/60">
                       <RotateCcw size={11} /> Practicar
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-[#18181F] dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]">
                       <Clock size={11} /> Pendiente
                     </span>
                   )}
@@ -1487,7 +1487,7 @@ export default function ClmScheduleView({
                   }}
                   onSelectReference={(ref) => openReference(ref)}
                 />
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                   Congregación
                 </span>
                 <button
@@ -1498,7 +1498,7 @@ export default function ClmScheduleView({
                     setSongNumberInput(numMatch ? numMatch[0] : '');
                     setEditingSongPart(part);
                   }}
-                  className="p-2 sm:p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 sm:p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                   title="Cambiar o corregir número de cántico"
                 >
                   <Edit3 size={14} />
@@ -1512,8 +1512,8 @@ export default function ClmScheduleView({
                       title={conflicts.map((c) => c.details).join(' | ')}
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 cursor-help ${
                         hasStrict
-                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
-                          : 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800/60'
+                          : 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60'
                       }`}
                     >
                       <AlertTriangle size={11} />
@@ -1523,21 +1523,21 @@ export default function ClmScheduleView({
 
                   <button
                     onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                    className="min-h-[36px] sm:min-h-0 px-3 py-1.5 sm:py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
+                    className="min-h-[36px] sm:min-h-0 px-3 py-1.5 sm:py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                     title="Toca para editar o cambiar asignación"
                   >
                     <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span className="truncate max-w-[175px] sm:max-w-none">{part.asignado_nombre}</span>
                   </button>
 
-                  {/* Botón Rápido Quitar Titular (visible en sm+ para evitar toques accidentales en móvil; en móvil está dentro del panel al tocar el nombre) */}
+                  {/* Botón Rápido Quitar Titular */}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleAssignInline(part.id, '', 'main');
                     }}
-                    className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800/60 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
                     aria-label="Quitar asignado"
                   >
@@ -1549,7 +1549,7 @@ export default function ClmScheduleView({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                        className="min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                        className="min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                         title="Cambiar ayudante"
                       >
                         <span className="text-[10px] text-indigo-500 font-bold">Ayud.:</span>
@@ -1561,7 +1561,7 @@ export default function ClmScheduleView({
                           e.stopPropagation();
                           handleAssignInline(part.id, '', 'assistant');
                         }}
-                        className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                        className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800/60 transition-all cursor-pointer shadow-2xs active:scale-95"
                         title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
                         aria-label="Quitar ayudante"
                       >
@@ -1580,7 +1580,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         setSelectedStudentForModal(studentPub);
                       }}
-                      className="p-2 sm:p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      className="p-2 sm:p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-[#18181F] dark:text-indigo-400 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
                       title={`Ver Ficha Oficial S-38 e historial de ${studentPub.full_name || studentPub.name}`}
                       aria-label="Ver Ficha S-38"
                     >
@@ -1595,7 +1595,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       setSelectedPartForReplacement(part);
                     }}
-                    className="p-2 sm:p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-600 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="p-2 sm:p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-[#18181F] dark:text-amber-400 dark:hover:bg-amber-600 border border-amber-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Buscar sustituto para ${part.asignado_nombre}`}
                     aria-label="Sustituir asignación"
                   >
@@ -1609,7 +1609,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       handleSendWhatsAppSingle(part, 'main', false);
                     }}
-                    className="p-2 sm:p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="p-2 sm:p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-[#18181F] dark:text-emerald-400 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Enviar asignación por WhatsApp a ${part.asignado_nombre}`}
                     aria-label="Enviar WhatsApp al titular"
                   >
@@ -1624,7 +1624,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleSendWhatsAppSingle(part, 'assistant', false);
                       }}
-                      className="hidden sm:inline-flex p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      className="hidden sm:inline-flex p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-[#18181F] dark:text-indigo-400 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
                       title={`Enviar asignación por WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
                       aria-label="Enviar WhatsApp al ayudante"
                     >
@@ -1653,7 +1653,7 @@ export default function ClmScheduleView({
                 className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                   partAnnotation?.noteText || partAnnotation?.highlightColor
                     ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 shadow-2xs font-bold'
-                    : 'text-slate-300 dark:text-zinc-600 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#18181F]'
+                    : 'text-zinc-300 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                 }`}
                 title={partAnnotation?.noteText ? `Nota vinculada: "${partAnnotation.noteText.slice(0, 30)}..."` : 'Vincular nota de estudio o subrayar en el panel lateral'}
               >
@@ -1690,17 +1690,17 @@ export default function ClmScheduleView({
 
         {/* Panel expandible para seleccionar asignados */}
         {isExpanded && !isSong && (
-          <div className="bg-slate-50/80 dark:bg-slate-900/60 p-4 border-t border-slate-100 dark:border-white/[0.04] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+          <div className="bg-zinc-50/80 dark:bg-[#18181F] p-4 border-t border-zinc-100 dark:border-[#27272A] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] font-bold text-slate-500 uppercase">
+                <label className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase">
                   Hermano Asignado (Titular)
                 </label>
                 {part.asignado_nid && (
                   <button
                     type="button"
                     onClick={() => handleAssignInline(part.id, '', 'main')}
-                    className="text-[10px] font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    className="text-[10px] font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
                     <X size={11} />
                     <span>Dejar sin asignar</span>
@@ -1738,14 +1738,14 @@ export default function ClmScheduleView({
             {part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">
+                  <label className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase">
                     Ayudante (Demostración)
                   </label>
                   {part.asignado_auxiliar_nid && (
                     <button
                       type="button"
                       onClick={() => handleAssignInline(part.id, '', 'assistant')}
-                      className="text-[10px] font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
+                      className="text-[10px] font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
                     >
                       <X size={11} />
                       <span>Quitar ayudante</span>
@@ -1779,9 +1779,9 @@ export default function ClmScheduleView({
 
             {/* Panel de Lección S-38 en el selector expandido */}
             {isStudentPart && (
-              <div className="col-span-1 md:col-span-2 bg-white dark:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-200 dark:border-white/10 mt-1 shadow-2xs">
+              <div className="col-span-1 md:col-span-2 bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] mt-1 shadow-2xs">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
                     <BookOpen size={14} className="text-indigo-500" />
                     Punto de Consejo (Lección Folleto Maestros th / lmd)
                   </span>
@@ -1798,7 +1798,7 @@ export default function ClmScheduleView({
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                    <label className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase block mb-1">
                       Asignar Otra Lección Oficial
                     </label>
                     <Select
@@ -1830,7 +1830,7 @@ export default function ClmScheduleView({
                     <button
                       type="button"
                       onClick={() => handleResetLessonStatus(part)}
-                      className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 text-xs font-medium transition-all cursor-pointer"
+                      className="py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] text-xs font-medium transition-all cursor-pointer"
                       title="Restablecer estado a pendiente"
                     >
                       Reset
@@ -1841,7 +1841,7 @@ export default function ClmScheduleView({
             )}
 
             {/* Acciones directas de WhatsApp en el panel expandido */}
-            <div className="col-span-1 md:col-span-2 pt-2 border-t border-slate-200/60 dark:border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
+            <div className="col-span-1 md:col-span-2 pt-2 border-t border-zinc-200/60 dark:border-[#27272A] flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2 flex-wrap">
                 {part.asignado_nombre && (
                   <>
@@ -1856,7 +1856,7 @@ export default function ClmScheduleView({
                     <button
                       type="button"
                       onClick={() => handleCopyWhatsAppMessage(part, 'main', false)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-[#121216] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] transition-all cursor-pointer"
                       title="Copiar texto del mensaje"
                     >
                       <Copy size={13} />
@@ -1878,7 +1878,7 @@ export default function ClmScheduleView({
                     <button
                       type="button"
                       onClick={() => handleCopyWhatsAppMessage(part, 'assistant', false)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 transition-all cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-[#121216] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] transition-all cursor-pointer"
                       title="Copiar texto del ayudante"
                     >
                       <Copy size={13} />
@@ -1893,7 +1893,7 @@ export default function ClmScheduleView({
                   <button
                     type="button"
                     onClick={() => handleTogglePartRoom(part.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs"
                     title={part.es_clase_auxiliar ? 'Transferir al Auditorio Principal' : 'Transferir a la Sala Auxiliar'}
                   >
                     <ArrowRightLeft size={13} />
@@ -1904,7 +1904,7 @@ export default function ClmScheduleView({
                   type="button"
                   onClick={() => handleSendWhatsAppSingle(part, 'main', true)}
                   disabled={!part.asignado_nombre}
-                  className="text-[11px] text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white underline cursor-pointer disabled:opacity-40"
+                  className="text-[11px] text-zinc-500 hover:text-zinc-700 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] underline cursor-pointer disabled:opacity-40"
                 >
                   Enviar como recordatorio
                 </button>
@@ -1917,10 +1917,10 @@ export default function ClmScheduleView({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-950 font-sans">
+    <div className="flex flex-col h-full bg-white dark:bg-[#09090B] font-sans">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-fade-in">
+        <div className="fixed top-4 right-4 z-50 bg-[#121216] text-[#F4F4F5] px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 border border-indigo-500/30 animate-fade-in">
           <Check size={14} className="text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -1929,17 +1929,17 @@ export default function ClmScheduleView({
       {/* ── BARRA SUPERIOR DE ACCIONES (SOLO CUANDO NO ESTÁ EMBEBIDO EN LA BARRA UNIFICADA) ── */}
       {!hideHeaderToolbar ? (
         <>
-          <div className="px-6 py-3.5 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="px-6 py-3.5 border-b border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Título: Programa VMC */}
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+              <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40">
                 <CalendarDays className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
+                <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] leading-tight flex items-center gap-1.5">
                   Programa <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">VMC</span>
                 </h1>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] font-medium">
                   Vida y Ministerio Cristianos
                 </p>
               </div>
@@ -1950,7 +1950,7 @@ export default function ClmScheduleView({
               {/* Sincronizar */}
               <button
                 onClick={handleSyncOrganized}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Sincronizar catálogo oficial con Organized"
               >
                 <RefreshCw size={13} className="shrink-0" />
@@ -1958,7 +1958,7 @@ export default function ClmScheduleView({
               </button>
 
               {/* Importar .jwpub */}
-              <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs">
+              <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs">
                 <FileUp size={13} className="shrink-0" />
                 <span>Importar .jwpub</span>
                 <input
@@ -1973,7 +1973,7 @@ export default function ClmScheduleView({
               {/* Auto-Asignar Local */}
               <button
                 onClick={handleAutoAssign}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
                 title="Auto-asignar respetando rotación histórica y privilegios"
               >
                 <Sparkles size={13} className="shrink-0" />
@@ -1984,7 +1984,7 @@ export default function ClmScheduleView({
               <button
                 type="button"
                 onClick={handleQuickClearAllAssignments}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60 text-xs font-bold transition-all cursor-pointer shadow-2xs"
                 title="Quitar a todas las personas asignadas de esta reunión"
               >
                 <UserMinus size={13} className="shrink-0 text-rose-600 dark:text-rose-400" />
@@ -1995,7 +1995,7 @@ export default function ClmScheduleView({
               <button
                 type="button"
                 onClick={() => setIsMonthlyBillboardModalOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Abrir programa mensual apaisado para la cartelera de anuncios del Salón del Reino"
               >
                 <CalendarDays size={13} className="shrink-0" />
@@ -2005,7 +2005,7 @@ export default function ClmScheduleView({
               {/* WhatsApp VMC Notificador */}
               <button
                 onClick={() => setIsWhatsAppModalOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
                 title="Centro de envíos de asignaciones y recordatorios por WhatsApp"
               >
                 <MessageCircle size={13} className="shrink-0" />
@@ -2013,7 +2013,7 @@ export default function ClmScheduleView({
               </button>
 
               {/* Indicador de Estado de Sincronización en la Nube */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]">
                 {syncStatus === 'saving' || guardando ? (
                   <>
                     <RefreshCw size={13} className="animate-spin text-indigo-500" />
@@ -2041,7 +2041,7 @@ export default function ClmScheduleView({
               <button
                 onClick={() => handleGuardar(programa)}
                 disabled={guardando}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-white/10 dark:text-zinc-200 dark:border-white/10 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Guardar y sincronizar con Firestore inmediatamente"
               >
                 <Save size={13} className="shrink-0" />
@@ -2051,7 +2051,7 @@ export default function ClmScheduleView({
               {/* Imprimir S-89 */}
               <button
                 onClick={handleGenerateS89}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Imprimir hojas oficiales de asignación S-89 en PDF"
               >
                 <FileText size={13} className="shrink-0" />
@@ -2071,7 +2071,7 @@ export default function ClmScheduleView({
                   if (pub) setSelectedStudentForModal(pub);
                   else showToast('No hay estudiantes disponibles.');
                 }}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Ver registros oficiales S-38 y control de lecciones del folleto de oratoria"
               >
                 <Award size={13} className="shrink-0" />
@@ -2085,7 +2085,7 @@ export default function ClmScheduleView({
                   setShowAuxRoom(true);
                   setIsAuxCounselorModalOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                 title="Gestionar el Consejero y asignaciones de la Sala Auxiliar"
               >
                 <UserCheck size={13} className="shrink-0" />
@@ -2102,21 +2102,21 @@ export default function ClmScheduleView({
                 onClick={() => setIsWeeklyConflictsModalOpen(true)}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
                   currentWeekConflictStats.strict > 0
-                    ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 animate-pulse'
+                    ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60 animate-pulse'
                     : currentWeekConflictStats.warning > 0
-                    ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+                    ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60'
                 }`}
                 title="Ver auditoría de cruces, ausencias y saturaciones de esta semana"
               >
                 {currentWeekConflictStats.strict > 0 ? (
-                  <AlertTriangle size={13} className="text-rose-600" />
+                  <AlertTriangle size={13} className="text-rose-600 dark:text-rose-400" />
                 ) : currentWeekConflictStats.warning > 0 ? (
-                  <AlertTriangle size={13} className="text-amber-600" />
+                  <AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />
                 ) : (
-                  <ShieldCheck size={13} className="text-emerald-600" />
+                  <ShieldCheck size={13} className="text-emerald-600 dark:text-emerald-400" />
                 )}
-                <span>
+                <span className="font-mono tabular-nums">
                   {currentWeekConflictStats.strict > 0
                     ? `${currentWeekConflictStats.strict} Cruces`
                     : currentWeekConflictStats.warning > 0
@@ -2128,7 +2128,7 @@ export default function ClmScheduleView({
           </div>
 
           {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS STANDALONE (DRILL-DOWN JW LIBRARY) ── */}
-          <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-[#121216] border-b border-slate-200/80 dark:border-[#27272A] flex items-center justify-between gap-4 flex-wrap">
+          <div className="px-6 py-3.5 bg-zinc-50/70 dark:bg-[#121216] border-b border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-4 flex-wrap">
             {/* Cápsula de navegación semanal con Drill-Down Matricial */}
             <div className="flex items-center gap-3 flex-wrap">
               {/* Selector Matricial 3-Toques (Mes > Semana > Sección) */}
@@ -2139,20 +2139,20 @@ export default function ClmScheduleView({
                 titlePlaceholder="Explorar reunión..."
               />
 
-              <div className="flex items-center bg-white dark:bg-[#18181F] border border-slate-200 dark:border-[#27272A] rounded-full px-3 py-1.5 shadow-xs gap-3">
+              <div className="flex items-center bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-full px-3 py-1.5 shadow-xs gap-3">
                 <button
                   onClick={handlePrevWeek}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
+                  className="p-1 rounded-full text-zinc-400 hover:text-zinc-800 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
                   title="Semana anterior"
                 >
                   <ChevronLeft size={16} />
                 </button>
 
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="font-bold text-slate-900 dark:text-zinc-100">
+                  <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                     {programa?.rango_semana || formatTheocraticWeekRange(semanaFechaStr)}
                   </span>
-                  <span className="text-slate-300 dark:text-zinc-700">|</span>
+                  <span className="text-zinc-300 dark:text-[#27272A]">|</span>
                   <InlineReferenceToken
                     reference={{
                       id: `reading-${semanaFechaStr}`,
@@ -2162,14 +2162,14 @@ export default function ClmScheduleView({
                     }}
                     onSelectReference={(ref) => openReference(ref)}
                   />
-                  <span className="text-slate-400 dark:text-zinc-500 font-mono tabular-nums text-[11px]">
+                  <span className="text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums text-[11px]">
                     Sem. {programa?.semana_num || '41'}
                   </span>
                 </div>
 
                 <button
                   onClick={handleNextWeek}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
+                  className="p-1 rounded-full text-zinc-400 hover:text-zinc-800 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
                   title="Semana siguiente"
                 >
                   <ChevronRight size={16} />
@@ -2178,7 +2178,7 @@ export default function ClmScheduleView({
             </div>
 
             {/* Checkbox de Sala Auxiliar */}
-            <div className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+            <div className="px-3.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] shadow-2xs hover:bg-zinc-50 dark:hover:bg-[#121216] transition-colors select-none">
               <SplashCheckbox
                 size="sm"
                 checked={showAuxRoom}
@@ -2195,8 +2195,8 @@ export default function ClmScheduleView({
                 onClick={() => setActiveRoom('principal')}
                 className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
                   activeRoom === 'principal'
-                    ? 'text-slate-800 dark:text-white'
-                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    ? 'text-zinc-800 dark:text-[#F4F4F5]'
+                    : 'text-zinc-400 hover:text-zinc-600 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
@@ -2205,13 +2205,13 @@ export default function ClmScheduleView({
 
               {showAuxRoom && (
                 <>
-                  <span className="text-slate-300 dark:text-slate-700">/</span>
+                  <span className="text-zinc-300 dark:text-[#27272A]">/</span>
                   <button
                     onClick={() => setActiveRoom('auxiliar')}
                     className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
                       activeRoom === 'auxiliar'
                         ? 'text-amber-700 dark:text-amber-400'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                        : 'text-zinc-400 hover:text-zinc-600 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
                     }`}
                   >
                     <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
@@ -2224,20 +2224,20 @@ export default function ClmScheduleView({
         </>
       ) : (
         /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="px-3.5 sm:px-5 py-2.5 sm:py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/70 dark:border-white/[0.06] flex flex-col gap-2 text-xs">
+        <div className="px-3.5 sm:px-5 py-2.5 sm:py-3 bg-zinc-50/80 dark:bg-[#121216] border-b border-zinc-200/70 dark:border-[#27272A] flex flex-col gap-2 text-xs">
           {/* Fila principal: Título + Lectura a la izquierda, Checkbox Sala Auxiliar + Cronómetro a la derecha */}
           <div className="flex items-start sm:items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className="font-bold text-slate-900 dark:text-zinc-100 text-xs sm:text-sm whitespace-nowrap">
+                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs sm:text-sm whitespace-nowrap">
                   Reunión Entre Semana (VMC)
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 font-bold text-[10px] sm:text-[11px] uppercase tracking-wide whitespace-nowrap">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 border border-indigo-200/70 dark:border-indigo-500/30 font-bold font-mono tabular-nums text-[10px] sm:text-[11px] uppercase tracking-wide whitespace-nowrap">
                   {effectivePrograma?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48'}
                 </span>
               </div>
               {currentWeek?.midweek?.date && (
-                <p className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] sm:text-xs mt-0.5 truncate">
+                <p className="font-semibold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums text-[11px] sm:text-xs mt-0.5 truncate">
                   {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
                   {settings?.midweekMeetingTime ? ` (${settings.midweekMeetingTime})` : ''}
                 </p>
@@ -2247,7 +2247,7 @@ export default function ClmScheduleView({
             <div className="flex items-center gap-1.5 shrink-0">
               {/* Checkbox compacto integrado en la esquina superior derecha */}
               <div
-                className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 shadow-2xs select-none"
+                className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] shadow-2xs select-none"
                 title="Activar o desactivar Sala Auxiliar para esta semana"
               >
                 <SplashCheckbox
@@ -2265,10 +2265,10 @@ export default function ClmScheduleView({
                   setTimerInitialPartId(undefined);
                   setIsTimerModalOpen(true);
                 }}
-                className="hidden sm:flex min-h-[32px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs shrink-0"
+                className="hidden sm:flex min-h-[32px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] transition-all cursor-pointer shadow-2xs shrink-0"
                 title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
               >
-                <Clock size={12} className="shrink-0 text-amber-400 dark:text-white" />
+                <Clock size={12} className="shrink-0 text-amber-400 dark:text-amber-400" />
                 <span>Cronómetro / Atril</span>
               </button>
             </div>
@@ -2276,15 +2276,15 @@ export default function ClmScheduleView({
 
           {/* Sub-barra compacta SOLO cuando Sala Auxiliar está activa */}
           {showAuxRoom && (
-            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/60 dark:border-white/[0.05]">
-              <div className="inline-flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
+            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-zinc-200/60 dark:border-[#27272A]">
+              <div className="inline-flex items-center gap-0.5 bg-white dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold shadow-2xs">
                 <button
                   type="button"
                   onClick={() => setActiveRoom('principal')}
                   className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeRoom === 'principal'
                       ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
                   <span>Auditorio</span>
@@ -2296,7 +2296,7 @@ export default function ClmScheduleView({
                   className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeRoom === 'auxiliar'
                       ? 'bg-amber-500 text-white font-bold shadow-xs'
-                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
                   <span>Sala Auxiliar</span>
@@ -2325,7 +2325,7 @@ export default function ClmScheduleView({
       <div className="flex-1 overflow-y-auto pb-16">
         {/* Banner de la Sala Auxiliar cuando está activa */}
         {activeRoom === 'auxiliar' && (
-          <div className="mx-6 mt-3 mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200/80 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="mx-6 mt-3 mb-4 p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
                 <UserCheck size={22} />
@@ -2339,13 +2339,13 @@ export default function ClmScheduleView({
                     Folleto Maestros
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   Consejero:{' '}
                   <span className="text-amber-700 dark:text-amber-400">
                     {auxCounselorPart?.asignado_nombre || 'Sin asignar todavía'}
                   </span>
                 </h3>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                   {visiblePartes.filter((p) => p.seccion === 'maestros' || p.tipo === 'lectura_biblica').length} intervenciones de estudiantes programadas en esta sala.
                 </p>
               </div>
@@ -2374,7 +2374,7 @@ export default function ClmScheduleView({
                     showToast('Hoja de trabajo del Consejero descargada en PDF.');
                   }
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                 title="Descargar Hoja de Trabajo del Consejero en PDF para la reunión"
               >
                 <FileText size={13} />
@@ -2404,7 +2404,7 @@ export default function ClmScheduleView({
               <button
                 type="button"
                 onClick={() => handleToggleAuxRoom(false)}
-                className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 hover:bg-amber-100/50 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#18181F] border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 hover:bg-amber-100/50 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
               >
                 Desactivar Sala Auxiliar
               </button>
@@ -2463,21 +2463,21 @@ export default function ClmScheduleView({
       {/* ── MODAL CENTRO DE ENVÍOS WHATSAPP VMC ── */}
       {isWhatsAppModalOpen && programa && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl w-full max-w-3xl overflow-hidden shadow-xl flex flex-col max-h-[90vh]">
             {/* Header del Modal */}
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/80 dark:bg-[#18181F]">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-600 dark:text-emerald-400">
                   <MessageCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                     Centro de Notificaciones WhatsApp
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-800/40">
                       VMC
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                     {programa.rango_semana || `Semana del ${programa.semana_fecha}`} • {settings?.congregationName || 'Congregación'}
                   </p>
                 </div>
@@ -2485,22 +2485,22 @@ export default function ClmScheduleView({
 
               <button
                 onClick={() => setIsWhatsAppModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-500 hover:text-zinc-800 dark:hover:text-[#F4F4F5] transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Controles de Modo y Resumen */}
-            <div className="p-4 sm:px-6 bg-slate-100/60 dark:bg-slate-800/30 border-b border-slate-200/80 dark:border-white/[0.06] flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-white/10">
+            <div className="p-4 sm:px-6 bg-zinc-100/60 dark:bg-[#18181F]/40 border-b border-zinc-200/80 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-1 bg-white dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setWhatsAppIsReminder(false)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     !whatsAppIsReminder
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
                   Nueva Asignación
@@ -2511,7 +2511,7 @@ export default function ClmScheduleView({
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     whatsAppIsReminder
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
                   Recordatorio Semanal
@@ -2521,7 +2521,7 @@ export default function ClmScheduleView({
               <button
                 type="button"
                 onClick={handleCopyFullMeetingSummary}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer shadow-xs"
               >
                 <Copy size={13} />
                 <span>Copiar Resumen Completo</span>
@@ -2537,7 +2537,7 @@ export default function ClmScheduleView({
 
                 if (assignedParts.length === 0) {
                   return (
-                    <div className="py-12 text-center text-slate-400 dark:text-slate-500">
+                    <div className="py-12 text-center text-zinc-400 dark:text-[#A1A1AA]">
                       <p className="text-sm">No hay hermanos asignados todavía para esta semana.</p>
                       <p className="text-xs mt-1">Asigna a los hermanos en el programa antes de enviar avisos.</p>
                     </div>
@@ -2558,7 +2558,7 @@ export default function ClmScheduleView({
                   return (
                     <div
                       key={part.id}
-                      className="p-4 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-white/20 transition-all"
+                      className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all"
                     >
                       {/* Info de la parte */}
                       <div className="min-w-0 flex-1">
@@ -2566,29 +2566,29 @@ export default function ClmScheduleView({
                           <span
                             className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                             style={{
-                              backgroundColor: `${SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6556F0'}20`,
-                              color: SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6556F0',
+                              backgroundColor: `${SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366F1'}20`,
+                              color: SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366F1',
                             }}
                           >
                             {part.seccion.replace('_', ' ')}
                           </span>
                           {part.es_clase_auxiliar && (
-                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/40 dark:border-amber-800/40">
                               Sala Auxiliar
                             </span>
                           )}
-                          <span className="text-xs font-semibold text-slate-800 dark:text-white">
+                          <span className="text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             {part.titulo}
                           </span>
                         </div>
 
                         {/* Titular */}
                         {part.asignado_nombre && (
-                          <div className="mt-2 flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-                            <span className="font-bold text-slate-500">Titular:</span>
-                            <span className="font-semibold text-slate-900 dark:text-white">{part.asignado_nombre}</span>
+                          <div className="mt-2 flex items-center gap-2 text-xs text-zinc-700 dark:text-[#F4F4F5]">
+                            <span className="font-bold text-zinc-500 dark:text-[#A1A1AA]">Titular:</span>
+                            <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">{part.asignado_nombre}</span>
                             {titPub?.phone ? (
-                              <span className="text-slate-400 font-mono text-[11px]">{titPub.phone}</span>
+                              <span className="text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums text-[11px]">{titPub.phone}</span>
                             ) : (
                               <span className="text-amber-500 text-[10px] italic">Sin teléfono registrado</span>
                             )}
@@ -2597,11 +2597,11 @@ export default function ClmScheduleView({
 
                         {/* Ayudante */}
                         {part.asignado_auxiliar_nombre && (
-                          <div className="mt-1 flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-                            <span className="font-bold text-slate-500">Ayudante:</span>
+                          <div className="mt-1 flex items-center gap-2 text-xs text-zinc-700 dark:text-[#F4F4F5]">
+                            <span className="font-bold text-zinc-500 dark:text-[#A1A1AA]">Ayudante:</span>
                             <span className="font-semibold text-indigo-600 dark:text-indigo-400">{part.asignado_auxiliar_nombre}</span>
                             {auxPub?.phone ? (
-                              <span className="text-slate-400 font-mono text-[11px]">{auxPub.phone}</span>
+                              <span className="text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums text-[11px]">{auxPub.phone}</span>
                             ) : (
                               <span className="text-amber-500 text-[10px] italic">Sin teléfono registrado</span>
                             )}
@@ -2618,7 +2618,7 @@ export default function ClmScheduleView({
                               onClick={() => handleSendWhatsAppSingle(part, 'main', whatsAppIsReminder)}
                               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-xs ${
                                 titNotified
-                                  ? 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-zinc-300 hover:bg-slate-200'
+                                  ? 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] hover:bg-zinc-200'
                                   : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                               }`}
                               title={`Enviar WhatsApp a ${part.asignado_nombre}`}
@@ -2630,7 +2630,7 @@ export default function ClmScheduleView({
                             <button
                               type="button"
                               onClick={() => handleCopyWhatsAppMessage(part, 'main', whatsAppIsReminder)}
-                              className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 transition-colors cursor-pointer"
+                              className="p-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] transition-colors cursor-pointer"
                               title="Copiar texto del mensaje"
                             >
                               {copiedPartId === `${part.id}_main` ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
@@ -2645,7 +2645,7 @@ export default function ClmScheduleView({
                               onClick={() => handleSendWhatsAppSingle(part, 'assistant', whatsAppIsReminder)}
                               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-xs ${
                                 auxNotified
-                                  ? 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-zinc-300 hover:bg-slate-200'
+                                  ? 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] hover:bg-zinc-200'
                                   : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                               }`}
                               title={`Enviar WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
@@ -2657,7 +2657,7 @@ export default function ClmScheduleView({
                             <button
                               type="button"
                               onClick={() => handleCopyWhatsAppMessage(part, 'assistant', whatsAppIsReminder)}
-                              className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 transition-colors cursor-pointer"
+                              className="p-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] transition-colors cursor-pointer"
                               title="Copiar texto del ayudante"
                             >
                               {copiedPartId === `${part.id}_assistant` ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
@@ -2672,14 +2672,14 @@ export default function ClmScheduleView({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-3.5 border-t border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between">
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="px-6 py-3.5 border-t border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] flex items-center justify-between">
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                 Los mensajes incluyen el enlace de confirmación en 1 clic.
               </span>
               <button
                 type="button"
                 onClick={() => setIsWhatsAppModalOpen(false)}
-                className="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-xs font-bold text-slate-800 dark:text-white transition-colors cursor-pointer"
+                className="px-4 py-1.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-[#27272A] dark:hover:bg-[#323238] text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] transition-colors cursor-pointer"
               >
                 Cerrar
               </button>
@@ -2769,45 +2769,45 @@ export default function ClmScheduleView({
       )}
       {/* Modal de Confirmación para Quitar Asignados VMC */}
       {isConfirmClearClmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 border border-zinc-200 dark:border-[#27272A]">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-900/40 flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <UserMinus size={18} />
                 </div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                <h3 className="font-bold text-base text-zinc-900 dark:text-[#F4F4F5]">
                   Quitar Asignados de la Reunión
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsConfirmClearClmOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+            <p className="text-sm text-zinc-600 dark:text-[#A1A1AA] leading-relaxed">
               ¿Deseas quitar a todas las personas asignadas de esta reunión de entre semana?
             </p>
-            <p className="text-xs text-slate-400 dark:text-zinc-500">
+            <p className="text-xs text-zinc-400 dark:text-[#A1A1AA]">
               Los temas oficiales, canciones, lecturas de la Biblia y configuración de salas se mantendrán intactos. Solo se liberarán los participantes para que puedas reasignar libremente.
             </p>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsConfirmClearClmOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleConfirmClearClm}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
               >
                 <UserMinus size={14} />
                 <span>Sí, Quitar Asignados</span>
@@ -2819,28 +2819,28 @@ export default function ClmScheduleView({
 
       {/* Modal para editar número de cántico */}
       {editingSongPart && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4 border border-zinc-200 dark:border-[#27272A]">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-[#18181F] border border-indigo-200/50 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <Music size={18} />
                 </div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                <h3 className="font-bold text-base text-zinc-900 dark:text-[#F4F4F5]">
                   Cambiar Cántico
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingSongPart(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer"
               >
                 <X size={16} />
               </button>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-600 dark:text-zinc-300 block mb-1">
+              <label className="text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] block mb-1">
                 Número del Cántico
               </label>
               <input
@@ -2850,7 +2850,7 @@ export default function ClmScheduleView({
                 value={songNumberInput}
                 onChange={(e) => setSongNumberInput(e.target.value)}
                 placeholder="Ej. 145"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
+                className="w-full px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold font-mono tabular-nums"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -2859,23 +2859,23 @@ export default function ClmScheduleView({
                   }
                 }}
               />
-              <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1.5">
-                Cántico actual: <span className="font-semibold text-slate-600 dark:text-zinc-300">{editingSongPart.titulo}</span>
+              <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1.5 font-mono tabular-nums">
+                Cántico actual: <span className="font-semibold text-zinc-600 dark:text-[#F4F4F5]">{editingSongPart.titulo}</span>
               </p>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setEditingSongPart(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleSaveSong}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
               >
                 <Check size={14} />
                 <span>Guardar Cántico</span>

@@ -6,6 +6,26 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.41] — 31 de Octubre, 2026
+**Estandarización Visual Táctil Neutra JW Library, Erradicación de Paneles de Color Saturados, Depuración del Catálogo y Aislamiento de Reuniones**
+
+- 🎨 **Estandarización Estética Integral Estilo JW Library (`index.css`, `CleaningDutiesTab.tsx`, `CarritosTab.tsx`, `CategoryHubTab.tsx`, componentes de la aplicación):**
+  - Erradicación sistemática de paneles inundados de color saturado (fondos rojizos `bg-rose-950/20`, púrpuras, ámbar y esmeraldas intensos) que causaban fricción y fatiga visual en modo oscuro.
+  - Adopción universal de superficies táctiles oscuras de alto contraste (`#121216` y `#18181F`) con bordes de zinc precisos (`#27272A`), botones de acción principal en contraste monocromático (`bg-zinc-900` / `dark:bg-white`) y botones táctiles neutros de apoyo.
+  - Sustitución de cajas de advertencia saturadas por micropuntos semánticos sutiles (`w-1.5 h-1.5`) para señalar estados de cobertura, alertas de choques e indicadores de condición.
+- 🗂️ **Depuración y Simplificación del Catálogo de Módulos (`CategoryHubTab.tsx`):**
+  - Eliminación de la barra horizontal superior de categorías y campo de búsqueda redundante, permitiendo que la pantalla principal cargue directamente con los departamentos teocráticos ordenados y sin barreras de navegación.
+  - Supresión de botones de filtro secundarios (*"Ver solo..."*) para una experiencia limpia y libre de distracciones.
+- 🏛️ **Aislamiento Departamental Estricto de Reuniones (`CategoryHubTab.tsx`, `Navbar.tsx`):**
+  - Desacoplamiento total del ministerio personal respecto a la administración de las reuniones de congregación.
+  - Al acceder a **Reuniones**, la vista presenta exclusivamente sus 4 módulos teocráticos: *Programa de Reuniones* (Vida y Ministerio Cristianos y Fin de Semana), *Hojas de Asignación S-89*, *Discursos Públicos* y *Hospitalidad de Oradores*.
+  - El ministerio personal (cronómetro de horas, revisitas, estudios bíblicos y portal S-4) permanece aislado en el portal privado del publicador (`inicio`).
+- 🧹 **Neutralización en Servicios de la Congregación y Predicación con Carritos (`CleaningDutiesTab.tsx`, `CarritosTab.tsx`):**
+  - Transformación del *Detector de Choques en Deberes* hacia tarjetas ejecutivas neutras con microindicadores de conflicto y botones táctiles de reemplazo.
+  - Estandarización de las tarjetas de turnos de carritos, matriz de equidad, tarjetas de métricas KPI y badges de parejas familiares.
+
+---
+
 ### [v0.1.0-alpha.40] — 29 de Octubre, 2026
 **Compartimentos Zero-Trust (Envelope Encryption), Validación Estricta de PINs, Pipeline CI con Barrera de Release y CSP Estricto en PC**
 

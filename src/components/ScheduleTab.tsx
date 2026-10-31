@@ -293,11 +293,11 @@ export const ScheduleTab: React.FC = () => {
 
   if (!currentWeek) {
     return (
-      <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200">
+      <div className="p-8 text-center text-zinc-500 dark:text-[#A1A1AA] bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A]">
         <p>No hay semanas programadas.</p>
         <button
           onClick={addNextWeek}
-          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold"
+          className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition shadow-xs cursor-pointer"
         >
           Crear Primera Semana
         </button>
@@ -525,24 +525,24 @@ export const ScheduleTab: React.FC = () => {
       <div
         onTouchStart={handleWeekTouchStart}
         onTouchEnd={handleWeekTouchEnd}
-        className="relative z-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-3 sm:p-4 shadow-xs space-y-2.5 sm:space-y-3"
+        className="relative z-20 bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-3 sm:p-4 shadow-xs space-y-2.5 sm:space-y-3"
       >
         {/* Fila 1: Navegación de Semana y Selector de Modalidad (Apilados limpiamente en móvil, en línea en desktop) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3">
           {/* Bloque 1A: Contador (desktop) + Cápsula de Semana + Botón Hoy */}
           <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto min-w-0">
-            <span className="hidden lg:inline-block text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1 shrink-0">
+            <span className="hidden lg:inline-block text-xs font-semibold font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA] mr-1 shrink-0">
               Semana {currentIndex + 1} de {sortedWeeks.length}
             </span>
 
             {/* Cápsula de navegación de semana interactiva con selector rápido */}
             <div className="relative flex items-center gap-1.5 flex-1 md:flex-initial min-w-0">
-              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
+              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] p-1 rounded-xl">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer active:scale-95 shrink-0"
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-[#121216] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                   title="Semana anterior (o desliza a la derecha)"
                   aria-label="Semana anterior"
                 >
@@ -552,7 +552,7 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsWeekPickerOpen((prev) => !prev)}
-                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-800/80 transition-all cursor-pointer select-none shadow-2xs"
+                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] hover:bg-white dark:hover:bg-[#121216] transition-all cursor-pointer select-none shadow-2xs"
                   title="Clic para abrir selector de semanas, meses y calendario"
                 >
                   <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -563,7 +563,7 @@ export const ScheduleTab: React.FC = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" title="Semana en curso (Hoy)" />
                   )}
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${
+                    className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0 ${
                       isWeekPickerOpen ? 'rotate-180 text-indigo-500' : ''
                     }`}
                   />
@@ -572,7 +572,7 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={goToNextWeek}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer active:scale-95 shrink-0"
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-[#121216] transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                   title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente (o desliza a la izquierda)' : 'Crear siguiente semana'}
                   aria-label="Semana siguiente"
                 >
@@ -600,20 +600,20 @@ export const ScheduleTab: React.FC = () => {
                     onClick={() => setIsWeekPickerOpen(false)}
                   />
 
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-2xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150">
-                    <div className="flex items-center justify-between pb-2.5 sm:pb-2 border-b border-slate-100 dark:border-white/5">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-[#121216] border-0 sm:border border-zinc-200 dark:border-[#27272A] rounded-none sm:rounded-2xl shadow-xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between pb-2.5 sm:pb-2 border-b border-zinc-100 dark:border-[#27272A]">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           data-mobile-back-btn="true"
                           onClick={() => setIsWeekPickerOpen(false)}
-                          className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                          className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                           aria-label="Volver al programa"
                         >
                           <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                         </button>
                         <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm sm:text-xs font-bold text-slate-900 dark:text-white">
+                        <span className="text-sm sm:text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           Selector de Semanas
                         </span>
                       </div>
@@ -641,8 +641,8 @@ export const ScheduleTab: React.FC = () => {
                           onClick={() => setWeekPickerMonthFilter('all')}
                           className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                             weekPickerMonthFilter === 'all'
-                              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
-                              : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                              ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
+                              : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                           }`}
                         >
                           Todas
@@ -654,8 +654,8 @@ export const ScheduleTab: React.FC = () => {
                             onClick={() => setWeekPickerMonthFilter(mKey)}
                             className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                               weekPickerMonthFilter === mKey
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
-                                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                                ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
+                                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                             }`}
                           >
                             {formatMonthYearKey(mKey)}
@@ -681,12 +681,12 @@ export const ScheduleTab: React.FC = () => {
                             className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2 text-xs cursor-pointer border ${
                               isSelected
                                 ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200 shadow-2xs font-semibold'
-                                : 'bg-white dark:bg-slate-800/40 border-transparent hover:border-slate-200 dark:hover:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                : 'bg-white dark:bg-[#18181F] border-zinc-200/60 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-indigo-500/40 text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/80'
                             }`}
                           >
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className={`font-bold ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-white'}`}>
+                                <span className={`font-bold font-mono tabular-nums ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-800 dark:text-white'}`}>
                                   {formatTheocraticWeekRange(w.weekStartDate, w.weekEndDate)}
                                 </span>
                                 {isToday && (
@@ -700,7 +700,7 @@ export const ScheduleTab: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                              <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">
                                 {w.midweek.bibleReading || w.specialEvent?.title || `Semana ${idx + 1}`}
                               </p>
                             </div>
@@ -713,8 +713,8 @@ export const ScheduleTab: React.FC = () => {
                       })}
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-2">
-                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                    <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
+                      <label className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] block">
                         Saltar o crear fecha exacta:
                       </label>
                       <div className="flex items-center gap-1.5">
@@ -722,7 +722,7 @@ export const ScheduleTab: React.FC = () => {
                           type="date"
                           value={customJumpDate}
                           onChange={(e) => setCustomJumpDate(e.target.value)}
-                          className="flex-1 text-xs px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                          className="flex-1 text-xs px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
                         />
                         <button
                           type="button"
@@ -745,7 +745,7 @@ export const ScheduleTab: React.FC = () => {
                             setToastNotification('Siguiente semana agregada al programa.');
                             setTimeout(() => setToastNotification(null), 3000);
                           }}
-                          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs transition cursor-pointer border border-transparent dark:border-[#27272A]"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Agregar Siguiente Semana (+7 días)</span>
@@ -760,14 +760,14 @@ export const ScheduleTab: React.FC = () => {
 
           {/* Bloque 1B: Selector de tipo de reunión (3 columnas simétricas en móvil, en línea en desktop) */}
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08] gap-1">
+            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A] gap-1">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
                 className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'all'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 Todo
@@ -777,8 +777,8 @@ export const ScheduleTab: React.FC = () => {
                 onClick={() => setViewMode('midweek')}
                 className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'midweek'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 Entre Semana
@@ -788,8 +788,8 @@ export const ScheduleTab: React.FC = () => {
                 onClick={() => setViewMode('weekend')}
                 className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'weekend'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 Fin de Semana
@@ -799,7 +799,7 @@ export const ScheduleTab: React.FC = () => {
             {/* Botón Nueva Semana sutil (solo en desktop md+) */}
             <button
               onClick={addNextWeek}
-              className="hidden md:flex p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer shrink-0"
+              className="hidden md:flex p-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer shrink-0"
               title="Añadir nueva semana"
             >
               <Plus className="w-4 h-4" />
@@ -808,7 +808,7 @@ export const ScheduleTab: React.FC = () => {
         </div>
 
         {/* ── BARRA DE HERRAMIENTAS DE ACCIONES ── */}
-        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs">
+        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-2.5 border-t border-zinc-200 dark:border-[#27272A] w-full text-xs">
           {/* Lado izquierdo: Acciones clave con diseño limpio */}
           <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             {!isReadOnly ? (
@@ -821,7 +821,7 @@ export const ScheduleTab: React.FC = () => {
                 <span>Autoasignar</span>
               </button>
             ) : (
-              <span className="text-slate-500 text-[11px] sm:text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg truncate">
+              <span className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] sm:text-xs font-medium px-2 py-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] rounded-lg truncate">
                 Solo lectura ({effectiveRoleInfo.shortName})
               </span>
             )}
@@ -842,7 +842,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={handlePrintS89}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-medium transition-all cursor-pointer"
               title="Descargar hojas oficiales de asignación S-89 en PDF"
             >
               <FileText className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -853,7 +853,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenS38}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-medium transition-all cursor-pointer"
               title="Registros S-38 y folleto de oratoria"
             >
               <Award className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -877,8 +877,8 @@ export const ScheduleTab: React.FC = () => {
               onClick={() => setIsConflictsModalOpen(true)}
               className={`min-h-[34px] sm:min-h-0 flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap shrink-0 ${
                 weekConflictsCount > 0
-                  ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
-                  : 'text-slate-600 dark:text-zinc-300 border-slate-200/80 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5'
+                  ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 font-mono tabular-nums'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
               }`}
               title="Auditoría de cruces de esta semana"
             >
@@ -887,7 +887,7 @@ export const ScheduleTab: React.FC = () => {
               ) : (
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               )}
-              <span>{weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}</span>
+              <span className="font-mono tabular-nums">{weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}</span>
             </button>
 
             {/* Menú Desplegable "Más Opciones" */}
@@ -895,7 +895,7 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-                className="min-h-[34px] min-w-[34px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
+                className="min-h-[34px] min-w-[34px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
                 title="Más herramientas, S-89, S-38 y opciones"
                 aria-label="Más herramientas y opciones"
               >
@@ -908,32 +908,32 @@ export const ScheduleTab: React.FC = () => {
                     className="hidden sm:block fixed inset-0 z-40"
                     onClick={() => setIsMoreMenuOpen(false)}
                   />
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-slate-50 dark:bg-slate-950 sm:bg-white sm:dark:bg-slate-800 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-xl z-50 p-3 sm:py-1.5 sm:px-0 animate-in fade-in duration-100 flex flex-col justify-start">
-                    <div className="flex sm:hidden items-center gap-3 px-3 py-2.5 mb-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs shrink-0">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-[#121216] border-0 sm:border border-zinc-200 dark:border-[#27272A] rounded-none sm:rounded-2xl shadow-xl z-50 p-3 sm:py-1.5 sm:px-0 animate-in fade-in duration-100 flex flex-col justify-start">
+                    <div className="flex sm:hidden items-center gap-3 px-3 py-2.5 mb-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-2xs shrink-0">
                       <button
                         type="button"
                         data-mobile-back-btn="true"
                         onClick={() => setIsMoreMenuOpen(false)}
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                         aria-label="Atrás"
                       >
                         <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       </button>
-                      <span className="text-sm font-extrabold text-slate-800 dark:text-white truncate">
+                      <span className="text-sm font-extrabold text-zinc-800 dark:text-[#F4F4F5] truncate">
                         Herramientas del Programa
                       </span>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 sm:bg-transparent sm:dark:bg-transparent rounded-2xl sm:rounded-none border border-slate-200/80 dark:border-slate-800 sm:border-0 divide-y divide-slate-100 dark:divide-slate-800/80 sm:divide-y-0 overflow-hidden shadow-2xs sm:shadow-none">
+                    <div className="bg-white dark:bg-[#121216] sm:bg-transparent sm:dark:bg-transparent rounded-2xl sm:rounded-none border border-zinc-200 dark:border-[#27272A] sm:border-0 divide-y divide-zinc-100 dark:divide-[#27272A] sm:divide-y-0 overflow-hidden shadow-2xs sm:shadow-none">
                       {/* Mobile quick access to S-89 and S-38 */}
-                      <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+                      <div className="sm:hidden divide-y divide-zinc-100 dark:divide-[#27272A]">
                         <button
                           type="button"
                           onClick={() => {
                             setIsMoreMenuOpen(false);
                             handlePrintS89();
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-slate-800 dark:text-zinc-100 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer text-left"
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                         >
                           <FileText className="w-4 h-4 text-rose-500 shrink-0" />
                           <span>Descargar Hojas S-89 (PDF)</span>
@@ -945,7 +945,7 @@ export const ScheduleTab: React.FC = () => {
                             setIsMoreMenuOpen(false);
                             handleOpenS38();
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-slate-800 dark:text-zinc-100 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer text-left"
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                         >
                           <Award className="w-4 h-4 text-indigo-500 shrink-0" />
                           <span>Registro de Estudiantes (S-38)</span>
@@ -958,7 +958,7 @@ export const ScheduleTab: React.FC = () => {
                           setIsMoreMenuOpen(false);
                           setIsMwbModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                       >
                         <BookOpen className="w-4 h-4 text-amber-600 shrink-0" />
                         <span>Importar Guía de Actividades (MWB)</span>
@@ -971,7 +971,7 @@ export const ScheduleTab: React.FC = () => {
                           setOrganizedModalTab('catalogo');
                           setIsOrganizedModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                       >
                         <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
                         <span>Catálogo de Semanas Organized</span>
@@ -983,7 +983,7 @@ export const ScheduleTab: React.FC = () => {
                           setIsMoreMenuOpen(false);
                           setIsMonthlyBillboardModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                       >
                         <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <span>Cartelera Mensual del Salón</span>
@@ -995,7 +995,7 @@ export const ScheduleTab: React.FC = () => {
                           setIsMoreMenuOpen(false);
                           setIsTimerModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                       >
                         <Timer className="w-4 h-4 text-amber-500 shrink-0" />
                         <span>Modo Atril / Cronómetro</span>
@@ -1003,7 +1003,7 @@ export const ScheduleTab: React.FC = () => {
 
                       {!isReadOnly && (
                         <>
-                          <div className="hidden sm:block my-1 border-t border-slate-100 dark:border-white/5" />
+                          <div className="hidden sm:block my-1 border-t border-zinc-100 dark:border-[#27272A]" />
                           <button
                             type="button"
                             onClick={() => {
@@ -1015,7 +1015,7 @@ export const ScheduleTab: React.FC = () => {
                               setEventNotes(currentWeek.specialEvent?.notes || '');
                               setIsSpecialEventModalOpen(true);
                             }}
-                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                           >
                             <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
                             <span>
@@ -1030,13 +1030,13 @@ export const ScheduleTab: React.FC = () => {
                               setSourceWeekId(sortedWeeks[0]?.id || '');
                               setIsCopyModalOpen(true);
                             }}
-                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
                           >
-                            <Copy className="w-4 h-4 text-slate-500 shrink-0" />
+                            <Copy className="w-4 h-4 text-zinc-500 shrink-0" />
                             <span>Copiar Estructura de Semana</span>
                           </button>
 
-                          <div className="hidden sm:block my-1 border-t border-slate-100 dark:border-white/5" />
+                          <div className="hidden sm:block my-1 border-t border-zinc-100 dark:border-[#27272A]" />
                           <button
                             type="button"
                             onClick={() => {
@@ -1061,19 +1061,19 @@ export const ScheduleTab: React.FC = () => {
 
       {/* SPECIAL EVENT BANNER IF ACTIVE */}
       {currentWeek.specialEvent?.isSpecial && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-400 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/20 border-2 border-amber-400/80 dark:border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
               <Sparkle className="w-6 h-6" />
             </div>
-            <div>
-              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+            <div className="min-w-0">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-amber-200 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 px-2.5 py-0.5 rounded-full inline-block">
                 Fecha Especial Programada
               </span>
-              <h3 className="text-base font-bold text-slate-900 mt-0.5">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] mt-1 truncate">
                 {currentWeek.specialEvent.title}
               </h3>
-              <p className="text-xs text-amber-800 mt-0.5">
+              <p className="text-xs text-amber-800 dark:text-amber-300/90 mt-0.5">
                 {currentWeek.specialEvent.noMeetingMidweek && '⛔ Sin reunión de entre semana. '}
                 {currentWeek.specialEvent.noMeetingWeekend && '⛔ Sin reunión de fin de semana. '}
                 {currentWeek.specialEvent.notes && `Nota: ${currentWeek.specialEvent.notes}`}
@@ -1082,6 +1082,7 @@ export const ScheduleTab: React.FC = () => {
           </div>
 
           <button
+            type="button"
             onClick={() => {
               setEventTitle(currentWeek.specialEvent?.title || '');
               setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
@@ -1090,7 +1091,7 @@ export const ScheduleTab: React.FC = () => {
               setEventNotes(currentWeek.specialEvent?.notes || '');
               setIsSpecialEventModalOpen(true);
             }}
-            className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 border border-amber-300 text-xs font-bold text-amber-900 transition-all shrink-0"
+            className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-amber-300 dark:border-amber-500/30 text-xs font-bold text-amber-900 dark:text-amber-300 transition-all shrink-0 cursor-pointer active:scale-95 shadow-2xs"
           >
             Modificar Evento
           </button>
@@ -1100,7 +1101,7 @@ export const ScheduleTab: React.FC = () => {
       {/* REUNIÓN DE ENTRE SEMANA (VMC - ASIGNADOR OFICIAL) */}
       {(viewMode === 'all' || viewMode === 'midweek') && (
         <div className="space-y-4">
-          <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
+          <div className="rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden bg-white dark:bg-[#121216] shadow-xs">
             <ClmScheduleView
               key={currentWeek.weekStartDate}
               publishers={publishers}
@@ -1122,28 +1123,28 @@ export const ScheduleTab: React.FC = () => {
       {(viewMode === 'all' || viewMode === 'weekend') && (
         <div className="space-y-4">
           <div
-            className={`rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs transition-opacity ${
+            className={`rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden bg-white dark:bg-[#121216] shadow-xs transition-opacity ${
               currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
             }`}
           >
             {/* ── ENCABEZADO FDS SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */}
-            <div className="px-3.5 sm:px-5 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/70 dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs">
+            <div className="px-3.5 sm:px-5 py-3 bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                <span className="font-bold text-slate-900 dark:text-zinc-100 text-xs sm:text-sm">
+                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs sm:text-sm">
                   Reunión del Fin de Semana
                 </span>
-                <span className="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] sm:text-xs">
+                <span className="hidden sm:inline text-zinc-300 dark:text-zinc-600">•</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] sm:text-xs font-mono tabular-nums">
                   {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-white/[0.05]">
+              <div className="flex items-center gap-2 flex-wrap pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-200 dark:border-[#27272A]">
                 {!isReadOnly && (
                   <button
                     type="button"
                     onClick={() => handleQuickSyncOrganized('weekend')}
-                    className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
                     title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1157,7 +1158,7 @@ export const ScheduleTab: React.FC = () => {
                     setOrganizedModalTab('bosquejos');
                     setIsOrganizedModalOpen(true);
                   }}
-                  className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                  className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
                   title="Ver catálogo oficial de 194 bosquejos"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -1170,19 +1171,19 @@ export const ScheduleTab: React.FC = () => {
             <div className="flex-1 overflow-y-auto">
               {/* 1. MARCO INICIAL: Presidente, Cántico 1, Oración Inicial */}
               {/* FILA: Presidente */}
-              <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
                       P.
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                           Presidente de la reunión
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight leading-relaxed">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight leading-relaxed">
                         Preside la reunión, presenta al orador visitante/local y da los anuncios finales
                       </p>
                     </div>
@@ -1270,7 +1271,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Presidente
                       </button>
@@ -1280,26 +1281,26 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* FILA: Cántico Inicial */}
-              <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
-                          Cántico {currentWeek.weekend.openingSong || 12}
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
+                          Cántico <span className="font-mono tabular-nums">{currentWeek.weekend.openingSong || 12}</span>
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                         Cántico de apertura de la reunión del fin de semana
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border border-transparent dark:border-[#27272A]">
                       Congregación
                     </span>
                     {!isReadOnly && (
@@ -1309,7 +1310,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                         title="Cambiar número de cántico"
                       >
                         <Edit3 size={13} />
@@ -1320,19 +1321,19 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* FILA: Oración Inicial */}
-              <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                           Oración de apertura
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                         Petición y agradecimiento a Jehová antes de la conferencia pública
                       </p>
                     </div>
@@ -1420,7 +1421,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Oración
                       </button>
@@ -1438,8 +1439,8 @@ export const ScheduleTab: React.FC = () => {
                   DISCURSO PÚBLICO (30 MIN)
                 </div>
 
-                <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3.5 sm:py-4 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-3">
+                <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3.5 sm:py-4 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-3">
                     <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                       <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                         <Mic className="w-3.5 h-3.5" />
@@ -1447,23 +1448,23 @@ export const ScheduleTab: React.FC = () => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           {currentWeek.weekend.publicTalkOutlineNumber && (
-                            <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 font-bold text-[10px] tracking-wide shrink-0">
+                            <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 font-bold font-mono tabular-nums text-[10px] tracking-wide shrink-0">
                               Bosquejo #{currentWeek.weekend.publicTalkOutlineNumber}
                             </span>
                           )}
-                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             {currentWeek.weekend.publicTalkTheme || 'Tema del Discurso Público por definir'}
                           </h4>
-                          <span className="text-xs text-slate-400 font-normal">
+                          <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-normal">
                             (30 min)
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-slate-500 dark:text-slate-400">
-                          <span className="font-medium text-slate-700 dark:text-zinc-300">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                          <span className="font-medium text-zinc-700 dark:text-[#F4F4F5]">
                             Orador: <strong>{currentWeek.weekend.publicTalkSpeaker || 'Sin especificar'}</strong>
                             {currentWeek.weekend.visitingSpeakerCongregation && (
-                              <span className="text-slate-500 ml-1">
+                              <span className="text-zinc-500 dark:text-[#A1A1AA] ml-1">
                                 ({currentWeek.weekend.visitingSpeakerCongregation})
                               </span>
                             )}
@@ -1525,7 +1526,7 @@ export const ScheduleTab: React.FC = () => {
                             setWeekendEditTab('discurso');
                             setIsWeekendEditModalOpen(true);
                           }}
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-indigo-50 text-zinc-600 hover:text-indigo-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-indigo-400 dark:hover:bg-indigo-950/30 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Orador
                         </button>
@@ -1536,26 +1537,26 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* 3. CÁNTICO INTERMEDIO */}
-              <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
-                          Cántico {currentWeek.weekend.middleSong || 68}
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
+                          Cántico <span className="font-mono tabular-nums">{currentWeek.weekend.middleSong || 68}</span>
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                         Cántico intermedio entre el discurso y el estudio de La Atalaya
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border border-transparent dark:border-[#27272A]">
                       Congregación
                     </span>
                     {!isReadOnly && (
@@ -1565,7 +1566,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                         title="Cambiar número de cántico intermedio"
                       >
                         <Edit3 size={13} />
@@ -1585,7 +1586,7 @@ export const ScheduleTab: React.FC = () => {
                 </div>
 
                 {/* Sub-fila: Tema del artículo de La Atalaya */}
-                <div className="border-b border-slate-100 dark:border-white/[0.04] bg-emerald-50/20 dark:bg-emerald-950/10">
+                <div className="border-b border-zinc-100 dark:border-[#27272A]/70 bg-emerald-50/20 dark:bg-emerald-950/10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors gap-2">
                     <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                       <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
@@ -1596,10 +1597,10 @@ export const ScheduleTab: React.FC = () => {
                           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold text-[10px] tracking-wide shrink-0">
                             Artículo Oficial
                           </span>
-                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             {currentWeek.weekend.watchtowerTheme || 'Tema de La Atalaya por definir'}
                           </h4>
-                          <span className="text-xs text-slate-400 font-normal">
+                          <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-normal">
                             (60 min)
                           </span>
                         </div>
@@ -1629,19 +1630,19 @@ export const ScheduleTab: React.FC = () => {
                 </div>
 
                 {/* FILA: Conductor de La Atalaya */}
-                <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                     <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                       <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
                         <BookOpen className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             Quién dirige La Atalaya (Conductor)
                           </h4>
                         </div>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                           Dirige el estudio con la congregación formulando preguntas y comentarios
                         </p>
                       </div>
@@ -1729,7 +1730,7 @@ export const ScheduleTab: React.FC = () => {
                               () => {}
                             )
                           }
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Conductor
                         </button>
@@ -1739,19 +1740,19 @@ export const ScheduleTab: React.FC = () => {
                 </div>
 
                 {/* FILA: Lector de La Atalaya */}
-                <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                     <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                       <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
                         <FileText className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                             Lector de La Atalaya
                           </h4>
                         </div>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                           Lectura clara y audible de los párrafos del artículo
                         </p>
                       </div>
@@ -1839,7 +1840,7 @@ export const ScheduleTab: React.FC = () => {
                               () => {}
                             )
                           }
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Lector
                         </button>
@@ -1851,26 +1852,26 @@ export const ScheduleTab: React.FC = () => {
 
               {/* 5. MARCO FINAL: Cántico Final, Oración Final */}
               {/* FILA: Cántico Final */}
-              <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
-                          Cántico {currentWeek.weekend.closingSong || 138}
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
+                          Cántico <span className="font-mono tabular-nums">{currentWeek.weekend.closingSong || 138}</span>
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                         Cántico de conclusión de la reunión
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border border-transparent dark:border-[#27272A]">
                       Congregación
                     </span>
                     {!isReadOnly && (
@@ -1880,7 +1881,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                         title="Cambiar número de cántico de conclusión"
                       >
                         <Edit3 size={13} />
@@ -1892,18 +1893,18 @@ export const ScheduleTab: React.FC = () => {
 
               {/* FILA: Oración Final */}
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                        <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                           Oración de conclusión
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight">
                         Oración final y bendición para concluir la reunión del fin de semana
                       </p>
                     </div>
@@ -1991,7 +1992,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Oración
                       </button>
@@ -2041,33 +2042,33 @@ export const ScheduleTab: React.FC = () => {
 
       {/* MODAL: COPY WEEK STRUCTURE */}
       {isCopyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-zinc-100 dark:border-[#27272A]">
               <button
                 type="button"
                 data-mobile-back-btn="true"
                 aria-label="Atrás"
                 onClick={() => setIsCopyModalOpen(false)}
-                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] cursor-pointer active:scale-95 shrink-0"
               >
                 <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               </button>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Copiar estructura de otra semana
               </h3>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Esto copiará los títulos y partes del programa de la semana seleccionada hacia la semana actual, dejando las asignaciones listas para asignar.
             </p>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                 Semana de origen:
               </label>
               <select
                 value={sourceWeekId}
                 onChange={e => setSourceWeekId(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white"
+                className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {sortedWeeks.filter(w => w.id !== currentWeek.id).map(w => (
                   <option key={w.id} value={w.id}>
@@ -2079,7 +2080,7 @@ export const ScheduleTab: React.FC = () => {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setIsCopyModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer"
               >
                 Cancelar
               </button>
@@ -2088,7 +2089,7 @@ export const ScheduleTab: React.FC = () => {
                   if (sourceWeekId) copyWeekStructure(sourceWeekId, currentWeek.id);
                   setIsCopyModalOpen(false);
                 }}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
               >
                 Copiar Estructura
               </button>
@@ -2099,36 +2100,36 @@ export const ScheduleTab: React.FC = () => {
 
       {/* MODAL: SPECIAL EVENT */}
       {isSpecialEventModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-zinc-100 dark:border-[#27272A]">
               <button
                 type="button"
                 data-mobile-back-btn="true"
                 aria-label="Atrás"
                 onClick={() => setIsSpecialEventModalOpen(false)}
-                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] cursor-pointer active:scale-95 shrink-0"
               >
                 <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               </button>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Sparkle className="w-5 h-5 text-amber-500" />
                 <span>Configurar Evento o Fecha Especial</span>
               </h3>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Registra asambleas, conmemoración o visitas especiales. Si marcas "Sin reunión", esa reunión quedará bloqueada en el programa.
             </p>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Tipo de Evento:
                 </label>
                 <select
                   value={eventType}
                   onChange={e => setEventType(e.target.value as any)}
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="visita_superintendente">Visita del Superintendente de Circuito</option>
                   <option value="asamblea_circuito">Asamblea de Circuito</option>
@@ -2139,7 +2140,7 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Título del Evento:
                 </label>
                 <input
@@ -2147,12 +2148,12 @@ export const ScheduleTab: React.FC = () => {
                   value={eventTitle}
                   onChange={e => setEventTitle(e.target.value)}
                   placeholder="Ej. Visita del Superintendente de Circuito"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-xs font-bold text-slate-800">Bloqueo de reuniones ordinarias:</span>
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-2">
+                <span className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5]">Bloqueo de reuniones ordinarias:</span>
                 <div className="flex flex-col gap-2 pt-1">
                   <SplashCheckbox
                     size="sm"
@@ -2170,7 +2171,7 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Notas / Detalles:
                 </label>
                 <input
@@ -2178,7 +2179,7 @@ export const ScheduleTab: React.FC = () => {
                   value={eventNotes}
                   onChange={e => setEventNotes(e.target.value)}
                   placeholder="Ej. Reunión con precursores el sábado a las 10:00"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
             </div>
@@ -2191,7 +2192,7 @@ export const ScheduleTab: React.FC = () => {
                     updateWeek({ ...currentWeek, specialEvent: undefined });
                     setIsSpecialEventModalOpen(false);
                   }}
-                  className="text-xs font-bold text-rose-600 hover:underline"
+                  className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
                 >
                   Quitar Evento Especial
                 </button>
@@ -2199,13 +2200,13 @@ export const ScheduleTab: React.FC = () => {
               <div className="flex justify-end gap-2 ml-auto">
                 <button
                   onClick={() => setIsSpecialEventModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveSpecialEvent}
-                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold"
+                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs cursor-pointer"
                 >
                   Guardar Evento
                 </button>
@@ -2285,37 +2286,37 @@ export const ScheduleTab: React.FC = () => {
 
       {/* MODAL: QUITAR ASIGNADOS DE LA SEMANA */}
       {isClearWeekAssignmentsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 border border-zinc-200 dark:border-[#27272A]">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   data-mobile-back-btn="true"
                   aria-label="Atrás"
                   onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
-                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] cursor-pointer active:scale-95 shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 </button>
-                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-900/40 flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <UserMinus className="w-4 h-4" />
                 </div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                <h3 className="font-bold text-base text-zinc-900 dark:text-[#F4F4F5]">
                   Quitar Asignados de la Semana
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
-                className="hidden sm:flex p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="hidden sm:flex p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer"
               >
                 <XCircle className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-zinc-300">
-              Selecciona qué sección de la semana ({currentWeek.weekStartDate}) deseas dejar sin asignar:
+            <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
+              Selecciona qué sección de la semana (<span className="font-mono tabular-nums">{currentWeek.weekStartDate}</span>) deseas dejar sin asignar:
             </p>
 
             <div className="space-y-2">
@@ -2338,10 +2339,10 @@ export const ScheduleTab: React.FC = () => {
               ].map((opt) => (
                 <label
                   key={opt.id}
-                  className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${
+                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                     clearScope === opt.id
                       ? 'border-rose-500 bg-rose-50/40 dark:bg-rose-950/20 ring-1 ring-rose-400'
-                      : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                      : 'border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F]/40'
                   }`}
                 >
                   <input
@@ -2353,10 +2354,10 @@ export const ScheduleTab: React.FC = () => {
                     className="mt-0.5 text-rose-600 focus:ring-rose-500"
                   />
                   <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] block">
                       {opt.label}
                     </span>
-                    <span className="text-[11px] text-slate-500 dark:text-zinc-400 block mt-0.5 leading-snug">
+                    <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block mt-0.5 leading-snug">
                       {opt.desc}
                     </span>
                   </div>
@@ -2364,22 +2365,22 @@ export const ScheduleTab: React.FC = () => {
               ))}
             </div>
 
-            <p className="text-[11px] text-slate-400 dark:text-zinc-500 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] leading-relaxed bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
               ℹ️ Los temas oficiales, canciones, lecturas y números de bosquejo se conservan intactos. Solo se liberan las personas asignadas.
             </p>
 
-            <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+            <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleConfirmClearAssignments}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
               >
                 <UserMinus className="w-3.5 h-3.5" />
                 <span>Confirmar y Quitar Asignados</span>
@@ -2392,27 +2393,27 @@ export const ScheduleTab: React.FC = () => {
       {/* ── MODAL EDITAR PROGRAMA DEL FIN DE SEMANA (TEMA, ORADOR, ATALAYA, CÁNTICOS) ── */}
       {isWeekendEditModalOpen && currentWeek && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl w-full max-w-xl overflow-hidden shadow-xl flex flex-col max-h-[90vh]">
             {/* Header del Modal */}
-            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/80 dark:bg-[#18181F]">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 <button
                   type="button"
                   data-mobile-back-btn="true"
                   aria-label="Atrás"
                   onClick={() => setIsWeekendEditModalOpen(false)}
-                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-200/80 dark:bg-slate-700 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-200/80 dark:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 </button>
-                <div className="hidden sm:flex p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                <div className="hidden sm:flex p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-600 dark:text-emerald-400">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                     Editar Programa del Fin de Semana
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                     {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                   </p>
                 </div>
@@ -2421,21 +2422,21 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsWeekendEditModalOpen(false)}
-                className="hidden sm:flex p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                className="hidden sm:flex p-1.5 rounded-xl hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-500 hover:text-zinc-800 dark:hover:text-[#F4F4F5] transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Pestañas de Navegación del Modal */}
-            <div className="px-6 pt-3 pb-1 border-b border-slate-200 dark:border-white/[0.06] flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/20">
+            <div className="px-6 pt-3 pb-2 border-b border-zinc-200 dark:border-[#27272A] flex items-center gap-2 bg-zinc-100/50 dark:bg-[#121216]">
               <button
                 type="button"
                 onClick={() => setWeekendEditTab('discurso')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   weekendEditTab === 'discurso'
-                    ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-white/10'
-                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs border border-zinc-200/80 dark:border-indigo-500/30'
+                    : 'text-zinc-500 hover:text-zinc-900 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 Discurso Público
@@ -2445,8 +2446,8 @@ export const ScheduleTab: React.FC = () => {
                 onClick={() => setWeekendEditTab('atalaya')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   weekendEditTab === 'atalaya'
-                    ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-2xs border border-slate-200/80 dark:border-white/10'
-                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#18181F] text-emerald-600 dark:text-emerald-400 shadow-2xs border border-zinc-200/80 dark:border-emerald-500/30'
+                    : 'text-zinc-500 hover:text-zinc-900 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 La Atalaya
@@ -2456,8 +2457,8 @@ export const ScheduleTab: React.FC = () => {
                 onClick={() => setWeekendEditTab('canciones')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   weekendEditTab === 'canciones'
-                    ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-2xs border border-slate-200/80 dark:border-white/10'
-                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] shadow-2xs border border-zinc-200/80 dark:border-[#27272A]'
+                    : 'text-zinc-500 hover:text-zinc-900 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 Cánticos (3)
@@ -2468,9 +2469,9 @@ export const ScheduleTab: React.FC = () => {
             <div className="p-6 space-y-4 flex-1 overflow-y-auto">
               {weekendEditTab === 'discurso' && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Fecha exacta de esta reunión:
                       </label>
                       <input
@@ -2484,20 +2485,20 @@ export const ScheduleTab: React.FC = () => {
                           u.weekend.date = e.target.value;
                           updateWeek(u);
                         }}
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                        className="w-full text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Día y hora de la congregación:
                       </label>
-                      <div className="text-xs font-semibold py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      <div className="text-xs font-mono tabular-nums font-semibold py-2.5 px-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                         {settings.weekendMeetingDay} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                       </div>
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                       Catálogo Oficial de Bosquejos (#1 al 194):
                     </label>
                     <select
@@ -2512,7 +2513,7 @@ export const ScheduleTab: React.FC = () => {
                         }
                         updateWeek(u);
                       }}
-                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                      className="w-full text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                     >
                       <option value="">-- Seleccionar bosquejo del catálogo oficial --</option>
                       {OFFICIAL_PUBLIC_TALK_OUTLINES.map((o) => (
@@ -2524,7 +2525,7 @@ export const ScheduleTab: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                       Tema del Discurso Público:
                     </label>
                     <input
@@ -2536,13 +2537,13 @@ export const ScheduleTab: React.FC = () => {
                         updateWeek(u);
                       }}
                       placeholder="Ej. ¿Quién es el Dios verdadero?"
-                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                      className="w-full text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Nombre del Orador:
                       </label>
                       <input
@@ -2554,11 +2555,11 @@ export const ScheduleTab: React.FC = () => {
                           updateWeek(u);
                         }}
                         placeholder="Ej. Hno. Carlos Martínez"
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                        className="w-full text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Congregación de Origen:
                       </label>
                       <input
@@ -2570,7 +2571,7 @@ export const ScheduleTab: React.FC = () => {
                           updateWeek(u);
                         }}
                         placeholder="Ej. Los Pinos / Local"
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                        className="w-full text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
@@ -2580,7 +2581,7 @@ export const ScheduleTab: React.FC = () => {
               {weekendEditTab === 'atalaya' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                       Tema / Artículo de La Atalaya:
                     </label>
                     <input
@@ -2592,12 +2593,12 @@ export const ScheduleTab: React.FC = () => {
                         updateWeek(u);
                       }}
                       placeholder="Ej. Confiemos plenamente en el cuidado amoroso de Jehová"
-                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                      className="w-full text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                       Texto Temático del Artículo:
                     </label>
                     <input
@@ -2609,7 +2610,7 @@ export const ScheduleTab: React.FC = () => {
                         updateWeek(u);
                       }}
                       placeholder="Ej. Salmo 84:11"
-                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                      className="w-full text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
                 </div>
@@ -2619,7 +2620,7 @@ export const ScheduleTab: React.FC = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Cántico Inicial:
                       </label>
                       <input
@@ -2634,12 +2635,12 @@ export const ScheduleTab: React.FC = () => {
                           updateWeek(u);
                         }}
                         placeholder="Ej. 12"
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                        className="w-full text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Cántico Intermedio:
                       </label>
                       <input
@@ -2654,12 +2655,12 @@ export const ScheduleTab: React.FC = () => {
                           updateWeek(u);
                         }}
                         placeholder="Ej. 68"
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                        className="w-full text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
                         Cántico de Conclusión:
                       </label>
                       <input
@@ -2674,7 +2675,7 @@ export const ScheduleTab: React.FC = () => {
                           updateWeek(u);
                         }}
                         placeholder="Ej. 138"
-                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                        className="w-full text-xs font-mono tabular-nums font-semibold text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
                   </div>
@@ -2683,7 +2684,7 @@ export const ScheduleTab: React.FC = () => {
             </div>
 
             {/* Footer del Modal */}
-            <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-end">
+            <div className="px-6 py-3.5 bg-zinc-50 dark:bg-[#18181F] border-t border-zinc-200 dark:border-[#27272A] flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setIsWeekendEditModalOpen(false)}
@@ -2698,8 +2699,8 @@ export const ScheduleTab: React.FC = () => {
 
       {/* TOAST NOTIFICATION */}
       {toastNotification && (
-        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-2xl border border-indigo-500/40 text-xs font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom duration-200">
-          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 px-4 py-3 bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] rounded-2xl shadow-xl border border-indigo-500/30 text-xs font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom duration-200">
+          <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
           <span>{toastNotification}</span>
         </div>
       )}

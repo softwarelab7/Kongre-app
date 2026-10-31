@@ -81,8 +81,8 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-lg bg-white dark:bg-[#121216] rounded-3xl p-6 sm:p-8 shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col items-center text-center">
         {/* Brand Emblem */}
         <div className="flex items-center justify-center mb-6">
           <Logo variant="horizontal" className="h-9 w-auto object-contain" />
@@ -100,45 +100,45 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
         )}
 
         {/* Title */}
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-2">
+        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mb-2">
           {myRequest?.status === 'rejected'
             ? 'Solicitud No Aprobada'
             : 'En Espera de Aprobación'}
         </h2>
 
         {/* Description */}
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mb-6 leading-relaxed">
+        <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#A1A1AA] max-w-md mb-6 leading-relaxed">
           {myRequest?.status === 'rejected'
             ? 'Los ancianos revisaron tu solicitud pero no fue aprobada para vincularse a esta congregación.'
             : 'Tu cuenta de Google y tus credenciales teocráticas fueron recibidas. Por seguridad teocrática, los ancianos o hermanos autorizados deben aprobar la vinculación de tu correo antes de que puedas acceder a la app.'}
         </p>
 
         {/* Details Card */}
-        <div className="w-full bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/80 text-left mb-6 space-y-2.5">
+        <div className="w-full bg-zinc-50 dark:bg-[#18181F]/60 rounded-2xl p-4 border border-zinc-200 dark:border-[#27272A]/80 text-left mb-6 space-y-2.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span className="text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-indigo-500" />
               <span>Congregación:</span>
             </span>
-            <span className="font-bold text-slate-800 dark:text-slate-200">
+            <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
               {settings.congregationName || 'Congregación Local'}
             </span>
           </div>
 
           {myRequest?.brotherName && (
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <span className="text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Publicador:</span>
               </span>
-              <span className="font-bold text-slate-800 dark:text-slate-200">
+              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
                 {myRequest.brotherName}
               </span>
             </div>
           )}
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span className="text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-indigo-500" />
               <span>Correo de Google:</span>
             </span>
@@ -149,7 +149,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
 
           {roleInfo && (
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <span className="text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Privilegio / Rol:</span>
               </span>
@@ -159,8 +159,8 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             </div>
           )}
 
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200 dark:border-slate-700">
-            <span className="text-slate-500 dark:text-slate-400">Estado de vinculación:</span>
+          <div className="flex items-center justify-between text-xs pt-1 border-t border-zinc-200 dark:border-[#27272A]">
+            <span className="text-zinc-500 dark:text-[#A1A1AA]">Estado de vinculación:</span>
             <span
               className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
                 myRequest?.status === 'rejected'
@@ -196,14 +196,14 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
           <button
             type="button"
             onClick={onSignOut}
-            className="w-full py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full py-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Cerrar Sesión / Salir</span>
           </button>
         </div>
 
-        <p className="mt-6 text-[11px] text-slate-400 dark:text-slate-500">
+        <p className="mt-6 text-[11px] text-zinc-400 dark:text-[#71717A]">
           Tip: Puedes avisar personalmente al Coordinador o al Secretario para que aprueben tu acceso.
         </p>
       </div>

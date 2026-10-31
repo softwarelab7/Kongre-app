@@ -80,11 +80,11 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={isUpdating ? undefined : onClose}
     >
       <div
-        className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-6 sm:p-7 space-y-5"
+        className="relative w-full max-w-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl p-6 sm:p-7 space-y-5"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button (deshabilitado mientras se instala) */}
@@ -92,7 +92,7 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer"
             aria-label="Cerrar aviso de actualización"
           >
             <X className="w-5 h-5" />
@@ -117,22 +117,22 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
                 v{updateInfo.latestVersion}
               </span>
             </div>
-            <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
+            <h3 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight mt-1">
               ¡Actualización Disponible para PC!
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
               Hay una nueva compilación de <strong>Kongre App</strong> con mejoras teocráticas y correcciones.
             </p>
           </div>
         </div>
 
         {/* Version Comparison Box */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-2 text-xs">
-          <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A] space-y-2 text-xs">
+          <div className="flex items-center justify-between text-zinc-600 dark:text-[#D4D4D8]">
             <span>Tu versión instalada:</span>
-            <span className="font-mono font-bold text-slate-500 line-through">v{updateInfo.currentVersion}</span>
+            <span className="font-mono font-bold text-zinc-500 line-through">v{updateInfo.currentVersion}</span>
           </div>
-          <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold">
+          <div className="flex items-center justify-between text-zinc-900 dark:text-white font-bold">
             <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="w-4 h-4" />
               Nueva versión disponible:
@@ -140,7 +140,7 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
             <span className="font-mono text-sm text-indigo-600 dark:text-indigo-400">v{updateInfo.latestVersion}</span>
           </div>
           {updateInfo.fileName && (
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="pt-2 border-t border-zinc-200 dark:border-[#27272A]/60 flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
               <span className="truncate pr-2">Paquete oficial: <strong>{updateInfo.fileName}</strong></span>
               {updateInfo.fileSize && <span className="shrink-0 font-medium font-mono">{updateInfo.fileSize}</span>}
             </div>
@@ -181,8 +181,8 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
 
         {/* Instrucciones de terminal para paquetes de sistema Linux (.rpm / .deb) */}
         {!isUpdating && terminalCommand && (
-          <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 space-y-1.5 text-xs">
-            <div className="flex items-center justify-between text-slate-600 dark:text-slate-300 font-semibold text-[11px]">
+          <div className="p-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]/60 space-y-1.5 text-xs">
+            <div className="flex items-center justify-between text-zinc-600 dark:text-[#D4D4D8] font-semibold text-[11px]">
               <span className="flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-indigo-500" />
                 Comando rápido de instalación para tu sistema:
@@ -196,7 +196,7 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
                 <span>{copiedCommand ? 'Copiado' : 'Copiar'}</span>
               </button>
             </div>
-            <code className="block p-2 rounded-lg bg-slate-900 text-slate-100 font-mono text-[11px] overflow-x-auto select-all">
+            <code className="block p-2 rounded-lg bg-zinc-900 text-zinc-100 font-mono text-[11px] overflow-x-auto select-all">
               {terminalCommand}
             </code>
           </div>
@@ -241,7 +241,7 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-center"
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer text-center"
             >
               Recordarme más tarde
             </button>

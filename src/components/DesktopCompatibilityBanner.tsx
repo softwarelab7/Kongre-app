@@ -101,7 +101,7 @@ export const PLATFORMS_DATA: Record<PlatformId, PlatformConfig> = {
       size: '90.9 MB',
       url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
     },
-    gradient: 'from-purple-600 via-indigo-600 to-slate-800',
+    gradient: 'from-purple-600 via-indigo-600 to-zinc-800',
   },
 };
 
@@ -160,13 +160,13 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className={`${
         isMobileVariant ? 'rounded-2xl p-4 sm:p-5' : 'mt-4 rounded-3xl p-4 sm:p-5'
-      } bg-linear-to-br from-indigo-50/95 via-white to-violet-50/80 dark:from-slate-900 dark:via-indigo-950/85 dark:to-slate-900 text-slate-900 dark:text-white border border-indigo-200/90 dark:border-indigo-800/70 shadow-md shadow-indigo-500/5 dark:shadow-indigo-950/30 relative overflow-hidden transition-all`}
+      } bg-linear-to-br from-indigo-50/95 via-white to-violet-50/80 dark:from-zinc-900 dark:via-indigo-950/85 dark:to-zinc-900 text-zinc-900 dark:text-white border border-indigo-200/90 dark:border-indigo-800/70 shadow-md shadow-indigo-500/5 dark:shadow-indigo-950/30 relative overflow-hidden transition-all`}
     >
       {/* Top subtle accent line */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-indigo-600 via-violet-500 to-sky-500" />
 
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-indigo-100/90 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-indigo-100/90 dark:border-[#27272A]">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
           <motion.div
             whileHover={{ scale: 1.08, rotate: 2 }}
@@ -181,10 +181,10 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
               <span aria-hidden="true">·</span>
               <span className="font-mono">Linux Nativo v{CURRENT_APP_VERSION}</span>
             </div>
-            <h3 className="text-[15px] sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mt-0.5">
+            <h3 className="text-[15px] sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight leading-snug mt-0.5">
               Kongre App para Linux & PWA
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
+            <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed mt-0.5">
               Paquetes nativos ultraligeros para cabina y Salón del Reino con operación 100% offline.
             </p>
           </div>
@@ -204,7 +204,7 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
       {/* Interactive OS Selector Grid */}
       <div className="py-3">
         <div className="flex items-center justify-between gap-2 mb-2">
-          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+          <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA]">
             Elige el paquete oficial para Linux:
           </span>
         </div>
@@ -225,7 +225,7 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
                 className={`px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer border flex items-center gap-2.5 ${
                   isSelected
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20'
-                    : 'bg-white/90 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:border-indigo-300 dark:hover:border-indigo-600'
+                    : 'bg-white/90 dark:bg-[#18181F]/70 border-zinc-200/80 dark:border-[#27272A]/80 text-zinc-700 dark:text-[#E4E4E7] hover:border-indigo-300 dark:hover:border-indigo-600'
                 }`}
               >
                 <PIcon
@@ -239,7 +239,7 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
                   </div>
                   <div
                     className={`text-[10px] font-mono truncate mt-0.5 ${
-                      isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-400'
+                      isSelected ? 'text-indigo-100' : 'text-zinc-400 dark:text-[#A1A1AA]'
                     }`}
                   >
                     {p.primaryFile.ext} · {p.primaryFile.size}
@@ -259,18 +259,18 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.2 }}
-          className="pt-3 border-t border-indigo-100/90 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+          className="pt-3 border-t border-indigo-100/90 dark:border-[#27272A] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
         >
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-100">
               <ActiveIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">{activeConfig.architecture}</span>
-              <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+              <span className="text-zinc-300 dark:text-[#71717A]" aria-hidden="true">·</span>
               <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px]">
                 {activeConfig.badge}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               {activeConfig.compatibilityNote}
             </p>
           </div>

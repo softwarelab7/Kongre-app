@@ -247,20 +247,20 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
       aria-label="Registro teocrático e invitaciones"
     >
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 bg-zinc-950/70 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white">
                 Registro Teocrático e Invitaciones
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Sistema de acceso seguro de congregación
               </p>
             </div>
@@ -269,21 +269,21 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar gestor de invitaciones"
-            className="p-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+            className="p-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab buttons */}
-        <div className="flex border-b border-slate-100 dark:border-slate-800 px-6 gap-2 bg-slate-50/50 dark:bg-slate-900/50 overflow-x-auto">
+        <div className="flex border-b border-zinc-100 dark:border-[#27272A] px-6 gap-2 bg-zinc-50/50 dark:bg-[#121216]/50 overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab('generar')}
             className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'generar'
                 ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
             }`}
           >
             Generar Invitación y QR
@@ -294,7 +294,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
             className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'invitaciones'
                 ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
             }`}
           >
             <span>Invitaciones Activas</span>
@@ -308,7 +308,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
             className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'sesiones'
                 ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
             }`}
           >
             <span>Dispositivos Autorizados</span>
@@ -322,7 +322,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
             className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'clave_maestra'
                 ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
             }`}
           >
             Clave Maestra (Zero-Knowledge)
@@ -336,7 +336,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
             <div className="space-y-5">
               {!generatedInvitation ? (
                 <form onSubmit={handleGenerate} className="space-y-4">
-                  <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 text-slate-600 dark:text-slate-300">
+                  <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 text-zinc-600 dark:text-[#D4D4D8]">
                     <p>
                       Crea un código de invitación teocrático con el rol preasignado. Al compartirlo con el hermano, podrá escanear el código QR con su celular o ingresar el código alfanumérico para quedar registrado automáticamente sin necesidad de autoregistros públicos.
                     </p>
@@ -344,7 +344,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
                   {/* Role Selector */}
                   <div>
-                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1.5">
+                    <label className="block font-bold text-zinc-800 dark:text-[#E4E4E7] mb-1.5">
                       Rol teocrático a otorgar:
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -359,11 +359,11 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                             className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                               isSelected
                                 ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-950 dark:text-white ring-1 ring-indigo-600'
-                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-300'
+                                : 'border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A]/60 text-zinc-700 dark:text-[#D4D4D8]'
                             }`}
                           >
                             <span className="font-bold block text-xs">{info.name}</span>
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] line-clamp-1 mt-0.5">
                               {info.description}
                             </span>
                           </button>
@@ -375,7 +375,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                   {/* Brother Name */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                         Nombre del hermano (opcional):
                       </label>
                       <input
@@ -383,18 +383,18 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                         value={targetBrotherName}
                         onChange={(e) => setTargetBrotherName(e.target.value)}
                         placeholder="Ej: Hno. Carlos Morales"
-                        className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                        className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                         Vigencia de la invitación:
                       </label>
                       <select
                         value={expiryDays}
                         onChange={(e) => setExpiryDays(Number(e.target.value))}
-                        className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                        className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
                       >
                         <option value={7}>7 días</option>
                         <option value={15}>15 días</option>
@@ -404,7 +404,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                  <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex justify-end">
                     <button
                       type="submit"
                       className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer shadow-md flex items-center gap-2"
@@ -416,23 +416,23 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                 </form>
               ) : (
                 /* Generated Result View */
-                <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-5 animate-fade-in">
+                <div className="p-6 rounded-3xl bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A] space-y-5 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                         Invitación Generada con Éxito
                       </span>
-                      <h4 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                      <h4 className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">
                         {THEOCRATIC_ROLES[generatedInvitation.role as TheocraticRole]?.name}
                       </h4>
                       {generatedInvitation.targetName && (
-                        <p className="text-xs text-slate-500">Destinada a: {generatedInvitation.targetName}</p>
+                        <p className="text-xs text-zinc-500">Destinada a: {generatedInvitation.targetName}</p>
                       )}
                     </div>
                     <button
                       type="button"
                       onClick={() => setGeneratedInvitation(null)}
-                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100"
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-[#E4E4E7] font-bold hover:bg-zinc-100"
                     >
                       Crear Otra
                     </button>
@@ -441,9 +441,9 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                   {/* QR & Code Display */}
                   <div className="flex flex-col sm:flex-row items-center gap-6 justify-center py-2">
                     {qrDataUrl && (
-                      <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200">
+                      <div className="p-3 bg-white rounded-2xl shadow-md border border-zinc-200">
                         <img src={qrDataUrl} alt="QR de Invitación" className="w-40 h-40 object-contain" />
-                        <span className="text-[9px] font-bold text-center block text-slate-400 mt-1">
+                        <span className="text-[9px] font-bold text-center block text-zinc-400 mt-1">
                           Escanear con la cámara del celular
                         </span>
                       </div>
@@ -451,11 +451,11 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
                     <div className="space-y-3 text-center sm:text-left">
                       <div>
-                        <span className="text-xs text-slate-400 block mb-1">Código Portátil de Invitación (Multidispositivo):</span>
-                        <div className="inline-block px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border-2 border-indigo-500 font-mono font-bold text-sm sm:text-base text-indigo-700 dark:text-indigo-400 tracking-wider shadow-xs break-all">
+                        <span className="text-xs text-zinc-400 block mb-1">Código Portátil de Invitación (Multidispositivo):</span>
+                        <div className="inline-block px-3.5 py-2 rounded-xl bg-white dark:bg-[#121216] border-2 border-indigo-500 font-mono font-bold text-sm sm:text-base text-indigo-700 dark:text-indigo-400 tracking-wider shadow-xs break-all">
                           {getFullPortableInviteCode(generatedInvitation.code)}
                         </div>
-                        <span className="text-[10px] text-slate-400 block mt-1">
+                        <span className="text-[10px] text-zinc-400 block mt-1">
                           Código corto local: <strong className="font-mono">{generatedInvitation.code}</strong>
                         </span>
                       </div>
@@ -464,7 +464,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopy(generatedInvitation.code, generatedInvitation.role as TheocraticRole)}
-                          className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          className="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                           <span>{copiedCode ? '¡Copiado!' : 'Copiar Invitación'}</span>
@@ -490,7 +490,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
           {activeTab === 'invitaciones' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <span className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Invitaciones Registradas en el Sistema:
                 </span>
                 <button
@@ -507,7 +507,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
               </div>
 
               {invitations.length === 0 ? (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-zinc-400">
                   No hay invitaciones registradas.
                 </div>
               ) : (
@@ -515,14 +515,14 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                   {invitations.map((inv) => (
                     <div
                       key={inv.id}
-                      className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      className="p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-xs">
                             {getFullPortableInviteCode(inv.code)}
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-[#D4D4D8]">
                             {THEOCRATIC_ROLES[inv.role as TheocraticRole]?.shortName || inv.role}
                           </span>
                           {inv.status === 'active' && (
@@ -541,7 +541,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-[11px] text-zinc-500">
                           {inv.targetName ? `Destinada a: ${inv.targetName}` : 'Sin destinatario fijo'}
                           {inv.usedByEmail ? ` • Usada por: ${inv.usedByEmail}` : ''}
                         </p>
@@ -556,7 +556,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                                 setGeneratedInvitation(inv);
                                 setActiveTab('generar');
                               }}
-                              className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold flex items-center gap-1 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-700 dark:text-[#E4E4E7] font-bold flex items-center gap-1 cursor-pointer"
                               title="Ver código QR para escanear"
                             >
                               <QrCode className="w-3.5 h-3.5" />
@@ -602,11 +602,11 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
           {/* TAB 3: ACTIVE DEVICE SESSIONS */}
           {activeTab === 'sesiones' && (
             <div className="space-y-4">
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-                <span className="font-bold text-slate-900 dark:text-white block mb-0.5">
+              <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A]">
+                <span className="font-bold text-zinc-900 dark:text-white block mb-0.5">
                   Control de Dispositivos y Cuentas Conectadas
                 </span>
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-zinc-500 dark:text-[#A1A1AA]">
                   Si un hermano se muda de congregación o deja de servir como anciano o siervo ministerial, puedes revocar inmediatamente su sesión desde este panel.
                 </p>
               </div>
@@ -619,8 +619,8 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                       key={sess.id}
                       className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                         isRevoked
-                          ? 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 opacity-60'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                          ? 'border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#121216]/50 opacity-60'
+                          : 'border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -633,7 +633,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 dark:text-white text-xs">{sess.name}</span>
+                            <span className="font-bold text-zinc-900 dark:text-white text-xs">{sess.name}</span>
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                               {THEOCRATIC_ROLES[sess.role as TheocraticRole]?.shortName || sess.role}
                             </span>
@@ -647,7 +647,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-0.5">
+                          <p className="text-[11px] text-zinc-500 mt-0.5">
                             {sess.email} • {sess.deviceInfo} • Activo: {sess.lastActive}
                           </p>
                         </div>
@@ -696,7 +696,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
               {isMasterPassphraseSet && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                     Clave Maestra Actual:
                   </label>
                   <input
@@ -704,14 +704,14 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                     value={currentMasterPass}
                     onChange={(e) => setCurrentMasterPass(e.target.value)}
                     placeholder="Introduce la clave maestra actual"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
                     required
                   />
                 </div>
               )}
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                   Nueva Clave Maestra de Congregación:
                 </label>
                 <input
@@ -719,13 +719,13 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                   value={newMasterPass}
                   onChange={(e) => setNewMasterPass(e.target.value)}
                   placeholder={isMasterPassphraseSet ? 'Dejar en blanco para desactivar' : 'Mínimo 8 caracteres'}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
                 />
               </div>
 
               {newMasterPass && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1">
                     Confirmar Nueva Clave Maestra:
                   </label>
                   <input
@@ -733,13 +733,13 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                     value={confirmMasterPass}
                     onChange={(e) => setConfirmMasterPass(e.target.value)}
                     placeholder="Repite la nueva clave"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
                     required
                   />
                 </div>
               )}
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex justify-end">
                 <button
                   type="submit"
                   className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer shadow-md"

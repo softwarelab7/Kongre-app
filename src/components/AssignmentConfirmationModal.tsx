@@ -191,7 +191,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/70 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
@@ -200,10 +200,10 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
         role="dialog"
         aria-modal="true"
         aria-label="Confirmación de Asignación"
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-zinc-200 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150"
       >
         {/* Top Header Card */}
-        <div className="px-6 py-5 bg-linear-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white relative">
+        <div className="px-6 py-5 bg-linear-to-br from-indigo-700 via-indigo-800 to-zinc-900 text-white relative">
           <button
             type="button"
             onClick={onClose}
@@ -236,23 +236,23 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
         <div className="p-6 space-y-5">
           {/* Greeting */}
           <div>
-            <span className="text-xs text-slate-500 font-medium">Asignado a:</span>
-            <h3 className="text-lg font-bold text-slate-900">
+            <span className="text-xs text-zinc-500 font-medium">Asignado a:</span>
+            <h3 className="text-lg font-bold text-zinc-900">
               {targetPublisher.gender === 'hermana' ? 'Hna.' : 'Hno.'} {targetPublisher.name}
             </h3>
           </div>
 
           {/* Details Card */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
                 <BookOpen className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
                   Parte asignada
                 </span>
-                <p className="text-sm font-bold text-slate-900 leading-snug">
+                <p className="text-sm font-bold text-zinc-900 leading-snug">
                   {assignmentDetails.roleTitle}
                 </p>
                 {assignmentDetails.room && (
@@ -263,30 +263,30 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs text-slate-600">
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-200 text-xs text-zinc-600">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-slate-400" />
+                <Calendar className="w-4 h-4 text-zinc-400" />
                 <span>{assignmentDetails.meetingDate}</span>
               </div>
               {assignmentDetails.timeMinutes && (
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-slate-400" />
+                  <Clock className="w-4 h-4 text-zinc-400" />
                   <span>{assignmentDetails.timeMinutes} minutos</span>
                 </div>
               )}
             </div>
 
             {assignmentDetails.assistant && (
-              <div className="pt-2 border-t border-slate-200 flex items-center gap-2 text-xs text-slate-700 font-medium">
-                <Users className="w-4 h-4 text-slate-400" />
+              <div className="pt-2 border-t border-zinc-200 flex items-center gap-2 text-xs text-zinc-700 font-medium">
+                <Users className="w-4 h-4 text-zinc-400" />
                 <span>Ayudante: <strong>{assignmentDetails.assistant.name}</strong></span>
               </div>
             )}
 
             {assignmentDetails.lessonNumber && (
-              <div className="pt-2 border-t border-slate-200 text-xs">
-                <span className="text-slate-500 font-medium">Punto de consejo:</span>
-                <p className="font-bold text-slate-900 mt-0.5">
+              <div className="pt-2 border-t border-zinc-200 text-xs">
+                <span className="text-zinc-500 font-medium">Punto de consejo:</span>
+                <p className="font-bold text-zinc-900 mt-0.5">
                   📖 Lección #{assignmentDetails.lessonNumber}: {assignmentDetails.lessonTitle || ''}
                 </p>
               </div>
@@ -294,8 +294,8 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
           </div>
 
           {/* Current Status Feedback */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200 text-xs">
-            <span className="font-semibold text-slate-600">Estado de tu respuesta:</span>
+          <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-100 border border-zinc-200 text-xs">
+            <span className="font-semibold text-zinc-600">Estado de tu respuesta:</span>
             <span
               className={`px-2.5 py-1 rounded-full font-bold ${
                 effectiveStatus === 'confirmada'
@@ -329,7 +329,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
                   onClick={() => setShowReplacementPrompt(false)}
-                  className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 font-medium"
+                  className="px-3 py-1.5 text-xs text-zinc-600 hover:text-zinc-900 font-medium"
                 >
                   Cancelar
                 </button>
@@ -381,7 +381,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
 
               <button
                 onClick={() => setShowReplacementPrompt(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border border-slate-200 text-slate-700 font-bold text-sm transition-all active:scale-95"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-zinc-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border border-zinc-200 text-zinc-700 font-bold text-sm transition-all active:scale-95"
               >
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
                 <span>Solicitar Reemplazo</span>
@@ -391,11 +391,11 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <div className="px-6 py-3 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between text-xs text-zinc-500">
           <span>Kongre • Gestor Teocrático</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-zinc-900 text-white font-semibold hover:bg-zinc-800 transition-colors"
           >
             Cerrar
           </button>

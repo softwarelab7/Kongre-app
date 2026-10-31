@@ -55,7 +55,7 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
   ];
 
   return (
-    <div className="p-5 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] shadow-xs space-y-4">
+    <div className="p-5 rounded-3xl bg-zinc-50 dark:bg-[#121216]/60 border border-zinc-200/80 dark:border-white/[0.08] shadow-xs space-y-4">
       {/* Fila principal con Anillo SVG, Títulos y Switch */}
       <div className="flex items-center gap-4">
         {/* Anillo de 60px con indicador de minutos */}
@@ -66,20 +66,20 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
           state="ok"
           className="shrink-0"
         >
-          <b className="text-lg font-black text-slate-900 dark:text-white leading-none">
+          <b className="text-lg font-black text-zinc-900 dark:text-white leading-none">
             {isOn ? currentMins : '–'}
           </b>
-          <small className="text-[9.5px] text-slate-400 dark:text-slate-500 font-bold block mt-0.5">
+          <small className="text-[9.5px] text-zinc-400 dark:text-[#71717A] font-bold block mt-0.5">
             min
           </small>
         </AutoLockRing>
 
         {/* Título y subtítulo explicativo */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
             Bloqueo automático
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 leading-snug">
             {isDemoMode
               ? 'El auto-bloqueo está desactivado temporalmente en modo demo.'
               : isOn
@@ -97,7 +97,7 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
           disabled={!isPinEnabled || isDemoMode}
           onClick={handleToggleSwitch}
           className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden disabled:opacity-40 disabled:cursor-not-allowed ${
-            isOn ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+            isOn ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
           }`}
         >
           <span
@@ -124,7 +124,7 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
         />
 
         {/* Marcas de minutos (5 a 15) */}
-        <div className="flex justify-between text-[10px] font-semibold text-slate-400 dark:text-slate-500 tabular-nums mt-1 px-1">
+        <div className="flex justify-between text-[10px] font-semibold text-zinc-400 dark:text-[#71717A] tabular-nums mt-1 px-1">
           {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((m) => (
             <span
               key={m}
@@ -132,7 +132,7 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
               className={`transition-colors cursor-pointer ${
                 m === currentMins && isOn
                   ? 'text-indigo-600 dark:text-indigo-400 font-bold scale-110'
-                  : 'hover:text-slate-700 dark:hover:text-slate-300'
+                  : 'hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {m}
@@ -153,7 +153,7 @@ export const AutoLockSettingsCard: React.FC<AutoLockSettingsCardProps> = ({
                 className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                   isPresetActive
                     ? 'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs'
-                    : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                    : 'bg-white dark:bg-[#18181F]/80 border-zinc-200 dark:border-[#27272A]/80 text-zinc-600 dark:text-[#D4D4D8] hover:border-zinc-300 dark:hover:border-zinc-600'
                 }`}
               >
                 {p.label}

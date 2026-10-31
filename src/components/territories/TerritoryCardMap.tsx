@@ -215,18 +215,18 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
   const area = hasPolygon ? calculateAreaSquareMeters(territory.polygon!) : 0;
 
   return (
-    <div className={`relative w-full ${heightClass} rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md bg-slate-100 dark:bg-slate-900`}>
+    <div className={`relative w-full ${heightClass} rounded-2xl overflow-hidden border border-zinc-200 dark:border-[#27272A] shadow-md bg-zinc-100 dark:bg-[#121216]`}>
       {/* Map Element */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Floating Controls */}
       <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">
         {/* Layer Switcher */}
-        <div className="flex flex-col bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-200 dark:border-slate-800 shadow-md overflow-hidden">
+        <div className="flex flex-col bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-md overflow-hidden">
           <button
             type="button"
             onClick={() => handleChangeTile(activeTile === 'satellite' ? 'positron' : 'satellite')}
-            className="p-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
             title={activeTile === 'satellite' ? 'Cambiar a plano urbano' : 'Cambiar a vista satelital'}
           >
             <Layers className="w-4 h-4" />
@@ -238,7 +238,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
           type="button"
           onClick={handleLocateMe}
           disabled={isLocating}
-          className="p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+          className="p-2 rounded-xl bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] shadow-md hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors disabled:opacity-50"
           title="Ver mi ubicación en el territorio (GPS)"
         >
           <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin text-blue-500' : ''}`} />
@@ -248,7 +248,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
         <button
           type="button"
           onClick={handleRecenter}
-          className="p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] shadow-md hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
           title="Centrar en el territorio"
         >
           <Maximize2 className="w-4 h-4" />
@@ -267,7 +267,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
 
       {/* Floating Bottom Info Pill */}
       {hasPolygon && (
-        <div className="absolute bottom-3 left-3 z-[400] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-2 pointer-events-none">
+        <div className="absolute bottom-3 left-3 z-[400] bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-md text-[11px] text-zinc-600 dark:text-[#D4D4D8] flex items-center gap-2 pointer-events-none">
           <span>📏 Perímetro: <strong>{formatDistance(perimeter)}</strong></span>
           <span>•</span>
           <span>📐 Área: <strong>{formatArea(area)}</strong></span>

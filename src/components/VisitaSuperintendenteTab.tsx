@@ -139,8 +139,8 @@ export const VisitaSuperintendenteTab: React.FC = () => {
 
   if (!circuitVisit) {
     return (
-      <div className="bg-white p-8 rounded-xl border border-slate-200 text-center">
-        <p className="text-slate-600">No hay información configurada para la visita del Superintendente de Circuito.</p>
+      <div className="bg-white dark:bg-[#121216] p-8 rounded-2xl border border-zinc-200 dark:border-[#27272A] text-center shadow-xs">
+        <p className="text-zinc-600 dark:text-[#A1A1AA]">No hay información configurada para la visita del Superintendente de Circuito.</p>
       </div>
     );
   }
@@ -359,26 +359,26 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
     <div className="space-y-6">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 border border-slate-700 animate-slide-up">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#18181F] text-[#F4F4F5] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border border-[#27272A] animate-slide-up">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-sm font-medium">{toastMessage}</span>
         </div>
       )}
 
       {/* Barra de Acciones de la Visita del SC (Unified Container) */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase font-mono tabular-nums bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
             {circuitVisit.circuitNumber || 'Circuito'}
           </span>
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             {circuitVisit.status === 'proxima' ? 'Próxima Visita' : circuitVisit.status === 'en_curso' ? 'En Curso' : 'Concluida'}
           </span>
-          <span className="text-xs font-semibold text-slate-700 dark:text-zinc-200">
+          <span className="text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5]">
             Hno. {circuitVisit.overseerName}{circuitVisit.wifeName ? ` y Hna. ${circuitVisit.wifeName}` : ''}
           </span>
-          <span className="text-xs text-slate-400 hidden md:inline">
+          <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] hidden md:inline font-mono tabular-nums">
             • Semana del {circuitVisit.startDate} al {circuitVisit.endDate}
           </span>
         </div>
@@ -403,7 +403,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
           <button
             onClick={openEditVisitModal}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-zinc-200 text-xs font-bold rounded-xl transition border border-slate-200/80 dark:border-white/[0.08] shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold rounded-xl transition border border-zinc-200/80 dark:border-[#27272A] shadow-xs active:scale-95 cursor-pointer"
           >
             <Edit2 className="w-3.5 h-3.5" />
             <span>Editar Datos</span>
@@ -413,39 +413,39 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
       {/* Quick Highlights Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-        <div className="bg-white dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs">
-          <div className="text-slate-500 dark:text-slate-400 font-medium mb-1">Discurso Entre Semana (30m)</div>
-          <div className="font-semibold text-slate-900 dark:text-white truncate" title={circuitVisit.midweekTalkTheme}>
+        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Discurso Entre Semana (30m)</div>
+          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate" title={circuitVisit.midweekTalkTheme}>
             {circuitVisit.midweekTalkTheme}
           </div>
-          <div className="text-indigo-600 dark:text-indigo-400 text-[11px] mt-0.5 font-bold">Cántico {circuitVisit.midweekSongNumber || '-'}</div>
+          <div className="text-indigo-600 dark:text-indigo-400 text-[11px] mt-0.5 font-bold font-mono tabular-nums">Cántico {circuitVisit.midweekSongNumber || '-'}</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs">
-          <div className="text-slate-500 dark:text-slate-400 font-medium mb-1">Discurso Público Fin de Semana</div>
-          <div className="font-semibold text-slate-900 dark:text-white truncate" title={circuitVisit.weekendPublicTalkTheme}>
+        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Discurso Público Fin de Semana</div>
+          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate" title={circuitVisit.weekendPublicTalkTheme}>
             {circuitVisit.weekendPublicTalkTheme}
           </div>
-          <div className="text-slate-400 text-[11px] mt-0.5">Reunión pública de 30 min</div>
+          <div className="text-zinc-400 dark:text-zinc-500 text-[11px] mt-0.5">Reunión pública de 30 min</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs">
-          <div className="text-slate-500 dark:text-slate-400 font-medium mb-1">Hospitalidad & Comidas</div>
-          <div className="font-semibold text-slate-900 dark:text-white">
+        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Hospitalidad & Comidas</div>
+          <div className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
             {mealsStats.confirmed} de {mealsStats.total} Confirmadas
           </div>
           <div className="text-emerald-600 dark:text-emerald-400 text-[11px] mt-0.5 font-bold">Almuerzos y cenas organizadas</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs">
-          <div className="text-slate-500 dark:text-slate-400 font-medium mb-1">Registros & Auditoría (Checklist)</div>
+        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Registros & Auditoría (Checklist)</div>
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-900 dark:text-white">{checklistStats.percent}% completado</span>
-            <span className="text-slate-400 text-[11px]">({checklistStats.completed}/{checklistStats.total})</span>
+            <span className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{checklistStats.percent}% completado</span>
+            <span className="text-zinc-400 dark:text-zinc-500 text-[11px] font-mono tabular-nums">({checklistStats.completed}/{checklistStats.total})</span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1 mt-1.5">
+          <div className="w-full bg-zinc-100 dark:bg-[#18181F] rounded-full h-1 mt-1.5 overflow-hidden">
             <div
-              className="bg-emerald-500 h-1 rounded-full"
+              className="bg-emerald-500 h-1 rounded-full transition-all duration-300"
               style={{ width: `${checklistStats.percent}%` }}
             />
           </div>
@@ -453,64 +453,64 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
       </div>
 
       {/* Sub-tabs Navigation */}
-      <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-xs flex items-center gap-2 overflow-x-auto">
+      <div className="bg-white dark:bg-[#121216] p-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-1.5 overflow-x-auto">
         <button
           onClick={() => setActiveSubTab('programa')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
             activeSubTab === 'programa'
-              ? 'bg-blue-50 text-blue-700 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
-          <Calendar className="w-4 h-4 text-blue-600" />
+          <Calendar className="w-4 h-4 text-zinc-500" />
           <span>Programa & Discursos</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('comidas')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
             activeSubTab === 'comidas'
-              ? 'bg-blue-50 text-blue-700 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
-          <Utensils className="w-4 h-4 text-emerald-600" />
-          <span>Comidas & Hospitalidad ({mealsStats.confirmed}/{mealsStats.total})</span>
+          <Utensils className="w-4 h-4 text-zinc-500" />
+          <span>Comidas & Hospitalidad <span className="font-mono tabular-nums">({mealsStats.confirmed}/{mealsStats.total})</span></span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('predicacion')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
             activeSubTab === 'predicacion'
-              ? 'bg-blue-50 text-blue-700 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
-          <Compass className="w-4 h-4 text-amber-600" />
+          <Compass className="w-4 h-4 text-zinc-500" />
           <span>Plan de Predicación Semanal</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('checklist')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
             activeSubTab === 'checklist'
-              ? 'bg-blue-50 text-blue-700 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
-          <CheckSquare className="w-4 h-4 text-indigo-600" />
-          <span>Registros & Archivo ({checklistStats.percent}%)</span>
+          <CheckSquare className="w-4 h-4 text-zinc-500" />
+          <span>Registros & Archivo <span className="font-mono tabular-nums">({checklistStats.percent}%)</span></span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('carpeta_ejecutiva')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
             activeSubTab === 'carpeta_ejecutiva'
-              ? 'bg-indigo-600 text-white font-semibold shadow-xs'
-              : 'bg-indigo-50/70 text-indigo-800 hover:bg-indigo-100'
+              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
-          <FileCheck className="w-4 h-4" />
+          <FileCheck className="w-4 h-4 text-zinc-500" />
           <span>Carpeta Ejecutiva (S-1 / S-21 / S-88 / S-13)</span>
         </button>
       </div>
@@ -523,78 +523,78 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           {/* Talk Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Midweek service talk */}
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                   Reunión Entre Semana
                 </span>
-                <span className="text-xs text-slate-500 font-medium">30 Minutos</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-800 leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
                   {circuitVisit.midweekTalkTheme}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                   Discurso de servicio del Superintendente de Circuito tras las partes de Nuestra Vida Cristiana.
                 </p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+              <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs text-zinc-600 dark:text-[#A1A1AA]">
                 <span className="flex items-center gap-1">
-                  <Music className="w-3.5 h-3.5 text-blue-600" /> Cántico final:
+                  <Music className="w-3.5 h-3.5 text-zinc-500" /> Cántico final:
                 </span>
-                <span className="font-bold text-slate-800">
+                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                   {circuitVisit.midweekSongNumber ? `Cántico #${circuitVisit.midweekSongNumber}` : 'A elegir por el SC'}
                 </span>
               </div>
             </div>
 
             {/* Weekend public talk */}
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                   Fin de Semana • Público
                 </span>
-                <span className="text-xs text-slate-500 font-medium">30 Minutos</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-800 leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
                   {circuitVisit.weekendPublicTalkTheme}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                   Pronunciado por el Hno. {circuitVisit.overseerName} para toda la congregación e invitados.
                 </p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+              <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs text-zinc-600 dark:text-[#A1A1AA]">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-indigo-600" /> Horario:
+                  <Clock className="w-3.5 h-3.5 text-zinc-500" /> Horario:
                 </span>
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                   {settings.weekendMeetingDay} {settings.weekendMeetingTime}
                 </span>
               </div>
             </div>
 
             {/* Weekend concluding talk */}
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                   Fin de Semana • Conclusión
                 </span>
-                <span className="text-xs text-slate-500 font-medium">30 Minutos</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-800 leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
                   {circuitVisit.weekendFinalTalkTheme}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                   Discurso final de estímulo y despedida tras el estudio de La Atalaya.
                 </p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+              <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs text-zinc-600 dark:text-[#A1A1AA]">
                 <span className="flex items-center gap-1">
-                  <Music className="w-3.5 h-3.5 text-emerald-600" /> Cántico de despedida:
+                  <Music className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> Cántico de despedida:
                 </span>
-                <span className="font-bold text-slate-800">
+                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                   {circuitVisit.weekendSongNumber ? `Cántico #${circuitVisit.weekendSongNumber}` : 'A elegir por el SC'}
                 </span>
               </div>
@@ -602,20 +602,20 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           </div>
 
           {/* Special Meetings Section */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <span>Reuniones Especiales Convocadas</span>
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Reuniones con precursores, siervos ministeriales y ancianos durante la semana.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddMeetingModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Reunión</span>
@@ -624,32 +624,32 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {circuitVisit.specialMeetings.map((sp) => (
-                <div key={sp.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2 relative group">
+                <div key={sp.id} className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 space-y-2 relative group">
                   <button
                     onClick={() => removeSpecialMeeting(sp.id)}
-                    className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition p-1"
+                    className="absolute top-3 right-3 text-zinc-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition p-1 cursor-pointer"
                     title="Eliminar reunión"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
 
-                  <h4 className="font-bold text-slate-800 text-sm pr-6">{sp.title}</h4>
-                  <div className="space-y-1 text-xs text-slate-600">
-                    <p className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                  <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm pr-6">{sp.title}</h4>
+                  <div className="space-y-1 text-xs text-zinc-600 dark:text-[#A1A1AA]">
+                    <p className="flex items-center gap-1.5 font-mono tabular-nums">
+                      <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       <span>{sp.date} • {sp.time}</span>
                     </p>
                     <p className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-blue-600" />
+                      <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       <span>{sp.location}</span>
                     </p>
-                    <p className="flex items-center gap-1.5 text-slate-700 font-medium">
-                      <Users className="w-3.5 h-3.5 text-indigo-600" />
+                    <p className="flex items-center gap-1.5 text-zinc-700 dark:text-[#F4F4F5] font-medium">
+                      <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                       <span>{sp.attendeesDescription}</span>
                     </p>
                   </div>
                   {sp.notes && (
-                    <p className="text-[11px] text-slate-500 italic bg-white p-2 rounded border border-slate-200/60 mt-1">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic bg-white dark:bg-[#121216] p-2 rounded border border-zinc-200/60 dark:border-[#27272A] mt-1">
                       {sp.notes}
                     </p>
                   )}
@@ -667,9 +667,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
         <div className="space-y-6">
           {/* Preferences Banner */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-1.5 text-amber-900 text-xs">
-              <div className="font-bold flex items-center gap-1.5 text-amber-800">
-                <Utensils className="w-4 h-4 text-amber-600" />
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-xs">
+              <div className="font-bold flex items-center gap-1.5 text-zinc-900 dark:text-[#F4F4F5]">
+                <Utensils className="w-4 h-4 text-amber-500" />
                 <span>Preferencias Alimentarias & Alergias de los Hermanos Visitantes:</span>
               </div>
               <p className="leading-relaxed">
@@ -677,9 +677,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
               </p>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-1.5 text-blue-900 text-xs">
-              <div className="font-bold flex items-center gap-1.5 text-blue-800">
-                <Home className="w-4 h-4 text-blue-600" />
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-xs">
+              <div className="font-bold flex items-center gap-1.5 text-zinc-900 dark:text-[#F4F4F5]">
+                <Home className="w-4 h-4 text-zinc-500" />
                 <span>Alojamiento & Hospedaje:</span>
               </div>
               <p className="leading-relaxed">
@@ -689,25 +689,25 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           </div>
 
           {/* Meals Table / Grid */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                  <Utensils className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
+                  <Utensils className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <span>Calendario de Comidas (Martes a Domingo)</span>
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Familias anfitrionas coordinadas para almorzar o cenar con el superintendente de circuito y su esposa.
                 </p>
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full font-mono tabular-nums bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
                 {mealsStats.confirmed} de {mealsStats.total} confirmadas
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider border-b border-zinc-200 dark:border-[#27272A]">
                   <tr>
                     <th className="py-3 px-4">Día & Comida</th>
                     <th className="py-3 px-4">Familia Anfitriona</th>
@@ -717,50 +717,48 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
                     <th className="py-3 px-4 text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                   {circuitVisit.meals.map((meal) => (
-                    <tr key={meal.id} className="hover:bg-slate-50/80 transition">
+                    <tr key={meal.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/50 transition">
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-slate-800">
+                        <div className="font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                           {meal.day} {meal.date.slice(5)}
                         </div>
-                        <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${
-                          meal.mealType === 'almuerzo' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
+                        <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           {meal.mealType === 'almuerzo' ? 'Almuerzo' : 'Cena'}
                         </span>
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-slate-800 flex items-center gap-1.5">
-                          <HeartHandshake className="w-4 h-4 text-blue-600" />
+                        <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                          <HeartHandshake className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                           <span>{meal.hostName || 'Por asignar'}</span>
                         </div>
                         {meal.hostPhone && (
-                          <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                            <Phone className="w-3 h-3 text-slate-400" />
+                          <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1 mt-0.5 font-mono tabular-nums">
+                            <Phone className="w-3 h-3 text-zinc-400" />
                             <span>{meal.hostPhone}</span>
                           </div>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-xs text-slate-600">
+                      <td className="py-3.5 px-4 text-xs text-zinc-600 dark:text-[#A1A1AA]">
                         {meal.location || 'Salón del Reino o casa anfitriona'}
                       </td>
 
                       <td className="py-3.5 px-4">
                         {meal.isConfirmed ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Confirmada
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Confirmada
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
-                            <AlertCircle className="w-3 h-3 text-amber-600" /> Pendiente
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Pendiente
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-xs text-slate-500 max-w-xs truncate" title={meal.notes}>
+                      <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-xs truncate" title={meal.notes}>
                         {meal.notes || '-'}
                       </td>
 
@@ -768,14 +766,14 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleShareMealWhatsApp(meal)}
-                            className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition"
+                            className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-md transition cursor-pointer"
                             title="Enviar itinerario a la familia por WhatsApp"
                           >
                             <Share2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => openEditMealModal(meal)}
-                            className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition"
+                            className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-md transition cursor-pointer"
                             title="Editar asignación de comida"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -796,14 +794,14 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
       {/* ========================================================= */}
       {activeSubTab === 'predicacion' && (
         <div className="space-y-6">
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <Compass className="w-5 h-5 text-amber-600" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   <span>Salidas al Ministerio con el Superintendente y su Esposa</span>
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Coordinación de los grupos de predicación, puntos de reunión y parejas asignadas para acompañarlos.
                 </p>
               </div>
@@ -829,7 +827,7 @@ ${m.notes ? `• Nota: ${m.notes}` : ''}`;
 ${ministryList}`;
                   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition self-start sm:self-auto"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition self-start sm:self-auto cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Compartir Salidas por WhatsApp</span>
@@ -842,59 +840,59 @@ ${ministryList}`;
                 const wifeComp = m.wifeCompanionPublisherId ? publishersMap.get(m.wifeCompanionPublisherId) : null;
 
                 return (
-                  <div key={m.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
+                  <div key={m.id} className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 space-y-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-800 text-sm">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm font-mono tabular-nums">
                             {m.day} {m.date.slice(5)}
                           </span>
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded font-mono tabular-nums bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300">
                             {m.time}
                           </span>
                           {m.groupNumber && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">
+                            <span className="text-xs px-2 py-0.5 rounded font-mono tabular-nums bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-medium">
                               Grupo {m.groupNumber}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-600 flex items-center gap-1 mt-1">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Punto: <strong>{m.meetingPoint}</strong></span>
+                        <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] flex items-center gap-1 mt-1">
+                          <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+                          <span>Punto: <strong className="text-zinc-800 dark:text-[#F4F4F5]">{m.meetingPoint}</strong></span>
                           {m.territoryNumber && (
-                            <span>• Territorio #{m.territoryNumber}</span>
+                            <span className="font-mono tabular-nums">• Territorio #{m.territoryNumber}</span>
                           )}
                         </p>
                       </div>
 
                       <button
                         onClick={() => openEditMinistryModal(m)}
-                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-slate-200/60 rounded-md transition"
+                        className="p-1.5 text-zinc-500 dark:text-[#A1A1AA] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-zinc-200/60 dark:hover:bg-[#27272A] rounded-md transition cursor-pointer"
                         title="Editar acompañantes y punto de salida"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-2 text-xs">
+                    <div className="bg-white dark:bg-[#121216] p-3 rounded-lg border border-zinc-200 dark:border-[#27272A] space-y-2 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Acompaña al Hno. {circuitVisit.overseerName}:</span>
-                        <span className="font-semibold text-slate-800 flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-blue-600" />
-                          {coComp?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Acompaña al Hno. {circuitVisit.overseerName}:</span>
+                        <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-1">
+                          <User className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          {coComp?.name || <span className="text-zinc-400 italic">Sin asignar</span>}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Acompaña a la Hna. {circuitVisit.wifeName || 'Esposa'}:</span>
-                        <span className="font-semibold text-slate-800 flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-purple-600" />
-                          {wifeComp?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Acompaña a la Hna. {circuitVisit.wifeName || 'Esposa'}:</span>
+                        <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-1">
+                          <User className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                          {wifeComp?.name || <span className="text-zinc-400 italic">Sin asignar</span>}
                         </span>
                       </div>
                     </div>
 
                     {m.notes && (
-                      <p className="text-xs text-slate-600 bg-amber-50/60 p-2 rounded border border-amber-200/50">
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-[#18181F] p-2 rounded border border-zinc-200 dark:border-[#27272A]">
                         {m.notes}
                       </p>
                     )}
@@ -911,20 +909,20 @@ ${ministryList}`;
       {/* ========================================================= */}
       {activeSubTab === 'checklist' && (
         <div className="space-y-6">
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   <span>Lista de Verificación de Archivos y Registros de la Congregación</span>
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Documentos oficiales que el superintendente de circuito revisará durante su visita (S-21, S-88, Cuentas, Territorios).
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="text-xs font-semibold px-3 py-1 rounded-full font-mono tabular-nums bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                   {checklistStats.completed} de {checklistStats.total} listos ({checklistStats.percent}%)
                 </span>
               </div>
@@ -937,8 +935,8 @@ ${ministryList}`;
                   onClick={() => toggleVisitChecklistItem(item.id)}
                   className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
                     item.completed
-                      ? 'bg-emerald-50/50 border-emerald-200 text-slate-800'
-                      : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
+                      ? 'bg-zinc-50/70 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] opacity-75'
+                      : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                 >
                   <div className="mt-0.5 pointer-events-none">
@@ -951,18 +949,18 @@ ${ministryList}`;
 
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className={`text-sm font-medium ${item.completed ? 'line-through text-slate-500' : 'text-slate-800'}`}>
+                      <p className={`text-sm font-medium ${item.completed ? 'line-through text-zinc-400 dark:text-zinc-500' : 'text-zinc-900 dark:text-[#F4F4F5]'}`}>
                         {item.task}
                       </p>
                       {item.assignedRole && (
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] shrink-0">
                           {item.assignedRole}
                         </span>
                       )}
                     </div>
 
                     {item.notes && (
-                      <p className="text-xs text-slate-500 italic">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] italic">
                         {item.notes}
                       </p>
                     )}
@@ -980,13 +978,13 @@ ${ministryList}`;
       {activeSubTab === 'carpeta_ejecutiva' && (
         <div className="space-y-6">
           {/* Header & Actions */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <FileCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Dossier Ejecutivo de Auditoría para la Visita del Superintendente de Circuito</span>
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                 Consolidado automático de Tarjetas S-21, Asistencia S-88, Precursores Regulares (600 h), Grupos de Servicio y Territorios S-13.
               </p>
             </div>
@@ -995,7 +993,7 @@ ${ministryList}`;
               <select
                 value={selectedServiceYear}
                 onChange={(e) => setSelectedServiceYear(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 bg-slate-50"
+                className="px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-zinc-50 dark:bg-[#18181F] outline-hidden cursor-pointer"
               >
                 <option value="2025-2026">Año de Servicio 2025-2026</option>
                 <option value="2026-2027">Año de Servicio 2026-2027</option>
@@ -1015,9 +1013,9 @@ ${ministryList}`;
                   a.rel = 'noopener noreferrer';
                   a.click();
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
               >
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Enviar Resumen WhatsApp</span>
               </button>
 
@@ -1025,7 +1023,7 @@ ${ministryList}`;
                 onClick={() =>
                   printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)
                 }
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-white rounded-xl text-xs font-bold border border-transparent dark:border-[#27272A] shadow-xs transition cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Imprimir Dossier A4</span>
@@ -1036,30 +1034,30 @@ ${ministryList}`;
           {/* 4 Executive Summary Blocks */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Roster Block */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
-              <div className="text-[11px] font-bold uppercase text-slate-500">
+            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 1. Publicadores y Nombramientos
               </div>
-              <div className="text-2xl font-black text-slate-900">
+              <div className="text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                 {executiveReport.roster.totalPublishers}{' '}
-                <span className="text-xs font-semibold text-emerald-600">
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   ({executiveReport.roster.activeCount} activos)
                 </span>
               </div>
-              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+              <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-0.5 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
                 <div className="flex justify-between">
                   <span>Ancianos / Siervos Min.:</span>
-                  <strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {executiveReport.roster.eldersCount} / {executiveReport.roster.ministerialServantsCount}
                   </strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Precursores Regulares:</span>
-                  <strong>{executiveReport.roster.regularPioneersCount}</strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{executiveReport.roster.regularPioneersCount}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Irregulares / Inactivos:</span>
-                  <strong className="text-amber-700">
+                  <strong className="text-amber-700 dark:text-amber-400 font-mono tabular-nums">
                     {executiveReport.roster.irregularCount} / {executiveReport.roster.inactiveCount}
                   </strong>
                 </div>
@@ -1067,18 +1065,18 @@ ${ministryList}`;
             </div>
 
             {/* S-88 Attendance Block */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
-              <div className="text-[11px] font-bold uppercase text-slate-500">
+            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 2. Asistencia S-88 (Promedios)
               </div>
-              <div className="text-2xl font-black text-indigo-700">
+              <div className="text-2xl font-black font-mono tabular-nums text-indigo-700 dark:text-indigo-400">
                 {executiveReport.attendanceS88.avgWeekendTotal}{' '}
-                <span className="text-xs font-semibold text-slate-500">fin de semana</span>
+                <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">fin de semana</span>
               </div>
-              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+              <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-0.5 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
                 <div className="flex justify-between">
                   <span>Entre Semana (Salón/Zoom):</span>
-                  <strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {executiveReport.attendanceS88.avgMidweekTotal} (
                     {executiveReport.attendanceS88.avgMidweekInPerson}+
                     {executiveReport.attendanceS88.avgMidweekZoom})
@@ -1086,7 +1084,7 @@ ${ministryList}`;
                 </div>
                 <div className="flex justify-between">
                   <span>Fin de Semana (Salón/Zoom):</span>
-                  <strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {executiveReport.attendanceS88.avgWeekendTotal} (
                     {executiveReport.attendanceS88.avgWeekendInPerson}+
                     {executiveReport.attendanceS88.avgWeekendZoom})
@@ -1094,7 +1092,7 @@ ${ministryList}`;
                 </div>
                 <div className="flex justify-between">
                   <span>Proporción vs Activos:</span>
-                  <strong className="text-emerald-700">
+                  <strong className="text-emerald-700 dark:text-emerald-400 font-mono tabular-nums">
                     {executiveReport.attendanceS88.weekendToPublisherRatioPercent}%
                   </strong>
                 </div>
@@ -1102,49 +1100,49 @@ ${ministryList}`;
             </div>
 
             {/* Pioneer 600h Audit Block */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
-              <div className="text-[11px] font-bold uppercase text-slate-500">
+            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 3. Auditoría Precursores (600h)
               </div>
-              <div className="text-2xl font-black text-emerald-700">
+              <div className="text-2xl font-black font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
                 {executiveReport.ministryS1.pioneerAudit.summary.onTrackCount} /{' '}
                 {executiveReport.ministryS1.pioneerAudit.summary.totalRegularPioneers}{' '}
-                <span className="text-xs font-semibold text-slate-500">en meta</span>
+                <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">en meta</span>
               </div>
-              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+              <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-0.5 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
                 <div className="flex justify-between">
                   <span>Promedio mensual PR:</span>
-                  <strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {executiveReport.ministryS1.pioneerAudit.summary.avgRegularPioneerMonthlyHours} h/mes
                   </strong>
                 </div>
                 <div className="flex justify-between">
                   <span>En observación / Déficit:</span>
-                  <strong className="text-amber-700">
+                  <strong className="text-amber-700 dark:text-amber-400 font-mono tabular-nums">
                     {executiveReport.ministryS1.pioneerAudit.summary.warningCount} /{' '}
                     {executiveReport.ministryS1.pioneerAudit.summary.behindCount}
                   </strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Cursos Bíblicos (Prom. Mes):</span>
-                  <strong>{executiveReport.ministryS1.totalBibleStudiesPerMonthAvg}</strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{executiveReport.ministryS1.totalBibleStudiesPerMonthAvg}</strong>
                 </div>
               </div>
             </div>
 
             {/* S-13 Territories Block */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
-              <div className="text-[11px] font-bold uppercase text-slate-500">
+            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 4. Territorios S-13 (Cobertura)
               </div>
-              <div className="text-2xl font-black text-blue-700">
+              <div className="text-2xl font-black font-mono tabular-nums text-blue-700 dark:text-blue-400">
                 {executiveReport.territoriesS13.coveragePercent}%{' '}
-                <span className="text-xs font-semibold text-slate-500">anual</span>
+                <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">anual</span>
               </div>
-              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+              <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-0.5 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
                 <div className="flex justify-between">
                   <span>Disponibles / Asignados:</span>
-                  <strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                     {executiveReport.territoriesS13.availableCount} /{' '}
                     {executiveReport.territoriesS13.assignedCount}
                   </strong>
@@ -1152,33 +1150,33 @@ ${ministryList}`;
                 <div className="flex justify-between">
                   <span>Vencidos (&gt; 4 meses):</span>
                   <strong
-                    className={
+                    className={`font-mono tabular-nums ${
                       executiveReport.territoriesS13.overdueCount > 0
-                        ? 'text-rose-600'
-                        : 'text-emerald-600'
-                    }
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-emerald-600 dark:text-emerald-400'
+                    }`}
                   >
                     {executiveReport.territoriesS13.overdueCount}
                   </strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Direcciones "No Visitar":</span>
-                  <strong>{executiveReport.territoriesS13.totalNoVisitAddresses}</strong>
+                  <strong className="font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{executiveReport.territoriesS13.totalNoVisitAddresses}</strong>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Groups Breakdown Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200">
-              <h4 className="font-bold text-slate-800 text-sm">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A]">
+              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                 Estado por Grupos de Servicio del Campo (Revisión con el Superintendente de Servicio)
               </h4>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] uppercase text-[10px] font-bold border-b border-zinc-200 dark:border-[#27272A]">
                   <tr>
                     <th className="py-3 px-4">Grupo</th>
                     <th className="py-3 px-4">Superintendente / Auxiliar</th>
@@ -1191,34 +1189,34 @@ ${ministryList}`;
                     <th className="py-3 px-4 text-right">Cursos Bíblicos</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                   {executiveReport.ministryS1.groupsSummary.map((g) => (
-                    <tr key={g.groupNumber} className="hover:bg-slate-50/80">
-                      <td className="py-3 px-4 font-bold text-slate-900">
+                    <tr key={g.groupNumber} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/50">
+                      <td className="py-3 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                         Grupo {g.groupNumber}: {g.groupName}
                       </td>
-                      <td className="py-3 px-4 text-slate-600">
-                        {g.overseerName} <span className="text-slate-400">/</span> {g.assistantName}
+                      <td className="py-3 px-4 text-zinc-600 dark:text-[#A1A1AA]">
+                        {g.overseerName} <span className="text-zinc-400">/</span> {g.assistantName}
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-slate-800">
+                      <td className="py-3 px-3 text-center font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                         {g.totalMembers}
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-emerald-600">
+                      <td className="py-3 px-3 text-center font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400">
                         {g.activeMembers}
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-amber-600">
+                      <td className="py-3 px-3 text-center font-bold font-mono tabular-nums text-amber-600 dark:text-amber-400">
                         {g.irregularMembers}
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-rose-600">
+                      <td className="py-3 px-3 text-center font-bold font-mono tabular-nums text-rose-600 dark:text-rose-400">
                         {g.inactiveMembers}
                       </td>
-                      <td className="py-3 px-3 text-center font-semibold text-indigo-600">
+                      <td className="py-3 px-3 text-center font-semibold font-mono tabular-nums text-indigo-600 dark:text-indigo-400">
                         {g.regularPioneers}
                       </td>
-                      <td className="py-3 px-3 text-right font-bold text-slate-800">
+                      <td className="py-3 px-3 text-right font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                         {g.totalHoursYear} h
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-slate-800">
+                      <td className="py-3 px-4 text-right font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                         {g.avgBibleStudies}
                       </td>
                     </tr>
@@ -1229,15 +1227,15 @@ ${ministryList}`;
           </div>
 
           {/* Pioneer Audit Table inside Circuit Visit */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200">
-              <h4 className="font-bold text-slate-800 text-sm">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A]">
+              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                 Revisión de Tarjetas S-21 de Precursores Regulares (Meta Anual: 600 h / 50 h mensuales)
               </h4>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] uppercase text-[10px] font-bold border-b border-zinc-200 dark:border-[#27272A]">
                   <tr>
                     <th className="py-3 px-4">Precursor</th>
                     <th className="py-3 px-3 text-center">Grupo</th>
@@ -1250,47 +1248,47 @@ ${ministryList}`;
                     <th className="py-3 px-4 text-center">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                   {executiveReport.ministryS1.pioneerAudit.regularPioneers.map((p) => (
-                    <tr key={p.publisher.id} className="hover:bg-slate-50/80">
-                      <td className="py-3 px-4 font-bold text-slate-900">{p.publisher.name}</td>
-                      <td className="py-3 px-3 text-center text-slate-600">
+                    <tr key={p.publisher.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/50">
+                      <td className="py-3 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">{p.publisher.name}</td>
+                      <td className="py-3 px-3 text-center font-mono tabular-nums text-zinc-600 dark:text-[#A1A1AA]">
                         G-{p.publisher.groupNumber || '-'}
                       </td>
-                      <td className="py-3 px-3 text-center font-semibold">
+                      <td className="py-3 px-3 text-center font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                         {p.monthsReported} / 12
                       </td>
-                      <td className="py-3 px-3 text-right">{p.totalHours} h</td>
-                      <td className="py-3 px-3 text-right text-indigo-600">
+                      <td className="py-3 px-3 text-right font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{p.totalHours} h</td>
+                      <td className="py-3 px-3 text-right font-mono tabular-nums text-indigo-600 dark:text-indigo-400">
                         {p.totalCreditHours > 0 ? `+${p.totalCreditHours} h` : '-'}
                       </td>
-                      <td className="py-3 px-3 text-right font-black text-slate-900">
+                      <td className="py-3 px-3 text-right font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                         {p.effectiveHours} h
                       </td>
-                      <td className="py-3 px-3 text-right font-semibold">{p.avgMonthlyHours} h</td>
+                      <td className="py-3 px-3 text-right font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{p.avgMonthlyHours} h</td>
                       <td
-                        className={`py-3 px-3 text-right font-bold ${
+                        className={`py-3 px-3 text-right font-bold font-mono tabular-nums ${
                           p.hoursDelta >= 0
-                            ? 'text-emerald-600'
+                            ? 'text-emerald-600 dark:text-emerald-400'
                             : p.hoursDelta >= -20
-                            ? 'text-amber-600'
-                            : 'text-rose-600'
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-rose-600 dark:text-rose-400'
                         }`}
                       >
                         {p.hoursDelta >= 0 ? `+${p.hoursDelta} h` : `${p.hoursDelta} h`}
                       </td>
                       <td className="py-3 px-4 text-center">
                         {p.paceStatus === 'en_meta' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            En Meta
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> En Meta
                           </span>
                         ) : p.paceStatus === 'atencion' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                            Observación
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Observación
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
-                            Déficit
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Déficit
                           </span>
                         )}
                       </td>
@@ -1307,137 +1305,137 @@ ${ministryList}`;
       {/* MODAL: EDITAR INFORMACIÓN DE LA VISITA */}
       {/* ========================================================= */}
       {isEditVisitModalOpen && visitFormData && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
-              <h3 className="font-bold text-slate-800 text-lg">Configuración de la Visita del SC</h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-xl w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base sm:text-lg">Configuración de la Visita del SC</h3>
               <button
                 onClick={() => setIsEditVisitModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveVisitDetails} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveVisitDetails} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Nombre del SC *</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Nombre del SC *</label>
                   <input
                     type="text"
                     required
                     value={visitFormData.overseerName}
                     onChange={e => setVisitFormData({ ...visitFormData, overseerName: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Nombre de la Esposa</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Nombre de la Esposa</label>
                   <input
                     type="text"
                     value={visitFormData.wifeName || ''}
                     onChange={e => setVisitFormData({ ...visitFormData, wifeName: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Circuito</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Circuito</label>
                   <input
                     type="text"
                     value={visitFormData.circuitNumber}
                     onChange={e => setVisitFormData({ ...visitFormData, circuitNumber: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Fecha Inicio (Martes)</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Fecha Inicio (Martes)</label>
                   <input
                     type="date"
                     value={visitFormData.startDate}
                     onChange={e => setVisitFormData({ ...visitFormData, startDate: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Fecha Fin (Domingo)</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Fecha Fin (Domingo)</label>
                   <input
                     type="date"
                     value={visitFormData.endDate}
                     onChange={e => setVisitFormData({ ...visitFormData, endDate: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Tema del Discurso Entre Semana (30 min) *</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Tema del Discurso Entre Semana (30 min) *</label>
                 <input
                   type="text"
                   required
                   value={visitFormData.midweekTalkTheme}
                   onChange={e => setVisitFormData({ ...visitFormData, midweekTalkTheme: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Tema Discurso Público (Fin de semana) *</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Tema Discurso Público (Fin de semana) *</label>
                   <input
                     type="text"
                     required
                     value={visitFormData.weekendPublicTalkTheme}
                     onChange={e => setVisitFormData({ ...visitFormData, weekendPublicTalkTheme: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Tema Discurso Final de Conclusión *</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Tema Discurso Final de Conclusión *</label>
                   <input
                     type="text"
                     required
                     value={visitFormData.weekendFinalTalkTheme}
                     onChange={e => setVisitFormData({ ...visitFormData, weekendFinalTalkTheme: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Preferencias Alimentarias / Alergias</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Preferencias Alimentarias / Alergias</label>
                 <textarea
                   rows={2}
                   value={visitFormData.dietaryPreferences || ''}
                   onChange={e => setVisitFormData({ ...visitFormData, dietaryPreferences: e.target.value })}
                   placeholder="Ej. Evitar mariscos, poco condimento, preferencia por frutas y pollo..."
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Notas de Hospedaje / Alojamiento</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Notas de Hospedaje / Alojamiento</label>
                 <textarea
                   rows={2}
                   value={visitFormData.lodgingNotes || ''}
                   onChange={e => setVisitFormData({ ...visitFormData, lodgingNotes: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setIsEditVisitModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium"
+                  className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-xs"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
                 >
                   Guardar Cambios
                 </button>
@@ -1451,23 +1449,23 @@ ${ministryList}`;
       {/* MODAL: EDITAR ARREGLO DE COMIDA */}
       {/* ========================================================= */}
       {editMealModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
-                <h3 className="font-bold text-slate-800 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
                   Arreglo de Hospitalidad: {editMealModal.day} ({editMealModal.mealType === 'almuerzo' ? 'Almuerzo' : 'Cena'})
                 </h3>
-                <p className="text-xs text-slate-500">{editMealModal.date}</p>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">{editMealModal.date}</p>
               </div>
-              <button onClick={() => setEditMealModal(null)} className="text-slate-400 hover:text-slate-600 p-1">
+              <button onClick={() => setEditMealModal(null)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveMeal} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Seleccionar Publicador / Familia Anfitriona</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Seleccionar Publicador / Familia Anfitriona</label>
                 <select
                   value={mealFormData.hostPublisherId}
                   onChange={e => {
@@ -1480,7 +1478,7 @@ ${ministryList}`;
                       hostPhone: pub?.phone || mealFormData.hostPhone,
                     });
                   }}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden cursor-pointer"
                 >
                   <option value="">-- Ingreso manual o seleccionar publicador --</option>
                   {publishers.map(p => (
@@ -1492,47 +1490,47 @@ ${ministryList}`;
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nombre Anfitrión / Familia *</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Nombre Anfitrión / Familia *</label>
                 <input
                   type="text"
                   required
                   value={mealFormData.hostName}
                   onChange={e => setMealFormData({ ...mealFormData, hostName: e.target.value })}
                   placeholder="Ej. Familia González"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Teléfono de Contacto</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Teléfono de Contacto</label>
                 <input
                   type="text"
                   value={mealFormData.hostPhone}
                   onChange={e => setMealFormData({ ...mealFormData, hostPhone: e.target.value })}
                   placeholder="+1 (555) 000-0000"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Lugar / Dirección</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Lugar / Dirección</label>
                 <input
                   type="text"
                   value={mealFormData.location}
                   onChange={e => setMealFormData({ ...mealFormData, location: e.target.value })}
                   placeholder="Ej. Casa Fam. González - Calle 5 #24 o Salón del Reino"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Menú / Notas</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Menú / Notas</label>
                 <input
                   type="text"
                   value={mealFormData.notes}
                   onChange={e => setMealFormData({ ...mealFormData, notes: e.target.value })}
                   placeholder="Ej. Pollo al horno con ensalada fresca"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
@@ -1545,17 +1543,17 @@ ${ministryList}`;
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setEditMealModal(null)}
-                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium"
+                  className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-xs"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
                 >
                   Guardar Arreglo
                 </button>
@@ -1569,16 +1567,16 @@ ${ministryList}`;
       {/* MODAL: EDITAR SALIDA DE PREDICACIÓN */}
       {/* ========================================================= */}
       {editMinistryModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
-                <h3 className="font-bold text-slate-800 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
                   Predicación: {editMinistryModal.day} ({editMinistryModal.date})
                 </h3>
-                <p className="text-xs text-slate-500">Asignar punto de reunión y acompañantes</p>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Asignar punto de reunión y acompañantes</p>
               </div>
-              <button onClick={() => setEditMinistryModal(null)} className="text-slate-400 hover:text-slate-600 p-1">
+              <button onClick={() => setEditMinistryModal(null)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1586,47 +1584,47 @@ ${ministryList}`;
             <form onSubmit={handleSaveMinistry} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Hora de salida</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Hora de salida</label>
                   <input
                     type="text"
                     value={minFormData.time}
                     onChange={e => setMinFormData({ ...minFormData, time: e.target.value })}
                     placeholder="09:30"
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Territorio asignado</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Territorio asignado</label>
                   <input
                     type="text"
                     value={minFormData.territoryNumber}
                     onChange={e => setMinFormData({ ...minFormData, territoryNumber: e.target.value })}
                     placeholder="Ej. 02, 05-A"
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Punto de Reunión</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Punto de Reunión</label>
                 <input
                   type="text"
                   required
                   value={minFormData.meetingPoint}
                   onChange={e => setMinFormData({ ...minFormData, meetingPoint: e.target.value })}
                   placeholder="Ej. Salón del Reino o Plaza Central"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">
                   Acompaña al Superintendente de Circuito
                 </label>
                 <select
                   value={minFormData.coCompanionPublisherId}
                   onChange={e => setMinFormData({ ...minFormData, coCompanionPublisherId: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden cursor-pointer"
                 >
                   <option value="">-- Seleccionar hermano --</option>
                   {publishers
@@ -1640,13 +1638,13 @@ ${ministryList}`;
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">
                   Acompaña a la Esposa del Superintendente
                 </label>
                 <select
                   value={minFormData.wifeCompanionPublisherId}
                   onChange={e => setMinFormData({ ...minFormData, wifeCompanionPublisherId: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden cursor-pointer"
                 >
                   <option value="">-- Seleccionar hermana --</option>
                   {publishers
@@ -1660,27 +1658,27 @@ ${ministryList}`;
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Notas / Instrucciones</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Notas / Instrucciones</label>
                 <input
                   type="text"
                   value={minFormData.notes}
                   onChange={e => setMinFormData({ ...minFormData, notes: e.target.value })}
                   placeholder="Ej. Salida especial con precursores o trabajo comercial"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setEditMinistryModal(null)}
-                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium"
+                  className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold shadow-xs"
+                  className="px-4 py-2 bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
                 >
                   Guardar Salida
                 </button>
@@ -1694,83 +1692,83 @@ ${ministryList}`;
       {/* MODAL: AGREGAR REUNIÓN ESPECIAL */}
       {/* ========================================================= */}
       {isAddMeetingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
-              <h3 className="font-bold text-slate-800 text-base">Agregar Reunión Especial</h3>
-              <button onClick={() => setIsAddMeetingModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">Agregar Reunión Especial</h3>
+              <button onClick={() => setIsAddMeetingModalOpen(false)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddSpecialMeetingSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Título de la Reunión *</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Título de la Reunión *</label>
                 <input
                   type="text"
                   required
                   value={newMeetingData.title}
                   onChange={e => setNewMeetingData({ ...newMeetingData, title: e.target.value })}
                   placeholder="Ej. Reunión con los Jóvenes de la Congregación"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Fecha</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Fecha</label>
                   <input
                     type="date"
                     value={newMeetingData.date}
                     onChange={e => setNewMeetingData({ ...newMeetingData, date: e.target.value })}
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Horario</label>
+                  <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Horario</label>
                   <input
                     type="text"
                     value={newMeetingData.time}
                     onChange={e => setNewMeetingData({ ...newMeetingData, time: e.target.value })}
                     placeholder="18:00 - 19:00"
-                    className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                    className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-mono tabular-nums outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Lugar</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">Lugar</label>
                 <input
                   type="text"
                   value={newMeetingData.location}
                   onChange={e => setNewMeetingData({ ...newMeetingData, location: e.target.value })}
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">¿Quiénes asisten? *</label>
+                <label className="block font-semibold text-zinc-700 dark:text-[#F4F4F5] mb-1">¿Quiénes asisten? *</label>
                 <input
                   type="text"
                   required
                   value={newMeetingData.attendeesDescription}
                   onChange={e => setNewMeetingData({ ...newMeetingData, attendeesDescription: e.target.value })}
                   placeholder="Ej. Jóvenes bautizados de 12 a 25 años"
-                  className="w-full p-2.5 border border-slate-200 rounded-lg text-sm"
+                  className="w-full p-2.5 border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs outline-hidden"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t">
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setIsAddMeetingModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium"
+                  className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-xs"
+                  className="px-4 py-2 bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
                 >
                   Guardar Reunión
                 </button>

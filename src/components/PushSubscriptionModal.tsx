@@ -264,11 +264,11 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Suscripción a recordatorios Push automáticos"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-zinc-950/70 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* HEADER */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10">
+        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-start justify-between gap-4 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10">
           <div className="flex items-center gap-3.5">
             <div
               className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md shrink-0 ${
@@ -294,11 +294,11 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   </span>
                 )}
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1">
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-1">
                 Suscripción a Recordatorios Push Automáticos
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Publicador vinculado: <strong className="text-slate-800 dark:text-slate-200">{publisherName}</strong>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                Publicador vinculado: <strong className="text-zinc-800 dark:text-[#E4E4E7]">{publisherName}</strong>
               </p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana de notificaciones Push"
-            className="p-2 rounded-xl bg-white/80 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-white/80 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-500 dark:text-[#A1A1AA] transition-all cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -338,14 +338,14 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
           )}
 
           {/* 1. TARJETA PRINCIPAL DE SUSCRIPCIÓN DEL NAVEGADOR */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-4">
+          <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
+                <div className="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-white">
                   <Smartphone size={15} className="text-purple-600 dark:text-purple-400" />
                   <span>Dispositivo: {subscription?.deviceLabel || deviceLabel}</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] leading-relaxed">
                   Al suscribirte, el <strong>Service Worker de Kongre</strong> guarda tus próximas asignaciones en la memoria segura del navegador y dispara avisos nativos aunque cierres la pestaña o la aplicación.
                 </p>
               </div>
@@ -376,8 +376,8 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
             </div>
 
             {/* Indicadores técnicos del Service Worker */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-slate-200/70 dark:border-slate-700/60">
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-zinc-200/70 dark:border-[#27272A]/60">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] flex items-center gap-2.5">
                 <span
                   className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                     permission === 'granted'
@@ -388,8 +388,8 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   }`}
                 />
                 <div className="min-w-0">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">Permiso Navegador</div>
-                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">Permiso Navegador</div>
+                  <div className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                     {permission === 'granted'
                       ? 'Autorizado'
                       : permission === 'denied'
@@ -399,11 +399,11 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] flex items-center gap-2.5">
                 <ShieldCheck size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">Motor Segundo Plano</div>
-                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">Motor Segundo Plano</div>
+                  <div className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                     {subscription?.mode === 'web-push'
                       ? 'Web Push VAPID + SW'
                       : 'Service Worker + IndexedDB'}
@@ -411,11 +411,11 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] flex items-center gap-2.5">
                 <Layers size={16} className="text-purple-600 dark:text-purple-400 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">Cola Programada</div>
-                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">Cola Programada</div>
+                  <div className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                     {scheduledReminders.length} recordatorio{scheduledReminders.length === 1 ? '' : 's'}
                   </div>
                 </div>
@@ -424,15 +424,15 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
           </div>
 
           {/* 2. CONFIGURACIÓN DE ANTICIPACIÓN Y HORARIO */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
               <Clock size={14} className="text-indigo-500" />
               <span>Preferencias de Recordatorios Automáticos</span>
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Anticipación del recordatorio principal:
                 </label>
                 <select
@@ -440,7 +440,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   onChange={(e) =>
                     handleUpdatePreference({ notifyDaysBefore: parseInt(e.target.value, 10) })
                   }
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-purple-500"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-900 dark:text-white focus:outline-hidden focus:border-purple-500"
                 >
                   <option value={1}>1 día antes de la reunión (24h)</option>
                   <option value={2}>2 días antes de la reunión (48h)</option>
@@ -450,13 +450,13 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Hora preferida para recibir el aviso:
                 </label>
                 <select
                   value={prefs.preferredHour || '09:00'}
                   onChange={(e) => handleUpdatePreference({ preferredHour: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-hidden focus:border-purple-500"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-900 dark:text-white focus:outline-hidden focus:border-purple-500"
                 >
                   <option value="07:00">🌅 07:00 AM (Mañana temprano)</option>
                   <option value="08:00">🌅 08:00 AM (Mañana)</option>
@@ -476,7 +476,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2 cursor-pointer ${
                   prefs.notifySameDay
                     ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-300 dark:border-purple-800 text-purple-900 dark:text-purple-200'
-                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    : 'bg-zinc-50 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
                 }`}
               >
                 <div>
@@ -487,7 +487,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                     prefs.notifySameDay
                       ? 'bg-purple-600 text-white'
-                      : 'border border-slate-300 dark:border-slate-600'
+                      : 'border border-zinc-300 dark:border-zinc-600'
                   }`}
                 >
                   {prefs.notifySameDay && <Check size={12} />}
@@ -500,7 +500,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2 cursor-pointer ${
                   prefs.notifyDuties
                     ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-300 dark:border-purple-800 text-purple-900 dark:text-purple-200'
-                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    : 'bg-zinc-50 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
                 }`}
               >
                 <div>
@@ -511,7 +511,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                     prefs.notifyDuties
                       ? 'bg-purple-600 text-white'
-                      : 'border border-slate-300 dark:border-slate-600'
+                      : 'border border-zinc-300 dark:border-zinc-600'
                   }`}
                 >
                   {prefs.notifyDuties && <Check size={12} />}
@@ -524,7 +524,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2 cursor-pointer ${
                   prefs.notifyCarts
                     ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-300 dark:border-purple-800 text-purple-900 dark:text-purple-200'
-                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    : 'bg-zinc-50 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
                 }`}
               >
                 <div>
@@ -535,7 +535,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                     prefs.notifyCarts
                       ? 'bg-purple-600 text-white'
-                      : 'border border-slate-300 dark:border-slate-600'
+                      : 'border border-zinc-300 dark:border-zinc-600'
                   }`}
                 >
                   {prefs.notifyCarts && <Check size={12} />}
@@ -548,7 +548,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                 className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2 cursor-pointer ${
                   prefs.soundEnabled
                     ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-300 dark:border-purple-800 text-purple-900 dark:text-purple-200'
-                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    : 'bg-zinc-50 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -562,7 +562,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                     prefs.soundEnabled
                       ? 'bg-purple-600 text-white'
-                      : 'border border-slate-300 dark:border-slate-600'
+                      : 'border border-zinc-300 dark:border-zinc-600'
                   }`}
                 >
                   {prefs.soundEnabled && <Check size={12} />}
@@ -586,7 +586,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
               <button
                 type="button"
                 onClick={handleInstantTest}
-                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
               >
                 <Send size={13} />
                 <span>Probar al Instante</span>
@@ -611,7 +611,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
           {/* 4. COLA DE RECORDATORIOS PROGRAMADOS EN EL SERVICE WORKER */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
                 <Calendar size={14} className="text-purple-500" />
                 <span>Cola de Recordatorios en Segundo Plano ({scheduledReminders.length})</span>
               </h4>
@@ -627,11 +627,11 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
             </div>
 
             {scheduledReminders.length === 0 ? (
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 text-center space-y-1">
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/40 border border-dashed border-zinc-200 dark:border-[#27272A] text-center space-y-1">
+                <p className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   No hay asignaciones futuras pendientes en las próximas semanas
                 </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   En cuanto se te programe una parte, discurso, deber o turno de carrito, se agendará aquí automáticamente.
                 </p>
               </div>
@@ -649,7 +649,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                   return (
                     <div
                       key={rem.id}
-                      className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3"
+                      className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/80 dark:border-[#27272A]/70 flex items-center justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -664,17 +664,17 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
                               ? 'Aviso Mismo Día'
                               : `Aviso ${prefs.notifyDaysBefore}d antes`}
                           </span>
-                          <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                          <span className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                             {rem.assignmentTitle}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
                           {rem.meetingName} • Reunión: {rem.meetingDate} ({rem.meetingTime})
                         </p>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="text-[10px] font-bold text-slate-400 uppercase">
+                        <div className="text-[10px] font-bold text-zinc-400 uppercase">
                           Disparo Push
                         </div>
                         <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
@@ -690,14 +690,14 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
         </div>
 
         {/* FOOTER */}
-        <div className="p-4 sm:px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900 flex items-center justify-between gap-3">
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="p-4 sm:px-6 border-t border-zinc-100 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121216] flex items-center justify-between gap-3">
+          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
             Funciona mediante Web Push API y Service Worker local sin exponer datos personales.
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold cursor-pointer transition-all"
+            className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold cursor-pointer transition-all"
           >
             Listo
           </button>

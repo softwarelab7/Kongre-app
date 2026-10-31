@@ -170,14 +170,14 @@ const SelectComponent: React.FC<SelectProps> = ({
   const menuInnerContent = (
     <>
       {/* Mobile Sheet Header */}
-      <div className="flex sm:hidden items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
-        <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+      <div className="flex sm:hidden items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/80 dark:bg-[#18181F]/60">
+        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">
           {placeholder}
         </span>
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+          className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white cursor-pointer"
           aria-label="Cerrar selector"
         >
           <X className="w-4 h-4" />
@@ -186,21 +186,21 @@ const SelectComponent: React.FC<SelectProps> = ({
 
       {/* Search Bar (when options > 7 or searchable=true) */}
       {isSearchActive && (
-        <div className="p-2.5 sm:p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">
-          <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="p-2.5 sm:p-2 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/60 dark:bg-[#18181F]/40 relative">
+          <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Buscar por nombre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 sm:pl-7 pr-8 py-2 sm:py-1.5 rounded-xl sm:rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-8 sm:pl-7 pr-8 py-2 sm:py-1.5 rounded-xl sm:rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-xs sm:text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => setSearchTerm('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 rounded cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -221,14 +221,14 @@ const SelectComponent: React.FC<SelectProps> = ({
                 className={`group relative flex w-full select-none items-center justify-between min-h-[42px] py-2.5 px-3 cursor-pointer transition-all rounded-xl text-left ${
                   isSelected
                     ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                    : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50/70 dark:hover:bg-slate-800/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
+                    : 'text-zinc-700 dark:text-[#E4E4E7] hover:bg-indigo-50/70 dark:hover:bg-[#27272A]/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
                 }`}
               >
                 <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1 pr-2">
                   {option.icon && (
                     <span
                       className={`shrink-0 mt-0.5 sm:mt-0 ${
-                        isSelected ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                        isSelected ? 'text-white' : 'text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
                       }`}
                     >
                       {option.icon}
@@ -248,7 +248,7 @@ const SelectComponent: React.FC<SelectProps> = ({
             );
           })
         ) : (
-          <div className="py-5 px-4 text-center text-slate-400 text-xs font-medium">
+          <div className="py-5 px-4 text-center text-zinc-400 text-xs font-medium">
             No se encontraron opciones
           </div>
         )}
@@ -268,24 +268,24 @@ const SelectComponent: React.FC<SelectProps> = ({
         aria-expanded={isOpen}
         className={
           buttonClassName ||
-          `w-full flex items-center justify-between gap-2.5 rounded-xl border bg-white dark:bg-slate-800/90 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold transition-all outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-2xs ${
+          `w-full flex items-center justify-between gap-2.5 rounded-xl border bg-white dark:bg-[#18181F]/90 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold transition-all outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-2xs ${
             isOpen
               ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
-              : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800'
+              : 'border-zinc-200 dark:border-[#27272A]/80 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50/50 dark:hover:bg-[#27272A]'
           }`
         }
       >
         <div className="flex items-center gap-2 truncate">
           {selectedOption?.icon && (
-            <span className="shrink-0 text-slate-500 dark:text-slate-400">
+            <span className="shrink-0 text-zinc-500 dark:text-[#A1A1AA]">
               {selectedOption.icon}
             </span>
           )}
           <span
             className={`truncate ${
               selectedOption
-                ? 'text-slate-900 dark:text-white font-medium'
-                : 'text-slate-400 dark:text-slate-500 font-normal'
+                ? 'text-zinc-900 dark:text-white font-medium'
+                : 'text-zinc-400 dark:text-[#71717A] font-normal'
             }`}
           >
             {selectedOption ? selectedOption.label : placeholder}
@@ -295,7 +295,7 @@ const SelectComponent: React.FC<SelectProps> = ({
         <ChevronDown
           size={16}
           className={`${
-            iconClassName || 'text-slate-400 dark:text-slate-500'
+            iconClassName || 'text-zinc-400 dark:text-[#71717A]'
           } transition-transform duration-200 shrink-0 ml-1.5 ${
             isOpen ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
           }`}
@@ -306,11 +306,11 @@ const SelectComponent: React.FC<SelectProps> = ({
       {isOpen && !disabled && (
         isMobile && typeof document !== 'undefined' ? (
           createPortal(
-            <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-slate-950/50 backdrop-blur-[2px] animate-in fade-in duration-150 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-zinc-950/50 backdrop-blur-[2px] animate-in fade-in duration-150 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
               <div
                 ref={menuRef}
-                className="w-full max-w-lg mx-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/40 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs animate-in slide-in-from-bottom-4 duration-200"
+                className="w-full max-w-lg mx-auto rounded-2xl bg-white dark:bg-[#121216] shadow-2xl shadow-zinc-900/40 dark:shadow-black/80 border border-zinc-200/90 dark:border-[#27272A] overflow-hidden text-xs animate-in slide-in-from-bottom-4 duration-200"
               >
                 {menuInnerContent}
               </div>
@@ -320,7 +320,7 @@ const SelectComponent: React.FC<SelectProps> = ({
         ) : (
           <div
             ref={menuRef}
-            className={`absolute inset-x-0 z-50 min-w-full w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/30 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
+            className={`absolute inset-x-0 z-50 min-w-full w-full rounded-2xl bg-white dark:bg-[#121216] shadow-2xl shadow-zinc-900/30 dark:shadow-black/80 border border-zinc-200/90 dark:border-[#27272A] overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
               openUpward
                 ? 'bottom-full mb-1.5 origin-bottom'
                 : 'top-full mt-1.5 origin-top'

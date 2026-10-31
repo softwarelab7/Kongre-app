@@ -127,20 +127,20 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={request ? 'Editar solicitud de precursorado auxiliar' : 'Nueva solicitud de precursor auxiliar S-205'}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-[#131d2e] rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] border border-zinc-200 dark:border-white/[0.08] flex flex-col overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl w-full max-w-2xl max-h-[92vh] border border-zinc-200 dark:border-[#27272A] flex flex-col overflow-hidden transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-white/[0.08] bg-zinc-50/70 dark:bg-white/[0.02]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
               <Target size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+              <h2 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {request ? 'Editar Solicitud de Precursorado' : 'Nueva Solicitud de Precursor Auxiliar (S-205)'}
               </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Formulario oficial para el Comité de Servicio de la Congregación
               </p>
             </div>
@@ -149,7 +149,7 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana de solicitud de precursor auxiliar"
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -159,23 +159,23 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Publicador */}
           <div>
-            <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
               Publicador Solicitante *
             </label>
             <div className="relative">
-              <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+              <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-[#A1A1AA] pointer-events-none" />
               <select
                 required
                 value={publisherId}
                 onChange={(e) => setPublisherId(e.target.value)}
-                className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl pl-10 pr-4 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl pl-10 pr-4 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="">Selecciona un publicador...</option>
                 {publishers
                   .filter((p) => p.status === 'active' || !p.status)
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map((pub) => (
-                    <option key={pub.id} value={pub.id}>
+                    <option key={pub.id} value={pub.id} className="dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">
                       {pub.name} {pub.role ? `(${pub.role})` : ''}
                     </option>
                   ))}
@@ -186,7 +186,7 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
           {/* Mes y Año de Servicio */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                 Mes de Servicio
               </label>
               <select
@@ -196,10 +196,10 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
                   setMonth(m);
                   setYear(y);
                 }}
-                className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
               >
                 {getUpcomingMonths().map((opt) => (
-                  <option key={`${opt.month}-${opt.year}`} value={`${opt.month}-${opt.year}`}>
+                  <option key={`${opt.month}-${opt.year}`} value={`${opt.month}-${opt.year}`} className="dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">
                     {opt.label}
                   </option>
                 ))}
@@ -208,46 +208,46 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
 
             {/* Meta de Horas */}
             <div>
-              <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
                 Meta de Horas Requerida
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setTargetHours(30)}
-                  className={`p-2.5 rounded-xl border text-center transition-all ${
+                  className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                     targetHours === 30
                       ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-500 font-bold'
-                      : 'border-zinc-200 dark:border-white/[0.08] hover:bg-zinc-50 dark:hover:bg-white/[0.02] text-zinc-700 dark:text-zinc-300'
+                      : 'border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                 >
-                  <div className="text-sm font-bold font-mono">30 Horas</div>
-                  <div className="text-[10px] text-zinc-400">Requisito estándar</div>
+                  <div className="text-sm font-bold font-mono tabular-nums">30 Horas</div>
+                  <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA]">Requisito estándar</div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setTargetHours(15)}
-                  className={`p-2.5 rounded-xl border text-center transition-all ${
+                  className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                     targetHours === 15
                       ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-500 font-bold'
-                      : 'border-zinc-200 dark:border-white/[0.08] hover:bg-zinc-50 dark:hover:bg-white/[0.02] text-zinc-700 dark:text-zinc-300'
+                      : 'border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                 >
-                  <div className="text-sm font-bold font-mono">15 Horas</div>
-                  <div className="text-[10px] text-zinc-400">Mes especial / SC</div>
+                  <div className="text-sm font-bold font-mono tabular-nums">15 Horas</div>
+                  <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA]">Mes especial / SC</div>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Solicitud Continua */}
-          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-black/20 border border-zinc-200/80 dark:border-white/[0.06] flex items-center justify-between gap-3">
+          <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3">
             <div>
-              <h4 className="text-xs font-bold text-zinc-900 dark:text-white">
+              <h4 className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Solicitud Continua de Precursorado Auxiliar
               </h4>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                 El publicador continuará sirviendo como precursor auxiliar mes a mes hasta nuevo aviso.
               </p>
             </div>
@@ -258,16 +258,16 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
                 onChange={(e) => setIsContinuous(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+              <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-hidden rounded-full peer dark:bg-[#27272A] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
             </label>
           </div>
 
           {/* Requisitos y Declaración Teocrática (S-205) */}
           <div className="space-y-2 pt-1">
-            <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider">
               Requisitos Teocráticos de Elegibilidad (Formulario S-205)
             </label>
-            <div className="space-y-3 p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200/60 dark:border-indigo-500/20 text-xs">
+            <div className="space-y-3 p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-[#18181F] border border-indigo-200/60 dark:border-[#27272A] text-xs">
               <SplashCheckbox
                 checked={checkBaptized}
                 onChange={(e) => setCheckBaptized(e.target.checked)}
@@ -288,7 +288,7 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
 
           {/* Notas u Observaciones */}
           <div>
-            <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5">
               Notas u Observaciones del Publicador
             </label>
             <textarea
@@ -296,23 +296,23 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej. Apoyaré en el grupo de carritos de los sábados, vacaciones de trabajo..."
               rows={2}
-              className="w-full bg-zinc-50 dark:bg-black/25 border border-zinc-200 dark:border-white/[0.1] rounded-xl px-4 py-2 text-zinc-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+              className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-4 py-2 text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 resize-none"
             />
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-white/[0.08]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-white/[0.1] text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05] transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-sm font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!checkBaptized || !checkMoralStanding || !checkCircumstances}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all"
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-bold transition-all cursor-pointer"
             >
               {request ? 'Guardar Cambios' : 'Registrar Solicitud'}
             </button>

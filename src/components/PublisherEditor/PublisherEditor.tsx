@@ -177,9 +177,9 @@ export const TAB_CONFIG: Record<
     label: 'Historial',
     shortCode: '11',
     icon: History,
-    color: 'text-slate-600 dark:text-slate-400',
-    gradient: 'from-slate-700 to-zinc-800',
-    shadow: 'shadow-slate-700/30',
+    color: 'text-zinc-600 dark:text-[#A1A1AA]',
+    gradient: 'from-zinc-700 to-zinc-800',
+    shadow: 'shadow-zinc-700/30',
     desc: 'Auditoría cronológica y reversión de cambios',
   },
 };
@@ -863,9 +863,9 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
         title: 'Historial de Auditoría',
         desc: 'Bitácora cronológica de modificaciones en la ficha con opción de reversión.',
         icon: History,
-        accentText: 'text-slate-600 dark:text-slate-400',
-        accentBg: 'bg-slate-100 dark:bg-slate-500/10',
-        accentBorderHover: 'hover:border-slate-400/70 dark:hover:border-slate-500/50',
+        accentText: 'text-zinc-600 dark:text-[#A1A1AA]',
+        accentBg: 'bg-zinc-100 dark:bg-zinc-500/10',
+        accentBorderHover: 'hover:border-zinc-400/70 dark:hover:border-zinc-500/50',
         statusText: 'Auditoría',
         rows: [
           {
@@ -897,7 +897,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       {/* 1. CABECERA EJECUTIVA DEL PUBLICADOR */}
-      <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 min-w-0">
           <button
             type="button"
@@ -908,7 +908,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 handleBack();
               }
             }}
-            className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer active:scale-95 shrink-0"
+            className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer active:scale-95 shrink-0"
             title={
               activeTab !== 'all'
                 ? 'Volver al panel de tarjetas'
@@ -929,13 +929,13 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="font-bold text-zinc-900 dark:text-white text-base sm:text-lg truncate">
+              <h2 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base sm:text-lg truncate">
                 {formData.full_name || formData.name || 'Nuevo Publicador'}
               </h2>
               <button
                 type="button"
                 onClick={() => setIsEditingName((prev) => !prev)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-indigo-600 dark:text-[#A1A1AA] dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                 title="Renombrar publicador"
               >
                 <Edit2 size={13} />
@@ -943,21 +943,21 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             </div>
 
             {/* Línea de Metadatos Tipográficos con separador · */}
-            <p className="text-xs font-mono tabular-nums text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+            <p className="text-xs font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
               <span>{formData.publisherCode || formData.nid || formData.id}</span>
-              <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
+              <span className="mx-1.5 text-zinc-300 dark:text-[#27272A]">·</span>
               <span className="font-sans font-semibold text-indigo-600 dark:text-indigo-400">
                 {publisherRoleLabel}
               </span>
-              <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
+              <span className="mx-1.5 text-zinc-300 dark:text-[#27272A]">·</span>
               <span className="font-sans">{groupName || 'Sin grupo'}</span>
               {ageInfo?.age !== null && ageInfo?.age !== undefined && (
                 <>
-                  <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
+                  <span className="mx-1.5 text-zinc-300 dark:text-[#27272A]">·</span>
                   <span>{ageInfo.age} años</span>
                 </>
               )}
-              <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
+              <span className="mx-1.5 text-zinc-300 dark:text-[#27272A]">·</span>
               <span
                 className={`font-sans font-semibold ${
                   isDirty
@@ -972,7 +972,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
         </div>
 
         {/* Completitud + Acción Primaria Guardar */}
-        <div className="flex items-center justify-between lg:justify-end gap-4 pt-3 lg:pt-0 border-t lg:border-t-0 border-zinc-100 dark:border-white/[0.05] shrink-0">
+        <div className="flex items-center justify-between lg:justify-end gap-4 pt-3 lg:pt-0 border-t lg:border-t-0 border-zinc-100 dark:border-[#27272A] shrink-0">
           <div
             className="flex items-center gap-2.5"
             title={
@@ -982,15 +982,15 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             }
           >
             <div className="text-right">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA] block">
                 Integridad Ficha
               </span>
-              <span className="text-xs font-mono tabular-nums font-bold text-zinc-700 dark:text-zinc-200">
+              <span className="text-xs font-mono tabular-nums font-bold text-zinc-700 dark:text-[#F4F4F5]">
                 {profileCompleteness.pct}% ({profileCompleteness.completed}/
                 {profileCompleteness.total})
               </span>
             </div>
-            <div className="w-20 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+            <div className="w-20 h-2 bg-zinc-100 dark:bg-[#18181F] rounded-full overflow-hidden border border-zinc-200/60 dark:border-[#27272A]">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   profileCompleteness.pct >= 85
@@ -1028,8 +1028,8 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
       {/* Editor de nombre inline */}
       {isEditingName && (
-        <div className="p-3.5 bg-white dark:bg-[#0f1623] border border-indigo-300 dark:border-indigo-500/40 rounded-2xl shadow-xs flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2">
-          <span className="text-xs font-bold text-zinc-500 shrink-0">Nombre completo:</span>
+        <div className="p-3.5 bg-white dark:bg-[#121216] border border-indigo-400/50 dark:border-indigo-500/40 rounded-2xl shadow-xs flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2">
+          <span className="text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] shrink-0">Nombre completo:</span>
           <input
             ref={nameInputRef}
             type="text"
@@ -1038,7 +1038,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === 'Escape') setIsEditingName(false);
             }}
-            className="flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/[0.08] rounded-xl px-3 py-1.5 text-sm font-bold text-zinc-900 dark:text-white focus:outline-none focus:border-indigo-500"
+            className="flex-1 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-1.5 text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:border-indigo-500"
             placeholder="Nombre y apellidos"
             autoFocus
           />
@@ -1055,7 +1055,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
       {/* 2. BARRA DE NAVEGACIÓN DE TARJETAS */}
       <div
         ref={tabsRef}
-        className="p-1.5 bg-zinc-100/90 dark:bg-[#0f1623] rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] flex items-center gap-1 overflow-x-auto no-scrollbar"
+        className="p-1.5 bg-zinc-100/90 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1 overflow-x-auto no-scrollbar"
       >
         {filteredTabs.map((tabKey) => {
           const config = TAB_CONFIG[tabKey];
@@ -1070,16 +1070,16 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 onClick={() => setActiveTab(tabKey)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-2xs font-bold border border-zinc-200/60 dark:border-transparent'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/[0.04]'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-2xs font-bold border border-zinc-200/80 dark:border-[#27272A]'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#18181F]/50'
                 }`}
               >
                 <Icon
                   size={14}
                   className={
                     isActive
-                      ? 'text-indigo-600 dark:text-white'
-                      : 'text-zinc-400 dark:text-zinc-500'
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-zinc-400 dark:text-[#A1A1AA]'
                   }
                 />
                 {config.shortCode && (
@@ -1095,7 +1095,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
               </button>
               {tabKey === 'all' && (
                 <div
-                  className="h-5 w-px bg-zinc-200 dark:bg-white/[0.08] mx-1 shrink-0"
+                  className="h-5 w-px bg-zinc-200 dark:bg-[#27272A] mx-1 shrink-0"
                   aria-hidden="true"
                 />
               )}
@@ -1116,7 +1116,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   <div
                     key={card.id}
                     onClick={() => setActiveTab(card.id)}
-                    className={`bg-white dark:bg-[#0f1623] rounded-3xl p-5 sm:p-6 border border-zinc-200/90 dark:border-white/[0.06] ${card.accentBorderHover} shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group`}
+                    className={`bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] ${card.accentBorderHover} shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group`}
                   >
                     <div>
                       {/* Encabezado de Tarjeta */}
@@ -1127,7 +1127,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                           >
                             <Icon size={19} />
                           </div>
-                          <span className="font-mono tabular-nums text-xs font-bold text-zinc-300 dark:text-zinc-600">
+                          <span className="font-mono tabular-nums text-xs font-bold text-zinc-300 dark:text-[#3F3F46]">
                             {card.code}
                           </span>
                         </div>
@@ -1136,7 +1136,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                           className={`text-[11px] font-mono tabular-nums font-semibold ${
                             card.statusOk
                               ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-zinc-500 dark:text-zinc-400'
+                              : 'text-zinc-500 dark:text-[#A1A1AA]'
                           }`}
                         >
                           {card.statusText}
@@ -1145,26 +1145,26 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
                       {/* Título y Descripción */}
                       <h4
-                        className={`text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:${card.accentText.split(' ')[0]} transition-colors`}
+                        className={`text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:${card.accentText.split(' ')[0]} transition-colors`}
                       >
                         {card.title}
                       </h4>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2 leading-relaxed">
                         {card.desc}
                       </p>
 
                       {/* Filas de Metadatos Limpias (Separadas por Hairlines, sin caja anidada) */}
-                      <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-white/[0.05] divide-y divide-zinc-100 dark:divide-white/[0.04] text-xs">
+                      <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-[#27272A] divide-y divide-zinc-100 dark:divide-[#27272A] text-xs">
                         {card.rows.map((r, rIdx) => (
                           <div
                             key={rIdx}
                             className="py-2 flex items-center justify-between gap-3"
                           >
-                            <span className="text-zinc-400 dark:text-zinc-500 shrink-0">
+                            <span className="text-zinc-400 dark:text-[#A1A1AA] shrink-0">
                               {r.label}
                             </span>
                             <span
-                              className={`font-semibold text-zinc-800 dark:text-zinc-200 truncate text-right ${
+                              className={`font-semibold text-zinc-800 dark:text-[#F4F4F5] truncate text-right ${
                                 r.mono ? 'font-mono tabular-nums' : ''
                               }`}
                             >
@@ -1177,7 +1177,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
                     {/* Pie Interactivo */}
                     <div
-                      className={`mt-4 pt-3 border-t border-zinc-100 dark:border-white/[0.05] flex items-center justify-between text-xs font-bold ${card.accentText}`}
+                      className={`mt-4 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-bold ${card.accentText}`}
                     >
                       <span>Configurar tarjeta</span>
                       <ChevronRight
@@ -1290,13 +1290,13 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             )}
 
             {/* Barra Inferior de Navegación Secuencial entre Tarjetas */}
-            <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 {prevTab ? (
                   <button
                     type="button"
                     onClick={() => setActiveTab(prevTab)}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 text-xs font-bold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] text-xs font-bold transition-colors cursor-pointer"
                   >
                     <ChevronLeft size={14} />
                     <span>
@@ -1307,7 +1307,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   <button
                     type="button"
                     onClick={() => setActiveTab('all')}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 text-xs font-bold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] text-xs font-bold transition-colors cursor-pointer"
                   >
                     <Layers size={14} />
                     <span>Panel de Tarjetas</span>
@@ -1318,9 +1318,9 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
-                className="text-xs font-semibold text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                className="text-xs font-semibold text-zinc-400 hover:text-indigo-600 dark:text-[#A1A1AA] dark:hover:text-indigo-400 transition-colors cursor-pointer"
               >
-                Tarjeta {currentSectionIdx + 1} de {sectionTabsOnly.length} · Ver todas
+                Tarjeta <span className="font-mono tabular-nums">{currentSectionIdx + 1}</span> de <span className="font-mono tabular-nums">{sectionTabsOnly.length}</span> · Ver todas
               </button>
 
               <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
@@ -1339,7 +1339,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   <button
                     type="button"
                     onClick={handleSaveClick}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
                   >
                     <Save size={14} />
                     <span>Guardar Ficha</span>
@@ -1353,17 +1353,17 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
       {/* MODAL: REGISTRAR AUSENCIA */}
       {showAbsenceModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0a1120]/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.08] w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3.5 mb-5">
               <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
                 <Plane size={20} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   Registrar Ausencia Programada
                 </h3>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Evita asignar partes en las semanas seleccionadas
                 </p>
               </div>
@@ -1372,7 +1372,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                     Fecha Inicio
                   </label>
                   <PremiumDatePicker
@@ -1381,7 +1381,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                     Fecha Fin
                   </label>
                   <PremiumDatePicker
@@ -1391,7 +1391,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5 block">
                   Motivo (Opcional)
                 </label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
@@ -1405,7 +1405,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                       key={preset}
                       type="button"
                       onClick={() => setNewAbsence((prev) => ({ ...prev, reason: preset }))}
-                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/60 dark:border-[#27272A] transition-colors cursor-pointer"
                     >
                       {preset}
                     </button>
@@ -1417,7 +1417,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                     setNewAbsence((prev) => ({ ...prev, reason: e.target.value }))
                   }
                   rows={2}
-                  className="w-full kf-input resize-none"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-3 text-xs text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500 resize-none"
                   placeholder="Ej: Vacaciones, cirugía, viaje laboral..."
                 />
               </div>
@@ -1427,7 +1427,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAbsenceModal(false)}
-                className="flex-1 py-2.5 bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold transition-colors hover:bg-zinc-200 cursor-pointer"
+                className="flex-1 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
@@ -1449,17 +1449,17 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
       {/* MODAL: CONTACTO DE EMERGENCIA */}
       {showEmergencyModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0a1120]/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.08] w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3.5 mb-5">
               <div className="w-11 h-11 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center">
                 <Heart size={20} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   {editingContact ? 'Editar Contacto de Emergencia' : 'Nuevo Contacto de Emergencia'}
                 </h3>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Información para aviso inmediato ante urgencias
                 </p>
               </div>
@@ -1467,20 +1467,20 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
             <div className="space-y-4">
               <div>
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                   Nombre Completo
                 </label>
                 <input
                   type="text"
                   value={newContact.name}
                   onChange={(e) => setNewContact((prev) => ({ ...prev, name: e.target.value }))}
-                  className="kf-input w-full"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                   placeholder="Nombre del familiar o hermano"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1.5 block">
                   Parentesco o Relación
                 </label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
@@ -1498,8 +1498,8 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                       onClick={() => setNewContact((prev) => ({ ...prev, relationship: rel }))}
                       className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
                         newContact.relationship === rel
-                          ? 'bg-rose-600 text-white'
-                          : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-rose-500/20 hover:text-rose-600'
+                          ? 'bg-rose-600 text-white shadow-xs'
+                          : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-rose-50 dark:hover:bg-rose-500/20 hover:text-rose-600 dark:hover:text-rose-400 border border-zinc-200/60 dark:border-[#27272A]'
                       }`}
                     >
                       {rel}
@@ -1512,14 +1512,14 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   onChange={(e) =>
                     setNewContact((prev) => ({ ...prev, relationship: e.target.value }))
                   }
-                  className="kf-input w-full"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                   placeholder="Ej: Esposo, Madre, Hijo, Hermano espiritual..."
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                     Teléfono Principal (Móvil)
                   </label>
                   <input
@@ -1528,12 +1528,12 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                     onChange={(e) =>
                       setNewContact((prev) => ({ ...prev, phone: e.target.value }))
                     }
-                    className="kf-input w-full font-mono"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                     placeholder="+54 9 11..."
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                     Teléfono Alternativo
                   </label>
                   <input
@@ -1542,14 +1542,14 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                     onChange={(e) =>
                       setNewContact((prev) => ({ ...prev, alt_phone: e.target.value }))
                     }
-                    className="kf-input w-full font-mono"
+                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                     placeholder="Opcional"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider mb-1 block">
                   Correo Electrónico (Opcional)
                 </label>
                 <input
@@ -1558,7 +1558,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   onChange={(e) =>
                     setNewContact((prev) => ({ ...prev, email: e.target.value }))
                   }
-                  className="kf-input w-full"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                   placeholder="correo@ejemplo.com"
                 />
               </div>
@@ -1571,7 +1571,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   setShowEmergencyModal(false);
                   setEditingContact(null);
                 }}
-                className="flex-1 py-2.5 bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold transition-colors hover:bg-zinc-200 cursor-pointer"
+                className="flex-1 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

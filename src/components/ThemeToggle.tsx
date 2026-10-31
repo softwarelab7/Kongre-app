@@ -92,8 +92,8 @@ export default function ThemeToggle({
   const variantClasses = isBrand
     ? "text-white hover:text-white hover:bg-white/10"
     : activeMode === "dark"
-    ? "text-white hover:text-slate-100 hover:bg-slate-800/60"
-    : "text-amber-500 hover:text-amber-600 hover:bg-slate-100/80 dark:text-amber-400 dark:hover:bg-slate-800/60";
+    ? "text-white hover:text-zinc-100 hover:bg-zinc-800/60"
+    : "text-amber-500 hover:text-amber-600 hover:bg-zinc-100/80 dark:text-amber-400 dark:hover:bg-[#27272A]/60";
 
   return (
     <button

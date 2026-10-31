@@ -266,7 +266,7 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
   }, [showSlipModal, currentPin, settings, publisherId, publisherName, currentRole]);
 
   return (
-    <section className="bg-white dark:bg-[#0f1623] p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs space-y-6 animate-in fade-in duration-300">
+    <section className="bg-white dark:bg-[#121216] p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6 animate-in fade-in duration-300">
       {/* 1. Cabecera Unificada de Credenciales */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.05]">
         <div className="flex items-start gap-3.5">
@@ -512,8 +512,8 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
 
       {/* 3. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR) */}
       {showSlipModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.08] rounded-3xl p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/[0.06]">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">

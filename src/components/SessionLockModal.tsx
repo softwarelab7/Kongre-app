@@ -113,13 +113,13 @@ export const SessionLockModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/95 backdrop-blur-md p-4 animate-fade-in select-none"
       role="dialog"
       aria-modal="true"
       aria-label="Pantalla de bloqueo de seguridad"
     >
       <div
-        className={`w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
+        className={`w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
           shake ? 'animate-bounce' : ''
         }`}
       >
@@ -131,7 +131,7 @@ export const SessionLockModal: React.FC = () => {
         <h2 className="text-xl font-black text-white tracking-tight">
           {settings.congregationName || 'Gestor Teocrático'}
         </h2>
-        <p className="text-xs text-slate-400 mt-2 mb-6">
+        <p className="text-xs text-zinc-400 mt-2 mb-6">
           Introduce tu PIN de Bloqueo para acceder a tu información
         </p>
 
@@ -145,7 +145,7 @@ export const SessionLockModal: React.FC = () => {
                 className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${
                   hasChar
                     ? 'bg-indigo-400 scale-125 shadow-xs shadow-indigo-500/50'
-                    : 'bg-slate-700 border border-slate-600'
+                    : 'bg-zinc-700 border border-zinc-600'
                 }`}
               />
             );
@@ -191,7 +191,7 @@ export const SessionLockModal: React.FC = () => {
               type="button"
               disabled={lockoutSeconds > 0}
               onClick={() => handleKeyPress(num)}
-              className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
+              className="h-12 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700/80 text-white font-bold text-lg border border-zinc-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
             >
               {num}
             </button>
@@ -201,7 +201,7 @@ export const SessionLockModal: React.FC = () => {
             disabled={lockoutSeconds > 0}
             onClick={handleClear}
             aria-label="Limpiar todo el PIN ingresado"
-            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 font-semibold text-xs border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
+            className="h-12 rounded-2xl bg-zinc-800/40 hover:bg-zinc-800 text-zinc-400 font-semibold text-xs border border-zinc-700/40 active:scale-95 transition-all disabled:opacity-40"
           >
             C
           </button>
@@ -209,7 +209,7 @@ export const SessionLockModal: React.FC = () => {
             type="button"
             disabled={lockoutSeconds > 0}
             onClick={() => handleKeyPress('0')}
-            className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
+            className="h-12 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700/80 text-white font-bold text-lg border border-zinc-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
           >
             0
           </button>
@@ -217,7 +217,7 @@ export const SessionLockModal: React.FC = () => {
             type="button"
             disabled={lockoutSeconds > 0}
             onClick={handleDelete}
-            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 flex items-center justify-center border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
+            className="h-12 rounded-2xl bg-zinc-800/40 hover:bg-zinc-800 text-zinc-400 flex items-center justify-center border border-zinc-700/40 active:scale-95 transition-all disabled:opacity-40"
             title="Borrar"
             aria-label="Borrar último dígito"
           >
@@ -235,7 +235,7 @@ export const SessionLockModal: React.FC = () => {
           <span>{isSubmitting ? 'Verificando...' : 'Desbloquear Sesión'}</span>
         </button>
 
-        <p className="text-[11px] text-slate-500 mt-4">
+        <p className="text-[11px] text-zinc-500 mt-4">
           Protección teocrática con cifrado AES-256 local
         </p>
       </div>

@@ -106,7 +106,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* SECCIÓN DESTACADA: PREFERENCIAS DE NOTIFICACIÓN DE ASIGNACIONES */}
-      <div className="bg-white dark:bg-[#0f1623] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-violet-200/80 dark:border-violet-500/30 shadow-xs space-y-5">
+      <div className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-violet-200/80 dark:border-violet-500/30 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/[0.06]">
           <div className="flex items-start sm:items-center gap-3">
             <div className="p-3 bg-violet-50 dark:bg-violet-500/15 rounded-2xl text-violet-600 dark:text-violet-400 shrink-0">
@@ -276,7 +276,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
                     `Hora preferida actualizada a las ${e.target.value}.`
                   )
                 }
-                className="w-full px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-slate-800 text-zinc-900 dark:text-white text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-violet-500"
+                className="w-full px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] text-xs font-bold font-mono tabular-nums focus:outline-hidden focus:ring-2 focus:ring-violet-500"
               >
                 <option value="07:00">07:00 AM (Mañana temprano)</option>
                 <option value="08:00">08:00 AM (Mañana)</option>
@@ -342,9 +342,9 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('notificaciones')}
-              className="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/50 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200/70 dark:border-violet-800/50 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
             >
-              <Sliders size={13} />
+              <Sliders size={13} className="text-zinc-400 dark:text-[#71717A]" />
               <span>Ver Opciones Avanzadas de Notificación</span>
             </button>
           </div>
@@ -355,41 +355,41 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 1: Información y Horarios */}
         <div
           onClick={() => setActiveTab('general')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-blue-50/[0.3] dark:hover:bg-blue-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-blue-400/50 dark:hover:border-blue-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <Calendar size={22} />
               </div>
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 {midDay} y {fdsDay}
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Información y Horarios
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Nombre oficial de la congregación, dirección física del Salón del Reino y horarios de reuniones semanales.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Congregación:</span>
-                <span className="font-semibold truncate max-w-[170px]">
+                <span className="text-zinc-400 dark:text-[#71717A]">Congregación:</span>
+                <span className="font-semibold truncate max-w-[170px] text-zinc-900 dark:text-[#F4F4F5]">
                   {congName || 'Sin asignar'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Horarios:</span>
-                <span className="font-semibold">
+                <span className="text-zinc-400 dark:text-[#71717A]">Horarios:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">
                   {midDay} {midTime} • {fdsDay} {fdsTime}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Abrir ajustes de horarios</span>
             <ChevronRight size={16} />
           </div>
@@ -398,41 +398,41 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 2: Reglas y Conflictos */}
         <div
           onClick={() => setActiveTab('reglas')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-amber-50/[0.3] dark:hover:bg-amber-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-amber-400/50 dark:hover:border-amber-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-amber-50 dark:bg-amber-500/10 rounded-2xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <ShieldAlert size={22} />
               </div>
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40">
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 Motor Anticolisión
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Reglas de Cruces y Conflictos
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Detección inteligente de asignaciones simultáneas, rotación de hermanos y prevención de bosquejos repetidos.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Parte y Deber:</span>
-                <span className="font-semibold">
+                <span className="text-zinc-400 dark:text-[#71717A]">Parte y Deber:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">
                   {!allowPartAndDuty ? 'Bloqueado (Recomendado)' : 'Permitido'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Rotación máxima:</span>
-                <span className="font-semibold">
+                <span className="text-zinc-400 dark:text-[#71717A]">Rotación máxima:</span>
+                <span className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                   {maxConsecutiveDuty} sem. deberes • {maxConsecutivePart} sem. partes
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Abrir reglas de asignación</span>
             <ChevronRight size={16} />
           </div>
@@ -441,33 +441,33 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 3: Invitaciones y Acceso QR */}
         <div
           onClick={() => setActiveTab('invitaciones')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-purple-50/[0.3] dark:hover:bg-purple-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-purple-400/50 dark:hover:border-purple-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <QrCode size={22} />
               </div>
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/40">
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
                 {invitations.filter((i) => i.status === 'active').length} vigentes
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Registro Teocrático e Invitaciones
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Códigos cerrados y códigos QR de un solo toque para vincular ancianos, siervos y publicadores con seguridad E2EE.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">ID Congregación:</span>
-                <span className="font-semibold font-mono text-xs">
+                <span className="text-zinc-400 dark:text-[#71717A]">ID Congregación:</span>
+                <span className="font-semibold font-mono tabular-nums text-xs text-zinc-900 dark:text-[#F4F4F5]">
                   {settings.congregationNumber || settings.congregationId || 'Configurado'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Seguridad:</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Seguridad:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   Zero-Knowledge E2EE
                 </span>
@@ -475,7 +475,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Gestionar invitaciones y QR</span>
             <ChevronRight size={16} />
           </div>
@@ -484,47 +484,41 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 4: Seguridad y Bloqueo */}
         <div
           onClick={() => setActiveTab('seguridad')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-emerald-50/[0.3] dark:hover:bg-emerald-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-emerald-400/50 dark:hover:border-emerald-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <Lock size={22} />
               </div>
-              <span
-                className={`px-2.5 py-1 rounded-xl text-[10px] font-bold ${
-                  isPinEnabled
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
-                }`}
-              >
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 {isPinEnabled ? 'PIN Activo' : 'Sin PIN'}
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Seguridad y Bloqueo de Sesión
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Protección con PIN numérico para el Salón del Reino, bloqueo por inactividad y modo privacidad RGPD/PII.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Auto-Bloqueo:</span>
-                <span className="font-semibold">
+                <span className="text-zinc-400 dark:text-[#71717A]">Auto-Bloqueo:</span>
+                <span className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                   {autoLockMinutes > 0 ? `${autoLockMinutes} min inactividad` : 'Manual'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Modo Privacidad:</span>
-                <span className="font-semibold">
+                <span className="text-zinc-400 dark:text-[#71717A]">Modo Privacidad:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">
                   {privacyModeEnabled ? 'Activado (Protegido)' : 'Desactivado'}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Configurar seguridad y PIN</span>
             <ChevronRight size={16} />
           </div>
@@ -533,39 +527,33 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 5: Nube y Sincronización */}
         <div
           onClick={() => setActiveTab('nube')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-sky-50/[0.3] dark:hover:bg-sky-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-sky-400/50 dark:hover:border-sky-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-sky-50 dark:bg-sky-500/10 rounded-2xl text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <Cloud size={22} />
               </div>
-              <span
-                className={`px-2.5 py-1 rounded-xl text-[10px] font-bold ${
-                  user
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40'
-                    : 'bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40'
-                }`}
-              >
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 {user ? 'Google Conectado' : 'Nube por ID'}
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Respaldo en la Nube
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Sincronización multi-dispositivo y respaldo en Google Firestore para todos los hermanos autorizados.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Cuenta:</span>
-                <span className="font-semibold truncate max-w-[170px]">
+                <span className="text-zinc-400 dark:text-[#71717A]">Cuenta:</span>
+                <span className="font-semibold truncate max-w-[170px] text-zinc-900 dark:text-[#F4F4F5]">
                   {user ? user.email : 'Conexión por ID teocrático'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Guardado:</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Guardado:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   Automático en cada cambio
                 </span>
@@ -573,7 +561,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Abrir sincronización en la nube</span>
             <ChevronRight size={16} />
           </div>
@@ -582,37 +570,37 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 6: Copias de Respaldo y Cifrado */}
         <div
           onClick={() => setActiveTab('respaldos')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <Database size={22} />
               </div>
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40">
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 AES-256 Militar
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Copias y Respaldo Cifrado
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Descarga copias de seguridad de toda la congregación o restaura archivos protegidos por contraseña.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Formatos:</span>
-                <span className="font-semibold">.json y .orgenc.json</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Formatos:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">.json y .orgenc.json</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Cifrado:</span>
-                <span className="font-semibold">AES-256-GCM + PBKDF2</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Cifrado:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">AES-256-GCM + PBKDF2</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Abrir copias y archivos</span>
             <ChevronRight size={16} />
           </div>
@@ -621,31 +609,31 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 7: Mantenimiento y Datos */}
         <div
           onClick={() => setActiveTab('mantenimiento')}
-          className="bg-white dark:bg-[#0f1623] hover:bg-rose-50/[0.3] dark:hover:bg-rose-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-rose-400/50 dark:hover:border-rose-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="p-3 bg-rose-50 dark:bg-rose-500/10 rounded-2xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl text-zinc-700 dark:text-[#F4F4F5] group-hover:scale-105 transition-transform">
                 <Trash2 size={22} />
               </div>
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40">
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
                 Herramientas
               </span>
             </div>
-            <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               Mantenimiento y Datos
             </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2">
               Eliminación de datos de demostración para iniciar en limpio, vaciado de publicadores o reinicio total.
             </p>
 
-            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Acciones:</span>
-                <span className="font-semibold">Limpieza y reseteo</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Acciones:</span>
+                <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5]">Limpieza y reseteo</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Protección:</span>
+                <span className="text-zinc-400 dark:text-[#71717A]">Protección:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   Nombre y horarios seguros
                 </span>
@@ -653,7 +641,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:translate-x-1 transition-transform">
+          <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] group-hover:text-zinc-900 dark:group-hover:text-white group-hover:translate-x-1 transition-all">
             <span>Abrir herramientas de mantenimiento</span>
             <ChevronRight size={16} />
           </div>
@@ -662,7 +650,7 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
         {/* Tarjeta 8: Registro de Versiones y Changelog */}
         <div
           onClick={() => onOpenVersionModal?.()}
-          className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] hover:bg-indigo-50/[0.3] dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">

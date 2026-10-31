@@ -331,22 +331,22 @@ export const HospitalidadTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {toastMsg && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center gap-2 text-xs font-semibold">
+        <div className="fixed bottom-5 right-5 z-50 bg-zinc-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center gap-2 text-xs font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMsg}</span>
         </div>
       )}
 
       {/* Top Navigation & Actions Bar */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="grid grid-cols-2 sm:inline-flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-800/70 p-1 gap-1 w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:inline-flex rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1 gap-1 w-full sm:w-auto">
             <button
               onClick={() => setActiveSubView('cuadrante')}
               className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
                 activeSubView === 'cuadrante'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
               <Calendar className="w-3.5 h-3.5 shrink-0" />
@@ -357,12 +357,12 @@ export const HospitalidadTab: React.FC = () => {
               onClick={() => setActiveSubView('anfitriones')}
               className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
                 activeSubView === 'anfitriones'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
               <Users className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Anfitriones ({hospitalityHosts.length})</span>
+              <span className="truncate">Anfitriones <span className="font-mono tabular-nums">({hospitalityHosts.length})</span></span>
             </button>
           </div>
 
@@ -370,7 +370,7 @@ export const HospitalidadTab: React.FC = () => {
             {activeSubView === 'cuadrante' && (
               <button
                 onClick={handleAutoAssignAllPendingWeeks}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer truncate"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 text-xs font-bold transition-all cursor-pointer truncate"
                 title="Asignar automáticamente familias anfitrionas a todas las semanas pendientes según rotación y capacidad"
               >
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
@@ -380,7 +380,7 @@ export const HospitalidadTab: React.FC = () => {
 
             <button
               onClick={handleCopyWhatsAppList}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer truncate"
             >
               {copiedSuccess ? (
                 <>
@@ -389,7 +389,7 @@ export const HospitalidadTab: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+                  <Copy className="w-3.5 h-3.5 text-zinc-500 dark:text-[#A1A1AA] shrink-0" />
                   <span className="truncate">Copiar WhatsApp</span>
                 </>
               )}
@@ -397,7 +397,7 @@ export const HospitalidadTab: React.FC = () => {
 
             <button
               onClick={openNewModal}
-              className={`${activeSubView === 'cuadrante' ? 'col-span-2 sm:col-span-1' : ''} flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 truncate`}
+              className={`${activeSubView === 'cuadrante' ? 'col-span-2 sm:col-span-1' : ''} flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer active:scale-95 truncate`}
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="truncate">Nuevo Anfitrión</span>
@@ -408,57 +408,57 @@ export const HospitalidadTab: React.FC = () => {
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {stats.total}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               Familias Registradas
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5" />
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {stats.activeCount}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               Disponibles / Activas
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Utensils className="w-5 h-5" />
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+            <Utensils className="w-5 h-5 text-zinc-500" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
-              {stats.totalCapacity} pers.
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+              {stats.totalCapacity} <span className="text-xs font-normal text-zinc-500 dark:text-[#A1A1AA]">pers.</span>
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               Capacidad Total
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-            <Calendar className="w-5 h-5" />
+        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+            <Calendar className="w-5 h-5 text-zinc-500" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {stats.assignedWeeksCount} / {weeks.length}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               Semanas Cubiertas
             </div>
           </div>
@@ -495,35 +495,35 @@ export const HospitalidadTab: React.FC = () => {
             return (
               <div
                 key={week.id}
-                className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-5 shadow-xs flex flex-col justify-between gap-4"
+                className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 flex flex-col justify-between gap-4"
               >
                 <div>
                   {/* Header */}
-                  <div className="flex items-start justify-between gap-2 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+                  <div className="flex items-start justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs">
+                        <span className="px-2.5 py-0.5 rounded-md bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-bold font-mono tabular-nums text-xs">
                           {w.date}
                         </span>
                         {isVisiting ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                             Orador Visitante
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
                             Orador Local
                           </span>
                         )}
                       </div>
-                      <h4 className="font-bold text-slate-900 dark:text-white text-sm mt-1 flex items-center gap-1.5">
+                      <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm mt-1.5 flex items-center gap-1.5">
                         <Mic className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                         <span>{speakerName}</span>
                       </h4>
                       {w.visitingSpeakerCongregation && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1 mt-0.5">
                           <Building className="w-3 h-3 text-emerald-600" />
                           <span>{w.visitingSpeakerCongregation}</span>
-                          {guests > 1 && <span>• {guests} comensales</span>}
+                          {guests > 1 && <span>• <span className="font-mono tabular-nums">{guests}</span> comensales</span>}
                         </p>
                       )}
                     </div>
@@ -541,21 +541,27 @@ export const HospitalidadTab: React.FC = () => {
                             },
                           })
                         }
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase cursor-pointer ${
-                          w.hospitalityStatus === 'confirmada'
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300'
-                            : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300'
-                        }`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase cursor-pointer border border-zinc-200 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300"
                       >
-                        {w.hospitalityStatus === 'confirmada' ? '✓ Confirmada' : '⏳ Pendiente'}
+                        {w.hospitalityStatus === 'confirmada' ? (
+                          <>
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span>Confirmada</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            <span>Pendiente</span>
+                          </>
+                        )}
                       </button>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handleOneClickAssignWeek(week)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-500/20 text-amber-900 dark:text-amber-200 font-bold text-xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] font-bold text-xs cursor-pointer"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                         <span>Asignar en 1 Clic</span>
                       </button>
                     )}
@@ -564,7 +570,7 @@ export const HospitalidadTab: React.FC = () => {
                   {/* Host Selector & Meal Type */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                      <label className="block text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] mb-1">
                         Familia Anfitriona Asignada
                       </label>
                       <select
@@ -579,7 +585,7 @@ export const HospitalidadTab: React.FC = () => {
                             },
                           })
                         }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-white outline-hidden"
+                        className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500"
                       >
                         <option value="">-- Sin asignar --</option>
                         {rankedSuggestions.length > 0 && (
@@ -604,7 +610,7 @@ export const HospitalidadTab: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                      <label className="block text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] mb-1">
                         Modalidad de Atención
                       </label>
                       <select
@@ -618,7 +624,7 @@ export const HospitalidadTab: React.FC = () => {
                             },
                           })
                         }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-white outline-hidden"
+                        className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500"
                       >
                         {Object.entries(MEAL_TYPE_LABELS).map(([k, label]) => (
                           <option key={k} value={k}>
@@ -630,14 +636,15 @@ export const HospitalidadTab: React.FC = () => {
                   </div>
 
                   {w.visitingSpeakerDietaryNotes && (
-                    <div className="mt-2.5 p-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200/70 dark:border-amber-500/20 text-amber-900 dark:text-amber-200 text-[11px]">
-                      <strong>⚠️ Alergias / Dieta del Orador:</strong> {w.visitingSpeakerDietaryNotes}
+                    <div className="mt-2.5 p-2 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 text-[11px] shadow-xs flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                      <span><strong className="text-zinc-900 dark:text-[#F4F4F5]">Alergias / Dieta del Orador:</strong> {w.visitingSpeakerDietaryNotes}</span>
                     </div>
                   )}
                 </div>
 
                 {/* 1-Click WhatsApp Reminders */}
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+                <div className="flex items-center gap-2 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
                   {assignedHostPub && (
                     <button
                       onClick={() => {
@@ -653,9 +660,9 @@ export const HospitalidadTab: React.FC = () => {
                           : `https://wa.me/?text=${encodeURIComponent(res.message)}`;
                         window.open(url, '_blank');
                       }}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 text-xs font-bold border border-amber-200 dark:border-amber-500/20 cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 text-xs font-bold border border-zinc-200 dark:border-[#27272A] cursor-pointer"
                     >
-                      <Utensils className="w-3.5 h-3.5 text-amber-600" />
+                      <Utensils className="w-3.5 h-3.5 text-zinc-500" />
                       <span>WhatsApp Anfitrión</span>
                     </button>
                   )}
@@ -674,9 +681,9 @@ export const HospitalidadTab: React.FC = () => {
                           : `https://wa.me/?text=${encodeURIComponent(message)}`;
                         window.open(url, '_blank');
                       }}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-500/20 cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 text-xs font-bold border border-zinc-200 dark:border-[#27272A] cursor-pointer"
                     >
-                      <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
                       <span>WhatsApp Orador</span>
                     </button>
                   )}
@@ -693,54 +700,54 @@ export const HospitalidadTab: React.FC = () => {
       {activeSubView === 'anfitriones' && (
         <>
           {/* Filter and Search Bar */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row gap-3 items-center justify-between">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por familia, teléfono o notas..."
-                className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+                className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] placeholder-zinc-400 focus:outline-hidden focus:border-indigo-500 transition-all"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-              <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
                 <Filter className="w-3.5 h-3.5" />
                 <span>Filtro:</span>
               </div>
 
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08]">
+              <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A]">
                 <button
                   onClick={() => setFilterStatus('all')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                     filterStatus === 'all'
-                      ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
-                  Todos ({hospitalityHosts.length})
+                  Todos <span className="font-mono tabular-nums">({hospitalityHosts.length})</span>
                 </button>
                 <button
                   onClick={() => setFilterStatus('active')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                     filterStatus === 'active'
-                      ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
-                  Disponibles ({stats.activeCount})
+                  Disponibles <span className="font-mono tabular-nums">({stats.activeCount})</span>
                 </button>
                 <button
                   onClick={() => setFilterStatus('allergies')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                     filterStatus === 'allergies'
-                      ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
-                  Con Notas ({stats.withAllergies})
+                  Con Notas <span className="font-mono tabular-nums">({stats.withAllergies})</span>
                 </button>
               </div>
             </div>
@@ -748,19 +755,19 @@ export const HospitalidadTab: React.FC = () => {
 
           {/* Host Families Grid */}
           {filteredHosts.length === 0 ? (
-            <div className="p-12 text-center bg-white dark:bg-[#131d2e] rounded-3xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs">
-              <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4">
+            <div className="p-12 text-center bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A]">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 border border-indigo-100 dark:border-indigo-500/20">
                 <Coffee className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 No hay anfitriones registrados
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 max-w-md mx-auto">
                 Registra las familias de la congregación dispuestas a ofrecer comida u hospedaje a los discursantes visitantes.
               </p>
               <button
                 onClick={openNewModal}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Añadir Primera Familia</span>
@@ -778,23 +785,23 @@ export const HospitalidadTab: React.FC = () => {
                 return (
                   <div
                     key={host.id}
-                    className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-5 shadow-xs flex flex-col justify-between transition-all hover:shadow-md"
+                    className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 flex flex-col justify-between transition-colors hover:border-indigo-500/40"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm shrink-0 border border-indigo-100 dark:border-indigo-500/20">
+                          <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm shrink-0 border border-indigo-100 dark:border-indigo-500/20">
                             {familyName.substring(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <h4 className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+                            <h4 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight leading-snug">
                               {familyName}
                             </h4>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
-                                🍽️ Capacidad: {host.capacity} pers.
+                                🍽️ Capacidad: <span className="font-mono tabular-nums">{host.capacity}</span> pers.
                               </span>
-                              <span className="text-[11px] text-slate-400">
+                              <span className="text-[11px] text-zinc-400 font-mono tabular-nums">
                                 • {assignments.length} turno(s)
                               </span>
                             </div>
@@ -803,10 +810,10 @@ export const HospitalidadTab: React.FC = () => {
 
                         <button
                           onClick={() => handleToggleActive(host)}
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer border ${
                             host.active
-                              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20'
-                              : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-white/10'
+                              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30'
+                              : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
                           }`}
                           title="Alternar disponibilidad"
                         >
@@ -814,25 +821,25 @@ export const HospitalidadTab: React.FC = () => {
                         </button>
                       </div>
 
-                      <div className="space-y-2 py-2 border-t border-slate-100 dark:border-white/[0.06] text-xs text-slate-600 dark:text-slate-300">
+                      <div className="space-y-2 py-2 border-t border-zinc-100 dark:border-[#27272A] text-xs text-zinc-600 dark:text-[#A1A1AA]">
                         {phone && (
                           <div className="flex items-center gap-2">
-                            <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span>{phone}</span>
+                            <Phone className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                            <span className="font-mono tabular-nums">{phone}</span>
                           </div>
                         )}
 
                         {address && (
                           <div className="flex items-start gap-2">
-                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                            <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
                             <span className="truncate">{address}</span>
                           </div>
                         )}
 
                         {host.dietaryNotes && (
-                          <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20 text-amber-900 dark:text-amber-200 text-xs">
-                            <div className="font-semibold text-[11px] flex items-center gap-1 mb-0.5">
-                              <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 text-xs shadow-xs">
+                            <div className="font-semibold text-[11px] flex items-center gap-1 mb-0.5 text-zinc-900 dark:text-[#F4F4F5]">
+                              <AlertCircle className="w-3 h-3 text-amber-500 shrink-0" />
                               <span>Dietas / Alergias:</span>
                             </div>
                             <p className="text-[11px] leading-relaxed">{host.dietaryNotes}</p>
@@ -840,19 +847,19 @@ export const HospitalidadTab: React.FC = () => {
                         )}
 
                         {host.notes && (
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                          <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic">
                             Nota: {host.notes}
                           </div>
                         )}
 
                         {assignments.length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+                          <div className="mt-2 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block mb-1">
                               📅 Turnos asignados:
                             </span>
                             {assignments.slice(0, 3).map((a, i) => (
-                              <div key={i} className="text-[11px] text-slate-700 dark:text-slate-300">
-                                • {a.date}: {a.speakerName}
+                              <div key={i} className="text-[11px] text-zinc-700 dark:text-[#F4F4F5]">
+                                • <span className="font-mono tabular-nums">{a.date}</span>: {a.speakerName}
                               </div>
                             ))}
                           </div>
@@ -860,11 +867,11 @@ export const HospitalidadTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between gap-2">
+                    <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
                       {phone ? (
                         <button
                           onClick={() => handleSendFamilyMessage(host)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 text-xs font-semibold transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 text-xs font-semibold transition-all cursor-pointer border border-emerald-200 dark:border-emerald-500/30"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
                           <span>WhatsApp</span>
@@ -876,14 +883,14 @@ export const HospitalidadTab: React.FC = () => {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => openEditModal(host)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-[#27272A]"
                           title="Editar anfitrión"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(host.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer border border-transparent hover:border-rose-200 dark:hover:border-rose-500/20"
                           title="Eliminar anfitrión"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -900,25 +907,25 @@ export const HospitalidadTab: React.FC = () => {
 
       {/* Modal: Crear / Editar Anfitrión */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#131d2e] w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#121216] w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50 dark:bg-[#18181F]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20">
                   <Coffee className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                     {editingHost ? 'Editar Anfitrión' : 'Nuevo Anfitrión de Hospitalidad'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Registro de hospitalidad para oradores visitantes
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -932,13 +939,13 @@ export const HospitalidadTab: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                   Familia / Publicador *
                 </label>
                 <select
                   value={selectedPublisherId}
                   onChange={(e) => setSelectedPublisherId(e.target.value)}
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:border-indigo-500"
                 >
                   <option value="" disabled>
                     Selecciona un hermano o familia...
@@ -953,24 +960,24 @@ export const HospitalidadTab: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                     Capacidad (Personas)
                   </label>
-                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 rounded-xl p-1.5">
+                  <div className="flex items-center gap-2 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-1.5">
                     <button
                       type="button"
                       onClick={() => setCapacity((prev) => Math.max(1, prev - 1))}
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white font-bold flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-bold flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                     >
                       -
                     </button>
-                    <span className="flex-1 text-center font-bold text-slate-900 dark:text-white text-sm">
+                    <span className="flex-1 text-center font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm font-mono tabular-nums">
                       {capacity} {capacity === 1 ? 'persona' : 'personas'}
                     </span>
                     <button
                       type="button"
                       onClick={() => setCapacity((prev) => Math.min(20, prev + 1))}
-                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white font-bold flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-bold flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                     >
                       +
                     </button>
@@ -978,7 +985,7 @@ export const HospitalidadTab: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col justify-end">
-                  <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                  <div className="p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A]/50 transition-colors">
                     <SplashCheckbox
                       size="sm"
                       checked={isActive}
@@ -990,7 +997,7 @@ export const HospitalidadTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                   Dirección Alterna (Opcional)
                 </label>
                 <input
@@ -998,12 +1005,12 @@ export const HospitalidadTab: React.FC = () => {
                   value={alternateAddress}
                   onChange={(e) => setAlternateAddress(e.target.value)}
                   placeholder="Dejar vacío para usar la dirección del publicador..."
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                   Teléfono de Contacto (Opcional)
                 </label>
                 <input
@@ -1011,12 +1018,12 @@ export const HospitalidadTab: React.FC = () => {
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="Dejar vacío para usar el teléfono del directorio..."
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] text-sm font-mono tabular-nums focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                   Alergias, Dietas y Restricciones
                 </label>
                 <textarea
@@ -1024,12 +1031,12 @@ export const HospitalidadTab: React.FC = () => {
                   value={dietaryNotes}
                   onChange={(e) => setDietaryNotes(e.target.value)}
                   placeholder="Ej: Alergia a mariscos, solo almuerzos en domingo, hay mascota en casa..."
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:border-indigo-500 resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] uppercase tracking-wider mb-1.5">
                   Notas Internas
                 </label>
                 <input
@@ -1037,21 +1044,21 @@ export const HospitalidadTab: React.FC = () => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Cualquier indicación adicional..."
-                  className="w-full py-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] text-sm focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
-              <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer"
                 >
                   Guardar Anfitrión
                 </button>

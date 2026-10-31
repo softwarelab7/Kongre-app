@@ -59,7 +59,7 @@ const AVATAR_PRESETS = [
     id: 'salon',
     name: 'Salón del Reino',
     icon: '🏛️',
-    bgColor: 'bg-slate-700',
+    bgColor: 'bg-zinc-700',
     dataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="%23334155"/><text x="50%" y="54%" font-size="44" text-anchor="middle" dominant-baseline="middle">🏛️</text></svg>',
   },
   {
@@ -447,7 +447,7 @@ export const UserProfileSettingsView: React.FC = () => {
       {/* ========================================================================= */}
       {/* 1. HERO IDENTITY & AVATAR BANNER                                          */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-500/10 via-slate-50/60 to-white dark:from-indigo-950/30 dark:via-slate-900/60 dark:to-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-500/10 via-zinc-50/60 to-white dark:from-indigo-950/30 dark:via-zinc-900/60 dark:to-zinc-900 border border-zinc-200/80 dark:border-[#27272A] p-6 sm:p-8 shadow-sm">
         {/* Subtle decorative ambient lights */}
         <div className="absolute -right-12 -top-12 w-52 h-52 bg-indigo-500/10 dark:bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-12 -bottom-12 w-52 h-52 bg-purple-500/10 dark:bg-purple-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -456,7 +456,7 @@ export const UserProfileSettingsView: React.FC = () => {
           {/* Avatar + Info Block */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
             <div className="relative group shrink-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden ring-4 ring-white dark:ring-slate-800 shadow-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-transform group-hover:scale-[1.02]">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden ring-4 ring-white dark:ring-[#18181F] shadow-xl bg-zinc-100 dark:bg-[#18181F] flex items-center justify-center transition-transform group-hover:scale-[1.02]">
                 {photoURL ? (
                   <img
                     src={photoURL}
@@ -478,7 +478,7 @@ export const UserProfileSettingsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1.5 -right-1.5 w-9 h-9 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-transform active:scale-90 cursor-pointer ring-3 ring-white dark:ring-slate-900"
+                className="absolute -bottom-1.5 -right-1.5 w-9 h-9 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-transform active:scale-90 cursor-pointer ring-3 ring-white dark:ring-[#121216]"
                 title="Subir o cambiar foto de perfil"
               >
                 <Camera className="w-4 h-4" />
@@ -486,7 +486,7 @@ export const UserProfileSettingsView: React.FC = () => {
             </div>
 
             <div className="space-y-2 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight truncate">
+              <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight truncate">
                 {displayName || 'Tu Nombre'}
               </h1>
 
@@ -497,8 +497,8 @@ export const UserProfileSettingsView: React.FC = () => {
                   <span>{effectiveRoleInfo.name}</span>
                 </span>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/70">
-                  <Building2 className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-zinc-100 dark:bg-[#18181F]/80 text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200/70 dark:border-[#27272A]/70">
+                  <Building2 className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
                   <span>{settings?.congregationName || 'Congregación Local'}</span>
                 </span>
 
@@ -541,7 +541,7 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 dark:border-[#27272A] shadow-2xs"
                 >
                   <Camera className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Subir Foto</span>
@@ -560,7 +560,7 @@ export const UserProfileSettingsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleRestoreGooglePhoto}
-                        className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
+                        className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 dark:border-[#27272A] shadow-2xs"
                       >
                         <span>Foto Google</span>
                       </button>
@@ -572,9 +572,9 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUrlInput((prev) => !prev)}
-                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 dark:border-[#27272A] shadow-2xs"
                 >
-                  <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
+                  <ImageIcon className="w-3.5 h-3.5 text-zinc-500" />
                   <span>Enlace Web</span>
                 </button>
 
@@ -582,7 +582,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    className="px-3.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-rose-200 dark:border-rose-800/60 shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:text-rose-600 dark:hover:text-rose-400 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-zinc-200 dark:border-[#27272A] shadow-2xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Quitar</span>
@@ -593,7 +593,7 @@ export const UserProfileSettingsView: React.FC = () => {
           </div>
 
           {/* Save Changes Hero Button */}
-          <div className="flex flex-col items-center md:items-end justify-center gap-2 shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-200/70 dark:border-slate-800">
+          <div className="flex flex-col items-center md:items-end justify-center gap-2 shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-zinc-200/70 dark:border-[#27272A]">
             <button
               type="submit"
               disabled={isSaving}
@@ -612,7 +612,7 @@ export const UserProfileSettingsView: React.FC = () => {
               )}
             </button>
             {userProfile?.updatedAt && (
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center md:text-right">
+              <span className="text-[11px] text-zinc-400 dark:text-[#71717A] text-center md:text-right">
                 Última sincronización: {new Date(userProfile.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
@@ -621,13 +621,13 @@ export const UserProfileSettingsView: React.FC = () => {
 
         {/* Collapsible Direct URL input */}
         {showUrlInput && (
-          <div className="mt-4 p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xs">
+          <div className="mt-4 p-3.5 rounded-2xl bg-white dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xs">
             <input
               type="url"
               value={customUrlTemp}
               onChange={(e) => setCustomUrlTemp(e.target.value)}
               placeholder="Pegar enlace directo de imagen (https://ejemplo.com/mi-foto.jpg)"
-              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-mono"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216] text-xs text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-mono"
             />
             <button
               type="button"
@@ -640,13 +640,13 @@ export const UserProfileSettingsView: React.FC = () => {
         )}
 
         {/* Theocratic Avatar Selector */}
-        <div className="mt-6 pt-5 border-t border-slate-200/70 dark:border-slate-800">
+        <div className="mt-6 pt-5 border-t border-zinc-200/70 dark:border-[#27272A]">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Avatares e insignias teocráticas recomendadas</span>
             </span>
-            <span className="text-[11px] text-slate-400">Selección rápida</span>
+            <span className="text-[11px] text-zinc-400">Selección rápida</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
@@ -660,7 +660,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   className={`group relative p-2.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold ring-2 ring-indigo-500/20'
-                      : 'bg-white/80 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300'
+                      : 'bg-white/80 dark:bg-[#18181F]/50 border-zinc-200/80 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-50 dark:hover:bg-[#27272A] hover:border-zinc-300'
                   }`}
                   title={preset.name}
                 >
@@ -684,9 +684,9 @@ export const UserProfileSettingsView: React.FC = () => {
 
       {/* Feedback Alerts */}
       {saveSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-xs animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-zinc-900 dark:text-[#F4F4F5] shadow-xs animate-in fade-in">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-emerald-600 dark:text-emerald-400 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <span>Tu perfil y tus preferencias se actualizaron y sincronizaron con éxito.</span>
@@ -695,8 +695,8 @@ export const UserProfileSettingsView: React.FC = () => {
       )}
 
       {saveError && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 flex items-center gap-3 text-xs font-semibold text-rose-900 dark:text-rose-200 shadow-xs animate-in fade-in">
-          <div className="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center gap-3 text-xs font-semibold text-zinc-900 dark:text-[#F4F4F5] shadow-xs animate-in fade-in">
+          <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-rose-500 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <AlertCircle className="w-4 h-4" />
           </div>
           <span>{saveError}</span>
@@ -710,16 +710,16 @@ export const UserProfileSettingsView: React.FC = () => {
         {/* LEFT COLUMN: Personal Info & Communication Preferences (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Card A: Datos Personales y Canales de Contacto */}
-          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
-            <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-5">
+            <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                     <User className="w-4 h-4" />
                   </div>
                   <span>Identidad y Datos de Contacto</span>
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                   Visible en tableros de asignaciones y listado de publicadores.
                 </p>
               </div>
@@ -728,7 +728,7 @@ export const UserProfileSettingsView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Nombre Visible */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1.5">
                   Nombre Visible *
                 </label>
                 <input
@@ -737,20 +737,20 @@ export const UserProfileSettingsView: React.FC = () => {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Ej. Carlos Mendoza"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/60 text-zinc-900 dark:text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-zinc-800 focus:outline-hidden transition"
                 />
               </div>
 
               {/* Cuenta Vinculada */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1.5">
                   Cuenta Principal
                 </label>
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 text-xs">
+                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/40 text-zinc-600 dark:text-[#D4D4D8] text-xs">
                   <span className="font-mono truncate">
                     {user?.email || (activeIsDemo ? 'modo.prueba@kongre.org' : 'Sesión local')}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0 ml-2">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-[#D4D4D8] shrink-0 ml-2">
                     {user ? 'Verificada' : 'Local'}
                   </span>
                 </div>
@@ -759,7 +759,7 @@ export const UserProfileSettingsView: React.FC = () => {
               {/* Teléfono / WhatsApp */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                     Teléfono / WhatsApp
                   </label>
                   {cleanPhoneForWa && (
@@ -781,15 +781,15 @@ export const UserProfileSettingsView: React.FC = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+52 55 1234 5678"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/60 text-zinc-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-zinc-800 focus:outline-hidden transition"
                   />
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Phone className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
                 </div>
               </div>
 
               {/* Correo Alternativo */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1.5">
                   Correo Alternativo (Opcional)
                 </label>
                 <div className="relative">
@@ -798,31 +798,31 @@ export const UserProfileSettingsView: React.FC = () => {
                     value={secondaryEmail}
                     onChange={(e) => setSecondaryEmail(e.target.value)}
                     placeholder="correo.alternativo@ejemplo.com"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/60 text-zinc-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-zinc-800 focus:outline-hidden transition"
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Mail className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Card B: Preferencias de Comunicación y Disponibilidad */}
-          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
-            <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+          <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-5">
+            <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   <Sliders className="w-4 h-4" />
                 </div>
                 <span>Canales de Contacto y Horarios</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                 Elige cómo y cuándo prefieres recibir confirmaciones y asignaciones.
               </p>
             </div>
 
             {/* Método de Contacto Preferido */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                 Canal Preferido de Contacto
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -870,7 +870,7 @@ export const UserProfileSettingsView: React.FC = () => {
                       className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                         isSelected
                           ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/20 shadow-xs'
-                          : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                          : 'bg-zinc-50/60 dark:bg-[#18181F]/40 border-zinc-200/80 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:bg-white dark:hover:bg-[#27272A]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -885,7 +885,7 @@ export const UserProfileSettingsView: React.FC = () => {
                       </div>
                       <div>
                         <span className="block text-xs font-bold leading-tight">{method.title}</span>
-                        <span className="block text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">{method.desc}</span>
+                        <span className="block text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">{method.desc}</span>
                       </div>
                     </button>
                   );
@@ -895,7 +895,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
             {/* Franja Horaria Preferida */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                 Franja Horaria Preferida
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -915,13 +915,13 @@ export const UserProfileSettingsView: React.FC = () => {
                       className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
                           ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                          : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                          : 'bg-zinc-50/60 dark:bg-[#18181F]/40 border-zinc-200/80 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:bg-white dark:hover:bg-[#27272A]'
                       }`}
                     >
                       <TimeIcon className={`w-4 h-4 mb-2 ${isSelected ? 'text-white' : time.color}`} />
                       <div>
                         <span className="block text-xs font-bold leading-tight">{time.label}</span>
-                        <span className={`block text-[10.5px] mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                        <span className={`block text-[10.5px] mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-zinc-400'}`}>
                           {time.sub}
                         </span>
                       </div>
@@ -933,7 +933,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
             {/* Notas de Disponibilidad */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1.5">
                 Notas de Disponibilidad o Circunstancias (Opcional)
               </label>
               <textarea
@@ -941,7 +941,7 @@ export const UserProfileSettingsView: React.FC = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Ej. Disponible fines de semana sin restricción. Jueves en turno laboral vespertino."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/60 text-zinc-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-zinc-800 focus:outline-hidden transition"
               />
             </div>
           </div>
@@ -950,16 +950,16 @@ export const UserProfileSettingsView: React.FC = () => {
         {/* RIGHT COLUMN: Push Notifications & Session Security (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Card C: Notificaciones Web Push y Recordatorios */}
-          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
-            <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-5">
+            <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                     <Bell className="w-4 h-4" />
                   </div>
                   <span>Avisos Push y Recordatorios</span>
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                   Alertas antes de tus asignaciones en este equipo.
                 </p>
               </div>
@@ -975,7 +975,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   }}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-hidden rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-indigo-600"></div>
               </label>
             </div>
 
@@ -998,9 +998,9 @@ export const UserProfileSettingsView: React.FC = () => {
               compact
             />
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3.5 text-xs">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] space-y-3.5 text-xs">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">Anticipación de aviso:</span>
+                <span className="text-zinc-600 dark:text-[#D4D4D8] font-semibold">Anticipación de aviso:</span>
                 <select
                   value={notifPrefs.notifyDaysBefore}
                   onChange={(e) => {
@@ -1008,7 +1008,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     saveNotificationPreferences({ notifyDaysBefore: days });
                     setNotifPrefs((prev) => ({ ...prev, notifyDaysBefore: days }));
                   }}
-                  className="py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
+                  className="py-1.5 px-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] font-bold text-zinc-800 dark:text-[#E4E4E7] cursor-pointer"
                 >
                   <option value={1}>1 día antes (24h)</option>
                   <option value={2}>2 días antes (48h)</option>
@@ -1017,7 +1017,7 @@ export const UserProfileSettingsView: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">Incluir turnos (audio, micro, aseo):</span>
+                <span className="text-zinc-600 dark:text-[#D4D4D8] font-semibold">Incluir turnos (audio, micro, aseo):</span>
                 <input
                   type="checkbox"
                   checked={notifPrefs.notifyDuties}
@@ -1035,7 +1035,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     type="button"
                     disabled={isSendingTestNotif}
                     onClick={handleSendTestNotification}
-                    className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#E4E4E7] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Bell className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span>{isSendingTestNotif ? 'Enviando prueba...' : 'Enviar Notificación de Prueba'}</span>
@@ -1051,15 +1051,15 @@ export const UserProfileSettingsView: React.FC = () => {
           </div>
 
           {/* Card D: Seguridad de la Sesión en este Dispositivo */}
-          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+          <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-4">
+            <div className="pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <span>Seguridad de Sesión</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
                 Controles de acceso local y cierre de cuenta en este equipo.
               </p>
             </div>
@@ -1069,22 +1069,22 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleLockSession}
-                  className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-between cursor-pointer border border-slate-200/70 dark:border-slate-700/70"
+                  className="w-full py-2.5 px-4 rounded-2xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#E4E4E7] font-bold text-xs transition flex items-center justify-between cursor-pointer border border-zinc-200/70 dark:border-[#27272A]/70"
                 >
                   <span className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Bloquear Sesión con PIN</span>
                   </span>
-                  <span className="text-[11px] text-slate-400 font-normal">Inmediato</span>
+                  <span className="text-[11px] text-zinc-400 font-normal">Inmediato</span>
                 </button>
               )}
 
               <button
                 type="button"
                 onClick={handleProfileLogout}
-                className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                className="w-full py-3 px-4 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5] hover:text-rose-600 dark:hover:text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
               >
-                <LogOut className="w-4 h-4 shrink-0" />
+                <LogOut className="w-4 h-4 shrink-0 text-zinc-400 dark:text-[#71717A]" />
                 <span>Cerrar Sesión en este Dispositivo</span>
               </button>
             </div>

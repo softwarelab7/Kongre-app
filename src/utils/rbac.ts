@@ -762,7 +762,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     id: 'publico',
     name: 'Modo Cartelera / Publicador (Solo Lectura)',
     shortName: 'Modo Cartelera (Lectura)',
-    badgeColor: 'bg-slate-700 text-white shadow-xs',
+    badgeColor: 'bg-zinc-700 text-white shadow-xs',
     description: 'Vista de solo lectura para el Salón o publicadores. No permite editar ni ver datos confidenciales.',
     allowedTabs: [
       'inicio', 'calendario', 'programacion', 'tablero_anuncios', 'mi_vista', 'perfil'

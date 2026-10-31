@@ -87,25 +87,25 @@ const FEATURE_ACCENT_STYLES: Record<
   }
 > = {
   indigo: {
-    card: 'bg-linear-to-br from-indigo-50/90 via-white to-violet-50/40 dark:from-indigo-950/50 dark:via-slate-800/90 dark:to-slate-900 border-indigo-200/80 dark:border-indigo-800/70 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10',
+    card: 'bg-linear-to-br from-indigo-50/90 via-white to-violet-50/40 dark:from-indigo-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-indigo-200/80 dark:border-indigo-800/70 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10',
     iconBox: 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15',
     kicker: 'text-indigo-600 dark:text-indigo-400',
     titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-300',
   },
   emerald: {
-    card: 'bg-linear-to-br from-emerald-50/90 via-white to-teal-50/40 dark:from-emerald-950/50 dark:via-slate-800/90 dark:to-slate-900 border-emerald-200/80 dark:border-emerald-800/70 hover:border-emerald-400 dark:hover:border-emerald-500 shadow-xs hover:shadow-md hover:shadow-emerald-500/10',
+    card: 'bg-linear-to-br from-emerald-50/90 via-white to-teal-50/40 dark:from-emerald-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-emerald-200/80 dark:border-emerald-800/70 hover:border-emerald-400 dark:hover:border-emerald-500 shadow-xs hover:shadow-md hover:shadow-emerald-500/10',
     iconBox: 'bg-linear-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/15',
     kicker: 'text-emerald-600 dark:text-emerald-400',
     titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-300',
   },
   amber: {
-    card: 'bg-linear-to-br from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/45 dark:via-slate-800/90 dark:to-slate-900 border-amber-200/80 dark:border-amber-800/70 hover:border-amber-400 dark:hover:border-amber-500 shadow-xs hover:shadow-md hover:shadow-amber-500/10',
+    card: 'bg-linear-to-br from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/45 dark:via-zinc-800/90 dark:to-zinc-900 border-amber-200/80 dark:border-amber-800/70 hover:border-amber-400 dark:hover:border-amber-500 shadow-xs hover:shadow-md hover:shadow-amber-500/10',
     iconBox: 'bg-linear-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 ring-2 ring-amber-500/15',
     kicker: 'text-amber-600 dark:text-amber-400',
     titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-300',
   },
   sky: {
-    card: 'bg-linear-to-br from-sky-50/90 via-white to-blue-50/40 dark:from-sky-950/50 dark:via-slate-800/90 dark:to-slate-900 border-sky-200/80 dark:border-sky-800/70 hover:border-sky-400 dark:hover:border-sky-500 shadow-xs hover:shadow-md hover:shadow-sky-500/10',
+    card: 'bg-linear-to-br from-sky-50/90 via-white to-blue-50/40 dark:from-sky-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-sky-200/80 dark:border-sky-800/70 hover:border-sky-400 dark:hover:border-sky-500 shadow-xs hover:shadow-md hover:shadow-sky-500/10',
     iconBox: 'bg-linear-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 ring-2 ring-sky-500/15',
     kicker: 'text-sky-600 dark:text-sky-400',
     titleHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-300',
@@ -142,11 +142,11 @@ function LandingFeatureCard({
           </div>
         )}
         <h3
-          className={`text-[13px] sm:text-[13.5px] font-extrabold text-slate-900 dark:text-white leading-snug transition-colors ${styles.titleHover}`}
+          className={`text-[13px] sm:text-[13.5px] font-extrabold text-zinc-900 dark:text-white leading-snug transition-colors ${styles.titleHover}`}
         >
           {title}
         </h3>
-        <p className="mt-0.5 text-[11px] sm:text-[11.5px] leading-snug text-slate-600 dark:text-slate-300 line-clamp-2">
+        <p className="mt-0.5 text-[11px] sm:text-[11.5px] leading-snug text-zinc-600 dark:text-[#D4D4D8] line-clamp-2">
           {text}
         </p>
       </div>
@@ -179,34 +179,34 @@ function DesktopOption({
       onClick={onClick}
       className={`group flex w-full cursor-pointer items-center gap-3 rounded-2xl border p-2.5 sm:p-3 lg:p-2.5 text-left transition-all duration-200 ${
         isFeatured
-          ? 'border-indigo-200/90 dark:border-indigo-800/80 bg-linear-to-r from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/60 dark:via-indigo-950/25 dark:to-slate-900/90 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10'
-          : 'border-slate-200/75 dark:border-slate-800/90 bg-white/80 dark:bg-slate-900/50 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:border-indigo-300/80 dark:hover:border-indigo-700/70'
+          ? 'border-indigo-200/90 dark:border-indigo-800/80 bg-linear-to-r from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/60 dark:via-indigo-950/25 dark:to-zinc-900/90 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10'
+          : 'border-zinc-200/75 dark:border-[#27272A]/90 bg-white/80 dark:bg-[#121216]/50 hover:bg-zinc-50/90 dark:hover:bg-[#27272A]/70 hover:border-indigo-300/80 dark:hover:border-indigo-700/70'
       }`}
     >
       <span
         className={`flex h-9 w-9 sm:h-9.5 sm:w-9.5 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105 ${
           isFeatured
             ? 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-600/25'
-            : 'bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/80 border border-slate-200/60 dark:border-slate-700/60'
+            : 'bg-zinc-100 dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/80 border border-zinc-200/60 dark:border-[#27272A]/60'
         }`}
       >
         {iconCustom ? iconCustom : <Icon size={18} strokeWidth={2.1} aria-hidden />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
-          <b className="text-[13px] sm:text-[13.5px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors leading-snug">
+          <b className="text-[13px] sm:text-[13.5px] font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors leading-snug">
             {title}
           </b>
           {meta && (
             <>
-              <span className="text-slate-300 dark:text-slate-600 text-xs" aria-hidden="true">·</span>
+              <span className="text-zinc-300 dark:text-[#71717A] text-xs" aria-hidden="true">·</span>
               <span className="text-[10.5px] font-medium text-indigo-600/90 dark:text-indigo-400/90 whitespace-nowrap">
                 {meta}
               </span>
             </>
           )}
         </span>
-        <span className="mt-0.5 block text-[11px] sm:text-[11.5px] leading-snug text-slate-500 dark:text-slate-400 line-clamp-1">
+        <span className="mt-0.5 block text-[11px] sm:text-[11.5px] leading-snug text-zinc-500 dark:text-[#A1A1AA] line-clamp-1">
           {description}
         </span>
       </span>
@@ -214,7 +214,7 @@ function DesktopOption({
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
           isFeatured
             ? 'bg-indigo-100/80 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white'
-            : 'text-slate-400 dark:text-slate-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-300'
+            : 'text-zinc-400 dark:text-[#71717A] group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-300'
         }`}
       >
         <ArrowRight
@@ -255,7 +255,7 @@ function LandingOptionRow({
       className={`w-full box-border p-3.5 sm:p-4 rounded-2xl text-left cursor-pointer transition-all flex items-start gap-3.5 sm:gap-4 group ${
         isFeatured
           ? 'bg-brand-soft border-[1.5px] border-bline hover:border-brand dark:bg-indigo-950/40 dark:border-indigo-800 dark:hover:border-indigo-600 shadow-xs'
-          : 'bg-transparent border-[1.5px] border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/60'
+          : 'bg-transparent border-[1.5px] border-transparent hover:bg-zinc-100 dark:hover:bg-[#27272A]/60'
       }`}
     >
       <div className="shrink-0 mt-0.5">
@@ -268,7 +268,7 @@ function LandingOptionRow({
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center flex-wrap gap-2">
-          <span className="text-[15.5px] sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-brand transition-colors">
+          <span className="text-[15.5px] sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-brand transition-colors">
             {title}
           </span>
           {badge && badge.tone === 'oficial' && (
@@ -282,12 +282,12 @@ function LandingOptionRow({
             </span>
           )}
         </div>
-        <div className="mt-1 text-[13px] leading-snug text-slate-500 dark:text-slate-400">
+        <div className="mt-1 text-[13px] leading-snug text-zinc-500 dark:text-[#A1A1AA]">
           {description}
         </div>
       </div>
 
-      <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0 mt-0.5" />
+      <ArrowRight className="w-5 h-5 text-zinc-400 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0 mt-0.5" />
     </button>
   );
 }
@@ -1332,7 +1332,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       {/* 0. MOBILE HERO & SHEET VIEW (< md) - FIEL A BIENVENIDA-HTML*/}
       {/* ========================================================= */}
       {activeTab === 'home' && (
-        <div className="md:hidden flex flex-col flex-1 bg-white dark:bg-slate-900 font-sans">
+        <div className="md:hidden flex flex-col flex-1 bg-white dark:bg-[#121216] font-sans">
           {/* Top Gradient Banner with Horizontal White Logo & Slogan */}
           <div
             className="relative px-5 pt-4 pb-12 sm:pb-14 flex flex-col items-center select-none text-white shrink-0"
@@ -1376,11 +1376,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           </div>
 
           {/* Sliding Bottom Sheet */}
-          <div className="-mt-7 flex-1 rounded-t-[28px] bg-white dark:bg-slate-900 px-5 pt-7 pb-6 flex flex-col shadow-2xl z-10">
-            <h1 className="text-[22px] font-bold text-slate-900 dark:text-white m-0 tracking-tight">
+          <div className="-mt-7 flex-1 rounded-t-[28px] bg-white dark:bg-[#121216] px-5 pt-7 pb-6 flex flex-col shadow-2xl z-10">
+            <h1 className="text-[22px] font-bold text-zinc-900 dark:text-white m-0 tracking-tight">
               ¡Bienvenido a Kongre!
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-4">
+            <p className="text-sm text-zinc-500 dark:text-[#A1A1AA] mt-1 mb-4">
               Elige cómo quieres entrar
             </p>
 
@@ -1451,17 +1451,17 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   <span>Funciones de la App</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-slate-500 dark:text-slate-400 font-semibold">4 Pilares</span>
+                  <span className="text-zinc-500 dark:text-[#A1A1AA] font-semibold">4 Pilares</span>
                 </div>
               </div>
 
-              <h2 className="text-[19px] sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+              <h2 className="text-[19px] sm:text-xl font-extrabold text-zinc-900 dark:text-white tracking-tight leading-snug">
                 Toda la gestión teocrática{' '}
                 <span className="bg-linear-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
                   en un solo lugar
                 </span>
               </h2>
-              <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 mt-1 mb-4 leading-relaxed">
+              <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] mt-1 mb-4 leading-relaxed">
                 Diseñada para coordinadores, secretarios, superintendentes de servicio y publicadores.
               </p>
 
@@ -1552,7 +1552,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               className={`hidden sm:flex group items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs border transition-all cursor-pointer shadow-2xs shrink-0 ${
                 desktopUpdate?.hasUpdate
                   ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-750 ring-2 ring-amber-500/25 animate-pulse'
-                  : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700'
+                  : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-100 border-zinc-200 dark:border-[#27272A]'
               }`}
               title={
                 desktopUpdate?.hasUpdate
@@ -1655,7 +1655,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <section
               key={isFullWidthView ? `portal-wide-${activeTab}` : `portal-${activeTab}`}
               aria-label="Portal de acceso"
-              className={`card rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-card relative ${
+              className={`card rounded-3xl border border-zinc-200/90 dark:border-[#27272A] bg-card relative ${
                 isFullWidthView
                   ? 'p-4 sm:p-6 lg:p-7 kg-register-box-enter shadow-2xl overflow-visible'
                   : 'p-3.5 sm:p-4.5 lg:p-4.5 kg-home-box-enter shadow-xl overflow-hidden'
@@ -1673,7 +1673,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* UNIFIED SESSION PANEL HEADER */}
               <div
-                className={`flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80 ${
+                className={`flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-[#27272A]/80 ${
                   isFullWidthView ? 'kg-header-enter' : ''
                 }`}
               >
@@ -1688,7 +1688,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         setEmailError(null);
                         setInviteCodeError(null);
                       }}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/60 dark:hover:text-indigo-300 transition-colors cursor-pointer group shrink-0"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100/80 dark:bg-[#18181F]/80 text-zinc-700 dark:text-[#E4E4E7] hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/60 dark:hover:text-indigo-300 transition-colors cursor-pointer group shrink-0"
                       title="Volver al inicio del panel"
                       aria-label="Volver al inicio del panel"
                     >
@@ -1716,7 +1716,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   </div>
                 </div>
 
-                <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-medium text-slate-400 dark:text-slate-500 shrink-0">
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 dark:text-[#71717A] shrink-0">
                   <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                   <span>Cifrado</span>
                   <span aria-hidden="true">·</span>
@@ -1727,7 +1727,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               {/* Main Title & Subtitle */}
               <div className={`${isFullWidthView ? 'kg-title-enter' : ''} pt-2.5`}>
                 <h2
-                  className={`font-extrabold tracking-tight text-slate-900 dark:text-white ${
+                  className={`font-extrabold tracking-tight text-zinc-900 dark:text-white ${
                     isFullWidthView
                       ? 'mb-0.5 text-lg sm:text-xl lg:text-2xl'
                       : 'mb-0.5 text-[18px] sm:text-[19px] lg:text-[20px]'
@@ -1746,7 +1746,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     : 'Registrar mi Congregación'}
                 </h2>
                 <p
-                  className={`text-slate-500 dark:text-slate-400 ${
+                  className={`text-zinc-500 dark:text-[#A1A1AA] ${
                     isFullWidthView
                       ? 'mb-2 sm:mb-2.5 text-[11.5px] sm:text-xs'
                       : 'mb-2.5 text-[11.5px] sm:text-xs'
@@ -1771,7 +1771,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 <div
                   role="tablist"
                   aria-label="Cambiar método de inicio de sesión"
-                  className="mb-4 grid grid-cols-3 gap-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/80 p-1 border border-slate-200/60 dark:border-slate-700/60"
+                  className="mb-4 grid grid-cols-3 gap-1 rounded-xl bg-zinc-100/90 dark:bg-[#18181F]/80 p-1 border border-zinc-200/60 dark:border-[#27272A]/60"
                 >
                   <button
                     type="button"
@@ -1783,8 +1783,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     }}
                     className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'email_login'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     <CircleUserRound className="w-3.5 h-3.5 shrink-0" />
@@ -1801,8 +1801,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     }}
                     className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'code_login'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     <KeyRound className="w-3.5 h-3.5 shrink-0" />
@@ -1819,8 +1819,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     }}
                     className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'invite_code_login'
-                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     <QrCode className="w-3.5 h-3.5 shrink-0" />
@@ -1846,11 +1846,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                   {/* 2. Section Divider for Sign-in Methods */}
                   <div className="relative flex items-center py-0.5">
-                    <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
-                    <span className="mx-2.5 shrink-0 text-[10px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
+                    <div className="grow border-t border-zinc-200/80 dark:border-[#27272A]" />
+                    <span className="mx-2.5 shrink-0 text-[10px] font-bold tracking-wider uppercase text-zinc-400 dark:text-[#71717A]">
                       Iniciar sesión en congregación existente
                     </span>
-                    <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
+                    <div className="grow border-t border-zinc-200/80 dark:border-[#27272A]" />
                   </div>
 
                   {/* 3. Sign-in Options Stack */}
@@ -1914,13 +1914,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               {activeTab === 'email_login' && (
                 <div className="space-y-4 pt-1 animate-fade-in">
                   {/* Tarjeta explicativa con los 3 requisitos y aprobación obligatoria */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs space-y-2.5">
-                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">
+                  <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200 dark:border-[#27272A]/80 text-xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
                       <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       <span>¿Cómo funciona el acceso con Google? (Lee antes de iniciar)</span>
                     </div>
 
-                    <div className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <div className="space-y-2 text-[11px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                       <p>
                         Para proteger los registros privados de la congregación, iniciar con Google <strong>no da acceso inmediato por sí solo</strong>:
                       </p>
@@ -1937,7 +1937,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </ul>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-amber-800 dark:text-amber-300 flex items-start gap-1.5 bg-amber-50/60 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
+                    <div className="pt-2 border-t border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold text-amber-800 dark:text-amber-300 flex items-start gap-1.5 bg-amber-50/60 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
                       <span className="shrink-0 text-sm">⚠️</span>
                       <span>
                         <strong>Consejo:</strong> Si no tienes los PINs que te proporcionan los ancianos, te sugerimos pedírselos antes de continuar para no perder tiempo.
@@ -1995,7 +1995,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             type="button"
                             onClick={handleGoogleLogin}
                             disabled={isAwaitingOAuth || !acceptedLegalTerms}
-                            className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900"
+                            className="w-full py-3.5 px-4 rounded-2xl border border-zinc-300 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#121216]"
                           >
                             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                               <path
@@ -2021,8 +2021,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       })()}
 
                       {/* Acceso alternativo con ID y PIN */}
-                      <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <div className="pt-2 text-center border-t border-zinc-100 dark:border-[#27272A]">
+                        <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                           ¿Prefieres ingresar sin cuenta de Google?{' '}
                           <button
                             type="button"
@@ -2059,10 +2059,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                               <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                               <span>Sesión de Google iniciada</span>
                             </div>
-                            <p className="text-xs text-slate-900 dark:text-white font-bold truncate">
+                            <p className="text-xs text-zinc-900 dark:text-white font-bold truncate">
                               {user.displayName || user.email}
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate">
                               {user.email}
                             </p>
                           </div>
@@ -2096,7 +2096,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* DATO 1: ID DE LA CONGREGACIÓN */}
                           <div>
-                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1 flex items-center gap-1.5">
                               <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                               <span>1. ID de la Congregación: *</span>
                             </label>
@@ -2116,13 +2116,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                                 }}
                                 onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
                                 placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
-                                className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                                className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                               />
                               {congregationIdInput && (
                                 <button
                                   type="button"
                                   onClick={() => setCongregationIdInput('')}
-                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg transition-colors cursor-pointer"
                                   title="Borrar ID"
                                   tabIndex={-1}
                                 >
@@ -2130,14 +2130,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                                 </button>
                               )}
                             </div>
-                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                            <span className="text-[10px] text-zinc-400 block mt-0.5">
                               Formato estándar oficial con guiones automáticos (ej: KGR-NQ5A-JQAA).
                             </span>
                           </div>
 
                           {/* DATO 2: PIN DE LA CONGREGACIÓN */}
                           <div>
-                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1 flex items-center gap-1.5">
                               <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                               <span>2. PIN de la Congregación: *</span>
                             </label>
@@ -2149,19 +2149,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                                 value={congregationPinInput}
                                 onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
                                 placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
-                                className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                                className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                               />
                               <button
                                 type="button"
                                 onClick={() => setShowCongPin(!showCongPin)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                                 tabIndex={-1}
                                 title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
                               >
                                 {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
                             </div>
-                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                            <span className="text-[10px] text-zinc-400 block mt-0.5">
                               Clave de 8 caracteres alfanuméricos con guión central automático (ej: 8X4W-9M2K).
                             </span>
                           </div>
@@ -2180,7 +2180,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                               value={personalPinInput}
                               onChange={(e) => setPersonalPinInput(e.target.value)}
                               placeholder="PIN asignado o déjalo vacío si eres el creador"
-                              className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                              className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white text-xs font-mono tracking-widest text-center"
                             />
                             <button
                               type="button"
@@ -2191,7 +2191,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                               {showPersPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                          <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">
                             Si eres el Coordinador registrado en la congregación, puedes dejar este campo vacío.
                           </span>
                         </div>
@@ -2218,7 +2218,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </form>
 
                       {/* Opción de Registrar Nueva Congregación */}
-                      <div className="pt-3 border-t border-slate-200 dark:border-slate-800 text-center">
+                      <div className="pt-3 border-t border-zinc-200 dark:border-[#27272A] text-center">
                         <button
                           type="button"
                           onClick={() => {
@@ -2255,7 +2255,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* DATO 1: ID DE LA CONGREGACIÓN */}
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1 flex items-center gap-1.5">
                           <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           <span>1. ID de la Congregación: *</span>
                         </label>
@@ -2275,13 +2275,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             }}
                             onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
                             placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
-                            className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                            className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                           />
                           {congregationIdInput && (
                             <button
                               type="button"
                               onClick={() => setCongregationIdInput('')}
-                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg transition-colors cursor-pointer"
                               title="Borrar ID"
                               tabIndex={-1}
                             >
@@ -2289,14 +2289,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             </button>
                           )}
                         </div>
-                        <span className="text-[10.5px] text-slate-400 mt-1 block">
+                        <span className="text-[10.5px] text-zinc-400 mt-1 block">
                           Identificador único oficial asignado a tu congregación (formato KGR-XXXX-XXXX).
                         </span>
                       </div>
 
                       {/* DATO 2: PIN DE LA CONGREGACIÓN */}
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-[#D4D4D8] mb-1 flex items-center gap-1.5">
                           <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           <span>2. PIN de la Congregación: *</span>
                         </label>
@@ -2308,19 +2308,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             value={congregationPinInput}
                             onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
                             placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
-                            className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                            className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                           />
                           <button
                             type="button"
                             onClick={() => setShowCongPin(!showCongPin)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                             tabIndex={-1}
                             title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
                           >
                             {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
-                        <span className="text-[10.5px] text-slate-400 mt-1 block">
+                        <span className="text-[10.5px] text-zinc-400 mt-1 block">
                           Clave de seguridad general de 8 caracteres con guión (ej: 8X4W-9M2K).
                         </span>
                       </div>
@@ -2339,7 +2339,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           value={personalPinInput}
                           onChange={(e) => setPersonalPinInput(e.target.value)}
                           placeholder="PIN que te dio el Coordinador o déjalo vacío si eres el creador"
-                          className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                          className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white text-xs font-mono tracking-widest text-center"
                         />
                         <button
                           type="button"
@@ -2429,19 +2429,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           value={inviteCodeInput}
                           onChange={(e) => setInviteCodeInput(e.target.value)}
                           placeholder="Código de invitación (ej: KGR-XXXX-XXXX::PIN::CÓDIGO)"
-                          className="w-full px-4 py-3.5 pr-12 rounded-xl border border-indigo-300 dark:border-indigo-700/80 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
+                          className="w-full px-4 py-3.5 pr-12 rounded-xl border border-indigo-300 dark:border-indigo-700/80 bg-white dark:bg-[#121216] text-zinc-900 dark:text-white placeholder-zinc-400 text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
                           autoFocus
                         />
                         <button
                           type="button"
                           onClick={() => setShowInviteCode((prev) => !prev)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 cursor-pointer"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-1 cursor-pointer"
                           title={showInviteCode ? 'Ocultar código' : 'Mostrar código'}
                         >
                           {showInviteCode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
-                      <span className="text-[10.5px] text-slate-400 dark:text-slate-500 block px-1">
+                      <span className="text-[10.5px] text-zinc-400 dark:text-[#71717A] block px-1">
                         Acepta código de invitación, código compuesto (<code className="font-mono">ID-PINCONG-PINPERSONAL</code>) o enlace QR.
                       </span>
                     </div>
@@ -2501,17 +2501,17 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800">
                       Privacidad Teocrática • Cero Confianza
                     </span>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-3">
+                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white mt-3">
                       Acceso Restringido a la Congregación
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 max-w-md mx-auto leading-relaxed">
-                      La cuenta de Google <strong className="text-slate-800 dark:text-slate-200">({unauthorizedGoogleAccount.email})</strong> no figura en la lista de ancianos ni de hermanos autorizados de <strong className="text-slate-800 dark:text-slate-200">{unauthorizedGoogleAccount.congregationName}</strong>.
+                    <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1.5 max-w-md mx-auto leading-relaxed">
+                      La cuenta de Google <strong className="text-zinc-800 dark:text-[#E4E4E7]">({unauthorizedGoogleAccount.email})</strong> no figura en la lista de ancianos ni de hermanos autorizados de <strong className="text-zinc-800 dark:text-[#E4E4E7]">{unauthorizedGoogleAccount.congregationName}</strong>.
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 text-left space-y-2">
-                    <p className="font-semibold text-slate-800 dark:text-slate-200">¿Cómo deseas proceder?</p>
-                    <ul className="list-disc list-inside space-y-1.5 text-slate-500 dark:text-slate-400">
+                  <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/60 text-xs text-zinc-600 dark:text-[#D4D4D8] text-left space-y-2">
+                    <p className="font-semibold text-zinc-800 dark:text-[#E4E4E7]">¿Cómo deseas proceder?</p>
+                    <ul className="list-disc list-inside space-y-1.5 text-zinc-500 dark:text-[#A1A1AA]">
                       <li><strong>Solicitar Aprobación:</strong> El Coordinador recibirá tu solicitud y podrá autorizar tu cuenta con tu rol correspondiente.</li>
                       <li><strong>PIN Personal:</strong> Si los ancianos ya te dieron un PIN de publicador, ingrésalo para conectarte directamente.</li>
                       <li><strong>Entrar como Invitado:</strong> Verás el programa y los anuncios de solo lectura sin datos personales.</li>
@@ -2542,7 +2542,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         setCongregationIdInput(unauthorizedGoogleAccount.congregationId);
                         setActiveTab('code_login');
                       }}
-                      className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <KeyRound className="w-4 h-4 text-indigo-500" />
                       <span>Conectar con ID y PIN de Congregación</span>
@@ -2564,7 +2564,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     <button
                       type="button"
                       onClick={handleEnterDemoMode}
-                      className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]/60 text-zinc-700 dark:text-[#E4E4E7] font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Probar Kongre en Modo Demo</span>
                     </button>

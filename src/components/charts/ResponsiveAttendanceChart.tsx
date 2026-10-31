@@ -180,31 +180,31 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
   const currentHover = hoveredIdx !== null ? attendanceData[hoveredIdx] : null;
 
   return (
-    <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between">
+    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Asistencia
             </h3>
             {stats.avgWeekend > 0 && (
-              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded">
+              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-mono tabular-nums">
                 ~{stats.avgWeekend} prom.
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400">Últimas semanas de reunión</p>
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Últimas semanas de reunión</p>
         </div>
 
         {/* LEGEND */}
         <div className="flex flex-col items-end gap-1 text-[11px] font-semibold">
-          <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-            <span className="w-2.5 h-2.5 rounded-sm bg-indigo-600 inline-block" />
+          <span className="flex items-center gap-1.5 text-zinc-700 dark:text-[#F4F4F5]">
+            <span className="w-2.5 h-2.5 rounded-xs bg-indigo-600 inline-block" />
             Fin de Sem.
           </span>
-          <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-            <span className="w-2.5 h-2.5 rounded-sm bg-violet-400 inline-block" />
+          <span className="flex items-center gap-1.5 text-zinc-700 dark:text-[#F4F4F5]">
+            <span className="w-2.5 h-2.5 rounded-xs bg-violet-400 inline-block" />
             Entre Sem.
           </span>
         </div>
@@ -233,13 +233,13 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
                 stroke="currentColor"
                 strokeDasharray={i === yTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={i === yTicks.length - 1 ? 1.5 : 1}
-                className="text-slate-200 dark:text-slate-700/60"
+                className="text-zinc-200 dark:text-zinc-700/60"
               />
               <text
                 x={padding.left - 6}
                 y={tick.y + 3}
                 textAnchor="end"
-                className="text-[10px] font-semibold fill-slate-400 font-mono"
+                className="text-[10px] font-semibold fill-zinc-400 font-mono"
               >
                 {tick.value}
               </text>
@@ -298,7 +298,7 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
                   className={`text-[10px] font-semibold transition-colors ${
                     isHovered
                       ? 'fill-indigo-600 dark:fill-indigo-400 font-bold'
-                      : 'fill-slate-400 dark:fill-slate-500'
+                      : 'fill-zinc-400 dark:fill-zinc-500'
                   }`}
                 >
                   {d.label}
@@ -332,10 +332,10 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
               top: `${padding.top + 70}px`,
             }}
           >
-            <div className="bg-slate-900/95 dark:bg-slate-950/95 text-white backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/10 text-xs min-w-[170px]">
-              <div className="font-bold text-slate-200 border-b border-white/10 pb-1 mb-1.5 flex items-center justify-between">
+            <div className="bg-zinc-900/95 dark:bg-zinc-950/95 text-white backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/10 text-xs min-w-[170px]">
+              <div className="font-bold text-zinc-200 border-b border-white/10 pb-1 mb-1.5 flex items-center justify-between">
                 <span>{currentHover.label}</span>
-                <span className="text-[10px] font-normal text-slate-400">
+                <span className="text-[10px] font-normal text-zinc-400">
                   {currentHover.fullDate}
                 </span>
               </div>
@@ -348,7 +348,7 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
                   <span className="font-bold text-white font-mono">
                     {currentHover.weekendTotal}
                     {currentHover.weekendInPerson > 0 && (
-                      <span className="text-[9px] text-slate-400 font-normal ml-1">
+                      <span className="text-[9px] text-zinc-400 font-normal ml-1">
                         ({currentHover.weekendInPerson}p + {currentHover.weekendZoom}z)
                       </span>
                     )}
@@ -362,7 +362,7 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
                   <span className="font-bold text-white font-mono">
                     {currentHover.midweekTotal}
                     {currentHover.midweekInPerson > 0 && (
-                      <span className="text-[9px] text-slate-400 font-normal ml-1">
+                      <span className="text-[9px] text-zinc-400 font-normal ml-1">
                         ({currentHover.midweekInPerson}p + {currentHover.midweekZoom}z)
                       </span>
                     )}
@@ -375,9 +375,9 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
       </div>
 
       {/* FOOTER STAT */}
-      <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+      <div className="pt-2 mt-1 border-t border-zinc-200 dark:border-[#27272A] flex items-center justify-between text-xs text-zinc-500 dark:text-[#A1A1AA]">
         <span>Promedio Fin de Semana</span>
-        <span className="font-bold text-slate-800 dark:text-slate-200">
+        <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
           {stats.avgWeekend > 0 ? `${stats.avgWeekend} personas` : 'Sin registros'}
         </span>
       </div>

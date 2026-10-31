@@ -75,7 +75,7 @@ export const DrillDownPicker: React.FC<DrillDownPickerProps> = ({
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
           isOpen
             ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-            : 'bg-white dark:bg-[#121216] border-slate-200 dark:border-[#27272A] text-slate-800 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-[#18181F]'
+            : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-[#18181F]'
         }`}
       >
         <div className="flex items-center gap-1.5 truncate max-w-[280px] sm:max-w-[420px]">
@@ -97,9 +97,9 @@ export const DrillDownPicker: React.FC<DrillDownPickerProps> = ({
 
       {/* Drill-Down In-Situ Matrix Popover Panel */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-2 w-[calc(100vw-32px)] max-w-md sm:w-[420px] bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-slate-200 dark:border-[#27272A] p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute left-0 top-full mt-2 w-[calc(100vw-32px)] max-w-md sm:w-[420px] bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200 dark:border-[#27272A] p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
           {/* Step Tabs Bar (Categoría / Mes -> Grupo / Semana -> Ítem) */}
-          <div className="flex items-center gap-1 pb-3 mb-3 border-b border-slate-100 dark:border-zinc-800">
+          <div className="flex items-center gap-1 pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
             {levels.map((lvl, idx) => {
               const isCurrent = activeStep === idx;
               const hasSelection = tempIndices[idx] !== undefined;
@@ -112,8 +112,8 @@ export const DrillDownPicker: React.FC<DrillDownPickerProps> = ({
                     isCurrent
                       ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
                       : hasSelection
-                      ? 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800/60'
-                      : 'text-slate-400 dark:text-zinc-500'
+                      ? 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
+                      : 'text-zinc-400 dark:text-zinc-500'
                   }`}
                 >
                   <span className="block text-[10px] uppercase tracking-wider opacity-60">Paso {idx + 1}</span>
@@ -136,7 +136,7 @@ export const DrillDownPicker: React.FC<DrillDownPickerProps> = ({
                     className={`h-12 px-2.5 rounded-xl border text-left flex flex-col justify-center transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs ring-2 ring-indigo-400/40'
-                        : 'bg-slate-50 dark:bg-[#18181F] border-slate-200/80 dark:border-[#27272A] text-slate-800 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-800 hover:border-slate-300'
+                        : 'bg-zinc-50 dark:bg-[#18181F] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-800 hover:border-zinc-300'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
@@ -151,7 +151,7 @@ export const DrillDownPicker: React.FC<DrillDownPickerProps> = ({
                     {item.sublabel && (
                       <span
                         className={`text-[10px] truncate leading-none mt-0.5 ${
-                          isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-zinc-400'
+                          isSelected ? 'text-indigo-100' : 'text-zinc-400 dark:text-zinc-400'
                         }`}
                       >
                         {item.sublabel}

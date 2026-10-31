@@ -45,6 +45,13 @@
   --color-jw-hl-blue: #3B82F6;
   --color-jw-hl-rose: #EC4899;
   --color-jw-hl-violet: #8B5CF6;
+
+  /* Mapeo universal de paleta de superficie y bordes al Design System JW Library */
+  --color-slate-950: var(--tw-slate-950, #09090B);
+  --color-slate-900: var(--tw-slate-900, #121216);
+  --color-slate-850: var(--tw-slate-850, #15151A);
+  --color-slate-800: var(--tw-slate-800, #18181F);
+  --color-slate-700: var(--tw-slate-700, #27272A);
 }
 
 /* ---------- Claro (por defecto) ---------- */
@@ -71,20 +78,27 @@
   --jw-text-primary: #0F172A;
   --jw-text-secondary: #475569;
   --jw-accent: #4F46E5;
+
+  --tw-slate-950: #020617;
+  --tw-slate-900: #0F172A;
+  --tw-slate-850: #141E33;
+  --tw-slate-800: #1E293B;
+  --tw-slate-700: #334155;
   color-scheme: light;
 }
 
 /* ---------- Oscuro (AMOLED-First) ---------- */
-[data-theme="dark"] {
-  --brand: #9085F4;
-  --brand-hover: #A9A0F6;
-  --brand-soft: #312E81;
-  --on-brand: #111827;
-  --bg: #111827;
-  --surface: #1F2937;
-  --border: #374151;
-  --text: #F9FAFB;
-  --text-muted: #9CA3AF;
+[data-theme="dark"],
+.dark {
+  --brand: #6366F1;
+  --brand-hover: #4F46E5;
+  --brand-soft: #1E1B4B;
+  --on-brand: #F4F4F5;
+  --bg: #09090B;
+  --surface: #121216;
+  --border: #27272A;
+  --text: #F4F4F5;
+  --text-muted: #A1A1AA;
   --success: #22C55E;
   --warning: #FBBF24;
   --error: #F87171;
@@ -97,6 +111,12 @@
   --jw-text-primary: #F4F4F5;
   --jw-text-secondary: #A1A1AA;
   --jw-accent: #6366F1;
+
+  --tw-slate-950: #09090B;
+  --tw-slate-900: #121216;
+  --tw-slate-850: #15151A;
+  --tw-slate-800: #18181F;
+  --tw-slate-700: #27272A;
   color-scheme: dark;
 }
 
@@ -124,6 +144,12 @@
   --jw-text-primary: #2C221E;
   --jw-text-secondary: #5C4B3B;
   --jw-accent: #4F46E5;
+
+  --tw-slate-950: #DFD3B6;
+  --tw-slate-900: #EAE0C8;
+  --tw-slate-850: #DFD3B6;
+  --tw-slate-800: #DFD3B6;
+  --tw-slate-700: #D0C2A2;
   color-scheme: light;
 }
 
@@ -152,6 +178,12 @@
   --jw-text-primary: #E5E7EB;
   --jw-text-secondary: #9CA3AF;
   --jw-accent: #818CF8;
+
+  --tw-slate-950: #000000;
+  --tw-slate-900: #0A0A0F;
+  --tw-slate-850: #101014;
+  --tw-slate-800: #141418;
+  --tw-slate-700: #27272A;
   color-scheme: dark;
 }
 

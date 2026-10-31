@@ -27,10 +27,10 @@ export const FloatingHighlightBar: React.FC<FloatingHighlightBarProps> = ({
     <div
       role="toolbar"
       aria-label="Barra de subrayado y anotaciones"
-      className="inline-flex items-center gap-1.5 p-1.5 rounded-full bg-slate-900/95 dark:bg-[#121216]/95 text-white shadow-xl border border-slate-700/80 dark:border-[#27272A] backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 z-30 select-none"
+      className="inline-flex items-center gap-1.5 p-1.5 rounded-full bg-zinc-900/95 dark:bg-[#121216]/95 text-white shadow-xl border border-zinc-700/80 dark:border-[#27272A] backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 z-30 select-none"
     >
       {/* 5 Color Circles */}
-      <div className="flex items-center gap-1 px-1 border-r border-slate-700 dark:border-zinc-800 pr-1.5">
+      <div className="flex items-center gap-1 px-1 border-r border-zinc-700 dark:border-zinc-800 pr-1.5">
         {HIGHLIGHT_OPTIONS.map((opt) => (
           <button
             key={opt.id}
@@ -49,7 +49,7 @@ export const FloatingHighlightBar: React.FC<FloatingHighlightBarProps> = ({
         type="button"
         onClick={onClearHighlight}
         title="Quitar subrayado"
-        className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition cursor-pointer"
+        className="p-1 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 dark:hover:bg-zinc-800 transition cursor-pointer"
       >
         <Eraser className="w-3.5 h-3.5" />
       </button>

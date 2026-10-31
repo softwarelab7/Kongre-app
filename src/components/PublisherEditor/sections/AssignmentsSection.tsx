@@ -253,7 +253,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
       {/* ===================================================================== */}
       {/* BLOQUE 1: CABECERA EJECUTIVA + CINTA DE KPIs DE HABILITACIÓN          */}
       {/* ===================================================================== */}
-      <section className="bg-white dark:bg-[#0f1623] rounded-3xl border border-zinc-200 dark:border-white/[0.06] overflow-hidden shadow-xs">
+      <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] overflow-hidden shadow-xs">
         <div className="p-6 md:p-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -366,7 +366,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
       {/* BLOQUE 2: PARÁMETROS DE ESTUDIANTE S-38 Y ORADOR PÚBLICO              */}
       {/* ===================================================================== */}
       {(isStudent || (isSpeaker && !isFemale)) && (
-        <section className="bg-white dark:bg-[#0f1623] rounded-3xl border border-zinc-200 dark:border-white/[0.06] p-6 md:p-8 shadow-xs space-y-5">
+        <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] p-6 md:p-8 shadow-xs space-y-5">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.05] pb-4">
             <div className="flex items-center gap-2.5">
               <span className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono text-xs font-black flex items-center justify-center">
@@ -490,7 +490,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
       {/* ===================================================================== */}
       {/* BLOQUE 3: MATRIZ DE HABILITACIÓN POR ÁREAS Y REUNIONES                */}
       {/* ===================================================================== */}
-      <section className="bg-white dark:bg-[#0f1623] rounded-3xl border border-zinc-200 dark:border-white/[0.06] p-6 md:p-8 shadow-xs space-y-6">
+      <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] p-6 md:p-8 shadow-xs space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div className="flex items-center gap-2.5">
             <span className="w-6 h-6 rounded-lg bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 font-mono text-xs font-black flex items-center justify-center">
@@ -669,7 +669,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
                               className={`w-4 h-4 shrink-0 rounded-md border flex items-center justify-center transition-all ${
                                 isSelected
                                   ? style.checkSelected
-                                  : 'bg-zinc-50 dark:bg-[#0f1623] border-zinc-300 dark:border-white/[0.12]'
+                                  : 'bg-zinc-50 dark:bg-[#18181F] border-zinc-300 dark:border-[#27272A]'
                               }`}
                             >
                               {isSelected && <Check size={10} strokeWidth={4} />}

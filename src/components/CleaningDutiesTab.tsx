@@ -642,15 +642,15 @@ export const CleaningDutiesTab: React.FC = () => {
     <div className="space-y-6">
       {/* Toast Notification Banner */}
       {autoAssignToast && (
-        <div className="p-3.5 rounded-2xl bg-indigo-600 text-white text-xs sm:text-sm font-bold shadow-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="p-3.5 rounded-2xl bg-zinc-900 text-white dark:bg-[#18181F] dark:text-zinc-100 border border-zinc-700 dark:border-[#27272A] text-xs sm:text-sm font-semibold shadow-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <Sparkles className="w-4 h-4 text-zinc-400 shrink-0" />
             <span>{autoAssignToast}</span>
           </div>
           <button
             type="button"
             onClick={() => setAutoAssignToast(null)}
-            className="text-white/80 hover:text-white p-1 cursor-pointer"
+            className="text-zinc-400 hover:text-white p-1 cursor-pointer transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -658,22 +658,22 @@ export const CleaningDutiesTab: React.FC = () => {
       )}
 
       {/* Barra Unificada de Pestañas y Acciones */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
           {/* Subtab Navigation Pills (Grid on mobile so nothing clips) */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-800/70 rounded-xl border border-slate-200/80 dark:border-white/10 w-full xl:w-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 p-1 bg-zinc-100 dark:bg-[#18181F] rounded-lg border border-zinc-200 dark:border-[#27272A] w-full xl:w-auto">
             <button
               onClick={() => setActiveSection('turnos')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'turnos'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
               <span className="truncate">Turnos Semanales</span>
               {activeWeekDutyConflicts.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold shrink-0">
+                <span className="px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-200 dark:bg-zinc-200 dark:text-zinc-800 text-[10px] font-bold font-mono tabular-nums shrink-0">
                   {activeWeekDutyConflicts.length}
                 </span>
               )}
@@ -681,62 +681,62 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('matriz_khs')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'matriz_khs'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <Layers className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
               <span className="truncate">Matriz Mensual</span>
             </button>
 
             <button
               onClick={() => setActiveSection('limpieza')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'limpieza'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <Brush className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="truncate">Aseo S-28 ({weeks.length})</span>
+              <Brush className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
+              <span className="truncate">Aseo S-28 (<span className="font-mono tabular-nums">{weeks.length}</span>)</span>
             </button>
 
             <button
               onClick={() => setActiveSection('catalogo')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'catalogo'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span className="truncate">Deberes ({customDuties.length})</span>
+              <Briefcase className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
+              <span className="truncate">Deberes (<span className="font-mono tabular-nums">{customDuties.length}</span>)</span>
             </button>
 
             <button
               onClick={() => setActiveSection('grupos')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'grupos'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <Users className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-              <span className="truncate">Grupos ({preachingGroups.length})</span>
+              <Users className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
+              <span className="truncate">Grupos (<span className="font-mono tabular-nums">{preachingGroups.length}</span>)</span>
             </button>
 
             <button
               onClick={() => setActiveSection('salidas')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'salidas'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
-              <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-              <span className="truncate">Salidas ({fieldServiceMeetings.length})</span>
+              <Compass className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
+              <span className="truncate">Salidas (<span className="font-mono tabular-nums">{fieldServiceMeetings.length}</span>)</span>
             </button>
           </div>
 
@@ -745,7 +745,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleAutoAssignSelectedWeekDuties('both')}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 truncate"
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 truncate"
                 title="Auto-asignar turnos de esta semana evitando choques de plataforma y agrupando familias"
               >
                 <Wand2 className="w-3.5 h-3.5 shrink-0" />
@@ -755,17 +755,17 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={handleCopyWeeklyDutiesSummary}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
               title="Copiar lista de turnos de la semana para WhatsApp"
             >
               {copiedDutiesSuccess ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   <span className="truncate">¡Copiado!</span>
                 </>
               ) : (
                 <>
-                  <MessageCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <MessageCircle className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
                   <span className="truncate">Turnos WhatsApp</span>
                 </>
               )}
@@ -773,18 +773,18 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={handleAutoRotateCleaning}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
               title="Rotar automáticamente los grupos de aseo semana a semana"
             >
-              <Brush className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <Brush className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
               <span className="truncate">Rotar Limpieza</span>
             </button>
 
             <button
               onClick={openNewDutyModal}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all active:scale-95 cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all active:scale-95 cursor-pointer truncate"
             >
-              <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <Plus className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
               <span className="truncate">Nuevo Privilegio</span>
             </button>
           </div>
@@ -793,65 +793,59 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{preachingGroups.length} Grupos</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Aseo y Servicio del Campo</div>
+            <div className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{preachingGroups.length} Grupos</div>
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">Aseo y Servicio del Campo</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
+            <div className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {dutyEquityRows.length} Hermanos
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Habilitados en Deberes</div>
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">Habilitados en Deberes</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              activeWeekDutyConflicts.length > 0
-                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-            }`}
-          >
+        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             {activeWeekDutyConflicts.length > 0 ? (
-              <AlertTriangle className="w-5 h-5" />
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
             ) : (
-              <CheckCircle2 className="w-5 h-5" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
             )}
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
+            <div className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {activeWeekDutyConflicts.length === 0
                 ? '0 Choques'
                 : `${activeWeekDutyConflicts.length} Alerta(s)`}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               Radar Plataforma vs Deberes
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <Brush className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
+            <div className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
               {selectedWeek?.cleaningGroupNumbers?.length
                 ? `Grupo #${selectedWeek.cleaningGroupNumbers.join(', #')}`
                 : 'Sin asignar'}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
               {CLEANING_TYPE_LABELS[selectedWeek?.cleaningType || 'semanal']}
             </div>
           </div>
@@ -862,27 +856,27 @@ export const CleaningDutiesTab: React.FC = () => {
       {activeSection === 'turnos' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Barra de navegación de semanas y acciones rápidas KHS */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-wrap">
               {/* Flechas de navegación semanal */}
-              <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl shrink-0">
+              <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] p-1 rounded-lg shrink-0">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="p-1 rounded-md hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
                   title="Semana anterior"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs font-bold px-2.5 text-slate-800 dark:text-white select-none whitespace-nowrap">
+                <span className="text-xs font-bold px-2.5 text-zinc-800 dark:text-[#F4F4F5] select-none whitespace-nowrap font-mono tabular-nums">
                   {selectedWeek ? `${selectedWeek.weekStartDate} al ${selectedWeek.weekEndDate}` : 'Seleccionar semana'}
                 </span>
                 <button
                   type="button"
                   onClick={goToNextWeek}
                   disabled={currentIndex >= sortedWeeks.length - 1}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="p-1 rounded-md hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
                   title="Semana siguiente"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -893,7 +887,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <select
                 value={selectedWeek?.id || ''}
                 onChange={(e) => setSelectedWeekId(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white cursor-pointer"
+                className="text-xs font-semibold px-3 py-2 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer"
               >
                 {sortedWeeks.map((w, idx) => (
                   <option key={w.id} value={w.id}>
@@ -903,8 +897,9 @@ export const CleaningDutiesTab: React.FC = () => {
               </select>
 
               {settings.conflictRules?.prioritizeFamilySameMeeting !== false && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/50 text-[11px] font-bold">
-                  <HeartHandshake className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                  <HeartHandshake className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                   <span>Agrupación Familiar Activa</span>
                 </span>
               )}
@@ -916,7 +911,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAutoAssignSelectedWeekDuties('both')}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer"
                     title="Auto-asignar los deberes vacíos de esta semana sin chocar con partes de plataforma"
                   >
                     <Wand2 className="w-3.5 h-3.5" />
@@ -926,11 +921,11 @@ export const CleaningDutiesTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleAutoAssignAllWeeksDuties}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/40 hover:bg-violet-100 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800/60 text-xs font-bold transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
                     title="Auto-rotar deberes en todas las semanas programadas con equidad histórica"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Rotar Todas ({weeks.length} sem.)</span>
+                    <Sparkles className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+                    <span>Rotar Todas (<span className="font-mono tabular-nums">{weeks.length}</span> sem.)</span>
                   </button>
                 </>
               )}
@@ -938,13 +933,13 @@ export const CleaningDutiesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowEquityPanel((prev) => !prev)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
                   showEquityPanel
-                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900'
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:bg-slate-100'
+                    ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-sm'
+                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                 }`}
               >
-                <BarChart3 className="w-3.5 h-3.5" />
+                <BarChart3 className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                 <span>Equidad</span>
               </button>
 
@@ -952,7 +947,7 @@ export const CleaningDutiesTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleClearAllWeekDuties}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 text-xs font-bold transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-semibold transition-all cursor-pointer"
                   title="Quitar todos los asignados a turnos en esta semana"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -964,17 +959,18 @@ export const CleaningDutiesTab: React.FC = () => {
 
           {/* RADAR DE CHOQUES EN VIVO (PLATAFORMA / SALIENTES / AUSENCIAS VS DEBERES) */}
           {activeWeekDutyConflicts.length > 0 && selectedWeek && (
-            <div className="bg-rose-50/90 dark:bg-rose-950/30 rounded-3xl border border-rose-200 dark:border-rose-800/60 p-4 sm:p-5 space-y-3 shadow-xs">
+            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300 flex items-center justify-center shrink-0">
-                    <AlertTriangle className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-rose-900 dark:text-rose-200">
-                      Detector de Choques en Deberes ({activeWeekDutyConflicts.length} alerta{activeWeekDutyConflicts.length > 1 ? 's' : ''})
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                      <span>Detector de Choques en Deberes ({activeWeekDutyConflicts.length} alerta{activeWeekDutyConflicts.length > 1 ? 's' : ''})</span>
                     </h4>
-                    <p className="text-xs text-rose-700 dark:text-rose-300">
+                    <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                       Hermanos asignados a Audio/Video, Micrófonos o Acomodadores que tienen parte en plataforma, discurso saliente o ausencia en la misma reunión:
                     </p>
                   </div>
@@ -990,26 +986,26 @@ export const CleaningDutiesTab: React.FC = () => {
                   return (
                     <div
                       key={`${c.meetingType}-${c.dutyKey}-${c.publisherId}-${idx}`}
-                      className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-rose-200/90 dark:border-rose-800/60 flex items-center justify-between gap-3 shadow-2xs"
+                      className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-extrabold text-slate-900 dark:text-white">
+                          <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {c.publisherName}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-200/70 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-300/40 dark:border-zinc-700/60">
                             {c.dutyName} ({c.meetingType === 'midweek' ? 'Entre Semana' : 'Fin de Semana'})
                           </span>
                         </div>
-                        <div className="mt-1 space-y-0.5 text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                        <div className="mt-1 space-y-0.5 text-[11px] text-zinc-600 dark:text-zinc-400 font-medium">
                           {c.platformClashes.length > 0 && (
-                            <div>• Parte en plataforma: {c.platformClashes.join(', ')}</div>
+                            <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" /><span>Parte en plataforma: {c.platformClashes.join(', ')}</span></div>
                           )}
                           {c.otherDutyClashes.length > 0 && (
-                            <div>• Otro deber simultáneo: {c.otherDutyClashes.join(', ')}</div>
+                            <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" /><span>Otro deber simultáneo: {c.otherDutyClashes.join(', ')}</span></div>
                           )}
-                          {c.outgoingSpeakerClash && <div>• {c.outgoingSpeakerClash}</div>}
-                          {c.absenceClash && <div>• {c.absenceClash}</div>}
+                          {c.outgoingSpeakerClash && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" /><span>{c.outgoingSpeakerClash}</span></div>}
+                          {c.absenceClash && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" /><span>{c.absenceClash}</span></div>}
                         </div>
                       </div>
 
@@ -1034,7 +1030,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               () => handleToggleDutyPublisher(c.meetingType, c.dutyKey, c.publisherId)
                             )
                           }
-                          className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shrink-0 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-semibold shrink-0 cursor-pointer transition-colors"
                         >
                           Reemplazar
                         </button>
@@ -1048,21 +1044,21 @@ export const CleaningDutiesTab: React.FC = () => {
 
           {/* PANEL DESPLEGABLE DE EQUIDAD Y ROTACIÓN DE DEBERES */}
           {showEquityPanel && (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-xs space-y-3 animate-in fade-in duration-150">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 space-y-3 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                     <span>Distribución y Equidad de Turnos Mecánicos</span>
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Conteo acumulado de turnos asignados en las {weeks.length} semanas del programa actual
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                    Conteo acumulado de turnos asignados en las <span className="font-mono tabular-nums">{weeks.length}</span> semanas del programa actual
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowEquityPanel(false)}
-                  className="text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="text-xs font-semibold text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
                 >
                   Cerrar ✕
                 </button>
@@ -1071,42 +1067,42 @@ export const CleaningDutiesTab: React.FC = () => {
               <div className="overflow-x-auto max-h-72">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
-                      <th className="py-2 pr-3 font-bold">Hermano</th>
-                      <th className="py-2 px-2 font-bold text-center">Total Turnos</th>
-                      <th className="py-2 px-2 font-bold text-center">Entre Sem.</th>
-                      <th className="py-2 px-2 font-bold text-center">Fin Sem.</th>
+                    <tr className="border-b border-zinc-200 dark:border-[#27272A] text-zinc-500 dark:text-[#A1A1AA] bg-zinc-50 dark:bg-[#18181F]">
+                      <th className="py-2.5 px-3 font-semibold">Hermano</th>
+                      <th className="py-2.5 px-2 font-semibold text-center">Total Turnos</th>
+                      <th className="py-2.5 px-2 font-semibold text-center">Entre Sem.</th>
+                      <th className="py-2.5 px-2 font-semibold text-center">Fin Sem.</th>
                       {customDuties.slice(0, 5).map((d) => (
-                        <th key={d.key} className="py-2 px-2 font-bold text-center truncate max-w-[100px]">
+                        <th key={d.key} className="py-2.5 px-2 font-semibold text-center truncate max-w-[100px]">
                           {d.name}
                         </th>
                       ))}
-                      <th className="py-2 pl-2 font-bold text-right">Último Turno</th>
+                      <th className="py-2.5 pl-2 font-semibold text-right">Último Turno</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                     {dutyEquityRows.map((row) => (
-                      <tr key={row.publisher.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
-                        <td className="py-2 pr-3 font-semibold text-slate-900 dark:text-white">
+                      <tr key={row.publisher.id} className="hover:bg-zinc-50 dark:hover:bg-[#18181F]/60">
+                        <td className="py-2 px-3 font-semibold text-zinc-900 dark:text-[#F4F4F5]">
                           {row.publisher.name}
                         </td>
                         <td className="py-2 px-2 text-center">
-                          <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold">
+                          <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-bold font-mono tabular-nums">
                             {row.totalDuties}
                           </span>
                         </td>
-                        <td className="py-2 px-2 text-center text-slate-600 dark:text-slate-300">
+                        <td className="py-2 px-2 text-center text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
                           {row.midweekDuties}
                         </td>
-                        <td className="py-2 px-2 text-center text-slate-600 dark:text-slate-300">
+                        <td className="py-2 px-2 text-center text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
                           {row.weekendDuties}
                         </td>
                         {customDuties.slice(0, 5).map((d) => (
-                          <td key={d.key} className="py-2 px-2 text-center text-slate-500 dark:text-slate-400">
+                          <td key={d.key} className="py-2 px-2 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                             {row.byDutyKey[d.key] || 0}
                           </td>
                         ))}
-                        <td className="py-2 pl-2 text-right text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+                        <td className="py-2 pl-2 text-right text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums text-[11px]">
                           {row.lastDutyDate || '—'}
                         </td>
                       </tr>
@@ -1120,20 +1116,20 @@ export const CleaningDutiesTab: React.FC = () => {
           {selectedWeek && (
             <>
               {/* BLOQUE 1: DEBERES Y TURNOS DE ENTRE SEMANA */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/[0.06]">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <Shield className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                         <span>Deberes y Turnos de Entre Semana</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
                           {selectedWeek.midweek?.date || selectedWeek.weekStartDate}
                         </span>
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                         Audio y Video, Micrófonos de pasillo, Plataforma, Acomodadores y deberes locales
                       </p>
                     </div>
@@ -1143,7 +1139,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAutoAssignSelectedWeekDuties('midweek')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                     >
                       <Wand2 className="w-3.5 h-3.5" />
                       <span>Completar Entre Semana</span>
@@ -1159,22 +1155,22 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={duty.id}
-                          className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 transition-all flex flex-col justify-between shadow-xs"
+                          className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2">
-                              <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">
+                              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs uppercase tracking-wider">
                                 {duty.name}
                               </h4>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-semibold text-slate-400">
+                                <span className="text-[10px] font-semibold text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums">
                                   {assignedIds.length}/{duty.maxPeople || 1}
                                 </span>
                                 {assignedIds.length > 0 && !isReadOnly && (
                                   <button
                                     type="button"
                                     onClick={() => handleClearDuty('midweek', duty.key)}
-                                    className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
+                                    className="text-[10px] text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 font-semibold cursor-pointer transition-colors"
                                     title={`Quitar a todos los asignados a ${duty.name}`}
                                   >
                                     Limpiar
@@ -1184,7 +1180,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             </div>
 
                             {duty.description && (
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 line-clamp-1">
                                 {duty.description}
                               </p>
                             )}
@@ -1192,7 +1188,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             {/* Assigned brothers list with KHS live conflict & family badges */}
                             <div className="mt-3 space-y-1.5">
                               {assignedIds.length === 0 ? (
-                                <p className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
+                                <p className="text-xs text-zinc-400 dark:text-[#A1A1AA] italic py-1">
                                   Sin asignar
                                 </p>
                               ) : (
@@ -1212,14 +1208,14 @@ export const CleaningDutiesTab: React.FC = () => {
                                   return (
                                     <div
                                       key={pid}
-                                      className={`p-2 rounded-xl border text-xs transition-all ${
+                                      className={`p-2 rounded-lg border text-xs transition-all ${
                                         liveStatus.hasConflict
-                                          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700'
-                                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-white/10'
+                                          ? 'bg-zinc-50 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
+                                          : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A]'
                                       }`}
                                     >
                                       <div className="flex items-center justify-between gap-1">
-                                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
+                                        <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5] truncate pr-1">
                                           {pub?.name || 'Hno.'}
                                         </span>
                                         <div className="flex items-center gap-1 shrink-0">
@@ -1227,7 +1223,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                             <button
                                               type="button"
                                               onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'midweek')}
-                                              className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
+                                              className="text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 p-0.5 transition-colors cursor-pointer"
                                               title="Enviar recordatorio por WhatsApp"
                                             >
                                               <MessageCircle className="w-3.5 h-3.5" />
@@ -1237,7 +1233,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                             <button
                                               type="button"
                                               onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
-                                              className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                                              className="text-zinc-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
                                               title="Quitar"
                                             >
                                               <X className="w-3.5 h-3.5" />
@@ -1248,8 +1244,8 @@ export const CleaningDutiesTab: React.FC = () => {
 
                                       {/* Live Conflict Alert Pill */}
                                       {liveStatus.hasConflict && (
-                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-300">
-                                          <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-semibold text-zinc-600 dark:text-zinc-400">
+                                          <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
                                           <span>
                                             {[
                                               ...liveStatus.platformClashes,
@@ -1265,7 +1261,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                       {/* Live KHS Family Grouping Pill */}
                                       {!liveStatus.hasConflict &&
                                         liveStatus.familyMembersInMeeting.length > 0 && (
-                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
                                             <HeartHandshake className="w-3 h-3 shrink-0" />
                                             <span className="truncate">
                                               Familia hoy: {liveStatus.familyMembersInMeeting.join(', ')}
@@ -1294,7 +1290,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                   () => {}
                                 )
                               }
-                              className="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-white/10 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-left cursor-pointer flex items-center gap-1"
+                              className="mt-3 pt-2.5 border-t border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 text-left cursor-pointer flex items-center gap-1 transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                               <span>Asignar persona</span>
@@ -1307,20 +1303,20 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 2: DEBERES Y TURNOS DE FIN DE SEMANA */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/[0.06]">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                         <span>Deberes y Turnos de Fin de Semana</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
                           {selectedWeek.weekend?.date || selectedWeek.weekEndDate}
                         </span>
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                         Audio y Video, Micrófonos de pasillo, Plataforma y Acomodadores del fin de semana
                       </p>
                     </div>
@@ -1330,7 +1326,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAutoAssignSelectedWeekDuties('weekend')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                     >
                       <Wand2 className="w-3.5 h-3.5" />
                       <span>Completar Fin de Semana</span>
@@ -1346,22 +1342,22 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={duty.id}
-                          className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 transition-all flex flex-col justify-between shadow-xs"
+                          className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2">
-                              <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">
+                              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs uppercase tracking-wider">
                                 {duty.name}
                               </h4>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-semibold text-slate-400">
+                                <span className="text-[10px] font-semibold text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums">
                                   {assignedIds.length}/{duty.maxPeople || 1}
                                 </span>
                                 {assignedIds.length > 0 && !isReadOnly && (
                                   <button
                                     type="button"
                                     onClick={() => handleClearDuty('weekend', duty.key)}
-                                    className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
+                                    className="text-[10px] text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 font-semibold cursor-pointer transition-colors"
                                     title={`Quitar a todos los asignados a ${duty.name}`}
                                   >
                                     Limpiar
@@ -1371,7 +1367,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             </div>
 
                             {duty.description && (
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 line-clamp-1">
                                 {duty.description}
                               </p>
                             )}
@@ -1379,7 +1375,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             {/* Assigned brothers list with KHS live conflict & family badges */}
                             <div className="mt-3 space-y-1.5">
                               {assignedIds.length === 0 ? (
-                                <p className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
+                                <p className="text-xs text-zinc-400 dark:text-[#A1A1AA] italic py-1">
                                   Sin asignar
                                 </p>
                               ) : (
@@ -1399,14 +1395,14 @@ export const CleaningDutiesTab: React.FC = () => {
                                   return (
                                     <div
                                       key={pid}
-                                      className={`p-2 rounded-xl border text-xs transition-all ${
+                                      className={`p-2 rounded-lg border text-xs transition-all ${
                                         liveStatus.hasConflict
-                                          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700'
-                                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-white/10'
+                                          ? 'bg-zinc-50 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
+                                          : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A]'
                                       }`}
                                     >
                                       <div className="flex items-center justify-between gap-1">
-                                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
+                                        <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5] truncate pr-1">
                                           {pub?.name || 'Hno.'}
                                         </span>
                                         <div className="flex items-center gap-1 shrink-0">
@@ -1414,7 +1410,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                             <button
                                               type="button"
                                               onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'weekend')}
-                                              className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
+                                              className="text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 p-0.5 transition-colors cursor-pointer"
                                               title="Enviar recordatorio por WhatsApp"
                                             >
                                               <MessageCircle className="w-3.5 h-3.5" />
@@ -1424,7 +1420,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                             <button
                                               type="button"
                                               onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
-                                              className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                                              className="text-zinc-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
                                               title="Quitar"
                                             >
                                               <X className="w-3.5 h-3.5" />
@@ -1435,8 +1431,8 @@ export const CleaningDutiesTab: React.FC = () => {
 
                                       {/* Live Conflict Alert Pill */}
                                       {liveStatus.hasConflict && (
-                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-300">
-                                          <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-semibold text-zinc-600 dark:text-zinc-400">
+                                          <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
                                           <span>
                                             {[
                                               ...liveStatus.platformClashes,
@@ -1453,7 +1449,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                       {/* Live KHS Family Grouping Pill */}
                                       {!liveStatus.hasConflict &&
                                         liveStatus.familyMembersInMeeting.length > 0 && (
-                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
                                             <HeartHandshake className="w-3 h-3 shrink-0" />
                                             <span className="truncate">
                                               Familia hoy: {liveStatus.familyMembersInMeeting.join(', ')}
@@ -1482,7 +1478,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                   () => {}
                                 )
                               }
-                              className="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-white/10 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 text-left cursor-pointer flex items-center gap-1"
+                              className="mt-3 pt-2.5 border-t border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 text-left cursor-pointer flex items-center gap-1 transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                               <span>Asignar persona</span>
@@ -1495,20 +1491,20 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 3: ASEO DEL SALÓN DEL REINO S-28 + RECORDATORIO 1-CLIC AL SUPERINTENDENTE DE GRUPO */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <Brush className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 flex-wrap">
                         <span>Aseo y Mantenimiento del Salón del Reino (S-28)</span>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           {CLEANING_TYPE_LABELS[selectedWeek.cleaningType || 'semanal']}
                         </span>
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                         Grupo de predicación encargado, lista de verificación S-28 y aviso directo por WhatsApp al Superintendente de Grupo
                       </p>
                     </div>
@@ -1517,7 +1513,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveSection('limpieza')}
-                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:underline cursor-pointer transition-colors"
                   >
                     Ver cronograma anual S-28 →
                   </button>
@@ -1526,7 +1522,7 @@ export const CleaningDutiesTab: React.FC = () => {
                 {/* Selector de Grupo(s), Modalidad y Estado de Insumos */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 space-y-2">
-                    <span className="text-xs text-slate-600 dark:text-slate-400 font-bold block">
+                    <span className="text-xs text-zinc-600 dark:text-[#A1A1AA] font-bold block">
                       Grupo(s) de Predicación a cargo esta semana:
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -1547,10 +1543,10 @@ export const CleaningDutiesTab: React.FC = () => {
                               }
                               updateWeek({ ...selectedWeek, cleaningGroupNumbers: list });
                             }}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-indigo-600 text-white shadow-xs'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
                             }`}
                           >
                             {isSelected ? '✓ ' : ''}Grupo #{g.number}: {g.name}
@@ -1562,7 +1558,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                      <label className="text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] block mb-1">
                         Modalidad de Aseo
                       </label>
                       <select
@@ -1574,7 +1570,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             cleaningType: e.target.value as CleaningProgramType,
                           })
                         }
-                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
+                        className="w-full px-2.5 py-2 rounded-lg text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
                       >
                         <option value="semanal">Semanal Regular</option>
                         <option value="profunda">Limpieza Profunda (S-28)</option>
@@ -1584,7 +1580,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                      <label className="text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] block mb-1">
                         Insumos de Aseo
                       </label>
                       <select
@@ -1596,7 +1592,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             cleaningSuppliesStatus: e.target.value as CleaningSuppliesStatus,
                           })
                         }
-                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
+                        className="w-full px-2.5 py-2 rounded-lg text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
                       >
                         <option value="abastecido">✓ Insumos Completos</option>
                         <option value="reponer_pronto">⚠ Reponer Pronto</option>
@@ -1621,16 +1617,16 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={grp.number}
-                          className="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div>
-                            <div className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <div className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                               <span>Grupo #{grp.number}: {grp.name}</span>
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
                                 {grpMembers.length} integrantes
                               </span>
                             </div>
-                            <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
+                            <div className="text-[11px] text-zinc-600 dark:text-[#A1A1AA] mt-1">
                               <span>Sup: <strong>{overseer?.name || 'Sin designar'}</strong></span>
                               {' • '}
                               <span>Aux: <strong>{assistant?.name || 'Sin designar'}</strong></span>
@@ -1641,7 +1637,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'overseer')}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
                               title="Enviar recordatorio y lista S-28 por WhatsApp al Superintendente de Grupo"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
@@ -1651,7 +1647,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'assistant')}
-                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-colors cursor-pointer"
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#323238] text-xs font-semibold transition-colors cursor-pointer"
                                 title="Enviar recordatorio por WhatsApp al Auxiliar de Grupo"
                               >
                                 <MessageCircle className="w-3.5 h-3.5" />
@@ -1666,13 +1662,13 @@ export const CleaningDutiesTab: React.FC = () => {
                 )}
 
                 {/* Lista de Verificación Interactiva S-28 */}
-                <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] space-y-2.5">
+                <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <CheckSquare className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                      <CheckSquare className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                       <span>Lista de Verificación S-28 para esta semana:</span>
                     </span>
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                       {(selectedWeek.cleaningChecklistCompleted || []).length} completadas
                     </span>
                   </div>
@@ -1692,17 +1688,17 @@ export const CleaningDutiesTab: React.FC = () => {
                           key={item.id}
                           type="button"
                           onClick={() => handleToggleCleaningChecklist(selectedWeek, item.id)}
-                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-2 ${
+                          className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-start gap-2 ${
                             isDone
-                              ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800/70'
-                              : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-slate-800'
+                              ? 'bg-zinc-100/80 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
+                              : 'bg-zinc-50/70 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] hover:bg-white dark:hover:bg-[#18181F]'
                           }`}
                         >
                           <div
                             className={`w-4 h-4 rounded-md mt-0.5 flex items-center justify-center shrink-0 border ${
                               isDone
-                                ? 'bg-emerald-600 border-emerald-600 text-white'
-                                : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600'
+                                ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900'
+                                : 'bg-white dark:bg-[#121216] border-zinc-300 dark:border-[#27272A]'
                             }`}
                           >
                             {isDone && <Check className="w-3 h-3" />}
@@ -1711,13 +1707,13 @@ export const CleaningDutiesTab: React.FC = () => {
                             <div
                               className={`text-xs font-bold leading-tight ${
                                 isDone
-                                  ? 'line-through text-emerald-900 dark:text-emerald-200'
-                                  : 'text-slate-800 dark:text-slate-200'
+                                  ? 'line-through text-zinc-400 dark:text-zinc-500'
+                                  : 'text-zinc-800 dark:text-[#F4F4F5]'
                               }`}
                             >
                               {item.label}
                             </div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
+                            <div className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 line-clamp-2">
                               {item.detail}
                             </div>
                           </div>
@@ -1734,14 +1730,14 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* ── SECCIÓN NUEVA: MATRIZ MENSUAL (TABLERO DE ANUNCIOS IMPRIMIBLE) ── */}
       {activeSection === 'matriz_khs' && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5 animate-in fade-in duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/10">
+        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5 animate-in fade-in duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Layers className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
                 <span>Matriz Mensual de Deberes y Aseo (Tablero del Salón)</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Vista consolidada multicolumna para el Tablero de Anuncios del Salón del Reino (Audio/Video, Micrófonos, Acomodadores y Limpieza)
               </p>
             </div>
@@ -1751,7 +1747,7 @@ export const CleaningDutiesTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleAutoAssignAllWeeksDuties}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm transition-all cursor-pointer font-mono tabular-nums"
                 >
                   <Wand2 className="w-4 h-4" />
                   <span>Auto-Completar Matriz ({sortedWeeks.length} sem.)</span>
@@ -1761,7 +1757,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handlePrintKhsDutiesMatrix}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white text-xs font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>Imprimir Tablero A4</span>
@@ -1772,7 +1768,7 @@ export const CleaningDutiesTab: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100/90 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-white/10">
+                <tr className="bg-zinc-100/90 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border-b border-zinc-200 dark:border-[#27272A]">
                   <th className="py-3 px-3 font-extrabold">Semana</th>
                   <th className="py-3 px-2 font-extrabold">Reunión</th>
                   {customDuties.map((d) => (
@@ -1780,12 +1776,12 @@ export const CleaningDutiesTab: React.FC = () => {
                       {d.name}
                     </th>
                   ))}
-                  <th className="py-3 px-3 font-extrabold text-amber-700 dark:text-amber-300">
+                  <th className="py-3 px-3 font-extrabold text-zinc-700 dark:text-zinc-300">
                     Aseo S-28
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200/70 dark:divide-white/10">
+              <tbody className="divide-y divide-zinc-200/70 dark:divide-[#27272A]">
                 {sortedWeeks.map((w) => {
                   const cleaningLabel =
                     w.cleaningGroupNumbers?.length > 0
@@ -1795,13 +1791,13 @@ export const CleaningDutiesTab: React.FC = () => {
                   return (
                     <React.Fragment key={w.id}>
                       {/* Fila Entre Semana */}
-                      <tr className="hover:bg-indigo-50/30 dark:hover:bg-indigo-950/20">
+                      <tr className="hover:bg-indigo-50/30 dark:hover:bg-[#18181F]/60">
                         <td
                           rowSpan={2}
-                          className="py-3 px-3 font-bold text-slate-900 dark:text-white align-top border-r border-slate-200/60 dark:border-white/10 whitespace-nowrap"
+                          className="py-3 px-3 font-bold text-zinc-900 dark:text-[#F4F4F5] align-top border-r border-zinc-200/60 dark:border-[#27272A] whitespace-nowrap"
                         >
-                          <div>{w.weekStartDate}</div>
-                          <div className="text-[10px] font-medium text-slate-400">
+                          <div className="font-mono tabular-nums">{w.weekStartDate}</div>
+                          <div className="text-[10px] font-medium text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums">
                             al {w.weekEndDate}
                           </div>
                           <button
@@ -1815,16 +1811,16 @@ export const CleaningDutiesTab: React.FC = () => {
                             Editar semana →
                           </button>
                         </td>
-                        <td className="py-2.5 px-2 font-bold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
+                        <td className="py-2.5 px-2 font-bold text-indigo-700 dark:text-indigo-400 whitespace-nowrap font-mono tabular-nums">
                           Entre Semana
-                          <div className="text-[10px] font-normal text-slate-400">
+                          <div className="text-[10px] font-normal text-zinc-400 dark:text-[#A1A1AA]">
                             {w.midweek?.date || w.weekStartDate}
                           </div>
                         </td>
                         {customDuties.map((d) => {
                           if (!d.midweek) {
                             return (
-                              <td key={d.key} className="py-2.5 px-2.5 text-slate-300 dark:text-slate-600">
+                              <td key={d.key} className="py-2.5 px-2.5 text-zinc-300 dark:text-zinc-600">
                                 —
                               </td>
                             );
@@ -1833,7 +1829,7 @@ export const CleaningDutiesTab: React.FC = () => {
                           return (
                             <td key={d.key} className="py-2.5 px-2.5">
                               {ids.length === 0 ? (
-                                <span className="text-slate-400 italic">Sin asignar</span>
+                                <span className="text-zinc-400 dark:text-[#A1A1AA] italic">Sin asignar</span>
                               ) : (
                                 <div className="flex flex-col gap-0.5">
                                   {ids.map((id) => {
@@ -1855,7 +1851,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                         className={`font-semibold ${
                                           st.hasConflict
                                             ? 'text-rose-600 dark:text-rose-400 underline decoration-wavy'
-                                            : 'text-slate-800 dark:text-slate-200'
+                                            : 'text-zinc-800 dark:text-[#F4F4F5]'
                                         }`}
                                         title={
                                           st.hasConflict
@@ -1874,29 +1870,29 @@ export const CleaningDutiesTab: React.FC = () => {
                         })}
                         <td
                           rowSpan={2}
-                          className="py-3 px-3 align-middle border-l border-slate-200/60 dark:border-white/10 bg-amber-50/30 dark:bg-amber-950/10"
+                          className="py-3 px-3 align-middle border-l border-zinc-200/60 dark:border-[#27272A] bg-amber-50/30 dark:bg-amber-950/20"
                         >
-                          <div className="font-extrabold text-amber-800 dark:text-amber-300">
+                          <div className="font-extrabold text-amber-800 dark:text-amber-300 font-mono tabular-nums">
                             {cleaningLabel}
                           </div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          <div className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                             {cType}
                           </div>
                         </td>
                       </tr>
 
                       {/* Fila Fin de Semana */}
-                      <tr className="bg-slate-50/50 dark:bg-white/[0.02] hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20">
-                        <td className="py-2.5 px-2 font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                      <tr className="bg-zinc-50/50 dark:bg-[#18181F]/20 hover:bg-emerald-50/30 dark:hover:bg-[#18181F]/60">
+                        <td className="py-2.5 px-2 font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap font-mono tabular-nums">
                           Fin de Semana
-                          <div className="text-[10px] font-normal text-slate-400">
+                          <div className="text-[10px] font-normal text-zinc-400 dark:text-[#A1A1AA]">
                             {w.weekend?.date || w.weekEndDate}
                           </div>
                         </td>
                         {customDuties.map((d) => {
                           if (!d.weekend) {
                             return (
-                              <td key={d.key} className="py-2.5 px-2.5 text-slate-300 dark:text-slate-600">
+                              <td key={d.key} className="py-2.5 px-2.5 text-zinc-300 dark:text-zinc-600">
                                 —
                               </td>
                             );
@@ -1905,7 +1901,7 @@ export const CleaningDutiesTab: React.FC = () => {
                           return (
                             <td key={d.key} className="py-2.5 px-2.5">
                               {ids.length === 0 ? (
-                                <span className="text-slate-400 italic">Sin asignar</span>
+                                <span className="text-zinc-400 dark:text-[#A1A1AA] italic">Sin asignar</span>
                               ) : (
                                 <div className="flex flex-col gap-0.5">
                                   {ids.map((id) => {
@@ -1927,7 +1923,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                         className={`font-semibold ${
                                           st.hasConflict
                                             ? 'text-rose-600 dark:text-rose-400 underline decoration-wavy'
-                                            : 'text-slate-800 dark:text-slate-200'
+                                            : 'text-zinc-800 dark:text-[#F4F4F5]'
                                         }`}
                                         title={
                                           st.hasConflict
@@ -1956,21 +1952,21 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 1. SECCIÓN: LIMPIEZA DEL SALÓN DEL REINO S-28 */}
       {activeSection === 'limpieza' && (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5 animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/10">
+      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5 animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
               <Brush className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               <span>Programa de Aseo del Salón del Reino (Estándar S-28)</span>
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Rotación de grupos de predicación, control de limpieza profunda e insumos, y aviso en 1 clic al Superintendente de Grupo.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleAutoRotateCleaning}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm transition-all cursor-pointer"
             >
               <Brush className="w-4 h-4" />
               <span>Auto-Rotar Grupos y Limpieza Profunda</span>
@@ -1996,12 +1992,12 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={w.id}
-                className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between space-y-3 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-2xs"
+                className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 flex flex-col justify-between space-y-3 hover:bg-white dark:hover:bg-[#18181F] transition-all"
               >
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-200">
-                      <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                    <span className="flex items-center gap-1 font-bold text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                       {w.weekStartDate} al {w.weekEndDate}
                     </span>
                     <span
@@ -2012,7 +2008,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                    <h4 className="text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                       {assignedGroupNums.length === 0
                         ? 'Sin grupo asignado'
                         : `Grupo(s): #${assignedGroupNums.join(', #')}`}
@@ -2026,7 +2022,7 @@ export const CleaningDutiesTab: React.FC = () => {
                           cleaningType: e.target.value as CleaningProgramType,
                         })
                       }
-                      className="text-[11px] font-bold px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-indigo-700 dark:text-indigo-300"
+                      className="text-[11px] font-bold px-2 py-1 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 focus:outline-none"
                     >
                       <option value="semanal">Aseo Semanal</option>
                       <option value="profunda">Limpieza Profunda</option>
@@ -2036,14 +2032,14 @@ export const CleaningDutiesTab: React.FC = () => {
                   </div>
 
                   {firstGroup && (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Sup. Grupo: <strong className="text-slate-700 dark:text-slate-200">{overseer?.name || 'Sin designar'}</strong>
-                      {' • '}Checklist S-28: <strong>{completedCount} áreas</strong>
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                      Sup. Grupo: <strong className="text-zinc-700 dark:text-[#F4F4F5]">{overseer?.name || 'Sin designar'}</strong>
+                      {' • '}Checklist S-28: <strong className="font-mono tabular-nums">{completedCount} áreas</strong>
                     </p>
                   )}
                 </div>
 
-                <div className="pt-2.5 border-t border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-2 flex-wrap">
+                <div className="pt-2.5 border-t border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex flex-wrap gap-1">
                     {preachingGroups.map((g) => {
                       const isSelected = assignedGroupNums.includes(g.number);
@@ -2062,10 +2058,10 @@ export const CleaningDutiesTab: React.FC = () => {
                             }
                             updateWeek({ ...w, cleaningGroupNumbers: list });
                           }}
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums ${
                             isSelected
-                              ? 'bg-indigo-600 text-white'
-                              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                              ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                              : 'bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                           }`}
                         >
                           G#{g.number}
@@ -2078,10 +2074,10 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleSendGroupCleaningWhatsApp(w, firstGroup, 'overseer')}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-bold transition-colors cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold transition-colors cursor-pointer"
                       title="Enviar recordatorio S-28 por WhatsApp al Superintendente de Grupo"
                     >
-                      <MessageCircle className="w-3 h-3" />
+                      <MessageCircle className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
                       <span>WhatsApp Sup.</span>
                     </button>
                   )}
@@ -2095,20 +2091,20 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 2. SECCIÓN: GRUPOS DE PREDICACIÓN */}
       {activeSection === 'grupos' && (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <Users className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               <span>Grupos de Predicación y Servicio</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Superintendentes, auxiliares e integrantes de cada grupo.
             </p>
           </div>
           <button
             onClick={openNewGroupModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Grupo</span>
@@ -2124,27 +2120,27 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={group.number}
-                className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between hover:shadow-md transition-all"
+                className="p-4 sm:p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]/40 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all"
               >
                 <div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center font-bold text-xs font-mono tabular-nums">
                         #{group.number}
                       </div>
-                      <h4 className="font-bold text-slate-900 text-sm">{group.name}</h4>
+                      <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">{group.name}</h4>
                     </div>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEditGroupModal(group)}
-                        className="p-1 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50"
+                        className="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteGroup(group.number)}
-                        className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
+                        className="p-1 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -2153,26 +2149,26 @@ export const CleaningDutiesTab: React.FC = () => {
 
                   {/* Leaders */}
                   <div className="mt-3 space-y-1 text-xs">
-                    <p className="text-slate-600">
-                      <strong className="text-slate-800">Superintendente:</strong>{' '}
-                      {overseer ? overseer.name : <span className="text-slate-400 italic">Sin designar</span>}
+                    <p className="text-zinc-600 dark:text-[#A1A1AA]">
+                      <strong className="text-zinc-800 dark:text-[#F4F4F5]">Superintendente:</strong>{' '}
+                      {overseer ? overseer.name : <span className="text-zinc-400 dark:text-[#A1A1AA] italic">Sin designar</span>}
                     </p>
-                    <p className="text-slate-600">
-                      <strong className="text-slate-800">Auxiliar:</strong>{' '}
-                      {assistant ? assistant.name : <span className="text-slate-400 italic">Sin designar</span>}
+                    <p className="text-zinc-600 dark:text-[#A1A1AA]">
+                      <strong className="text-zinc-800 dark:text-[#F4F4F5]">Auxiliar:</strong>{' '}
+                      {assistant ? assistant.name : <span className="text-zinc-400 dark:text-[#A1A1AA] italic">Sin designar</span>}
                     </p>
                   </div>
 
                   {/* Members count & list */}
-                  <div className="mt-4 pt-3 border-t border-slate-100">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA] block mb-1 font-mono tabular-nums">
                       Publicadores asignados ({members.length})
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {members.map(m => (
                         <span
                           key={m.id}
-                          className="px-2 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-700 font-medium"
+                          className="px-2 py-0.5 rounded-md text-[10px] bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] font-medium"
                         >
                           {m.name}
                         </span>
@@ -2189,20 +2185,20 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 3. SECCIÓN: DEBERES Y PERSONALIZADOS */}
       {activeSection === 'catalogo' && (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               <span>Deberes Operativos y Personalizados</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Crea responsabilidades personalizadas como estacionamiento, acomodadores o deberes locales.
             </p>
           </div>
           <button
             onClick={openNewDutyModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Crear Deber Personalizado</span>
@@ -2213,21 +2209,21 @@ export const CleaningDutiesTab: React.FC = () => {
           {customDuties.map(duty => (
             <div
               key={duty.id}
-              className="p-4 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between hover:shadow-md transition-all"
+              className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]/40 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all"
             >
               <div>
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-bold text-slate-900 text-sm">{duty.name}</h4>
+                    <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">{duty.name}</h4>
                     {duty.description && (
-                      <p className="text-xs text-slate-500 mt-0.5">{duty.description}</p>
+                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">{duty.description}</p>
                     )}
                   </div>
 
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditDutyModal(duty)}
-                      className="p-1 text-slate-400 hover:text-indigo-600 rounded-lg"
+                      className="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -2237,7 +2233,7 @@ export const CleaningDutiesTab: React.FC = () => {
                       !duty.key.startsWith('deber_acomodador') && (
                         <button
                           onClick={() => deleteCustomDuty(duty.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 rounded-lg"
+                          className="p-1 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -2245,18 +2241,18 @@ export const CleaningDutiesTab: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-semibold text-slate-600">
+                <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-semibold text-zinc-600 dark:text-[#A1A1AA]">
                   {duty.midweek && (
-                    <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                    <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                       Entre semana
                     </span>
                   )}
                   {duty.weekend && (
-                    <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">
+                    <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                       Fin de semana
                     </span>
                   )}
-                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                  <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] font-mono tabular-nums">
                     Máx: {duty.maxPeople || 1} personas
                   </span>
                 </div>
@@ -2269,14 +2265,14 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* SECTION 4: SALIDAS PARA LA PREDICACIÓN (SERVICIO DEL CAMPO) */}
       {activeSection === 'salidas' && (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Compass className="w-5 h-5 text-blue-600" />
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <Compass className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               <span>Salidas para la Predicación (Servicio del Campo)</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Horarios, puntos de encuentro y conductores para las salidas entre semana y fines de semana.
             </p>
           </div>
@@ -2284,17 +2280,17 @@ export const CleaningDutiesTab: React.FC = () => {
           <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <button
               onClick={handleCopyFsSchedule}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-colors shadow-xs min-h-[42px]"
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold border border-zinc-200 dark:border-[#27272A] transition-colors cursor-pointer min-h-[42px]"
               title="Copiar programa completo listo para enviar por WhatsApp"
             >
               {copiedFsSuccess ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                   <span className="truncate">¡Copiado!</span>
                 </>
               ) : (
                 <>
-                  <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <MessageCircle className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />
                   <span className="truncate">WhatsApp</span>
                 </>
               )}
@@ -2302,7 +2298,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={handleOpenAddFs}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs min-h-[42px]"
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm transition-colors cursor-pointer min-h-[42px]"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="truncate">Nueva Salida</span>
@@ -2317,25 +2313,25 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={fs.id}
-                className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 hover:border-blue-300 hover:bg-white transition-all flex flex-col justify-between shadow-xs"
+                className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:border-zinc-300 dark:hover:border-[#3F3F46] hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 font-extrabold text-xs">
+                    <span className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 font-extrabold text-xs font-mono tabular-nums border border-zinc-200 dark:border-[#27272A]">
                       {fs.dayOfWeek} • {fs.time}
                     </span>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleOpenEditFs(fs)}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl min-h-[38px] min-w-[38px] flex items-center justify-center transition-colors"
+                        className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-xl min-h-[38px] min-w-[38px] flex items-center justify-center transition-colors cursor-pointer"
                         title="Editar salida"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteFieldServiceMeeting(fs.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl min-h-[38px] min-w-[38px] flex items-center justify-center transition-colors"
+                        className="p-2 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl min-h-[38px] min-w-[38px] flex items-center justify-center transition-colors cursor-pointer"
                         title="Eliminar salida"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2343,24 +2339,24 @@ export const CleaningDutiesTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <h4 className="font-bold text-slate-900 text-sm mb-1">{fs.location}</h4>
+                  <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm mb-1">{fs.location}</h4>
 
                   {fs.notes && (
-                    <p className="text-xs text-slate-500 mb-2 italic">"{fs.notes}"</p>
+                    <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mb-2 italic">"{fs.notes}"</p>
                   )}
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/70 space-y-1 text-xs">
-                  <div className="flex items-center justify-between text-slate-600">
+                <div className="pt-2 border-t border-zinc-200/70 dark:border-[#27272A] space-y-1 text-xs">
+                  <div className="flex items-center justify-between text-zinc-600 dark:text-[#A1A1AA]">
                     <span>Conductor:</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                       {conductor ? conductor.name : 'Sin asignar'}
                     </span>
                   </div>
                   {fs.groupNumber && (
-                    <div className="flex items-center justify-between text-slate-600">
+                    <div className="flex items-center justify-between text-zinc-600 dark:text-[#A1A1AA]">
                       <span>Grupo a cargo:</span>
-                      <span className="font-semibold text-blue-700">Grupo #{fs.groupNumber}</span>
+                      <span className="font-semibold text-zinc-700 dark:text-zinc-300 font-mono tabular-nums">Grupo #{fs.groupNumber}</span>
                     </div>
                   )}
                 </div>
@@ -2373,15 +2369,15 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: GROUP EDIT / CREATE */}
       {isGroupModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {editingGroup ? 'Editar Grupo de Predicación' : 'Nuevo Grupo de Predicación'}
               </h3>
               <button
                 onClick={() => setIsGroupModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700"
+                className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] rounded-lg cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2390,35 +2386,35 @@ export const CleaningDutiesTab: React.FC = () => {
             <form onSubmit={handleSaveGroup} className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Número</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Número</label>
                   <input
                     type="number"
                     value={groupNumber}
                     onChange={e => setGroupNumber(Number(e.target.value))}
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none font-mono tabular-nums"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre del Grupo</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Nombre del Grupo</label>
                   <input
                     type="text"
                     required
                     value={groupName}
                     onChange={e => setGroupName(e.target.value)}
                     placeholder="Ej. Grupo 1 - Los Olivos"
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Superintendente de Grupo (Anciano / Siervo):
                 </label>
                 <select
                   value={groupOverseer}
                   onChange={e => setGroupOverseer(e.target.value)}
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 >
                   <option value="">-- Sin designar --</option>
                   {publishers.filter(p => p.gender === 'hermano').map(p => (
@@ -2430,13 +2426,13 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Auxiliar de Grupo:
                 </label>
                 <select
                   value={groupAssistant}
                   onChange={e => setGroupAssistant(e.target.value)}
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 >
                   <option value="">-- Sin designar --</option>
                   {publishers.filter(p => p.gender === 'hermano').map(p => (
@@ -2447,17 +2443,17 @@ export const CleaningDutiesTab: React.FC = () => {
                 </select>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex justify-end gap-2">
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsGroupModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold"
+                  className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm cursor-pointer transition-colors"
                 >
                   Guardar Grupo
                 </button>
@@ -2469,15 +2465,15 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: CUSTOM DUTY EDIT / CREATE */}
       {isDutyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {editingDuty ? 'Editar Deber Operativo' : 'Nuevo Deber Operativo'}
               </h3>
               <button
                 onClick={() => setIsDutyModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-700"
+                className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] rounded-lg cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2485,31 +2481,31 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <form onSubmit={handleSaveDuty} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nombre del Deber *</label>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Nombre del Deber *</label>
                 <input
                   type="text"
                   required
                   value={dutyName}
                   onChange={e => setDutyName(e.target.value)}
                   placeholder="Ej. Hospitalidad de oradores"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Descripción</label>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Descripción</label>
                 <input
                   type="text"
                   value={dutyDesc}
                   onChange={e => setDutyDesc(e.target.value)}
                   placeholder="Ej. Recibir y atender al orador visitante"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <span className="text-xs font-bold text-slate-700 block mb-1">Aplica en:</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">Aplica en:</span>
                   <div className="flex flex-col gap-2 pt-1">
                     <SplashCheckbox
                       size="sm"
@@ -2527,29 +2523,29 @@ export const CleaningDutiesTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Personas requeridas</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Personas requeridas</label>
                   <input
                     type="number"
                     min={1}
                     max={10}
                     value={dutyMaxPeople}
                     onChange={e => setDutyMaxPeople(Number(e.target.value))}
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none font-mono tabular-nums"
                   />
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex justify-end gap-2">
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsDutyModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold"
+                  className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm cursor-pointer transition-colors"
                 >
                   Guardar Deber
                 </button>
@@ -2561,18 +2557,18 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: FIELD SERVICE MEETING EDIT / CREATE */}
       {isFsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full max-h-[90vh] flex flex-col p-5 sm:p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-                <Compass className="w-5 h-5 text-blue-600 shrink-0" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-md w-full max-h-[90vh] flex flex-col p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3 shrink-0">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Compass className="w-5 h-5 text-zinc-500 dark:text-zinc-400 shrink-0" />
                 <span className="truncate">
                   {editingFs ? 'Editar Salida' : 'Nueva Salida a la Predicación'}
                 </span>
               </h3>
               <button
                 onClick={() => setIsFsModalOpen(false)}
-                className="p-2 text-slate-400 hover:text-slate-700 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] rounded-lg cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2581,11 +2577,11 @@ export const CleaningDutiesTab: React.FC = () => {
             <form onSubmit={handleSaveFs} className="space-y-4 overflow-y-auto flex-1 pr-1">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Día</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Día</label>
                   <select
                     value={fsForm.dayOfWeek}
                     onChange={(e) => setFsForm({ ...fsForm, dayOfWeek: e.target.value })}
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                   >
                     <option value="Lunes">Lunes</option>
                     <option value="Martes">Martes</option>
@@ -2598,19 +2594,19 @@ export const CleaningDutiesTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Hora</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Hora</label>
                   <input
                     type="time"
                     required
                     value={fsForm.time}
                     onChange={(e) => setFsForm({ ...fsForm, time: e.target.value })}
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none font-mono tabular-nums"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Lugar / Punto de Encuentro
                 </label>
                 <input
@@ -2619,17 +2615,17 @@ export const CleaningDutiesTab: React.FC = () => {
                   value={fsForm.location}
                   onChange={(e) => setFsForm({ ...fsForm, location: e.target.value })}
                   placeholder="Ej: Salón del Reino, Casa Hno. X, Parque Central"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Conductor</label>
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">Conductor</label>
                   <select
                     value={fsForm.conductorId}
                     onChange={(e) => setFsForm({ ...fsForm, conductorId: e.target.value })}
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                   >
                     <option value="">-- Por definir --</option>
                     {publishers
@@ -2643,7 +2639,7 @@ export const CleaningDutiesTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Grupo a cargo
                   </label>
                   <select
@@ -2651,7 +2647,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     onChange={(e) =>
                       setFsForm({ ...fsForm, groupNumber: parseInt(e.target.value, 10) })
                     }
-                    className="w-full p-2 text-xs rounded-xl border border-slate-200 bg-white"
+                    className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none font-mono tabular-nums"
                   >
                     {preachingGroups.map((g) => (
                       <option key={g.number} value={g.number}>
@@ -2663,7 +2659,7 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Notas / Modalidad
                 </label>
                 <input
@@ -2671,21 +2667,21 @@ export const CleaningDutiesTab: React.FC = () => {
                   value={fsForm.notes}
                   onChange={(e) => setFsForm({ ...fsForm, notes: e.target.value })}
                   placeholder="Ej: Carritos, De casa en casa, Territorio comercial"
-                  className="w-full p-2 text-xs rounded-xl border border-slate-200"
+                  className="w-full p-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex justify-end gap-2">
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsFsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
+                  className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-sm cursor-pointer transition-colors"
                 >
                   Guardar Salida
                 </button>

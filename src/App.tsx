@@ -1281,13 +1281,13 @@ const AppContent: React.FC = () => {
         const bar = document.createElement('div');
         bar.setAttribute('data-mobile-back-btn', 'true');
         bar.className =
-          'sm:hidden flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 z-30';
+          'sm:hidden flex items-center justify-between px-4 py-2.5 bg-white dark:bg-[#121216] border-b border-zinc-200 dark:border-[#27272A] shrink-0 sticky top-0 z-30';
 
         const backButton = document.createElement('button');
         backButton.type = 'button';
         backButton.setAttribute('aria-label', 'Atrás');
         backButton.className =
-          'inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 active:scale-95 cursor-pointer';
+          'inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] active:scale-95 cursor-pointer';
         backButton.innerHTML =
           '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600 dark:text-indigo-400 shrink-0"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
         backButton.onclick = (e) => {
@@ -1437,7 +1437,7 @@ const AppContent: React.FC = () => {
     return (
       <>
         {!isDesktopApp() && (
-          <div className="w-full bg-slate-900 text-white px-3.5 sm:px-4 py-1.5 flex items-center justify-between gap-2 text-xs border-b border-slate-800 z-50 shrink-0">
+          <div className="w-full bg-[#121216] text-white px-3.5 sm:px-4 py-1.5 flex items-center justify-between gap-2 text-xs border-b border-[#27272A] z-50 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -1459,7 +1459,7 @@ const AppContent: React.FC = () => {
               <span className="sm:hidden truncate">Volver a Presentación y Guía</span>
               <span className="hidden sm:inline truncate">Ir a Presentación y Documentación (www.kongre-app.com)</span>
             </button>
-            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline shrink-0">
+            <span className="text-[11px] font-mono tabular-nums text-zinc-400 hidden sm:inline shrink-0">
               kongre-app.com/#portal
             </span>
           </div>
@@ -1554,7 +1554,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] text-zinc-900 dark:text-[#F4F4F5] flex flex-col font-sans transition-colors duration-200">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -1588,18 +1588,18 @@ const AppContent: React.FC = () => {
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} ${isInspectorOpen ? 'lg:pr-[380px]' : ''} transition-all duration-200 flex flex-col justify-between overflow-x-clip`}>
         <div className="relative flex-1 w-full px-2.5 sm:px-4 md:px-6 lg:px-7 xl:px-8 py-2.5 sm:py-5 pb-6">
           {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
-            <div className="md:hidden sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 -mx-2.5 px-3 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2.5 mb-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="md:hidden sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 -mx-2.5 px-3 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2.5 mb-3.5 bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-3 shadow-2xs">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   type="button"
                   data-mobile-back-btn="true"
                   aria-label="Atrás"
                   onClick={() => setActiveTab(previousTab || 'menu')}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-all active:scale-95 cursor-pointer shrink-0"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] transition-all active:scale-95 cursor-pointer shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 </button>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 truncate">
+                <span className="text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5] truncate">
                   {mobileTabTitles[activeTab] || ''}
                 </span>
               </div>
@@ -1639,10 +1639,10 @@ const AppContent: React.FC = () => {
                     <Building2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                       {isGuestSession ? 'Modo Invitado / Exploración Activa' : '¡Bienvenido! Tu congregación aún no está configurada'}
                     </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                    <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
                       {isGuestSession
                         ? 'Estás explorando Kongre en modo invitado (solo lectura). Puedes consultar el programa de reuniones, cartelera y calendario, o registrar tu congregación para empezar a administrarla.'
                         : 'Puedes usar y explorar la app libremente, o registrar los datos oficiales (nombre, circuito y reuniones) para comenzar a organizar.'}

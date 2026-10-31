@@ -335,17 +335,17 @@ export const TableroAnunciosTab: React.FC = () => {
   const getCategoryBadge = (cat: CongregationNotice['category']) => {
     switch (cat) {
       case 'circuito':
-        return { label: 'Visita del SC', bg: 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300' };
+        return { label: 'Visita del SC', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
       case 'asamblea':
-        return { label: 'Asamblea', bg: 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' };
+        return { label: 'Asamblea', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
       case 'campana':
-        return { label: 'Campaña Especial', bg: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' };
+        return { label: 'Campaña Especial', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
       case 'limpieza':
-        return { label: 'Aseo y Salón', bg: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' };
+        return { label: 'Aseo y Salón', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
       case 'carta':
-        return { label: 'Carta Oficial', bg: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300' };
+        return { label: 'Carta Oficial', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
       default:
-        return { label: 'Anuncio General', bg: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300' };
+        return { label: 'Anuncio General', bg: 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]' };
     }
   };
 
@@ -362,15 +362,15 @@ export const TableroAnunciosTab: React.FC = () => {
     <div className="space-y-5">
       {/* Toast flotante */}
       {toastMsg && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-bold flex items-center justify-between gap-2 shadow-sm animate-in fade-in">
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 text-xs font-bold flex items-center justify-between gap-2 shadow-sm animate-in fade-in">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
             <span>{toastMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setToastMsg(null)}
-            className="text-emerald-600 hover:text-emerald-800 cursor-pointer"
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -378,15 +378,15 @@ export const TableroAnunciosTab: React.FC = () => {
       )}
 
       {/* Barra Principal de Navegación del Tablero Digital */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl w-full lg:w-auto">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] rounded-xl w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setActiveSubTab('cartelera_khs')}
             className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'cartelera_khs'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
+                ? 'bg-indigo-600 text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200/60 dark:hover:bg-[#27272A]'
             }`}
           >
             <Building2 className="w-4 h-4 shrink-0" />
@@ -399,18 +399,18 @@ export const TableroAnunciosTab: React.FC = () => {
             onClick={() => setActiveSubTab('despacho_mensual_khs')}
             className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'despacho_mensual_khs'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
+                ? 'bg-indigo-600 text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200/60 dark:hover:bg-[#27272A]'
             }`}
           >
             <Layers className="w-4 h-4 shrink-0" />
             <span className="truncate hidden sm:inline">Hojas por Hermano</span>
             <span className="truncate sm:hidden">Hojas (.ics)</span>
             <span
-              className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 ${
+              className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 font-mono tabular-nums ${
                 activeSubTab === 'despacho_mensual_khs'
                   ? 'bg-white/20 text-white'
-                  : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
+                  : 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
               }`}
             >
               {bundleStats.publishersCount}
@@ -422,8 +422,8 @@ export const TableroAnunciosTab: React.FC = () => {
             onClick={() => setActiveSubTab('anuncios_cartas')}
             className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'anuncios_cartas'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
+                ? 'bg-indigo-600 text-white'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200/60 dark:hover:bg-[#27272A]'
             }`}
           >
             <Bell className="w-4 h-4 shrink-0" />
@@ -431,10 +431,10 @@ export const TableroAnunciosTab: React.FC = () => {
             <span className="truncate sm:hidden">Comunicados</span>
             {notices.length > 0 && (
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 ${
+                className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 font-mono tabular-nums ${
                   activeSubTab === 'anuncios_cartas'
                     ? 'bg-white/20 text-white'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    : 'bg-zinc-200 dark:bg-[#27272A] text-zinc-700 dark:text-[#A1A1AA]'
                 }`}
               >
                 {notices.length}
@@ -448,7 +448,7 @@ export const TableroAnunciosTab: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenNew}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Publicar Anuncio</span>
@@ -463,7 +463,7 @@ export const TableroAnunciosTab: React.FC = () => {
       {activeSubTab === 'cartelera_khs' && selectedWeek && (
         <div className="space-y-5">
           {/* Barra de Control de la Semana y Exportaciones de Cartelera */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col xl:flex-row xl:items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 flex-wrap">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
@@ -473,7 +473,7 @@ export const TableroAnunciosTab: React.FC = () => {
                   <select
                     value={selectedWeek.id}
                     onChange={(e) => setSelectedWeekId(e.target.value)}
-                    className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-bold text-slate-900 dark:text-white cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] cursor-pointer font-mono tabular-nums focus:outline-none"
                   >
                     {weeks.map((wk) => (
                       <option key={wk.id} value={wk.id}>
@@ -501,7 +501,7 @@ export const TableroAnunciosTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handlePrintBoardA4}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer"
                 title="Imprimir hoja A4 consolidada lista para fijar en el Tablero de Información del Salón del Reino"
               >
                 <Printer className="w-4 h-4" />
@@ -511,21 +511,21 @@ export const TableroAnunciosTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleShareBoardWhatsApp}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all cursor-pointer"
                 title="Compartir el boletín semanal completo por WhatsApp"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4 text-emerald-500" />
                 <span>Boletín WhatsApp</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleCopyBoardWhatsApp}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all cursor-pointer"
                 title="Copiar boletín semanal de toda la cartelera"
               >
                 {copiedBoardBull ? (
-                  <Check className="w-4 h-4 text-emerald-600" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -535,7 +535,7 @@ export const TableroAnunciosTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDownloadMasterIcs}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 text-xs font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 text-xs font-bold transition-all cursor-pointer"
                 title="Descargar calendario general del Salón del Reino (.ics) para Google / Apple / Outlook Calendar"
               >
                 <Download className="w-4 h-4" />
@@ -549,60 +549,60 @@ export const TableroAnunciosTab: React.FC = () => {
             {/* COLUMNA IZQUIERDA (7 cols): S-140 VIDA Y MINISTERIO + REUNIÓN PÚBLICA */}
             <div className="lg:col-span-7 space-y-5">
               {/* BLOQUE 1: VIDA Y MINISTERIO CRISTIANOS (S-140) */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-indigo-900 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-indigo-950 dark:bg-[#18181F] border-b border-indigo-800/30 dark:border-[#27272A] text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-indigo-300" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
                       Reunión Vida y Ministerio Cristianos (S-140)
                     </h3>
                   </div>
-                  <span className="text-[11px] font-bold bg-white/15 px-2.5 py-0.5 rounded-lg">
+                  <span className="text-[11px] font-bold bg-white/15 px-2.5 py-0.5 rounded-lg font-mono tabular-nums">
                     {formatShortSpanishDate(selectedWeek.midweek.date || selectedWeek.weekStartDate)} •{' '}
                     {settings.midweekMeetingTime || '19:00'}
                   </span>
                 </div>
 
                 {selectedWeek.specialEvent?.noMeetingMidweek ? (
-                  <div className="p-6 text-center text-xs text-slate-500">
+                  <div className="p-6 text-center text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Sin reunión entre semana en el Salón ({selectedWeek.specialEvent.title || 'Evento Especial'}).
                   </div>
                 ) : (
                   <div className="p-4 space-y-4 text-xs">
                     {/* Presidente, Consejero y Oración Inicial */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-zinc-50 dark:bg-[#18181F]/50 p-3 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Presidente
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white">
+                        <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.midweek.presidentId, publishersMap)}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Consejero Sala Auxiliar
                         </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5]">
                           {selectedWeek.midweek.auxiliaryCounselorId
                             ? resolvePublisherName(selectedWeek.midweek.auxiliaryCounselorId, publishersMap)
                             : '—'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Oración Inicial
                         </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.midweek.initialPrayerId, publishersMap)}
                         </span>
                       </div>
                     </div>
 
                     {/* Tesoros de la Biblia */}
-                    <div className="border-l-4 border-slate-600 pl-3 space-y-1.5">
+                    <div className="border-l-4 border-zinc-500 pl-3 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-700 dark:text-[#F4F4F5]">
                           Tesoros de la Biblia
                         </span>
                         {selectedWeek.midweek.bibleReading && (
@@ -611,12 +611,12 @@ export const TableroAnunciosTab: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <div className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                         <div className="py-1.5 flex items-center justify-between gap-2">
-                          <span className="text-slate-600 dark:text-slate-300">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">
                             1. {selectedWeek.midweek.tesoros.discurso.title} (10 min)
                           </span>
-                          <span className="font-bold text-slate-900 dark:text-white">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {resolvePublisherName(
                               selectedWeek.midweek.tesoros.discurso.publisherId,
                               publishersMap
@@ -624,10 +624,10 @@ export const TableroAnunciosTab: React.FC = () => {
                           </span>
                         </div>
                         <div className="py-1.5 flex items-center justify-between gap-2">
-                          <span className="text-slate-600 dark:text-slate-300">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">
                             2. Busquemos Perlas Escondidas (10 min)
                           </span>
-                          <span className="font-bold text-slate-900 dark:text-white">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {resolvePublisherName(
                               selectedWeek.midweek.tesoros.perlas.publisherId,
                               publishersMap
@@ -635,11 +635,11 @@ export const TableroAnunciosTab: React.FC = () => {
                           </span>
                         </div>
                         <div className="py-1.5 flex items-center justify-between gap-2">
-                          <span className="text-slate-600 dark:text-slate-300">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">
                             3. Lectura de la Biblia (4 min)
                           </span>
                           <div className="text-right">
-                            <span className="font-bold text-slate-900 dark:text-white block">
+                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">
                               {resolvePublisherName(
                                 selectedWeek.midweek.tesoros.lecturaBiblia.publisherId,
                                 publishersMap
@@ -664,7 +664,7 @@ export const TableroAnunciosTab: React.FC = () => {
                       <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400 block">
                         Seamos Mejores Maestros
                       </span>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <div className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                         {selectedWeek.midweek.maestros.items.map((item, idx) => {
                           const tit = resolvePublisherName(item.publisherId, publishersMap);
                           const ast = item.assistantId
@@ -676,7 +676,7 @@ export const TableroAnunciosTab: React.FC = () => {
                               className="py-1.5 flex items-center justify-between gap-2"
                             >
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-slate-600 dark:text-slate-300">
+                                <span className="text-zinc-600 dark:text-[#A1A1AA]">
                                   {item.title} {item.timeMinutes ? `(${item.timeMinutes} min)` : ''}
                                 </span>
                                 {item.room === 'auxiliar' && (
@@ -685,10 +685,10 @@ export const TableroAnunciosTab: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <span className="font-bold text-slate-900 dark:text-white text-right">
+                              <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-right">
                                 {tit}
                                 {ast && (
-                                  <span className="font-medium text-slate-500 dark:text-slate-400">
+                                  <span className="font-medium text-zinc-500 dark:text-[#A1A1AA]">
                                     {' '}
                                     / {ast}
                                   </span>
@@ -705,30 +705,30 @@ export const TableroAnunciosTab: React.FC = () => {
                       <span className="text-[11px] font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-400 block">
                         Nuestra Vida Cristiana
                       </span>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <div className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                         {selectedWeek.midweek.vidaCristiana.items.map((item, idx) => (
                           <div
                             key={item.id || idx}
                             className="py-1.5 flex items-center justify-between gap-2"
                           >
-                            <span className="text-slate-600 dark:text-slate-300">
+                            <span className="text-zinc-600 dark:text-[#A1A1AA]">
                               {item.title} {item.timeMinutes ? `(${item.timeMinutes} min)` : ''}
                             </span>
-                            <span className="font-bold text-slate-900 dark:text-white">
+                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                               {resolvePublisherName(item.publisherId, publishersMap)}
                             </span>
                           </div>
                         ))}
                         <div className="py-1.5 flex items-center justify-between gap-2">
-                          <span className="font-semibold text-slate-700 dark:text-slate-200">
+                          <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5]">
                             Estudio Bíblico de la Congregación (30 min)
                           </span>
-                          <span className="font-bold text-slate-900 dark:text-white text-right">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-right">
                             {resolvePublisherName(
                               selectedWeek.midweek.vidaCristiana.estudioBiblico.conductorId,
                               publishersMap
                             )}{' '}
-                            <span className="font-normal text-slate-500">
+                            <span className="font-normal text-zinc-500 dark:text-[#A1A1AA]">
                               (Lector:{' '}
                               {resolvePublisherName(
                                 selectedWeek.midweek.vidaCristiana.estudioBiblico.lectorId,
@@ -739,8 +739,8 @@ export const TableroAnunciosTab: React.FC = () => {
                           </span>
                         </div>
                         <div className="py-1.5 flex items-center justify-between gap-2">
-                          <span className="text-slate-500">Oración de Conclusión</span>
-                          <span className="font-bold text-slate-900 dark:text-white">
+                          <span className="text-zinc-500 dark:text-[#A1A1AA]">Oración de Conclusión</span>
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {resolvePublisherName(selectedWeek.midweek.finalPrayerId, publishersMap)}
                           </span>
                         </div>
@@ -751,40 +751,40 @@ export const TableroAnunciosTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 2: REUNIÓN PÚBLICA Y ESTUDIO DE LA ATALAYA */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-blue-900 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-blue-950 dark:bg-[#18181F] border-b border-blue-800/30 dark:border-[#27272A] text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Mic className="w-4 h-4 text-blue-300" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
                       Reunión Pública y Estudio de La Atalaya
                     </h3>
                   </div>
-                  <span className="text-[11px] font-bold bg-white/15 px-2.5 py-0.5 rounded-lg">
+                  <span className="text-[11px] font-bold bg-white/15 px-2.5 py-0.5 rounded-lg font-mono tabular-nums">
                     {formatShortSpanishDate(selectedWeek.weekend.date || selectedWeek.weekEndDate)} •{' '}
                     {settings.weekendMeetingTime || '10:00'}
                   </span>
                 </div>
 
                 {selectedWeek.specialEvent?.noMeetingWeekend ? (
-                  <div className="p-6 text-center text-xs text-slate-500">
+                  <div className="p-6 text-center text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Sin reunión de fin de semana en el Salón ({selectedWeek.specialEvent.title || 'Evento Especial'}).
                   </div>
                 ) : (
                   <div className="p-4 space-y-3.5 text-xs">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-zinc-50 dark:bg-[#18181F]/50 p-3 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Presidente
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white">
+                        <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.weekend.presidentId, publishersMap)}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Canciones
                         </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">
                           {[
                             selectedWeek.weekend.openingSong && `#${selectedWeek.weekend.openingSong}`,
                             selectedWeek.weekend.middleSong && `#${selectedWeek.weekend.middleSong}`,
@@ -795,7 +795,7 @@ export const TableroAnunciosTab: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Hospitalidad Orador
                         </span>
                         <span className="font-semibold text-emerald-700 dark:text-emerald-400">
@@ -810,9 +810,9 @@ export const TableroAnunciosTab: React.FC = () => {
                     </div>
 
                     {/* Discurso Público */}
-                    <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50 space-y-1">
+                    <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/70 dark:border-blue-900/40 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-300 font-mono tabular-nums">
                           Discurso Público (30 min)
                           {selectedWeek.weekend.publicTalkOutlineNumber
                             ? ` • Bosquejo #${selectedWeek.weekend.publicTalkOutlineNumber}`
@@ -822,20 +822,20 @@ export const TableroAnunciosTab: React.FC = () => {
                           {selectedWeek.weekend.isVisitingSpeaker ? 'Orador Visitante' : 'Orador Local'}
                         </span>
                       </div>
-                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      <h4 className="text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
                         “{selectedWeek.weekend.publicTalkTheme || 'Tema por confirmar'}”
                       </h4>
-                      <p className="text-xs text-slate-700 dark:text-slate-300">
+                      <p className="text-xs text-zinc-700 dark:text-[#F4F4F5]">
                         <strong>Orador:</strong>{' '}
                         {selectedWeek.weekend.isVisitingSpeaker
-                          ? selectedWeek.weekend.publicTalkSpeaker || 'Por confirmar'
+                            ? selectedWeek.weekend.publicTalkSpeaker || 'Por confirmar'
                           : resolvePublisherName(
                               selectedWeek.weekend.publicTalkSpeaker,
                               publishersMap
                             )}
                         {selectedWeek.weekend.isVisitingSpeaker &&
                           selectedWeek.weekend.visitingSpeakerCongregation && (
-                            <span className="text-slate-500">
+                            <span className="text-zinc-500 dark:text-[#A1A1AA]">
                               {' '}
                               — Congregación {selectedWeek.weekend.visitingSpeakerCongregation}
                             </span>
@@ -844,28 +844,28 @@ export const TableroAnunciosTab: React.FC = () => {
                     </div>
 
                     {/* Estudio de La Atalaya */}
-                    <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] block">
                           Conductor La Atalaya
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white">
+                        <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.weekend.atalayaConductorId, publishersMap)}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] block">
                           Lector La Atalaya
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white">
+                        <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.weekend.atalayaLectorId, publishersMap)}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                        <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
                           Oración Final
                         </span>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                        <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                           {resolvePublisherName(selectedWeek.weekend.finalPrayerId, publishersMap)}
                         </span>
                       </div>
@@ -878,8 +878,8 @@ export const TableroAnunciosTab: React.FC = () => {
             {/* COLUMNA DERECHA (5 cols): DEBERES MECÁNICOS + ASEO S-28 + SERVICIO DEL CAMPO */}
             <div className="lg:col-span-5 space-y-5">
               {/* BLOQUE 3: MATRIZ DE DEBERES MECÁNICOS Y ACOMODADORES */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-teal-900 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-teal-950 dark:bg-[#18181F] border-b border-teal-800/30 dark:border-[#27272A] text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-teal-300" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
@@ -891,13 +891,13 @@ export const TableroAnunciosTab: React.FC = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-[10px] font-extrabold uppercase text-slate-500">
+                      <tr className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-[10px] font-extrabold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                         <th className="py-2.5 px-3">Departamento</th>
                         <th className="py-2.5 px-3">Entre Semana</th>
                         <th className="py-2.5 px-3">Fin de Semana</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                       {standardDutyKeys.map((dKey) => {
                         const label = getDutyFriendlyLabel(dKey, customDuties);
                         const midNames = resolveDutyNamesList(
@@ -911,14 +911,14 @@ export const TableroAnunciosTab: React.FC = () => {
                           publishersMap
                         );
                         return (
-                          <tr key={dKey} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
-                            <td className="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200">
+                          <tr key={dKey} className="hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/50">
+                            <td className="py-2.5 px-3 font-bold text-zinc-800 dark:text-[#F4F4F5]">
                               {label}
                             </td>
-                            <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">
+                            <td className="py-2.5 px-3 text-zinc-600 dark:text-[#A1A1AA]">
                               {midNames}
                             </td>
-                            <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">
+                            <td className="py-2.5 px-3 text-zinc-600 dark:text-[#A1A1AA]">
                               {wkndNames}
                             </td>
                           </tr>
@@ -930,15 +930,15 @@ export const TableroAnunciosTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 4: PROGRAMA DE ASEO DEL SALÓN DEL REINO (S-28) */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-emerald-900 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-[#F4F4F5] px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Brush className="w-4 h-4 text-emerald-300" />
+                    <Brush className="w-4 h-4 text-zinc-500" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
                       Aseo y Limpieza del Salón (S-28)
                     </h3>
                   </div>
-                  <span className="text-[10px] font-bold bg-white/15 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-zinc-100 dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded font-mono tabular-nums">
                     {CLEANING_TYPE_LABELS[selectedWeek.cleaningType || 'semanal']}
                   </span>
                 </div>
@@ -954,33 +954,33 @@ export const TableroAnunciosTab: React.FC = () => {
                     return (
                       <div
                         key={gNum}
-                        className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50 flex items-center justify-between gap-2"
+                        className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-2"
                       >
                         <div>
-                          <span className="font-extrabold text-emerald-900 dark:text-emerald-200 text-sm block">
+                          <span className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm block font-mono tabular-nums">
                             Grupo #{gNum} {grp?.name ? `— ${grp.name}` : ''}
                           </span>
-                          <span className="text-[11px] text-slate-600 dark:text-slate-300">
-                            Sup.: <strong>{ovs}</strong> • Aux.: <strong>{ast}</strong>
+                          <span className="text-[11px] text-zinc-600 dark:text-[#A1A1AA]">
+                            Sup.: <strong className="text-zinc-800 dark:text-[#F4F4F5]">{ovs}</strong> • Aux.: <strong className="text-zinc-800 dark:text-[#F4F4F5]">{ast}</strong>
                           </span>
                         </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px]">
+                        <span className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 font-bold text-[10px]">
                           Responsable
                         </span>
                       </div>
                     );
                   })}
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                  <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA] pt-1">
                     <span>
                       Modalidad:{' '}
-                      <strong className="text-slate-700 dark:text-slate-200">
+                      <strong className="text-zinc-700 dark:text-[#F4F4F5]">
                         {CLEANING_TYPE_LABELS[selectedWeek.cleaningType || 'semanal']}
                       </strong>
                     </span>
                     <span>
                       Insumos:{' '}
-                      <strong className="text-slate-700 dark:text-slate-200">
+                      <strong className="text-zinc-700 dark:text-[#F4F4F5]">
                         {CLEANING_SUPPLIES_LABELS[selectedWeek.cleaningSuppliesStatus || 'abastecido'].label}
                       </strong>
                     </span>
@@ -989,8 +989,8 @@ export const TableroAnunciosTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 5: SALIDAS AL SERVICIO DEL CAMPO */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-zinc-800 dark:bg-[#18181F] border-b border-zinc-700/50 dark:border-[#27272A] text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Compass className="w-4 h-4 text-sky-300" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
@@ -1001,20 +1001,20 @@ export const TableroAnunciosTab: React.FC = () => {
 
                 <div className="p-3.5 space-y-2 text-xs">
                   {fieldServiceMeetings.length === 0 ? (
-                    <p className="text-slate-400 text-center py-3">
+                    <p className="text-zinc-400 dark:text-[#A1A1AA] text-center py-3">
                       No hay salidas registradas en el programa.
                     </p>
                   ) : (
                     fieldServiceMeetings.slice(0, 5).map((fsm) => (
                       <div
                         key={fsm.id}
-                        className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 flex items-center justify-between gap-2"
+                        className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between gap-2"
                       >
                         <div>
-                          <span className="font-bold text-slate-900 dark:text-white">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                             {fsm.dayOfWeek} • {fsm.time}
                           </span>
-                          <span className="text-[11px] text-slate-500 block">{fsm.location}</span>
+                          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block">{fsm.location}</span>
                         </div>
                         <div className="text-right">
                           <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] block">
@@ -1023,7 +1023,7 @@ export const TableroAnunciosTab: React.FC = () => {
                               : 'Conductor'}
                           </span>
                           {fsm.territoryNumber && (
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums">
                               Territorio #{fsm.territoryNumber}
                             </span>
                           )}
@@ -1035,8 +1035,8 @@ export const TableroAnunciosTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 6: ANUNCIOS FIJADOS EN LA CARTELERA */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                <div className="bg-indigo-950 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+                <div className="bg-indigo-950 dark:bg-[#18181F] border-b border-indigo-800/30 dark:border-[#27272A] text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Pin className="w-4 h-4 text-amber-300" />
                     <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
@@ -1046,7 +1046,7 @@ export const TableroAnunciosTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveSubTab('anuncios_cartas')}
-                    className="text-[11px] font-bold text-indigo-200 hover:text-white underline cursor-pointer"
+                    className="text-[11px] font-bold text-indigo-200 dark:text-indigo-400 hover:text-white underline cursor-pointer font-mono tabular-nums"
                   >
                     Ver todos ({notices.length})
                   </button>
@@ -1056,13 +1056,13 @@ export const TableroAnunciosTab: React.FC = () => {
                   {sortedNotices.slice(0, 3).map((n) => (
                     <div
                       key={n.id}
-                      className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1"
+                      className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A] space-y-1"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-slate-900 dark:text-white">{n.title}</span>
-                        <span className="text-[10px] text-slate-400">{n.date}</span>
+                        <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{n.title}</span>
+                        <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] font-mono tabular-nums">{n.date}</span>
                       </div>
-                      <p className="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2">
+                      <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA] line-clamp-2">
                         {n.content}
                       </p>
                     </div>
@@ -1080,53 +1080,62 @@ export const TableroAnunciosTab: React.FC = () => {
       {activeSubTab === 'despacho_mensual_khs' && (
         <div className="space-y-5">
           {/* KPIs y Filtros de Despacho Mensual */}
-          <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   Despacho Unificado Mensual
                 </span>
-                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
                   Hojas Personales del Mes y Calendarios (.ics) por Publicador
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Envía en un solo mensaje de WhatsApp o archivo .ics todas las partes de VMC, Fin de Semana, Audio/Micrófonos, Aseo y Carritos de cada hermano.
                 </p>
               </div>
 
               {/* Tarjetas Resumen KPI */}
               <div className="grid grid-cols-3 gap-2.5 shrink-0">
-                <div className="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-800/60 text-center">
-                  <span className="text-base sm:text-lg font-black text-indigo-700 dark:text-indigo-300 block">
+                <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-xs text-center">
+                  <span className="text-base sm:text-lg font-black text-zinc-900 dark:text-[#F4F4F5] block font-mono tabular-nums">
                     {bundleStats.publishersCount}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500">Hermanos Asignados</span>
+                  <span className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                    Hermanos
+                  </span>
                 </div>
-                <div className="px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 dark:border-emerald-800/60 text-center">
-                  <span className="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-300 block">
+                <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-xs text-center">
+                  <span className="text-base sm:text-lg font-black text-zinc-900 dark:text-[#F4F4F5] block font-mono tabular-nums">
                     {bundleStats.totalAssignments}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500">Turnos / Partes</span>
+                  <span className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Turnos / Partes
+                  </span>
                 </div>
-                <div className="px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200/60 dark:border-amber-800/60 text-center">
-                  <span className="text-base sm:text-lg font-black text-amber-700 dark:text-amber-300 block">
+                <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-xs text-center">
+                  <span className="text-base sm:text-lg font-black text-zinc-900 dark:text-[#F4F4F5] block font-mono tabular-nums">
                     {bundleStats.totalFamilyDays}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500">Noches en Familia</span>
+                  <span className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    En Familia
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Controles de Filtro por Mes, Categoría y Buscador */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={dispatchSearch}
                   onChange={(e) => setDispatchSearch(e.target.value)}
                   placeholder="Buscar hermano o hermana..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-semibold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
@@ -1134,7 +1143,7 @@ export const TableroAnunciosTab: React.FC = () => {
                 <select
                   value={dispatchCategoryFilter}
                   onChange={(e) => setDispatchCategoryFilter(e.target.value as any)}
-                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-white"
+                  className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] focus:outline-none"
                 >
                   <option value="todas">Todas las áreas teocráticas</option>
                   <option value="vym">📖 Vida y Ministerio</option>
@@ -1148,7 +1157,7 @@ export const TableroAnunciosTab: React.FC = () => {
                 <select
                   value={dispatchMonthFilter}
                   onChange={(e) => setDispatchMonthFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-white"
+                  className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] focus:outline-none"
                 >
                   <option value="all_upcoming">Todas las semanas cargadas</option>
                   {availableMonths.map((mKey) => (
@@ -1170,15 +1179,15 @@ export const TableroAnunciosTab: React.FC = () => {
               return (
                 <div
                   key={pub.id}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs flex flex-col justify-between gap-3"
+                  className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col justify-between gap-3"
                 >
                   <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                        <h4 className="text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
                           {pub.name}
                         </h4>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                           {assignments.length}{' '}
                           {assignments.length === 1 ? 'asignación consolidada' : 'asignaciones consolidadas'}
                           {pub.groupNumber ? ` • Grupo #${pub.groupNumber}` : ''}
@@ -1186,41 +1195,41 @@ export const TableroAnunciosTab: React.FC = () => {
                       </div>
 
                       {familySharedDaysCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 font-mono tabular-nums">
                           👨‍👩‍👧‍👦 {familySharedDaysCount} d. en familia
                         </span>
                       )}
                     </div>
 
                     {/* Chips de desglose por área */}
-                    <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-bold">
+                    <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-bold font-mono tabular-nums">
                       {countsByCategory.vym > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           📖 VMC: {countsByCategory.vym}
                         </span>
                       )}
                       {countsByCategory.fin_de_semana > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           🏛️ Fin Sem.: {countsByCategory.fin_de_semana}
                         </span>
                       )}
                       {countsByCategory.deberes > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           🎧 Deberes: {countsByCategory.deberes}
                         </span>
                       )}
                       {countsByCategory.limpieza > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           🧹 Aseo: {countsByCategory.limpieza}
                         </span>
                       )}
                       {countsByCategory.carritos > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           🛒 Carritos: {countsByCategory.carritos}
                         </span>
                       )}
                       {countsByCategory.servicio_campo > 0 && (
-                        <span className="px-2 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                           🧭 Campo: {countsByCategory.servicio_campo}
                         </span>
                       )}
@@ -1231,15 +1240,15 @@ export const TableroAnunciosTab: React.FC = () => {
                       {(isExpanded ? assignments : assignments.slice(0, 3)).map((a) => (
                         <div
                           key={a.id}
-                          className="text-[11px] flex items-center justify-between gap-2 py-1 border-b border-slate-100 dark:border-slate-800/70 last:border-0"
+                          className="text-[11px] flex items-center justify-between gap-2 py-1 border-b border-zinc-100 dark:border-[#27272A] last:border-0"
                         >
-                          <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
-                            <strong className="text-slate-900 dark:text-white">
+                          <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5] truncate">
+                            <strong className="text-zinc-900 dark:text-white font-mono tabular-nums">
                               {formatShortSpanishDate(a.date)}:
                             </strong>{' '}
                             {a.title}
                           </span>
-                          <span className="text-[10px] text-slate-400 shrink-0">
+                          <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] shrink-0">
                             {a.categoryLabel}
                           </span>
                         </div>
@@ -1254,7 +1263,7 @@ export const TableroAnunciosTab: React.FC = () => {
                               [pub.id]: !prev[pub.id],
                             }))
                           }
-                          className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline pt-1 cursor-pointer"
+                          className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline pt-1 cursor-pointer font-mono tabular-nums"
                         >
                           {isExpanded
                             ? 'Ocultar lista completa'
@@ -1265,7 +1274,7 @@ export const TableroAnunciosTab: React.FC = () => {
                   </div>
 
                   {/* Acciones 1-Clic de Despacho para el Hermano */}
-                  <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5 flex-wrap">
+                  <div className="pt-2.5 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-1.5 flex-wrap">
                     <button
                       type="button"
                       onClick={() => {
@@ -1277,10 +1286,10 @@ export const TableroAnunciosTab: React.FC = () => {
                         );
                         openWhatsAppLink(pub.phone || '', msg);
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-bold transition-all cursor-pointer"
                       title="Enviar hoja mensual unificada por WhatsApp"
                     >
-                      <MessageCircle className="w-3.5 h-3.5" />
+                      <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
                       <span>WhatsApp Único</span>
                     </button>
 
@@ -1296,7 +1305,7 @@ export const TableroAnunciosTab: React.FC = () => {
                           );
                           triggerToast(`Calendario .ics descargado para ${pub.name}.`);
                         }}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all cursor-pointer"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all cursor-pointer"
                         title="Descargar archivo .ics con todas las asignaciones de este hermano"
                       >
                         <Download className="w-3.5 h-3.5" />
@@ -1313,7 +1322,7 @@ export const TableroAnunciosTab: React.FC = () => {
                             settings
                           )
                         }
-                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
+                        className="p-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] transition-all cursor-pointer"
                         title="Imprimir Hoja Mensual Personal A4"
                       >
                         <Printer className="w-3.5 h-3.5" />
@@ -1332,11 +1341,11 @@ export const TableroAnunciosTab: React.FC = () => {
                           setCopiedPubBundleId(pub.id);
                           setTimeout(() => setCopiedPubBundleId(null), 2000);
                         }}
-                        className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all cursor-pointer"
+                        className="p-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] transition-all cursor-pointer"
                         title="Copiar resumen mensual"
                       >
                         {copiedPubBundleId === pub.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
@@ -1356,7 +1365,7 @@ export const TableroAnunciosTab: React.FC = () => {
       {activeSubTab === 'anuncios_cartas' && (
         <div className="space-y-5">
           {/* Categories Filter Bar */}
-          <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-2 overflow-x-auto">
+          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-2 overflow-x-auto">
             {[
               { id: 'todos', label: 'Todos los anuncios' },
               { id: 'circuito', label: 'Visita del SC' },
@@ -1371,8 +1380,8 @@ export const TableroAnunciosTab: React.FC = () => {
                 onClick={() => setSelectedCategory(c.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === c.id
-                    ? 'bg-slate-900 dark:bg-indigo-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/60 dark:border-[#27272A]'
                 }`}
               >
                 {c.label}
@@ -1382,12 +1391,12 @@ export const TableroAnunciosTab: React.FC = () => {
 
           {/* Notices Grid */}
           {sortedNotices.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center">
-              <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-base font-bold text-slate-800 dark:text-white mb-1">
+            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-12 text-center">
+              <Bell className="w-12 h-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1">
                 No hay anuncios publicados en esta categoría
               </h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto mb-4">
                 Presione &ldquo;Publicar Anuncio&rdquo; para redactar un aviso para la congregación.
               </p>
             </div>
@@ -1399,10 +1408,10 @@ export const TableroAnunciosTab: React.FC = () => {
                 return (
                   <div
                     key={notice.id}
-                    className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all p-5 flex flex-col justify-between shadow-xs hover:shadow-md ${
+                    className={`bg-white dark:bg-[#121216] rounded-xl border transition-all p-5 flex flex-col justify-between ${
                       notice.pinned
-                        ? 'border-indigo-300 dark:border-indigo-700 ring-2 ring-indigo-100 dark:ring-indigo-950/50'
-                        : 'border-slate-200 dark:border-slate-800'
+                        ? 'border-indigo-500/70 ring-1 ring-indigo-500/30'
+                        : 'border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-[#3F3F46]'
                     }`}
                   >
                     <div>
@@ -1414,7 +1423,7 @@ export const TableroAnunciosTab: React.FC = () => {
                             {badge.label}
                           </span>
                           {notice.pinned && (
-                            <span className="flex items-center gap-1 text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full">
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200/50 dark:border-indigo-800/40">
                               <Pin className="w-3 h-3 fill-indigo-600" />
                               Fijado
                             </span>
@@ -1425,11 +1434,11 @@ export const TableroAnunciosTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleCopyNotice(notice)}
-                            className="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg transition-colors cursor-pointer"
                             title="Copiar texto para WhatsApp"
                           >
                             {copiedNoticeId === notice.id ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             ) : (
                               <Share2 className="w-4 h-4" />
                             )}
@@ -1439,7 +1448,7 @@ export const TableroAnunciosTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleOpenEdit(notice)}
-                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg transition-colors cursor-pointer"
                                 title="Editar anuncio"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -1460,7 +1469,7 @@ export const TableroAnunciosTab: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteNoticeId(notice.id)}
-                                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                  className="p-1.5 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
                                   title="Eliminar anuncio"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -1471,22 +1480,22 @@ export const TableroAnunciosTab: React.FC = () => {
                         </div>
                       </div>
 
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-snug">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] mb-2 leading-snug">
                         {notice.title}
                       </h3>
 
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line mb-4">
+                      <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] leading-relaxed whitespace-pre-line mb-4">
                         {notice.content}
                       </p>
                     </div>
 
-                    <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                    <div className="border-t border-zinc-100 dark:border-[#27272A] pt-3 flex items-center justify-between text-[11px] text-zinc-400 dark:text-[#A1A1AA] font-medium">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>Publicado: {notice.date}</span>
+                        <span className="font-mono tabular-nums">Publicado: {notice.date}</span>
                       </div>
                       {notice.author && (
-                        <span className="font-semibold text-slate-600 dark:text-slate-300">
+                        <span className="font-semibold text-zinc-600 dark:text-[#F4F4F5]">
                           Por: {notice.author}
                         </span>
                       )}
@@ -1501,17 +1510,17 @@ export const TableroAnunciosTab: React.FC = () => {
 
       {/* CREATE / EDIT NOTICE MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                <Bell className="w-5 h-5 text-indigo-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] max-w-lg w-full p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Bell className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>{editingNotice ? 'Editar Anuncio' : 'Nuevo Anuncio para el Tablero'}</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
+                className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] rounded-lg cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1519,7 +1528,7 @@ export const TableroAnunciosTab: React.FC = () => {
 
             <form onSubmit={handleSave} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Título del Anuncio
                 </label>
                 <input
@@ -1528,13 +1537,13 @@ export const TableroAnunciosTab: React.FC = () => {
                   placeholder="Ej. Visita del Superintendente de Circuito"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-semibold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Categoría
                   </label>
                   <select
@@ -1545,7 +1554,7 @@ export const TableroAnunciosTab: React.FC = () => {
                         category: e.target.value as CongregationNotice['category'],
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500"
                   >
                     <option value="anuncio">Anuncio General</option>
                     <option value="circuito">Visita del SC</option>
@@ -1557,7 +1566,7 @@ export const TableroAnunciosTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Publicado por
                   </label>
                   <input
@@ -1565,13 +1574,13 @@ export const TableroAnunciosTab: React.FC = () => {
                     placeholder="Ej. Cuerpo de Ancianos"
                     value={formData.author}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Contenido del Anuncio
                 </label>
                 <textarea
@@ -1580,31 +1589,31 @@ export const TableroAnunciosTab: React.FC = () => {
                   placeholder="Escriba los detalles completos del comunicado..."
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Fecha
                   </label>
                   <input
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                    className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:outline-none focus:border-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Vigencia hasta (Opcional)
                   </label>
                   <input
                     type="date"
                     value={formData.expiresDate}
                     onChange={(e) => setFormData({ ...formData, expiresDate: e.target.value })}
-                    className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
+                    className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
@@ -1618,17 +1627,17 @@ export const TableroAnunciosTab: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer"
+                  className="px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer transition-colors"
                 >
                   Guardar Anuncio
                 </button>
@@ -1640,3 +1649,4 @@ export const TableroAnunciosTab: React.FC = () => {
     </div>
   );
 };
+

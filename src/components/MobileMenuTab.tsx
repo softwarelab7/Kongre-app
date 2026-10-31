@@ -465,7 +465,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             <button
               type="button"
               onClick={onOpenPinsModal}
-              className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+              className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
             >
               <KeyRound className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span className="truncate">PINs</span>
@@ -476,7 +476,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             <button
               type="button"
               onClick={onOpenTimerModal}
-              className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+              className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
             >
               <Timer className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
               <span className="truncate">Atril</span>
@@ -487,7 +487,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             <button
               type="button"
               onClick={onOpenKioskModal}
-              className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+              className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
             >
               <Tv className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <span className="truncate">Kiosko</span>
@@ -498,7 +498,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             <button
               type="button"
               onClick={onOpenQrModal}
-              className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+              className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
             >
               <QrCode className="w-3.5 h-3.5 text-violet-500 shrink-0" />
               <span className="truncate">QR</span>
@@ -508,12 +508,12 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
           <button
             type="button"
             onClick={() => handleNavigate('conflictos')}
-            className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+            className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span className="truncate">Cruces</span>
             {conflicts.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[10px] font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 text-[10px] font-bold font-mono tabular-nums border border-zinc-300/80 dark:border-[#3E3E42]">
                 {conflicts.length}
               </span>
             )}
@@ -523,17 +523,11 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             <button
               type="button"
               onClick={onOpenQueueModal}
-              className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
+              className="h-10 px-2.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition cursor-pointer shadow-xs"
             >
-              <Wifi className={`w-3.5 h-3.5 shrink-0 ${!isOnline ? 'text-amber-500' : 'text-sky-500'}`} />
+              <Wifi className={`w-3.5 h-3.5 shrink-0 ${!isOnline ? 'text-amber-500' : 'text-zinc-400'}`} />
               <span className="truncate">Sincronía</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                  (offlineQueueStats?.pendingCount || 0) > 0
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                }`}
-              >
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold font-mono tabular-nums bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-300/80 dark:border-[#3E3E42]">
                 {offlineQueueStats?.pendingCount || 0}
               </span>
             </button>
@@ -544,8 +538,8 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
           2. DEPARTMENTS & MODULES (Clean 2-Column Tactile Grid immediately visible!)
          ========================================================================= */}
       {filteredDepartments.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 text-center border border-slate-200/80 dark:border-slate-800 space-y-2.5">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <div className="bg-white dark:bg-[#121216] rounded-xl p-6 text-center border border-zinc-200 dark:border-[#27272A] space-y-2.5">
+          <p className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">
             No se encontraron secciones para &quot;{searchQuery}&quot;
           </p>
           <button
@@ -554,7 +548,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
               setSearchQuery('');
               setSelectedCategory('all');
             }}
-            className="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold cursor-pointer"
           >
             Ver todos los departamentos
           </button>
@@ -569,7 +563,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-1.5">
                     <DeptIcon className={`w-3.5 h-3.5 ${dept.accentText}`} />
-                    <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <h3 className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                       {dept.title}
                     </h3>
                   </div>
@@ -594,16 +588,18 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
                             handleNavigate('roles');
                           }
                         }}
-                        className={`min-h-[64px] p-2.5 rounded-2xl text-left transition-all cursor-pointer flex flex-col justify-between border active:scale-[0.97] ${
+                        className={`min-h-[64px] p-2.5 rounded-xl text-left transition-all cursor-pointer flex flex-col justify-between border active:scale-[0.97] ${
                           isAllowed
-                            ? 'bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-700 border-slate-200/80 dark:border-slate-800 shadow-2xs'
-                            : 'bg-slate-50/60 dark:bg-slate-900/40 border-dashed border-slate-200 dark:border-slate-800 opacity-70'
+                            ? 'bg-white dark:bg-[#121216] hover:border-zinc-400 dark:hover:border-zinc-500 border-zinc-200 dark:border-[#27272A] shadow-xs'
+                            : 'bg-zinc-50/60 dark:bg-[#121216]/50 border-dashed border-zinc-200 dark:border-[#27272A] opacity-70'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-1.5 w-full">
                           <div
-                            className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
-                              isAllowed ? `${dept.accentBg} ${dept.accentText}` : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                              isAllowed
+                                ? 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-[#27272A]'
+                                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-400'
                             }`}
                           >
                             <ItemIcon className="w-3.5 h-3.5" />
@@ -611,27 +607,23 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
 
                           <div className="flex items-center gap-1 shrink-0">
                             {Boolean(item.badge) && (
-                              <span
-                                className={`px-1.5 py-0.5 rounded-full text-[9.5px] font-bold leading-none ${
-                                  item.badgeColor || 'bg-amber-500 text-white'
-                                }`}
-                              >
+                              <span className="px-1.5 py-0.5 rounded-full text-[9.5px] font-bold font-mono tabular-nums leading-none bg-zinc-200 dark:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-300/80 dark:border-[#3E3E42]">
                                 {item.badge}
                               </span>
                             )}
                             {!isAllowed ? (
                               <Lock className="w-3 h-3 text-amber-500 shrink-0" />
                             ) : (
-                              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" />
+                              <ChevronRight className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-600 shrink-0" />
                             )}
                           </div>
                         </div>
 
                         <div className="mt-1.5 min-w-0">
-                          <p className="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
+                          <p className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] leading-tight truncate">
                             {item.label}
                           </p>
-                          <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                          <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
                             {item.description}
                           </p>
                         </div>
@@ -646,12 +638,12 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
       )}
 
       {/* Mobile Version & Stage Footer */}
-      <div className="pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col items-center justify-center text-center gap-2">
+      <div className="pt-6 pb-8 border-t border-zinc-200 dark:border-[#27272A] flex flex-col items-center justify-center text-center gap-2">
         {onOpenVersionModal ? (
           <button
             type="button"
             onClick={onOpenVersionModal}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-xs font-semibold text-slate-700 dark:text-slate-200 active:scale-95 transition-all shadow-2xs"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] active:scale-95 transition-all shadow-xs cursor-pointer"
           >
             <span>Kongre App</span>
             <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">v{CURRENT_APP_VERSION}</span>
@@ -660,14 +652,14 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
             </span>
           </button>
         ) : (
-          <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+          <div className="inline-flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
             <span>v{CURRENT_APP_VERSION}</span>
             <span className="px-1.5 py-0.2 rounded text-[9px] font-sans font-bold bg-amber-100 text-amber-700">
               {CURRENT_APP_STAGE}
             </span>
           </div>
         )}
-        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
           Fase Alfa Preliminar • Camino a la v1.0.0 Oficial
         </p>
       </div>

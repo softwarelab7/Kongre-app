@@ -623,9 +623,9 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="p-3.5 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-xl text-xs space-y-2 min-w-[210px] animate-fade-in">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
-            <span className="font-bold text-slate-800 dark:text-slate-100">
+        <div className="p-3.5 rounded-2xl bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] shadow-xl text-xs space-y-2 min-w-[210px] animate-fade-in">
+          <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-1.5">
+            <span className="font-bold text-zinc-800 dark:text-zinc-100">
               {data.monthName ? `${data.monthName} ${data.year}` : `Semana ${label}`}
             </span>
             {data.avgOverall !== undefined && (
@@ -642,7 +642,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 <span className="w-2 h-2 rounded-full bg-indigo-500" />
                 Entre Semana:
               </span>
-              <span className="font-extrabold text-slate-900 dark:text-white">
+              <span className="font-extrabold text-zinc-900 dark:text-white">
                 {data.avgMidweek ?? data.midweek}
               </span>
             </div>
@@ -653,14 +653,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 <span className="w-2 h-2 rounded-full bg-sky-500" />
                 Fin de Semana:
               </span>
-              <span className="font-extrabold text-slate-900 dark:text-white">
+              <span className="font-extrabold text-zinc-900 dark:text-white">
                 {data.avgWeekend ?? data.weekend}
               </span>
             </div>
 
             {/* In-Person vs Zoom Details if available */}
             {data.inPersonPct !== undefined && (
-              <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="pt-1.5 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                 <span className="flex items-center gap-1">
                   <Building2 className="w-3 h-3 text-emerald-500" />
                   Presencial: {data.inPersonPct}%
@@ -673,7 +673,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             )}
 
             {data.maxAttendance > 0 && (
-              <div className="text-[10px] text-slate-400 dark:text-slate-500 text-right">
+              <div className="text-[10px] text-zinc-400 dark:text-[#71717A] text-right">
                 Pico del mes: {data.maxAttendance} personas
               </div>
             )}
@@ -687,7 +687,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Top Card & Filter Controls (Light/Dark Theme Consistent) */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs border border-slate-200 dark:border-slate-800">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216] text-zinc-900 dark:text-white shadow-2xs border border-zinc-200 dark:border-[#27272A]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -696,27 +696,27 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 Año Teocrático (1 Sep - 31 Ago)
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight">
               Tendencia Histórica de Asistencia
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
               Análisis de asistencia entre semana y fin de semana •{' '}
-              <strong className="text-slate-800 dark:text-slate-200">{settings.congregationName}</strong>
+              <strong className="text-zinc-800 dark:text-[#E4E4E7]">{settings.congregationName}</strong>
             </p>
           </div>
 
           {/* Right Selector & Action Pills */}
           <div className="grid grid-cols-2 sm:flex items-center gap-2">
             {/* Service Year Selector */}
-            <div className="flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-center gap-2 bg-zinc-50 dark:bg-[#18181F] px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A]">
               <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <select
                 value={selectedServiceYear}
                 onChange={(e) => setSelectedServiceYear(e.target.value)}
-                className="bg-transparent text-slate-900 dark:text-white font-bold text-xs outline-hidden cursor-pointer"
+                className="bg-transparent text-zinc-900 dark:text-white font-bold text-xs outline-hidden cursor-pointer"
               >
                 {availableYears.map((y) => (
-                  <option key={y} value={y} className="text-slate-900 bg-white dark:bg-slate-900 dark:text-white">
+                  <option key={y} value={y} className="text-zinc-900 bg-white dark:bg-[#121216] dark:text-white">
                     Año {y}
                   </option>
                 ))}
@@ -727,7 +727,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             <button
               type="button"
               onClick={handleCopyAnnualSummary}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-bold text-xs border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
               title="Copiar resumen del año de servicio al portapapeles"
             >
               {copiedSummary ? (
@@ -746,68 +746,68 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         </div>
 
         {/* Quick Annual KPI Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
-            <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mt-4 pt-4 border-t border-zinc-100 dark:border-[#27272A]">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider block">
               Promedio Anual
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgOverall}
             </div>
             <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">Congregación total</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
             <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 tracking-wider block">
               Entre Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgMidweek}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
               {settings.midweekMeetingDay || 'Miércoles'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
             <span className="text-[10px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-wider block">
               Fin de Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgWeekend}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
               {settings.weekendMeetingDay || 'Domingo'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
             <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 tracking-wider block">
               Pico Máximo
             </span>
             <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
               {annualMetrics.absolutePeak}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
               {annualMetrics.peakMonth || '—'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
             <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider block">
               Presencial / Zoom
             </span>
-            <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
+            <div className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5">
               {annualMetrics.annualInPersonPct}% / {annualMetrics.annualZoomPct}%
             </div>
             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Distribución anual</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
-            <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider block">
               Tendencia Anual
             </span>
-            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
+            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5">
               {annualMetrics.trendDelta >= 0 ? (
                 <>
                   <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -820,7 +820,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 </>
               )}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
               {annualMetrics.monthsWithData} de 12 meses
             </span>
           </div>
@@ -828,7 +828,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       </div>
 
       {/* Navigation Pills & Visual Mode Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-2 sm:p-2.5 rounded-2xl border border-slate-200/90 dark:border-slate-800/90 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121216] p-2 sm:p-2.5 rounded-2xl border border-zinc-200/90 dark:border-[#27272A]/90 shadow-2xs">
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
@@ -836,7 +836,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'last4weeks'
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -849,7 +849,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'trends'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -862,7 +862,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'channels'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -875,7 +875,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'weekly'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -888,7 +888,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'table'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
             }`}
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -899,14 +899,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* Chart View Secondary Filters */}
         <div className="flex items-center gap-2 self-end sm:self-center">
           {chartView === 'last4weeks' && (
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
+            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl text-xs">
               <button
                 type="button"
                 onClick={() => setFourWeeksLineMode('meetings')}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   fourWeeksLineMode === 'meetings'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Por Reunión
@@ -917,7 +917,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   fourWeeksLineMode === 'channels'
                     ? 'bg-emerald-600 text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Presencial vs Zoom
@@ -928,7 +928,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   fourWeeksLineMode === 'all'
                     ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Todas las Series
@@ -937,14 +937,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
           )}
 
           {chartView === 'trends' && (
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
+            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl text-xs">
               <button
                 type="button"
                 onClick={() => setMeetingFilter('both')}
                 className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
                   meetingFilter === 'both'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Todas
@@ -955,7 +955,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
                   meetingFilter === 'midweek'
                     ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Entre Semana
@@ -966,7 +966,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
                   meetingFilter === 'weekend'
                     ? 'bg-sky-600 text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 Fin de Semana
@@ -981,7 +981,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               className={`p-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
                 showAverageLine
                   ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-transparent'
+                  : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-500 border-transparent'
               }`}
               title="Alternar línea de promedio"
             >
@@ -1004,14 +1004,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       </div>
 
       {/* Main Chart Canvas Area */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 p-4 sm:p-6 shadow-xs">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/90 dark:border-[#27272A]/90 p-4 sm:p-6 shadow-xs">
         {/* VIEW 0: COMPARATIVA DE LAS ÚLTIMAS 4 SEMANAS (RECHARTS LINECHART) */}
         {chartView === 'last4weeks' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 dark:border-[#27272A] pb-4">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg">
+                  <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base sm:text-lg">
                     Tendencia Histórica: Comparativa de las Últimas 4 Semanas
                   </h3>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
@@ -1023,7 +1023,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                   Evolución comparativa semana a semana entre la Reunión de Entre Semana ({settings.midweekMeetingDay}), Fin de Semana ({settings.weekendMeetingDay}) y el promedio general.
                 </p>
               </div>
@@ -1066,10 +1066,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
                   Prom. 4 Semanas (Entre Semana)
                 </span>
-                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                <div className="text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
                   {lastFourWeeksComparison.avg4Midweek}
                 </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   Reunión Vida y Ministerio ({settings.midweekMeetingDay})
                 </span>
               </div>
@@ -1078,10 +1078,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 block">
                   Prom. 4 Semanas (Fin de Semana)
                 </span>
-                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                <div className="text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
                   {lastFourWeeksComparison.avg4Weekend}
                 </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   Discurso Público y Atalaya ({settings.weekendMeetingDay})
                 </span>
               </div>
@@ -1107,7 +1107,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     </>
                   )}
                 </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   Promedio 4 semanas: <strong>{lastFourWeeksComparison.avg4Overall}</strong>
                 </span>
               </div>
@@ -1116,10 +1116,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
                   Mayor Asistencia (4 Semanas)
                 </span>
-                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                <div className="text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
                   {lastFourWeeksComparison.peakValue}
                 </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate block">
+                <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
                   {lastFourWeeksComparison.peakWeekLabel}
                 </span>
               </div>
@@ -1226,9 +1226,9 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             </div>
 
             {/* 4-Week Comparative Cards Breakdown */}
-            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="space-y-3 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-[#D4D4D8]">
                   Desglose Comparativo de las Últimas 4 Semanas
                 </h4>
                 {lastFourWeeksComparison.isUsingSamplePreview && onUpdateAttendance && (
@@ -1247,14 +1247,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 {lastFourWeeksComparison.items.map((wItem, idx) => (
                   <div
                     key={wItem.weekId || idx}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5"
+                    className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/80 dark:border-[#27272A]/80 space-y-2.5"
                   >
-                    <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2">
+                    <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-[#27272A]/60 pb-2">
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
                           {wItem.weekNumberLabel}
                         </span>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        <span className="text-xs font-bold text-zinc-900 dark:text-white">
                           Semana del {wItem.shortDate}
                         </span>
                       </div>
@@ -1276,31 +1276,31 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
 
                     <div className="space-y-1.5 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">
                           Entre Semana:
                         </span>
                         <span className="font-bold text-indigo-600 dark:text-indigo-400">
                           {wItem.midweek}{' '}
-                          <span className="text-[10px] font-normal text-slate-400">
+                          <span className="text-[10px] font-normal text-zinc-400">
                             ({wItem.midweekInPerson}P / {wItem.midweekZoom}Z)
                           </span>
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">
                           Fin de Semana:
                         </span>
                         <span className="font-bold text-sky-600 dark:text-sky-400">
                           {wItem.weekend}{' '}
-                          <span className="text-[10px] font-normal text-slate-400">
+                          <span className="text-[10px] font-normal text-zinc-400">
                             ({wItem.weekendInPerson}P / {wItem.weekendZoom}Z)
                           </span>
                         </span>
                       </div>
 
-                      <div className="pt-1.5 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between">
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      <div className="pt-1.5 border-t border-zinc-200/50 dark:border-[#27272A]/50 flex items-center justify-between">
+                        <span className="font-semibold text-zinc-700 dark:text-[#D4D4D8]">
                           Promedio Semanal:
                         </span>
                         <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
@@ -1318,12 +1318,12 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* VIEW 1: TRENDS (AREA + COMPOSED) */}
         {chartView === 'trends' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
                   Evolución Mensual del Año de Servicio {selectedServiceYear}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Promedio de asistencia por reunión a lo largo de los 12 meses teocráticos.
                 </p>
               </div>
@@ -1448,12 +1448,12 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* VIEW 2: CHANNELS (STACKED BAR PRESENCIAL VS ZOOM) */}
         {chartView === 'channels' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
                   Canales de Asistencia: Salón del Reino vs Zoom
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Volumen mensual acumulado de asistencia presencial física y conexiones virtuales.
                 </p>
               </div>
@@ -1512,8 +1512,8 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               </div>
 
               {/* Annual Proportion Donut */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-center space-y-3">
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-100 dark:border-[#27272A] text-center space-y-3">
+                <span className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
                   Proporción Anual
                 </span>
                 <div className="h-44 w-full">
@@ -1543,7 +1543,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                       <Building2 className="w-3.5 h-3.5" /> Presencial:
                     </span>
-                    <strong className="text-slate-800 dark:text-white">
+                    <strong className="text-zinc-800 dark:text-white">
                       {annualMetrics.annualInPersonPct}%
                     </strong>
                   </div>
@@ -1551,7 +1551,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     <span className="text-purple-600 dark:text-purple-400 font-semibold flex items-center gap-1">
                       <Video className="w-3.5 h-3.5" /> Zoom:
                     </span>
-                    <strong className="text-slate-800 dark:text-white">
+                    <strong className="text-zinc-800 dark:text-white">
                       {annualMetrics.annualZoomPct}%
                     </strong>
                   </div>
@@ -1564,12 +1564,12 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* VIEW 3: WEEKLY TIMELINE */}
         {chartView === 'weekly' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
                   Línea de Tiempo Continua Semana a Semana
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Detalle semanal para identificar picos por visitas del SC, conmemoraciones o asambleas.
                 </p>
               </div>
@@ -1587,7 +1587,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             </div>
 
             {weeklyData.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-xs">
+              <div className="py-16 text-center text-zinc-400 text-xs">
                 No hay semanas registradas para el año de servicio {selectedServiceYear}.
               </div>
             ) : (
@@ -1641,24 +1641,24 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* VIEW 4: S-88 TABULAR BREAKDOWN */}
         {chartView === 'table' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
                   Tabla Oficial de Asistencia del Año de Servicio (Formulario S-88)
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Desglose mensual de promedios, reuniones celebradas y proporción por canal.
                 </p>
               </div>
 
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]">
                 Año {selectedServiceYear}
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
-              <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
-                <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 text-2xs uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-800">
+            <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-[#27272A]">
+              <table className="w-full text-left text-xs text-zinc-600 dark:text-[#D4D4D8]">
+                <thead className="bg-zinc-50 dark:bg-[#18181F]/80 text-zinc-700 dark:text-[#E4E4E7] text-2xs uppercase tracking-wider font-bold border-b border-zinc-200 dark:border-[#27272A]">
                   <tr>
                     <th className="py-3 px-4">Mes de Servicio</th>
                     <th className="py-3 px-3 text-center">Semanas</th>
@@ -1671,7 +1671,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     <th className="py-3 px-3 text-center">Acción</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {monthlyData.map((m, idx) => {
                     const isTopMonth = m.avgOverall > 0 && m.avgOverall === Math.max(...monthlyData.map((d) => d.avgOverall));
 
@@ -1682,10 +1682,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                           !m.hasData ? 'opacity-50' : ''
                         }`}
                       >
-                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <td className="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                           <span>{idx + 1}.</span>
                           <span>{m.monthName}</span>
-                          <span className="text-2xs text-slate-400 font-normal">({m.year})</span>
+                          <span className="text-2xs text-zinc-400 font-normal">({m.year})</span>
                           {isTopMonth && (
                             <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300/60">
                               Líder
@@ -1699,7 +1699,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                         <td className="py-3 px-3 text-right font-semibold text-sky-600 dark:text-sky-400">
                           {m.avgWeekend || '—'}
                         </td>
-                        <td className="py-3 px-3 text-right font-black text-slate-900 dark:text-slate-100">
+                        <td className="py-3 px-3 text-right font-black text-zinc-900 dark:text-zinc-100">
                           {m.avgOverall || '—'}
                         </td>
                         <td className="py-3 px-3 text-center text-emerald-600 dark:text-emerald-400 font-bold">
@@ -1708,7 +1708,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                         <td className="py-3 px-3 text-center text-purple-600 dark:text-purple-400 font-bold">
                           {m.hasData ? `${m.zoomPct}%` : '—'}
                         </td>
-                        <td className="py-3 px-3 text-right font-semibold text-slate-700 dark:text-slate-300">
+                        <td className="py-3 px-3 text-right font-semibold text-zinc-700 dark:text-[#D4D4D8]">
                           {m.maxAttendance || '—'}
                         </td>
                         <td className="py-3 px-3 text-center">
@@ -1726,7 +1726,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-slate-50/90 dark:bg-slate-800/90 font-black text-slate-900 dark:text-slate-100 border-t-2 border-slate-200 dark:border-slate-700 text-xs">
+                <tfoot className="bg-zinc-50/90 dark:bg-[#18181F]/90 font-black text-zinc-900 dark:text-zinc-100 border-t-2 border-zinc-200 dark:border-[#27272A] text-xs">
                   <tr>
                     <td className="py-3 px-4">PROMEDIO ANUAL (S-88)</td>
                     <td className="py-3 px-3 text-center">12 meses</td>
@@ -1748,7 +1748,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                     <td className="py-3 px-3 text-right text-amber-600 dark:text-amber-400">
                       {annualMetrics.absolutePeak}
                     </td>
-                    <td className="py-3 px-3 text-center text-2xs text-slate-400">Oficial</td>
+                    <td className="py-3 px-3 text-center text-2xs text-zinc-400">Oficial</td>
                   </tr>
                 </tfoot>
               </table>

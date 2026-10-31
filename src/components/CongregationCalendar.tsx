@@ -57,7 +57,7 @@ const CustomToolbar = (toolbar: any) => {
   const label = () => {
     const date = format(toolbar.date, 'MMMM yyyy', { locale: es });
     return (
-      <span className="text-base sm:text-lg font-bold capitalize text-slate-900 dark:text-white">
+      <span className="text-base sm:text-lg font-bold capitalize text-zinc-900 dark:text-white">
         {date}
       </span>
     );
@@ -70,15 +70,15 @@ const CustomToolbar = (toolbar: any) => {
           <button
             type="button"
             onClick={goToCurrent}
-            className="px-3 sm:px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors shadow-2xs cursor-pointer active:scale-95"
+            className="px-3 sm:px-3.5 py-1.5 text-xs font-bold text-zinc-700 bg-white border border-zinc-200 dark:bg-[#18181F] dark:border-[#27272A] dark:text-[#E4E4E7] rounded-xl hover:bg-zinc-50 dark:hover:bg-[#27272A]/60 transition-colors shadow-2xs cursor-pointer active:scale-95"
           >
             Hoy
           </button>
-          <div className="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 shadow-2xs">
+          <div className="flex items-center gap-0.5 bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-0.5 shadow-2xs">
             <button
               type="button"
               onClick={goToBack}
-              className="p-1.5 sm:p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer active:scale-95"
+              className="p-1.5 sm:p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 transition-colors cursor-pointer active:scale-95"
               title="Anterior"
             >
               <ChevronLeft size={16} />
@@ -86,7 +86,7 @@ const CustomToolbar = (toolbar: any) => {
             <button
               type="button"
               onClick={goToNext}
-              className="p-1.5 sm:p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer active:scale-95"
+              className="p-1.5 sm:p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 transition-colors cursor-pointer active:scale-95"
               title="Siguiente"
             >
               <ChevronRight size={16} />
@@ -109,7 +109,7 @@ const CustomToolbar = (toolbar: any) => {
         )}
       </div>
 
-      <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
+      <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-zinc-100/80 dark:bg-[#18181F]/80 p-1 rounded-xl border border-zinc-200/60 dark:border-[#27272A]/60 shadow-2xs">
         {[
           { key: 'month', label: 'Mes' },
           { key: 'week', label: 'Semana' },
@@ -122,8 +122,8 @@ const CustomToolbar = (toolbar: any) => {
             onClick={() => toolbar.onView(key)}
             className={`px-2 sm:px-3 py-1.5 sm:py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center active:scale-95 ${
               toolbar.view === key
-                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
+                : 'text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA]'
             }`}
           >
             {viewLabel}
@@ -162,7 +162,7 @@ const CustomDateHeader = ({ label, date, onDrillDown }: any) => {
         <button
           type="button"
           onClick={onDrillDown}
-          className="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-pointer mr-1 mt-1"
+          className="text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-pointer mr-1 mt-1"
         >
           {displayLabel}
         </button>
@@ -301,17 +301,17 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-lg w-full shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+        <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 sm:gap-3">
             <button
               type="button"
               data-mobile-back-btn="true"
               onClick={onClose}
               aria-label="Volver al calendario"
-              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 shrink-0 cursor-pointer active:scale-95"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-100 shrink-0 cursor-pointer active:scale-95"
             >
               <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             </button>
@@ -319,10 +319,10 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white">
                 {eventToEdit ? 'Editar Evento' : 'Nuevo Evento'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 {eventToEdit ? 'Modifica los detalles del evento' : 'Programa una actividad, asamblea o fecha especial'}
               </p>
             </div>
@@ -330,7 +330,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="hidden sm:flex p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden sm:flex p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -339,38 +339,38 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block ml-1">
               Título del Evento
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+              className="w-full bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A]/80 rounded-xl px-4 py-2.5 text-sm font-semibold text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-zinc-400"
               placeholder="Ej. Salida especial de predicación / Jornada de limpieza"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block ml-1">
                 Fecha Inicio
               </label>
               <PremiumDatePicker value={startDate} onChange={setStartDate} />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block ml-1">
                 Fecha Fin
               </label>
               <PremiumDatePicker value={endDate} onChange={setEndDate} />
             </div>
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4">
+          <div className="bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-200/80 dark:border-[#27272A]/80 rounded-2xl p-4">
             <label className="flex items-center gap-3 cursor-pointer group mb-3">
               <div
                 className={`w-9 h-5 rounded-full transition-colors relative flex items-center ${
-                  isAllDay ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                  isAllDay ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
                 }`}
               >
                 <div
@@ -385,29 +385,29 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
                 checked={isAllDay}
                 onChange={(e) => setIsAllDay(e.target.checked)}
               />
-              <span className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <span className="text-xs sm:text-sm font-semibold text-zinc-700 dark:text-[#D4D4D8]">
                 Todo el día
               </span>
             </label>
 
             {!isAllDay && (
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row gap-3">
+              <div className="pt-3 border-t border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 relative">
-                  <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   <input
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 pl-9 text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none"
+                    className="w-full bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 pl-9 text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] outline-none"
                   />
                 </div>
                 <div className="flex-1 relative">
-                  <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   <input
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 pl-9 text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none"
+                    className="w-full bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2 pl-9 text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] outline-none"
                   />
                 </div>
               </div>
@@ -415,7 +415,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block ml-1">
               Categoría del Evento
             </label>
             <Select
@@ -433,20 +433,20 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block ml-1">
               Descripción o Detalles (Opcional)
             </label>
             <textarea
               placeholder="Detalles adicionales, hermanos encargados o recordatorios..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-indigo-500/20 text-xs sm:text-sm font-medium text-slate-900 dark:text-white h-20 resize-none shadow-2xs placeholder:text-slate-400"
+              className="w-full bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A]/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-indigo-500/20 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white h-20 resize-none shadow-2xs placeholder:text-zinc-400"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900">
+        <div className="p-4 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-3 bg-zinc-50/50 dark:bg-[#121216]">
           {eventToEdit && onDelete && (
             <button
               type="button"
@@ -461,7 +461,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
+              className="px-4 py-2 bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] rounded-xl text-xs font-bold transition cursor-pointer"
             >
               Cancelar
             </button>
@@ -519,17 +519,17 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
     : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-lg w-full shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 bg-indigo-50/50 dark:bg-indigo-950/30">
+        <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2 bg-indigo-50/50 dark:bg-indigo-950/30">
           <div className="flex items-center gap-2.5 sm:gap-3">
             <button
               type="button"
               data-mobile-back-btn="true"
               onClick={onClose}
               aria-label="Volver al calendario"
-              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer active:scale-95"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white dark:bg-[#18181F] text-zinc-800 dark:text-zinc-100 border border-zinc-200 dark:border-[#27272A] shrink-0 cursor-pointer active:scale-95"
             >
               <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             </button>
@@ -540,7 +540,7 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 {isMidweek ? 'Reunión Entre Semana' : 'Reunión de Fin de Semana'}
               </span>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white">
                 {isMidweek ? 'Vida y Ministerio Cristianos' : 'Discurso Público y La Atalaya'}
               </h3>
             </div>
@@ -548,7 +548,7 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="hidden sm:flex p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden sm:flex p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -556,10 +556,10 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
 
         {/* Content */}
         <div className="p-5 space-y-4">
-          <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-100 dark:border-[#27272A]">
             <Clock className="w-4 h-4 text-indigo-500 shrink-0" />
             <div className="text-xs">
-              <span className="font-bold text-slate-900 dark:text-white capitalize">
+              <span className="font-bold text-zinc-900 dark:text-white capitalize">
                 {parseLocalDate(date).toLocaleDateString('es-ES', {
                   weekday: 'long',
                   day: 'numeric',
@@ -567,15 +567,15 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
                   year: 'numeric',
                 })}
               </span>
-              <span className="text-slate-400 ml-2 font-medium">Horario: {time || 'Programado'}</span>
+              <span className="text-zinc-400 ml-2 font-medium">Horario: {time || 'Programado'}</span>
             </div>
           </div>
 
           {isMidweek ? (
             <div className="space-y-3">
               {week.midweek?.bibleReading && (
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Lectura Semanal de la Biblia
                   </span>
                   <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">
@@ -585,19 +585,19 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
               )}
 
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Presidente
                   </span>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                  <p className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] mt-0.5 truncate">
                     {presidentName}
                   </p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Tesoros de la Biblia
                   </span>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                  <p className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] mt-0.5 truncate">
                     {week.midweek?.tesoros?.discurso?.publisherId
                       ? publishersMap.get(week.midweek.tesoros.discurso.publisherId)?.name || 'Asignado'
                       : 'Sin asignar'}
@@ -608,11 +608,11 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
           ) : (
             <div className="space-y-3">
               {week.weekend?.publicTalkTheme && (
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Discurso Público
                   </span>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-white mt-0.5">
                     "{week.weekend.publicTalkTheme}"
                   </p>
                   <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mt-1 flex items-center gap-1.5">
@@ -623,19 +623,19 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
               )}
 
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Presidente FDS
                   </span>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                  <p className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] mt-0.5 truncate">
                     {presidentName}
                   </p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-100 dark:border-[#27272A]/80">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                     Lector de La Atalaya
                   </span>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                  <p className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] mt-0.5 truncate">
                     {week.weekend?.atalayaLectorId
                       ? publishersMap.get(week.weekend.atalayaLectorId)?.name || 'Asignado'
                       : 'Sin asignar'}
@@ -647,11 +647,11 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
         </div>
 
         {/* Footer with action to navigate to program */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900">
+        <div className="p-4 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-3 bg-zinc-50/50 dark:bg-[#121216]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
+            className="px-4 py-2 bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] rounded-xl text-xs font-bold transition cursor-pointer"
           >
             Cerrar
           </button>
@@ -1108,16 +1108,16 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
         {/* Left Sidebar (Rendered below main calendar on mobile, left on desktop) */}
         <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4 order-2 lg:order-1">
           {/* Mini Calendar Widget (Desktop only since main calendar is directly above on mobile) */}
-          <div className="hidden lg:block bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+          <div className="hidden lg:block bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] rounded-2xl p-4 shadow-xs">
             <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 capitalize">
+              <span className="text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] capitalize">
                 {miniDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
               </span>
               <div className="flex gap-0.5">
                 <button
                   type="button"
                   onClick={() => handleMiniMonthChange(-1)}
-                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 cursor-pointer"
+                  className="p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 cursor-pointer"
                   title="Mes anterior"
                 >
                   <ChevronLeft size={16} />
@@ -1125,7 +1125,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                 <button
                   type="button"
                   onClick={() => handleMiniMonthChange(1)}
-                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 cursor-pointer"
+                  className="p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg text-zinc-500 cursor-pointer"
                   title="Mes siguiente"
                 >
                   <ChevronRight size={16} />
@@ -1136,7 +1136,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
             {/* Days header */}
             <div className="grid grid-cols-7 gap-1 mb-1">
               {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, idx) => (
-                <div key={idx} className="text-[10px] font-bold text-slate-400 text-center uppercase py-0.5">
+                <div key={idx} className="text-[10px] font-bold text-zinc-400 text-center uppercase py-0.5">
                   {day}
                 </div>
               ))}
@@ -1159,8 +1159,8 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                         : isToday
                         ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-extrabold'
                         : isCurrentMonth
-                        ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        : 'text-slate-300 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                        ? 'text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                        : 'text-zinc-300 dark:text-[#71717A] hover:bg-zinc-50 dark:hover:bg-[#27272A]/40'
                     }`}
                   >
                     <span>{day}</span>
@@ -1178,8 +1178,8 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
           </div>
 
           {/* Categorías (Filtros de Google Calendar) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3 ml-1">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] rounded-2xl p-4 shadow-xs">
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-3 ml-1">
               Capas y Categorías
             </h4>
             <div className="space-y-2.5">
@@ -1202,12 +1202,12 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                     className={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${
                       filterTypes.includes(filter.id)
                         ? `${filter.color} text-white shadow-2xs`
-                        : 'bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700'
+                        : 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A]'
                     }`}
                   >
                     {filterTypes.includes(filter.id) && <Check size={11} strokeWidth={3.5} />}
                   </div>
-                  <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                  <span className="text-xs text-zinc-700 dark:text-[#D4D4D8] font-semibold group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                     {filter.label}
                   </span>
                 </label>
@@ -1216,8 +1216,8 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
           </div>
 
           {/* Próximas Actividades */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3 ml-1">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] rounded-2xl p-4 shadow-xs">
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-3 ml-1">
               Próximas Actividades
             </h4>
             <div className="space-y-2">
@@ -1235,7 +1235,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                       className={`p-2.5 rounded-xl cursor-pointer transition-colors group border ${
                         isMeeting
                           ? 'bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-100/60 dark:border-indigo-900/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/40'
-                          : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                          : 'bg-zinc-50/60 dark:bg-[#18181F]/40 border-zinc-100 dark:border-[#27272A]/60 hover:bg-zinc-50 dark:hover:bg-[#27272A]/60'
                       }`}
                     >
                       <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-0.5 flex items-center justify-between">
@@ -1257,7 +1257,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                           </span>
                         )}
                       </p>
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 transition-colors truncate">
+                      <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7] group-hover:text-indigo-600 transition-colors truncate">
                         {e.title}
                       </p>
                     </div>
@@ -1265,14 +1265,14 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
                 })}
               {allEvents.filter((e) => e.start_date >= new Date().toISOString().split('T')[0]).length ===
                 0 && (
-                <p className="text-xs text-slate-400 italic text-center py-4">No hay eventos próximos</p>
+                <p className="text-xs text-zinc-400 italic text-center py-4">No hay eventos próximos</p>
               )}
             </div>
           </div>
         </div>
 
         {/* Main Calendar View (First on mobile, right column on desktop) */}
-        <div className="flex-1 w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-3 sm:p-6 flex flex-col min-h-[480px] sm:min-h-[640px] overflow-hidden rbc-custom-theme order-1 lg:order-2">
+        <div className="flex-1 w-full bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs p-3 sm:p-6 flex flex-col min-h-[480px] sm:min-h-[640px] overflow-hidden rbc-custom-theme order-1 lg:order-2">
           <DnDCalendar
             localizer={localizer}
             events={formatEventsForCalendar()}
@@ -1324,7 +1324,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
             }}
             selectable
             resizable={false}
-            className="flex-1 font-sans text-xs sm:text-sm text-slate-800 dark:text-slate-200 min-h-[580px]"
+            className="flex-1 font-sans text-xs sm:text-sm text-zinc-800 dark:text-[#E4E4E7] min-h-[580px]"
           />
         </div>
       </div>

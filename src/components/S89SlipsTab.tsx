@@ -288,16 +288,16 @@ export const S89SlipsTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Barra de Acciones de Hojas S-89 */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] space-y-3 transition-colors">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Toggle between Cards view and Local Official PDF Filler */}
-          <div className="grid grid-cols-2 sm:inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-semibold gap-1 w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:inline-flex p-1 bg-zinc-100 dark:bg-[#18181F] rounded-xl text-xs font-semibold gap-1 w-full sm:w-auto border border-zinc-200/80 dark:border-[#27272A]">
             <button
               onClick={() => setPrintLayout('cards')}
               className={`px-3 py-2 rounded-lg transition-all cursor-pointer text-center truncate ${
                 printLayout === 'cards'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold border border-zinc-200/80 dark:border-[#27272A]'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
               Tarjetas & Lecciones
@@ -306,8 +306,8 @@ export const S89SlipsTab: React.FC = () => {
               onClick={() => setPrintLayout('formato_local')}
               className={`px-3 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer truncate ${
                 printLayout === 'formato_local'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold border border-zinc-200/80 dark:border-[#27272A]'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
               <Upload className="w-3.5 h-3.5 shrink-0" />
@@ -321,11 +321,11 @@ export const S89SlipsTab: React.FC = () => {
               type="button"
               onClick={syncAllWeeksToIndexedDb}
               disabled={isSyncingOffline}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
               title="Sincronizar y respaldar todas las asignaciones S-89 en IndexedDB para uso sin conexión"
             >
               <HardDrive className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-              <span>
+              <span className="font-mono tabular-nums">
                 {isSyncingOffline
                   ? 'Sincronizando...'
                   : `Offline (${offlineStats?.totalCachedSlips || rawSlips.length})`}
@@ -336,7 +336,7 @@ export const S89SlipsTab: React.FC = () => {
             {activeWeek && (
               <button
                 onClick={() => setIsBatchWhatsAppOpen(true)}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer truncate"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer truncate"
                 title="Abrir panel de envío masivo de WhatsApp para toda la semana"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -356,7 +356,7 @@ export const S89SlipsTab: React.FC = () => {
       </div>
 
       {/* Week Selector Bar & Filters */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 transition-colors">
         {/* Navigation */}
         <div className="flex items-center gap-2">
           <button
@@ -366,16 +366,16 @@ export const S89SlipsTab: React.FC = () => {
               }
             }}
             disabled={currentWeekIndex <= 0}
-            className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white text-slate-700 transition-colors"
+            className="p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F] disabled:opacity-30 disabled:hover:bg-transparent text-zinc-700 dark:text-[#F4F4F5] transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
           <div className="text-center px-2">
-            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
               Semana Seleccionada
             </span>
-            <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+            <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
               {activeWeek ? `${activeWeek.weekStartDate} al ${activeWeek.weekEndDate}` : '—'}
             </span>
           </div>
@@ -387,7 +387,7 @@ export const S89SlipsTab: React.FC = () => {
               }
             }}
             disabled={currentWeekIndex >= sortedWeeks.length - 1}
-            className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white text-slate-700 transition-colors"
+            className="p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F] disabled:opacity-30 disabled:hover:bg-transparent text-zinc-700 dark:text-[#F4F4F5] transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -395,13 +395,13 @@ export const S89SlipsTab: React.FC = () => {
 
         {/* Room & Status Filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-500 font-medium">Sala:</span>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Filter className="w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA]" />
+            <span className="text-zinc-500 dark:text-[#A1A1AA] font-medium">Sala:</span>
             <select
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value as any)}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700"
+              className="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             >
               <option value="todos">Todas las salas</option>
               <option value="principal">Sala Principal</option>
@@ -409,8 +409,8 @@ export const S89SlipsTab: React.FC = () => {
             </select>
           </div>
 
-          <div className="text-xs text-slate-500">
-            <span className="font-bold text-slate-800">{filteredSlips.length}</span> asignaciones S-89 generadas
+          <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+            <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{filteredSlips.length}</span> asignaciones S-89 generadas
           </div>
         </div>
       </div>
@@ -423,21 +423,21 @@ export const S89SlipsTab: React.FC = () => {
           compactHeader={true}
         />
       ) : filteredSlips.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800 mb-1">
+        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-12 text-center transition-colors">
+          <FileText className="w-12 h-12 text-zinc-300 dark:text-[#27272A] mx-auto mb-3" />
+          <h3 className="text-base font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1">
             No hay asignaciones para estudiantes en esta semana
           </h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-md mx-auto mb-4">
             Asigne estudiantes a la Lectura de la Biblia o a las partes de Seamos Mejores Maestros en el
             Programa de la Reunión para rellenar automáticamente el formato oficial S-89.
           </p>
         </div>
       ) : printLayout === 'sheet4' ? (
         /* PRINT-READY 4-UP SHEET (Standard S-89 Official Paper Layout) */
-        <div className="bg-slate-100 p-4 sm:p-6 rounded-2xl border border-slate-200 overflow-x-auto">
+        <div className="bg-zinc-100 dark:bg-[#18181F] p-4 sm:p-6 rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-x-auto transition-colors">
           <div className="text-center mb-4">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Vista previa de impresión en hoja tamaño carta / A4 (4 formularios S-89 por página).
             </p>
           </div>
@@ -446,13 +446,13 @@ export const S89SlipsTab: React.FC = () => {
             {filteredSlips.map((slip) => (
               <div
                 key={slip.id}
-                className="bg-white border-2 border-dashed border-slate-400 p-4 rounded-xl shadow-xs text-slate-900 relative print:border-black print:shadow-none"
+                className="bg-white dark:bg-[#121216] border-2 border-dashed border-zinc-300 dark:border-[#27272A] p-4 rounded-xl text-zinc-900 dark:text-[#F4F4F5] relative print:border-black print:text-black print:bg-white"
               >
                 {/* Official S-89 Title */}
-                <div className="border-b-2 border-slate-800 pb-2 mb-3">
-                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                    <span>S-89-S</span>
-                    <span>11/23</span>
+                <div className="border-b-2 border-zinc-800 dark:border-[#27272A] pb-2 mb-3">
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
+                    <span className="font-mono tabular-nums">S-89-S</span>
+                    <span className="font-mono tabular-nums">11/23</span>
                   </div>
                   <h4 className="text-xs sm:text-sm font-extrabold uppercase text-center tracking-tight leading-tight">
                     ASIGNACIÓN PARA LA REUNIÓN
@@ -464,39 +464,39 @@ export const S89SlipsTab: React.FC = () => {
                 {/* S-89 Form Fields */}
                 <div className="space-y-2 text-xs">
                   <div>
-                    <span className="font-bold text-slate-700">Nombre: </span>
-                    <span className="font-extrabold text-slate-900 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
+                    <span className="font-bold text-zinc-700 dark:text-[#A1A1AA]">Nombre: </span>
+                    <span className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] border-b border-dotted border-zinc-400 dark:border-[#27272A] pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
                       {slip.studentName}
                     </span>
                   </div>
 
                   <div>
-                    <span className="font-bold text-slate-700">Ayudante: </span>
-                    <span className="text-slate-800 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
+                    <span className="font-bold text-zinc-700 dark:text-[#A1A1AA]">Ayudante: </span>
+                    <span className="text-zinc-800 dark:text-[#F4F4F5] border-b border-dotted border-zinc-400 dark:border-[#27272A] pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
                       {slip.assistantName || '—'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <div>
-                      <span className="font-bold text-slate-700">Fecha: </span>
-                      <span className="font-semibold text-slate-900">{slip.date}</span>
+                      <span className="font-bold text-zinc-700 dark:text-[#A1A1AA]">Fecha: </span>
+                      <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{slip.date}</span>
                     </div>
                     <div>
-                      <span className="font-bold text-slate-700">Parte núm.: </span>
-                      <span className="font-semibold text-slate-900">{slip.partNumber}</span>
+                      <span className="font-bold text-zinc-700 dark:text-[#A1A1AA]">Parte núm.: </span>
+                      <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{slip.partNumber}</span>
                     </div>
                   </div>
 
                   <div className="pt-1">
-                    <span className="font-bold text-slate-700">Título de la parte:</span>
-                    <p className="font-semibold text-slate-900 bg-slate-50 p-1.5 rounded border border-slate-200 text-[11px] mt-0.5">
+                    <span className="font-bold text-zinc-700 dark:text-[#A1A1AA]">Título de la parte:</span>
+                    <p className="font-semibold text-zinc-900 dark:text-[#F4F4F5] bg-zinc-50 dark:bg-[#18181F] p-1.5 rounded border border-zinc-200 dark:border-[#27272A] text-[11px] mt-0.5">
                       {slip.partTitle}
                     </p>
                   </div>
 
                   <div className="pt-1">
-                    <span className="font-bold text-slate-700 block mb-1">Se presentará en:</span>
+                    <span className="font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">Se presentará en:</span>
                     <div className="flex items-center gap-4 text-xs font-semibold">
                       <SplashCheckbox
                         size="sm"
@@ -514,8 +514,8 @@ export const S89SlipsTab: React.FC = () => {
                   </div>
 
                   {slip.lessonNumber && (
-                    <div className="pt-2 border-t border-slate-200 text-[11px] font-semibold text-indigo-900">
-                      Punto de consejo: Lección {slip.lessonNumber}
+                    <div className="pt-2 border-t border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold text-indigo-700 dark:text-indigo-400">
+                      Punto de consejo: Lección <span className="font-mono tabular-nums">{slip.lessonNumber}</span>
                     </div>
                   )}
                 </div>
@@ -536,20 +536,20 @@ export const S89SlipsTab: React.FC = () => {
             return (
               <div
                 key={slip.id}
-                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between"
+                className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-5 flex flex-col justify-between transition-colors"
               >
                 <div>
                   {/* Card Header */}
-                  <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
+                  <div className="flex items-start justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3 mb-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-xs text-indigo-700">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/40 flex items-center justify-center font-bold text-xs text-indigo-700 dark:text-indigo-400 font-mono tabular-nums">
                         Nº {slip.partNumber}
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
                           S-89 Oficial
                         </span>
-                        <h4 className="text-sm font-bold text-slate-900 line-clamp-1">
+                        <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] line-clamp-1">
                           {slip.partTitle}
                         </h4>
                       </div>
@@ -561,8 +561,8 @@ export const S89SlipsTab: React.FC = () => {
                         onClick={() => handleToggleSlipDelivered(slip)}
                         className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase transition-colors cursor-pointer flex items-center gap-1 ${
                           isConfirmed
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
                         }`}
                         title="Cambiar estado de entrega/confirmación (persistido en IndexedDB Offline)"
                       >
@@ -570,10 +570,10 @@ export const S89SlipsTab: React.FC = () => {
                         <span>{isConfirmed ? 'Entregada' : 'Pendiente'}</span>
                       </button>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${
                           slip.room === 'auxiliar'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-blue-100 text-blue-800'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                            : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
                         }`}
                       >
                         {slip.room === 'auxiliar' ? 'Sala Aux' : 'Sala Ppal'}
@@ -583,34 +583,34 @@ export const S89SlipsTab: React.FC = () => {
 
                   {/* Student & Assistant details */}
                   <div className="space-y-2 text-xs mb-3">
-                    <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <div className="flex items-center justify-between bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-100 dark:border-[#27272A]">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                         <div>
-                          <span className="text-[10px] text-slate-400 block font-semibold">
+                          <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] block font-semibold">
                             Estudiante
                           </span>
-                          <span className="font-bold text-slate-900 text-xs">
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs">
                             {slip.studentName}
                           </span>
                         </div>
                       </div>
                       {student?.phone && (
-                        <span className="text-[10px] text-slate-500 font-mono">
+                        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                           {student.phone}
                         </span>
                       )}
                     </div>
 
                     {slip.assistantName && (
-                      <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <div className="flex items-center justify-between bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-100 dark:border-[#27272A]">
                         <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <div>
-                            <span className="text-[10px] text-slate-400 block font-semibold">
+                            <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] block font-semibold">
                               Ayudante
                             </span>
-                            <span className="font-bold text-slate-800 text-xs">
+                            <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-xs">
                               {slip.assistantName}
                             </span>
                           </div>
@@ -618,37 +618,37 @@ export const S89SlipsTab: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2 text-slate-600 pt-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-zinc-600 dark:text-[#A1A1AA] pt-1">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA] shrink-0" />
                       <span>
-                        Fecha de la reunión: <strong className="text-slate-900">{slip.date}</strong>
+                        Fecha de la reunión: <strong className="text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{slip.date}</strong>
                       </span>
                     </div>
                   </div>
 
                   {/* SMART LESSON PROGRESS TRACKING BOX */}
-                  <div className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100 mb-3 space-y-2">
+                  <div className="p-3 rounded-2xl bg-indigo-50/70 dark:bg-[#18181F] border border-indigo-100 dark:border-[#27272A] mb-3 space-y-2">
                     <div className="flex items-start justify-between gap-1">
-                      <div className="flex items-center gap-1.5 text-indigo-900 font-bold text-xs">
-                        <BookOpen className="w-4 h-4 text-indigo-600 shrink-0" />
-                        <span>Lección #{currentLessonNum}:</span>
+                      <div className="flex items-center gap-1.5 text-indigo-900 dark:text-indigo-300 font-bold text-xs">
+                        <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <span>Lección <span className="font-mono tabular-nums">#{currentLessonNum}</span>:</span>
                       </div>
                       {student && (
                         <button
                           onClick={() => setHistoryStudent(student)}
-                          className="text-[10px] font-semibold text-indigo-600 hover:underline flex items-center gap-0.5"
+                          className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer"
                         >
                           <History className="w-3 h-3" /> Historial
                         </button>
                       )}
                     </div>
 
-                    <p className="text-xs font-semibold text-slate-800 leading-tight">
+                    <p className="text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] leading-tight">
                       {lessonObj?.title || 'Lectura eficaz y enseñanza'}
                     </p>
 
                     {feedback && (
-                      <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-bold text-center animate-in fade-in">
+                      <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-bold text-center animate-in fade-in">
                         {feedback}
                       </div>
                     )}
@@ -657,16 +657,16 @@ export const S89SlipsTab: React.FC = () => {
                     <div className="flex items-center gap-1.5 pt-1">
                       <button
                         onClick={() => handleAdvanceLesson(slip.studentId, currentLessonNum)}
-                        className="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-2xs transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer"
                         title="Marcar lección como aprobada y avanzar a la siguiente lección del folleto Maestros"
                       >
                         <Check className="w-3 h-3" />
-                        <span>Aprobar (#{Math.min(20, currentLessonNum + 1)})</span>
+                        <span>Aprobar (<span className="font-mono tabular-nums">#{Math.min(20, currentLessonNum + 1)}</span>)</span>
                       </button>
 
                       <button
                         onClick={() => handleRepeatLesson(slip.studentId, currentLessonNum)}
-                        className="py-1.5 px-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1"
+                        className="py-1.5 px-2 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer"
                         title="Indicar que el estudiante volverá a trabajar en esta misma lección en su próxima intervención"
                       >
                         <RotateCcw className="w-3 h-3" />
@@ -677,20 +677,20 @@ export const S89SlipsTab: React.FC = () => {
                 </div>
 
                 {/* Footer Actions: WhatsApp & Copy S-89 */}
-                <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-2">
+                <div className="border-t border-zinc-100 dark:border-[#27272A] pt-3 flex items-center justify-between gap-2">
                   <button
                     onClick={() => handleCopySlip(slip)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] text-xs font-semibold transition-colors cursor-pointer"
                     title="Copiar texto formal con enlace para WhatsApp"
                   >
                     {copiedId === slip.id ? (
                       <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-bold">¡Copiado!</span>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">¡Copiado!</span>
                       </>
                     ) : (
                       <>
-                        <Share2 className="w-3.5 h-3.5 text-slate-500" />
+                        <Share2 className="w-3.5 h-3.5 text-zinc-500 dark:text-[#A1A1AA]" />
                         <span>Copiar S-89</span>
                       </>
                     )}
@@ -698,7 +698,7 @@ export const S89SlipsTab: React.FC = () => {
 
                   <button
                     onClick={() => handleSendWhatsApp(slip)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
                     title="Abrir WhatsApp para enviar hoja de asignación con enlace de confirmación directo"
                   >
                     <Send className="w-3.5 h-3.5" />
@@ -722,21 +722,21 @@ export const S89SlipsTab: React.FC = () => {
 
       {/* Student Lesson History Modal */}
       {historyStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-950/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full max-h-[80vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-md w-full max-h-[80vh] flex flex-col border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+            <div className="px-5 py-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50 dark:bg-[#18181F]">
               <div>
-                <span className="text-[10px] uppercase font-bold text-indigo-600">
+                <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                   Historial de Lecciones Folleto Maestros
                 </span>
-                <h3 className="text-base font-bold text-slate-900">{historyStudent.name}</h3>
-                <p className="text-xs text-slate-500">
-                  Lección actual asignada: <strong>#{historyStudent.currentLessonNumber || 1}</strong>
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">{historyStudent.name}</h3>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                  Lección actual asignada: <strong className="font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">#{historyStudent.currentLessonNumber || 1}</strong>
                 </p>
               </div>
               <button
                 onClick={() => setHistoryStudent(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200"
+                className="p-1.5 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -747,24 +747,24 @@ export const S89SlipsTab: React.FC = () => {
                 historyStudent.lessonsHistory.map((rec) => (
                   <div
                     key={rec.id}
-                    className="p-3 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-2"
+                    className="p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] flex items-start justify-between gap-2"
                   >
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold font-mono tabular-nums">
                           Lección #{rec.lessonNumber}
                         </span>
-                        <span className="text-xs font-bold text-slate-800">{rec.lessonTitle}</span>
+                        <span className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5]">{rec.lessonTitle}</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">📅 {rec.date}</p>
-                      {rec.notes && <p className="text-xs text-slate-600 mt-0.5 italic">{rec.notes}</p>}
+                      <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-1 font-mono tabular-nums">📅 {rec.date}</p>
+                      {rec.notes && <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] mt-0.5 italic">{rec.notes}</p>}
                     </div>
 
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 border ${
                         rec.status === 'completada'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                       }`}
                     >
                       {rec.status === 'completada' ? 'Aprobada' : 'Continuar'}
@@ -772,16 +772,16 @@ export const S89SlipsTab: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-slate-400 text-xs">
+                <div className="text-center py-8 text-zinc-400 dark:text-[#A1A1AA] text-xs">
                   Aún no hay registros previos en el historial de este estudiante. Se iniciará en la Lección #1.
                 </div>
               )}
             </div>
 
-            <div className="p-3 border-t border-slate-100 bg-slate-50 text-right">
+            <div className="p-3 border-t border-zinc-100 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-right">
               <button
                 onClick={() => setHistoryStudent(null)}
-                className="px-4 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
+                className="px-4 py-1.5 rounded-xl bg-zinc-900 dark:bg-[#27272A] text-white text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-[#323238] cursor-pointer"
               >
                 Cerrar
               </button>

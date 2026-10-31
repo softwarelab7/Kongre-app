@@ -269,38 +269,38 @@ export const TerritoriosTab: React.FC = () => {
     switch (type) {
       case 'residencial':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-            <Home className="w-3 h-3" /> Residencial
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
+            <Home className="w-3 h-3 text-zinc-500 dark:text-[#A1A1AA]" /> Residencial
           </span>
         );
       case 'negocios':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            <Building2 className="w-3 h-3" /> Negocios
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
+            <Building2 className="w-3 h-3 text-teal-600 dark:text-teal-400" /> Negocios
           </span>
         );
       case 'edificios':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-            <Layers className="w-3 h-3" /> Edificios
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20">
+            <Layers className="w-3 h-3 text-indigo-600 dark:text-indigo-400" /> Edificios
           </span>
         );
       case 'rural':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-            <TreePine className="w-3 h-3" /> Rural
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+            <TreePine className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Rural
           </span>
         );
       case 'telefonico':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-            <Phone className="w-3 h-3" /> Telefónico
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20">
+            <Phone className="w-3 h-3 text-purple-600 dark:text-purple-400" /> Telefónico
           </span>
         );
       case 'campana':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-            <Compass className="w-3 h-3" /> Campaña
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
+            <Compass className="w-3 h-3 text-rose-600 dark:text-rose-400" /> Campaña
           </span>
         );
       default:
@@ -313,8 +313,8 @@ export const TerritoriosTab: React.FC = () => {
     const today = new Date();
     if (territory.status === 'disponible') {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Disponible
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Disponible
         </span>
       );
     }
@@ -322,8 +322,8 @@ export const TerritoriosTab: React.FC = () => {
     const isOverdue = territory.status === 'vencido' || (territory.dueDate && new Date(territory.dueDate) < today);
     if (isOverdue) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
-          <AlertTriangle className="w-3 h-3 text-rose-600" /> Vencido (+4 meses)
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
+          <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400" /> Vencido (+4m)
         </span>
       );
     }
@@ -334,16 +334,16 @@ export const TerritoriosTab: React.FC = () => {
       fifteenDays.setDate(today.getDate() + 15);
       if (d <= fifteenDays) {
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-            <Clock className="w-3 h-3 text-amber-600" /> Por vencer pronto
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+            <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Por vencer
           </span>
         );
       }
     }
 
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-        <Clock className="w-3 h-3 text-blue-600" /> Asignado
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
+        <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400" /> Asignado
       </span>
     );
   };
@@ -539,22 +539,22 @@ ${mapLink}${noVisitsText}
     <div className="space-y-6">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700 animate-slide-up">
+        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 bg-zinc-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-zinc-700 animate-slide-up">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-sm font-medium">{toastMessage}</span>
         </div>
       )}
 
       {/* Barra Unificada de Vistas y Acciones de Territorio */}
-      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         {/* View Mode Toggle - 2-column grid on mobile so nothing clips */}
-        <div className="grid grid-cols-2 sm:flex rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-slate-100 dark:bg-slate-800/90 p-1.5 gap-1">
+        <div className="grid grid-cols-2 sm:flex rounded-xl border border-zinc-200/70 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1.5 gap-1">
           <button
             onClick={() => setViewMode('cards')}
             className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 'cards'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <span className="truncate">Tarjetas</span>
@@ -563,8 +563,8 @@ ${mapLink}${noVisitsText}
             onClick={() => setViewMode('table')}
             className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 'table'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <span className="truncate">Tabla</span>
@@ -573,8 +573,8 @@ ${mapLink}${noVisitsText}
             onClick={() => setViewMode('map')}
             className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               viewMode === 'map'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <Map className={`w-3.5 h-3.5 shrink-0 ${viewMode === 'map' ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'}`} />
@@ -584,8 +584,8 @@ ${mapLink}${noVisitsText}
             onClick={() => setViewMode('s13')}
             className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 's13'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <span className="truncate">Fichero S-13</span>
@@ -595,7 +595,7 @@ ${mapLink}${noVisitsText}
         <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0">
           <button
             onClick={handleDownloadOfficialS13}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 rounded-xl transition cursor-pointer active:scale-95"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A] rounded-xl transition cursor-pointer active:scale-95"
             title="Cargar el PDF oficial S-13 de JW Hub para que la app lo rellene y descargue"
           >
             <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -604,7 +604,7 @@ ${mapLink}${noVisitsText}
 
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Nuevo Territorio</span>
@@ -617,85 +617,85 @@ ${mapLink}${noVisitsText}
         <button
           type="button"
           onClick={() => setStatusFilter('todos')}
-          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'todos'
               ? 'border-indigo-500 ring-2 ring-indigo-500/15 dark:border-indigo-400'
-              : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300'
+              : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/50'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <Map className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">{stats.total}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Total Territorios</div>
+            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] leading-tight">{stats.total}</div>
+            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Total Territorios</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('disponible')}
-          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'disponible'
               ? 'border-emerald-500 ring-2 ring-emerald-500/15 dark:border-emerald-400'
-              : 'border-slate-200 dark:border-slate-800 hover:border-emerald-300'
+              : 'border-zinc-200 dark:border-[#27272A] hover:border-emerald-300 dark:hover:border-emerald-500/50'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 leading-tight">{stats.disponibles}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Disponibles</div>
+            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 leading-tight">{stats.disponibles}</div>
+            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Disponibles</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('asignado')}
-          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'asignado'
-              ? 'border-indigo-500 ring-2 ring-indigo-500/15 dark:border-indigo-400'
-              : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300'
+              ? 'border-teal-500 ring-2 ring-teal-500/15 dark:border-teal-400'
+              : 'border-zinc-200 dark:border-[#27272A] hover:border-teal-300 dark:hover:border-teal-500/50'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
             <User className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 leading-tight">{stats.asignados}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">En Trabajo</div>
+            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-teal-600 dark:text-teal-400 leading-tight">{stats.asignados}</div>
+            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">En Trabajo</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('vencido')}
-          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'vencido'
               ? 'border-rose-500 ring-2 ring-rose-500/15 dark:border-rose-400'
-              : 'border-slate-200 dark:border-slate-800 hover:border-rose-300'
+              : 'border-zinc-200 dark:border-[#27272A] hover:border-rose-300 dark:hover:border-rose-500/50'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
             <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold text-rose-600 dark:text-rose-400 leading-tight">{stats.vencidos}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Vencidos (&gt;4m)</div>
+            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-rose-600 dark:text-rose-400 leading-tight">{stats.vencidos}</div>
+            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Vencidos (&gt;4m)</div>
           </div>
         </button>
 
-        <div className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+        <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
           <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 text-[11px] font-semibold uppercase tracking-wider mb-0.5">
             <span>Cobertura Anual</span>
             <Compass className="w-3.5 h-3.5" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">{stats.coveragePercentage}%</span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">({stats.completedLastYear}/{stats.total})</span>
+            <span className="text-lg sm:text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] leading-tight">{stats.coveragePercentage}%</span>
+            <span className="text-[11px] font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA]">({stats.completedLastYear}/{stats.total})</span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-1.5 overflow-hidden">
+          <div className="w-full bg-zinc-100 dark:bg-[#18181F] rounded-full h-1.5 mt-1.5 overflow-hidden">
             <div
               className="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full transition-all"
               style={{ width: `${Math.min(stats.coveragePercentage, 100)}%` }}
@@ -706,16 +706,16 @@ ${mapLink}${noVisitsText}
 
       {/* Radar S-13: Alertas de Territorios Vencidos (>4 meses) o Por Vencer */}
       {(s13Radar.overdue.length > 0 || s13Radar.expiringSoon.length > 0) && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800/60 p-4 shadow-xs space-y-3">
+        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-amber-500/30 dark:border-amber-500/20 p-4 shadow-xs space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <h3 className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
                 Radar S-13: Control de Plazo de 4 Meses ({s13Radar.overdue.length} vencidos •{' '}
                 {s13Radar.expiringSoon.length} por vencer)
               </h3>
             </div>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
               Envía recordatorio amigable por WhatsApp o registra la devolución en 1 clic
             </span>
           </div>
@@ -729,34 +729,25 @@ ${mapLink}${noVisitsText}
               return (
                 <div
                   key={terr.id}
-                  className={`p-3 rounded-xl border flex flex-col justify-between gap-2 text-xs ${
-                    isOver
-                      ? 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/60'
-                      : 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/60'
-                  }`}
+                  className="p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] flex flex-col justify-between gap-2 text-xs shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-extrabold text-slate-900 dark:text-white">
+                      <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                         Territorio #{terr.number} — {terr.name}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          isOver
-                            ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-200'
-                            : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200'
-                        }`}
-                      >
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] inline-flex items-center gap-1.5">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isOver ? 'bg-rose-500' : 'bg-amber-500'}`} />
                         {isOver ? 'Vencido (+4m)' : 'Por vencer'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">
-                      Tenencia: <strong>{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
-                      <strong>{terr.dueDate || '—'}</strong>
+                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA] mt-1">
+                      Tenencia: <strong className="text-zinc-800 dark:text-[#F4F4F5]">{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
+                      <strong className="font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">{terr.dueDate || '—'}</strong>
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-800">
+                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-zinc-200/60 dark:border-[#27272A]">
                     <button
                       type="button"
                       onClick={() => {
@@ -777,14 +768,14 @@ ${mapLink}${noVisitsText}
                       <button
                         type="button"
                         onClick={() => openReturnModal(terr)}
-                        className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-[10px] font-bold hover:bg-zinc-50 dark:hover:bg-[#27272A] cursor-pointer"
                       >
                         Recibir
                       </button>
                       <button
                         type="button"
                         onClick={() => openExtendModal(terr)}
-                        className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-[10px] font-bold hover:bg-zinc-50 dark:hover:bg-[#27272A] cursor-pointer"
                       >
                         Prorrogar
                       </button>
@@ -798,22 +789,22 @@ ${mapLink}${noVisitsText}
       )}
 
       {/* Controls & Filter Bar */}
-      <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs space-y-3">
+      <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search box */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Buscar por número, nombre, calle o publicador..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-9 py-2 border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-white placeholder-slate-400 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              className="w-full pl-10 pr-9 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -822,16 +813,16 @@ ${mapLink}${noVisitsText}
         </div>
 
         {/* Filter chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs">
-          <span className="text-slate-400 flex items-center gap-1 font-medium mr-1">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/80 dark:border-[#27272A] text-xs">
+          <span className="text-zinc-400 dark:text-[#A1A1AA] flex items-center gap-1 font-medium mr-1">
             <Filter className="w-3.5 h-3.5" /> Estado:
           </span>
           <button
             onClick={() => setStatusFilter('todos')}
             className={`px-2.5 py-1 rounded-full border transition ${
               statusFilter === 'todos'
-                ? 'bg-blue-600 text-white border-blue-600 font-medium'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                ? 'bg-indigo-600 text-white border-indigo-600 font-medium'
+                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
             }`}
           >
             Todos ({territories.length})
@@ -841,7 +832,7 @@ ${mapLink}${noVisitsText}
             className={`px-2.5 py-1 rounded-full border transition ${
               statusFilter === 'disponible'
                 ? 'bg-emerald-600 text-white border-emerald-600 font-medium'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
             }`}
           >
             Disponibles ({stats.disponibles})
@@ -850,8 +841,8 @@ ${mapLink}${noVisitsText}
             onClick={() => setStatusFilter('asignado')}
             className={`px-2.5 py-1 rounded-full border transition ${
               statusFilter === 'asignado'
-                ? 'bg-blue-600 text-white border-blue-600 font-medium'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                ? 'bg-teal-600 text-white border-teal-600 font-medium'
+                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
             }`}
           >
             Asignados ({stats.asignados})
@@ -861,7 +852,7 @@ ${mapLink}${noVisitsText}
             className={`px-2.5 py-1 rounded-full border transition ${
               statusFilter === 'vencido'
                 ? 'bg-rose-600 text-white border-rose-600 font-medium'
-                : 'bg-white text-rose-700 border-rose-200 hover:bg-rose-50'
+                : 'bg-white dark:bg-[#18181F] text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/40 hover:bg-rose-50 dark:hover:bg-rose-950/20'
             }`}
           >
             Vencidos ({stats.vencidos})
@@ -872,7 +863,7 @@ ${mapLink}${noVisitsText}
             <select
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value)}
-              className="py-1 px-2.5 border border-slate-200 rounded-lg text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="py-1 px-2.5 border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500"
             >
               <option value="todos">Todos los Tipos</option>
               <option value="residencial">Residencial</option>
@@ -887,7 +878,7 @@ ${mapLink}${noVisitsText}
               <select
                 value={zoneFilter}
                 onChange={e => setZoneFilter(e.target.value)}
-                className="py-1 px-2.5 border border-slate-200 rounded-lg text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="py-1 px-2.5 border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="todos">Todas las Zonas</option>
                 {zones.map(z => (
@@ -903,10 +894,10 @@ ${mapLink}${noVisitsText}
 
       {/* Main Content Area */}
       {filteredTerritories.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <Map className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-slate-700 mb-1">No se encontraron territorios</h3>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto mb-4">
+        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-12 text-center shadow-xs">
+          <Map className="w-12 h-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+          <h3 className="text-lg font-semibold text-zinc-800 dark:text-[#F4F4F5] mb-1">No se encontraron territorios</h3>
+          <p className="text-sm text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto mb-4">
             No hay ningún territorio que coincida con los filtros seleccionados o el término de búsqueda.
           </p>
           <button
@@ -916,7 +907,7 @@ ${mapLink}${noVisitsText}
               setTypeFilter('todos');
               setZoneFilter('todos');
             }}
-            className="px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition font-medium"
+            className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition font-medium cursor-pointer"
           >
             Restablecer filtros
           </button>
@@ -932,30 +923,30 @@ ${mapLink}${noVisitsText}
             return (
               <div
                 key={terr.id}
-                className={`bg-white rounded-xl border transition-all hover:shadow-md flex flex-col justify-between ${
+                className={`bg-white dark:bg-[#18181F] rounded-2xl border transition-all hover:border-zinc-300 dark:hover:border-zinc-600 flex flex-col justify-between ${
                   isOverdue
-                    ? 'border-rose-300 ring-1 ring-rose-200'
+                    ? 'border-rose-500/50 ring-1 ring-rose-500/20'
                     : isAssigned
-                    ? 'border-blue-200'
-                    : 'border-slate-200'
+                    ? 'border-teal-500/30'
+                    : 'border-zinc-200 dark:border-[#27272A]'
                 }`}
               >
                 {/* Card Top */}
                 <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-lg bg-slate-900 text-white font-bold flex items-center justify-center text-base shadow-sm">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-[#121216] text-white font-mono font-bold tabular-nums flex items-center justify-center text-base border border-zinc-700/50 dark:border-[#27272A] shadow-xs">
                         {terr.number}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800 text-sm leading-tight line-clamp-1" title={terr.name}>
+                        <h3 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-sm leading-tight line-clamp-1" title={terr.name}>
                           {terr.name}
                         </h3>
-                        <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-slate-400" />
+                        <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-zinc-400 dark:text-[#A1A1AA]" />
                           <span>{terr.zone}</span>
                           <span>•</span>
-                          <span>~{terr.estimatedHomes} hogares</span>
+                          <span className="font-mono tabular-nums">~{terr.estimatedHomes} hogares</span>
                         </p>
                       </div>
                     </div>
@@ -968,17 +959,17 @@ ${mapLink}${noVisitsText}
 
                   {/* Boundaries description */}
                   {terr.boundsDescription && (
-                    <div className="bg-slate-50 p-2.5 rounded-lg text-xs text-slate-600 border border-slate-100 leading-relaxed">
-                      <span className="font-medium text-slate-700">Límites: </span>
+                    <div className="bg-zinc-50 dark:bg-[#121216] p-2.5 rounded-xl text-xs text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/70 dark:border-[#27272A] leading-relaxed">
+                      <span className="font-medium text-zinc-700 dark:text-[#F4F4F5]">Límites: </span>
                       {terr.boundsDescription}
                     </div>
                   )}
 
                   {/* No-visit warning badge */}
                   {terr.noVisits && terr.noVisits.length > 0 && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-xs">
-                      <ShieldAlert className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                      <span className="font-medium">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 text-xs">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                      <span className="font-medium font-mono tabular-nums">
                         {terr.noVisits.length} {terr.noVisits.length === 1 ? 'casa NO visitar' : 'casas NO visitar'}
                       </span>
                     </div>
@@ -986,58 +977,58 @@ ${mapLink}${noVisitsText}
 
                   {/* Assignment Status details */}
                   {isAssigned && assignee ? (
-                    <div className="bg-blue-50/60 p-3 rounded-lg border border-blue-100 space-y-1.5">
+                    <div className="bg-teal-500/5 dark:bg-teal-950/20 p-3 rounded-xl border border-teal-500/20 space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500">Asignado a:</span>
-                        <span className="font-semibold text-slate-800 flex items-center gap-1">
-                          <User className="w-3 h-3 text-blue-600" />
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Asignado a:</span>
+                        <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1">
+                          <User className="w-3 h-3 text-teal-600 dark:text-teal-400" />
                           {assignee.name}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500">Fecha asignado:</span>
-                        <span className="text-slate-700">{terr.assignedDate || 'Reciente'}</span>
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Fecha asignado:</span>
+                        <span className="text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">{terr.assignedDate || 'Reciente'}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500">Límite (4 meses):</span>
-                        <span className={`font-medium ${isOverdue ? 'text-rose-600 font-bold' : 'text-slate-700'}`}>
+                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Límite (4 meses):</span>
+                        <span className={`font-mono tabular-nums font-medium ${isOverdue ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-zinc-700 dark:text-[#F4F4F5]'}`}>
                           {terr.dueDate || 'Sin definir'}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100 flex items-center justify-between text-xs">
-                      <span className="text-emerald-700 font-medium">Disponible para entrega</span>
+                    <div className="bg-emerald-500/5 dark:bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/20 flex items-center justify-between text-xs">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">Disponible para entrega</span>
                       {terr.lastCompletedDate && (
-                        <span className="text-slate-500">Completado: {terr.lastCompletedDate}</span>
+                        <span className="text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">Completado: {terr.lastCompletedDate}</span>
                       )}
                     </div>
                   )}
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="p-3 bg-slate-50/70 border-t border-slate-100 rounded-b-xl flex items-center justify-between gap-2">
+                <div className="p-3 bg-zinc-50/70 dark:bg-[#121216] border-t border-zinc-100 dark:border-[#27272A] rounded-b-2xl flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setDetailModalTerritory(terr)}
-                      className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 rounded-md transition"
+                      className="p-1.5 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] rounded-lg transition cursor-pointer"
                       title="Ver Ficha S-13 y No Visitar"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleShareWhatsApp(terr)}
-                      className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100/70 rounded-md transition"
+                      className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition cursor-pointer"
                       title="Compartir por WhatsApp"
                     >
                       <Share2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setPolygonEditorTerritory(terr)}
-                      className={`p-1.5 rounded-md transition cursor-pointer ${
+                      className={`p-1.5 rounded-lg transition cursor-pointer ${
                         terr.polygon && terr.polygon.length >= 3
-                          ? 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100/70 bg-indigo-50'
-                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                          ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-950/30'
+                          : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
                       }`}
                       title={terr.polygon && terr.polygon.length >= 3 ? "Editar polígono perimetral en el mapa" : "Delimitar polígono en el mapa"}
                     >
@@ -1048,7 +1039,7 @@ ${mapLink}${noVisitsText}
                         href={terr.mapUrl.trim()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100/70 rounded-md transition"
+                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition"
                         title="Abrir en Google Maps"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -1058,7 +1049,7 @@ ${mapLink}${noVisitsText}
                         href={`https://maps.google.com/?q=${encodeURIComponent(`${terr.name} ${settings.congregationName}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100/70 rounded-md transition"
+                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition"
                         title="Buscar en Google Maps"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -1066,17 +1057,17 @@ ${mapLink}${noVisitsText}
                     )}
                     <button
                       onClick={() => openEditModal(terr)}
-                      className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 rounded-md transition"
+                      className="p-1.5 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] rounded-lg transition cursor-pointer"
                       title="Editar datos del territorio"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDigitalCardTerritory(terr)}
-                      className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-md transition border border-indigo-200 cursor-pointer"
+                      className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-lg transition border border-indigo-200 dark:border-indigo-800/40 cursor-pointer"
                       title="Generar Tarjeta Digital y Código QR para el publicador"
                     >
-                      <QrCode className="w-3.5 h-3.5 text-indigo-600" />
+                      <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                       <span className="hidden sm:inline">Tarjeta</span>
                     </button>
                   </div>
@@ -1087,14 +1078,14 @@ ${mapLink}${noVisitsText}
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => openExtendModal(terr)}
-                          className="px-2.5 py-1 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-md transition"
+                          className="px-2.5 py-1 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] rounded-lg transition cursor-pointer"
                           title="Ampliar plazo de entrega"
                         >
                           Ampliar
                         </button>
                         <button
                           onClick={() => openReturnModal(terr)}
-                          className="px-3 py-1 text-xs font-semibold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md transition flex items-center gap-1"
+                          className="px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg transition flex items-center gap-1 cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" /> Devolver
                         </button>
@@ -1102,7 +1093,7 @@ ${mapLink}${noVisitsText}
                     ) : (
                       <button
                         onClick={() => openAssignModal(terr)}
-                        className="px-3.5 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition flex items-center gap-1 shadow-sm"
+                        className="px-3.5 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
                       >
                         <User className="w-3.5 h-3.5" /> Asignar
                       </button>
@@ -1115,10 +1106,10 @@ ${mapLink}${noVisitsText}
         </div>
       ) : viewMode === 'table' ? (
         /* TABLE VIEW */
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="data-table w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+              <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider border-b border-zinc-200 dark:border-[#27272A]">
                 <tr>
                   <th className="py-3 px-4">Nº</th>
                   <th className="py-3 px-4">Territorio y Zona</th>
@@ -1130,51 +1121,51 @@ ${mapLink}${noVisitsText}
                   <th className="py-3 px-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                 {filteredTerritories.map(terr => {
                   const assignee = terr.currentAssigneeId ? publishersMap.get(terr.currentAssigneeId) : null;
                   const isAssigned = terr.status !== 'disponible';
                   const isOverdue = terr.status === 'vencido' || (terr.dueDate && new Date(terr.dueDate) < new Date());
 
                   return (
-                    <tr key={terr.id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3 px-4 font-bold text-slate-800">#{terr.number}</td>
+                    <tr key={terr.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/60 transition">
+                      <td className="py-3 px-4 font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">#{terr.number}</td>
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-slate-800">{terr.name}</div>
-                        <div className="text-xs text-slate-500">{terr.zone}</div>
+                        <div className="font-semibold text-zinc-800 dark:text-[#F4F4F5]">{terr.name}</div>
+                        <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">{terr.zone}</div>
                       </td>
                       <td className="py-3 px-4">{getTypeBadge(terr.type)}</td>
-                      <td className="py-3 px-4 text-slate-600">~{terr.estimatedHomes}</td>
+                      <td className="py-3 px-4 font-mono tabular-nums text-zinc-600 dark:text-[#A1A1AA]">~{terr.estimatedHomes}</td>
                       <td className="py-3 px-4">{getStatusBadge(terr)}</td>
                       <td className="py-3 px-4">
                         {isAssigned && assignee ? (
-                          <div className="font-medium text-slate-800 flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
+                          <div className="font-medium text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
                               {assignee.name.charAt(0)}
                             </div>
                             <span>{assignee.name}</span>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Sin asignar</span>
+                          <span className="text-xs text-zinc-400 dark:text-zinc-500 italic">Sin asignar</span>
                         )}
                       </td>
                       <td className="py-3 px-4">
                         {isAssigned && terr.dueDate ? (
-                          <span className={`text-xs ${isOverdue ? 'font-bold text-rose-600' : 'text-slate-600'}`}>
+                          <span className={`text-xs font-mono tabular-nums ${isOverdue ? 'font-bold text-rose-600 dark:text-rose-400' : 'text-zinc-600 dark:text-[#A1A1AA]'}`}>
                             {terr.dueDate}
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400">-</span>
+                          <span className="text-xs text-zinc-400 dark:text-zinc-500">-</span>
                         )}
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setPolygonEditorTerritory(terr)}
-                            className={`p-1 rounded cursor-pointer ${
+                            className={`p-1 rounded-lg cursor-pointer ${
                               terr.polygon && terr.polygon.length >= 3
-                                ? 'text-indigo-600 hover:text-indigo-800 bg-indigo-50'
-                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                                ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/30'
+                                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
                             }`}
                             title="Delimitar Polígono en Mapa"
                           >
@@ -1182,14 +1173,14 @@ ${mapLink}${noVisitsText}
                           </button>
                           <button
                             onClick={() => handleShareWhatsApp(terr)}
-                            className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded"
+                            className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg cursor-pointer"
                             title="WhatsApp"
                           >
                             <Share2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDetailModalTerritory(terr)}
-                            className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded"
+                            className="p-1 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg cursor-pointer"
                             title="Ver Ficha S-13"
                           >
                             <Eye className="w-4 h-4" />
@@ -1197,14 +1188,14 @@ ${mapLink}${noVisitsText}
                           {isAssigned ? (
                             <button
                               onClick={() => openReturnModal(terr)}
-                              className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200"
+                              className="px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg border border-emerald-500/20 cursor-pointer"
                             >
                               Devolver
                             </button>
                           ) : (
                             <button
                               onClick={() => openAssignModal(terr)}
-                              className="px-2.5 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-sm"
+                              className="px-2.5 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs cursor-pointer"
                             >
                               Asignar
                             </button>
@@ -1235,73 +1226,75 @@ ${mapLink}${noVisitsText}
       ) : (
         /* OFFICIAL S-13 BATCH FICHERO VIEW */
         <div className="space-y-4">
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900 text-sm">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm shadow-xs">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0 mt-0.5">
+                <Info className="w-4 h-4 text-indigo-500" />
+              </div>
               <div>
-                <p className="font-semibold">Registro de Asignación de Territorio (Formulario S-13)</p>
-                <p className="text-xs text-amber-800 mt-0.5">
+                <p className="font-bold text-zinc-900 dark:text-[#F4F4F5]">Registro de Asignación de Territorio (Formulario S-13)</p>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 leading-relaxed">
                   Para descargar el formato oficial S-13 de JW, carga tu PDF oficial en blanco y la aplicación lo rellenará automáticamente con este historial de rotación.
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsS13ModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold shadow-2xs shrink-0 cursor-pointer transition-all"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-3.5 h-3.5 text-zinc-400 dark:text-[#71717A]" />
               <span>Cargar y Rellenar S-13 Oficial (PDF)</span>
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredTerritories.map(terr => (
-              <div key={terr.id} className="bg-white rounded-xl border border-slate-300 p-5 shadow-sm space-y-4">
-                <div className="flex items-start justify-between border-b pb-3">
+              <div key={terr.id} className="bg-white dark:bg-[#18181F] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs space-y-4">
+                <div className="flex items-start justify-between border-b border-zinc-200 dark:border-[#27272A] pb-3">
                   <div>
-                    <div className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+                    <div className="text-xs uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider">
                       S-13 • REGISTRO DE ASIGNACIÓN
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">
+                    <h3 className="text-lg font-bold text-zinc-800 dark:text-[#F4F4F5]">
                       Territorio Nº {terr.number}: {terr.name}
                     </h3>
-                    <p className="text-xs text-slate-500">{terr.zone} • {terr.type.toUpperCase()}</p>
+                    <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">{terr.zone} • {terr.type.toUpperCase()}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <span className="text-xs font-bold font-mono tabular-nums px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#121216] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]">
                       ~{terr.estimatedHomes} Hogares
                     </span>
                   </div>
                 </div>
 
                 {/* S-13 Table of Assignments */}
-                <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                <div className="overflow-x-auto border border-zinc-200 dark:border-[#27272A] rounded-xl">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-slate-100 font-semibold text-slate-700 border-b border-slate-200">
+                    <thead className="bg-zinc-100 dark:bg-[#121216] font-semibold text-zinc-700 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-[#27272A]">
                       <tr>
-                        <th className="p-2">Asignado a</th>
-                        <th className="p-2">Fecha Asign.</th>
-                        <th className="p-2">Fecha Devol.</th>
-                        <th className="p-2">Observaciones</th>
+                        <th className="p-2.5">Asignado a</th>
+                        <th className="p-2.5">Fecha Asign.</th>
+                        <th className="p-2.5">Fecha Devol.</th>
+                        <th className="p-2.5">Observaciones</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                       {terr.history && terr.history.length > 0 ? (
                         terr.history.map((rec, i) => (
-                          <tr key={rec.id || i} className={!rec.returnedDate ? 'bg-blue-50/50 font-medium' : ''}>
-                            <td className="p-2 text-slate-800">{rec.publisherName}</td>
-                            <td className="p-2 text-slate-600">{rec.assignedDate}</td>
-                            <td className="p-2 text-slate-600">
-                              {rec.returnedDate || <span className="text-blue-600 font-semibold">En curso</span>}
+                          <tr key={rec.id || i} className={!rec.returnedDate ? 'bg-indigo-50/30 dark:bg-indigo-950/20 font-medium' : ''}>
+                            <td className="p-2.5 text-zinc-800 dark:text-[#F4F4F5]">{rec.publisherName}</td>
+                            <td className="p-2.5 text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">{rec.assignedDate}</td>
+                            <td className="p-2.5 text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
+                              {rec.returnedDate || <span className="text-indigo-600 dark:text-indigo-400 font-semibold">En curso</span>}
                             </td>
-                            <td className="p-2 text-slate-500 italic max-w-xs truncate" title={rec.notes}>
+                            <td className="p-2.5 text-zinc-500 dark:text-[#A1A1AA] italic max-w-xs truncate" title={rec.notes}>
                               {rec.notes || '-'}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="p-3 text-center text-slate-400 italic">
+                          <td colSpan={4} className="p-3 text-center text-zinc-400 dark:text-zinc-500 italic">
                             Sin historial previo registrado.
                           </td>
                         </tr>
@@ -1312,14 +1305,14 @@ ${mapLink}${noVisitsText}
 
                 {/* No visit addresses summary */}
                 {terr.noVisits && terr.noVisits.length > 0 && (
-                  <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs space-y-1">
-                    <span className="font-bold text-rose-800 flex items-center gap-1">
-                      <ShieldAlert className="w-3.5 h-3.5" /> Domicilios No Visitar:
+                  <div className="p-2.5 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl text-xs space-y-1">
+                    <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-500" /> Domicilios No Visitar:
                     </span>
-                    <ul className="list-disc list-inside text-rose-700 pl-1">
+                    <ul className="list-disc list-inside text-zinc-600 dark:text-[#A1A1AA] pl-1">
                       {terr.noVisits.map(nv => (
                         <li key={nv.id}>
-                          <span className="font-medium">{nv.address}</span>
+                          <span className="font-medium text-zinc-900 dark:text-[#F4F4F5]">{nv.address}</span>
                           {nv.residentName ? ` (${nv.residentName})` : ''} - {nv.reason || 'Sin detalles'}
                         </li>
                       ))}
@@ -1327,16 +1320,16 @@ ${mapLink}${noVisitsText}
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-2 border-t text-xs">
+                <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-[#27272A] text-xs">
                   <button
                     onClick={() => handleShareWhatsApp(terr)}
-                    className="px-3 py-1.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md font-medium transition"
+                    className="px-3 py-1.5 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg font-medium transition cursor-pointer"
                   >
                     Enviar por WhatsApp
                   </button>
                   <button
                     onClick={() => setDetailModalTerritory(terr)}
-                    className="px-3 py-1.5 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md font-medium transition"
+                    className="px-3 py-1.5 text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800/40 rounded-lg font-medium transition cursor-pointer"
                   >
                     Ver Ficha Completa
                   </button>
@@ -1351,23 +1344,23 @@ ${mapLink}${noVisitsText}
       {/* MODAL: ASIGNAR TERRITORIO */}
       {/* ========================================================= */}
       {assignModalTerritory && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-[#27272A]">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   <User className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-lg">Asignar Territorio</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-lg">Asignar Territorio</h3>
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Nº {assignModalTerritory.number}: {assignModalTerritory.name}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setAssignModalTerritory(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1375,13 +1368,13 @@ ${mapLink}${noVisitsText}
 
             <div className="space-y-4 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Publicador Responsable *
                 </label>
                 <select
                   value={selectedPublisherId}
                   onChange={e => setSelectedPublisherId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">-- Seleccionar Publicador --</option>
                   {publishers
@@ -1396,7 +1389,7 @@ ${mapLink}${noVisitsText}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Fecha de Asignación *
                   </label>
                   <input
@@ -1408,25 +1401,25 @@ ${mapLink}${noVisitsText}
                       d.setMonth(d.getMonth() + 4);
                       setAssignDueDate(d.toISOString().slice(0, 10));
                     }}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Vencimiento (4 meses) *
                   </label>
                   <input
                     type="date"
                     value={assignDueDate}
                     onChange={e => setAssignDueDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Observaciones / Recomendaciones
                 </label>
                 <textarea
@@ -1434,23 +1427,23 @@ ${mapLink}${noVisitsText}
                   placeholder="Ej: Asignado para la campaña o fin de semana..."
                   value={assignNotes}
                   onChange={e => setAssignNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
               </div>
 
-              <div className="p-3 bg-blue-50 text-blue-800 rounded-lg text-xs flex items-start gap-2">
-                <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 text-zinc-700 dark:text-[#A1A1AA] border border-indigo-200/60 dark:border-indigo-800/40 rounded-xl text-xs flex items-start gap-2">
+                <Info className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                 <span>
-                  Las pautas teocráticas de la sucursal recomiendan devolver los territorios en un plazo máximo de <strong>4 meses</strong> para mantener la cobertura continua.
+                  Las pautas teocráticas recomiendan devolver los territorios en un plazo máximo de <strong>4 meses</strong> para mantener la rotación continua.
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <button
                 type="button"
                 onClick={() => setAssignModalTerritory(null)}
-                className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium rounded-lg"
+                className="px-4 py-2 text-sm text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5] font-medium rounded-xl cursor-pointer"
               >
                 Cancelar
               </button>
@@ -1458,7 +1451,7 @@ ${mapLink}${noVisitsText}
                 type="button"
                 disabled={!selectedPublisherId}
                 onClick={handleConfirmAssign}
-                className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg shadow-sm"
+                className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-xl shadow-xs cursor-pointer"
               >
                 Confirmar Asignación
               </button>
@@ -1471,23 +1464,23 @@ ${mapLink}${noVisitsText}
       {/* MODAL: DEVOLVER TERRITORIO */}
       {/* ========================================================= */}
       {returnModalTerritory && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-[#27272A]">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-lg">Devolver Territorio</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-lg">Devolver Territorio</h3>
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                     Nº {returnModalTerritory.number}: {returnModalTerritory.name}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setReturnModalTerritory(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1495,19 +1488,19 @@ ${mapLink}${noVisitsText}
 
             <div className="space-y-4 text-sm">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Fecha de Devolución *
                 </label>
                 <input
                   type="date"
                   value={returnDate}
                   onChange={e => setReturnDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Notas de finalización
                 </label>
                 <textarea
@@ -1515,27 +1508,27 @@ ${mapLink}${noVisitsText}
                   placeholder="Ej: Territorio completado al 100%. Se actualizaron direcciones 'no visitar'..."
                   value={returnNotes}
                   onChange={e => setReturnNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
               </div>
 
-              <div className="p-3 bg-emerald-50 text-emerald-800 rounded-lg text-xs">
+              <div className="p-3 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20 rounded-xl text-xs">
                 Esta acción registrará la fecha de devolución en la tarjeta histórica S-13 y cambiará el estado del territorio a <strong>Disponible</strong> para que otro publicador pueda solicitarlo.
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <button
                 type="button"
                 onClick={() => setReturnModalTerritory(null)}
-                className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium rounded-lg"
+                className="px-4 py-2 text-sm text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5] font-medium rounded-xl cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleConfirmReturn}
-                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm"
+                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-xs cursor-pointer"
               >
                 Registrar Devolución
               </button>
@@ -1548,47 +1541,47 @@ ${mapLink}${noVisitsText}
       {/* MODAL: EXTENDER PLAZO */}
       {/* ========================================================= */}
       {extendModalTerritory && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
-              <h3 className="font-bold text-slate-800 text-base">Extender Plazo de Entrega</h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-[#27272A]">
+              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">Extender Plazo de Entrega</h3>
               <button
                 onClick={() => setExtendModalTerritory(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-sm">
-              <p className="text-xs text-slate-600">
-                Territorio #{extendModalTerritory.number}: <strong>{extendModalTerritory.name}</strong>
+              <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
+                Territorio #{extendModalTerritory.number}: <strong className="text-zinc-900 dark:text-[#F4F4F5]">{extendModalTerritory.name}</strong>
               </p>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Nueva Fecha Límite
                 </label>
                 <input
                   type="date"
                   value={extendNewDueDate}
                   onChange={e => setExtendNewDueDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <button
                 type="button"
                 onClick={() => setExtendModalTerritory(null)}
-                className="px-3.5 py-1.5 text-xs text-slate-600 font-medium rounded-lg"
+                className="px-3.5 py-1.5 text-xs text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] font-medium rounded-xl cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleConfirmExtend}
-                className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
+                className="px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-xs cursor-pointer"
               >
                 Guardar Ampliación
               </button>
@@ -1601,38 +1594,38 @@ ${mapLink}${noVisitsText}
       {/* MODAL: FICHA DETALLADA S-13 & GESTOR NO VISITAR */}
       {/* ========================================================= */}
       {detailModalTerritory && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b">
+            <div className="flex items-start justify-between pb-3 border-b border-zinc-200 dark:border-[#27272A]">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-slate-900 text-white font-extrabold flex items-center justify-center text-xl shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 dark:bg-[#18181F] text-white font-mono font-extrabold tabular-nums flex items-center justify-center text-xl border border-zinc-700/50 dark:border-[#27272A] shadow-xs">
                   {detailModalTerritory.number}
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-lg leading-tight">
+                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-lg leading-tight">
                     {detailModalTerritory.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     {getTypeBadge(detailModalTerritory.type)}
-                    <span className="text-xs text-slate-500 font-medium">{detailModalTerritory.zone}</span>
-                    <span className="text-xs text-slate-400">•</span>
-                    <span className="text-xs text-slate-500">~{detailModalTerritory.estimatedHomes} hogares</span>
+                    <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">{detailModalTerritory.zone}</span>
+                    <span className="text-xs text-zinc-400">•</span>
+                    <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">~{detailModalTerritory.estimatedHomes} hogares</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setDetailModalTerritory(null)}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1.5 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Quick Actions Bar */}
-            <div className="flex items-center justify-between gap-2 p-3 bg-slate-50 rounded-xl text-xs">
+            <div className="flex items-center justify-between gap-2 p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] rounded-xl text-xs">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-slate-600">Estado actual:</span>
+                <span className="font-medium text-zinc-600 dark:text-[#A1A1AA]">Estado actual:</span>
                 {getStatusBadge(detailModalTerritory)}
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -1642,37 +1635,37 @@ ${mapLink}${noVisitsText}
                     setDetailModalTerritory(null);
                     setDigitalCardTerritory(t);
                   }}
-                  className="px-3 py-1 bg-indigo-600 text-white rounded-md font-bold hover:bg-indigo-700 transition flex items-center gap-1 shadow-xs cursor-pointer"
+                  className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
                 >
                   <QrCode className="w-3.5 h-3.5" /> Tarjeta Digital & QR
                 </button>
                 <button
                   onClick={() => handleShareWhatsApp(detailModalTerritory)}
-                  className="px-3 py-1 bg-emerald-600 text-white rounded-md font-medium hover:bg-emerald-700 transition flex items-center gap-1"
+                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition flex items-center gap-1 cursor-pointer"
                 >
-                  <Share2 className="w-3.5 h-3.5" /> Enviar por WhatsApp
+                  <Share2 className="w-3.5 h-3.5" /> WhatsApp
                 </button>
                 <button
                   onClick={() => setPolygonEditorTerritory(detailModalTerritory)}
-                  className="px-3 py-1 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1 bg-zinc-900 dark:bg-[#27272A] text-white rounded-lg font-medium hover:bg-zinc-800 transition flex items-center gap-1 cursor-pointer"
                 >
-                  <Map className="w-3.5 h-3.5" /> Delimitar Polígono
+                  <Map className="w-3.5 h-3.5" /> Polígono
                 </button>
                 {detailModalTerritory.mapUrl && /^https:\/\//i.test(detailModalTerritory.mapUrl.trim()) ? (
                   <a
                     href={detailModalTerritory.mapUrl.trim()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition flex items-center gap-1"
+                    className="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-medium transition flex items-center gap-1 cursor-pointer"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> Abrir Mapa
+                    <ExternalLink className="w-3.5 h-3.5" /> Mapa
                   </a>
                 ) : (
                   <a
                     href={`https://maps.google.com/?q=${encodeURIComponent(`${detailModalTerritory.name} ${settings.congregationName}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition flex items-center gap-1"
+                    className="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-medium transition flex items-center gap-1 cursor-pointer"
                   >
                     <ExternalLink className="w-3.5 h-3.5" /> Buscar Mapa
                   </a>
@@ -1683,10 +1676,10 @@ ${mapLink}${noVisitsText}
             {/* Boundaries & Notes */}
             <div className="space-y-3 text-sm">
               <div>
-                <h4 className="font-semibold text-slate-800 text-xs uppercase tracking-wider mb-1">
+                <h4 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-xs uppercase tracking-wider mb-1">
                   Límites y Geografía del Territorio
                 </h4>
-                <p className="bg-slate-50 p-3 rounded-lg text-slate-700 text-xs border border-slate-200/80 leading-relaxed">
+                <p className="bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl text-zinc-700 dark:text-[#A1A1AA] text-xs border border-zinc-200/80 dark:border-[#27272A] leading-relaxed">
                   {detailModalTerritory.boundsDescription || 'No se han especificado límites exactos.'}
                 </p>
               </div>
@@ -1698,10 +1691,10 @@ ${mapLink}${noVisitsText}
 
               {detailModalTerritory.notes && (
                 <div>
-                  <h4 className="font-semibold text-slate-800 text-xs uppercase tracking-wider mb-1">
+                  <h4 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-xs uppercase tracking-wider mb-1">
                     Instrucciones &amp; Notas de Predicación
                   </h4>
-                  <p className="bg-slate-50 p-3 rounded-lg text-slate-700 text-xs border border-slate-200/80 leading-relaxed">
+                  <p className="bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl text-zinc-700 dark:text-[#A1A1AA] text-xs border border-zinc-200/80 dark:border-[#27272A] leading-relaxed">
                     {detailModalTerritory.notes}
                   </p>
                 </div>
@@ -1709,10 +1702,10 @@ ${mapLink}${noVisitsText}
             </div>
 
             {/* No Visit Section (Do-Not-Call) */}
-            <div className="space-y-3 pt-3 border-t">
+            <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <div className="flex items-center justify-between">
-                <h4 className="font-bold text-slate-800 text-sm flex items-center gap-1.5 text-rose-800">
-                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                <h4 className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-sm flex items-center gap-1.5 text-rose-700 dark:text-rose-400">
+                  <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   Domicilios "No Visitar" ({detailModalTerritory.noVisits?.length || 0})
                 </h4>
               </div>
@@ -1722,12 +1715,12 @@ ${mapLink}${noVisitsText}
                   {detailModalTerritory.noVisits.map(nv => (
                     <div
                       key={nv.id}
-                      className="flex items-start justify-between p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs"
+                      className="flex items-start justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-xs shadow-2xs"
                     >
                       <div>
-                        <div className="font-bold text-rose-900">{nv.address}</div>
-                        {nv.residentName && <div className="text-rose-800">Residente: {nv.residentName}</div>}
-                        <div className="text-rose-700/80 mt-0.5 italic">
+                        <div className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{nv.address}</div>
+                        {nv.residentName && <div className="text-zinc-700 dark:text-[#A1A1AA]">Residente: {nv.residentName}</div>}
+                        <div className="text-zinc-500 dark:text-[#A1A1AA] mt-0.5 italic">
                           {nv.reason || 'Petición expresa'} (Registrado: {nv.dateAdded})
                         </div>
                       </div>
@@ -1736,7 +1729,7 @@ ${mapLink}${noVisitsText}
                           removeNoVisitAddress(detailModalTerritory.id, nv.id);
                           showToast('Dirección eliminada.');
                         }}
-                        className="text-rose-500 hover:text-rose-800 p-1"
+                        className="text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 p-1 cursor-pointer"
                         title="Quitar de la lista de no visitar"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1745,12 +1738,12 @@ ${mapLink}${noVisitsText}
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 italic">No hay direcciones marcadas como "No Visitar" en este territorio.</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 italic">No hay direcciones marcadas como "No Visitar" en este territorio.</p>
               )}
 
               {/* Add No Visit Form */}
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-                <span className="text-xs font-semibold text-slate-700 block">
+              <div className="bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-2">
+                <span className="text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] block">
                   + Agregar nuevo domicilio "No Visitar"
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -1759,14 +1752,14 @@ ${mapLink}${noVisitsText}
                     placeholder="Dirección exacta (ej: Calle 4 #12-30)*"
                     value={newNoVisitAddress}
                     onChange={e => setNewNoVisitAddress(e.target.value)}
-                    className="px-2.5 py-1.5 border border-slate-200 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    className="px-2.5 py-1.5 border border-zinc-200 dark:border-[#27272A] rounded-lg bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-rose-500"
                   />
                   <input
                     type="text"
                     placeholder="Nombre residente (opcional)"
                     value={newNoVisitName}
                     onChange={e => setNewNoVisitName(e.target.value)}
-                    className="px-2.5 py-1.5 border border-slate-200 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    className="px-2.5 py-1.5 border border-zinc-200 dark:border-[#27272A] rounded-lg bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-rose-500"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -1775,12 +1768,12 @@ ${mapLink}${noVisitsText}
                     placeholder="Motivo o fecha de solicitud (ej: Petición verbal formal)"
                     value={newNoVisitReason}
                     onChange={e => setNewNoVisitReason(e.target.value)}
-                    className="flex-1 px-2.5 py-1.5 border border-slate-200 rounded-md bg-white text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    className="flex-1 px-2.5 py-1.5 border border-zinc-200 dark:border-[#27272A] rounded-lg bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
                   />
                   <button
                     onClick={handleAddNoVisit}
                     disabled={!newNoVisitAddress.trim()}
-                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-semibold rounded-md text-xs transition shrink-0"
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-semibold rounded-lg text-xs transition shrink-0 cursor-pointer"
                   >
                     Guardar
                   </button>
@@ -1789,15 +1782,15 @@ ${mapLink}${noVisitsText}
             </div>
 
             {/* S-13 History Table */}
-            <div className="space-y-3 pt-3 border-t">
-              <h4 className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+            <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
+              <h4 className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-sm flex items-center gap-1.5">
+                <FileSpreadsheet className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 Historial S-13 de Asignaciones Pasadas
               </h4>
 
-              <div className="overflow-x-auto border border-slate-200 rounded-lg">
+              <div className="overflow-x-auto border border-zinc-200 dark:border-[#27272A] rounded-xl">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-100 font-semibold text-slate-700 border-b border-slate-200">
+                  <thead className="bg-zinc-100 dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-[#27272A]">
                     <tr>
                       <th className="p-2.5">Publicador</th>
                       <th className="p-2.5">Asignado</th>
@@ -1805,21 +1798,21 @@ ${mapLink}${noVisitsText}
                       <th className="p-2.5">Observaciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                     {detailModalTerritory.history && detailModalTerritory.history.length > 0 ? (
                       detailModalTerritory.history.map((h, i) => (
-                        <tr key={h.id || i} className={!h.returnedDate ? 'bg-blue-50/40 font-medium' : ''}>
-                          <td className="p-2.5 font-medium text-slate-800">{h.publisherName}</td>
-                          <td className="p-2.5 text-slate-600">{h.assignedDate}</td>
-                          <td className="p-2.5 text-slate-600">
-                            {h.returnedDate || <span className="text-blue-600 font-semibold">En curso</span>}
+                        <tr key={h.id || i} className={!h.returnedDate ? 'bg-indigo-50/30 dark:bg-indigo-950/20 font-medium' : ''}>
+                          <td className="p-2.5 font-medium text-zinc-800 dark:text-[#F4F4F5]">{h.publisherName}</td>
+                          <td className="p-2.5 text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">{h.assignedDate}</td>
+                          <td className="p-2.5 text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
+                            {h.returnedDate || <span className="text-indigo-600 dark:text-indigo-400 font-semibold">En curso</span>}
                           </td>
-                          <td className="p-2.5 text-slate-500 italic">{h.notes || '-'}</td>
+                          <td className="p-2.5 text-zinc-500 dark:text-[#A1A1AA] italic">{h.notes || '-'}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="p-4 text-center text-slate-400 italic">
+                        <td colSpan={4} className="p-4 text-center text-zinc-400 dark:text-zinc-500 italic">
                           Aún no hay historial de asignaciones registrado para este territorio.
                         </td>
                       </tr>
@@ -1830,7 +1823,7 @@ ${mapLink}${noVisitsText}
             </div>
 
             {/* Modal Bottom */}
-            <div className="flex items-center justify-between pt-3 border-t">
+            <div className="flex items-center justify-between pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <button
                 onClick={() => {
                   if (confirm(`¿Estás seguro de eliminar el territorio #${detailModalTerritory.number}?`)) {
@@ -1839,14 +1832,14 @@ ${mapLink}${noVisitsText}
                     showToast('Territorio eliminado.');
                   }
                 }}
-                className="text-rose-600 hover:text-rose-800 text-xs font-medium flex items-center gap-1"
+                className="text-rose-600 hover:text-rose-700 dark:hover:text-rose-400 text-xs font-medium flex items-center gap-1 cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Eliminar territorio
               </button>
 
               <button
                 onClick={() => setDetailModalTerritory(null)}
-                className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800"
+                className="px-4 py-2 bg-zinc-900 dark:bg-[#18181F] text-white border border-zinc-800 dark:border-[#27272A] hover:bg-zinc-800 dark:hover:bg-[#27272A] rounded-xl text-xs font-semibold cursor-pointer transition-colors"
               >
                 Cerrar
               </button>
@@ -1859,12 +1852,12 @@ ${mapLink}${noVisitsText}
       {/* MODAL: CREAR / EDITAR TERRITORIO */}
       {/* ========================================================= */}
       {(isCreatingNew || editTerritoryModal) && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="flex items-center justify-between pb-3 border-b">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-[#27272A]">
               <div className="flex items-center gap-2">
-                <Map className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-slate-800 text-lg">
+                <Map className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-lg">
                   {isCreatingNew ? 'Nuevo Territorio de Congregación' : `Editar Territorio #${editTerritoryModal?.number}`}
                 </h3>
               </div>
@@ -1873,7 +1866,7 @@ ${mapLink}${noVisitsText}
                   setIsCreatingNew(false);
                   setEditTerritoryModal(null);
                 }}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1882,7 +1875,7 @@ ${mapLink}${noVisitsText}
             <form onSubmit={handleSaveTerritory} className="space-y-3.5 text-sm">
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Número *
                   </label>
                   <input
@@ -1891,12 +1884,12 @@ ${mapLink}${noVisitsText}
                     placeholder="01, 14, R-02..."
                     value={formData.number}
                     onChange={e => setFormData({ ...formData, number: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono font-bold"
                   />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Nombre o Barrio *
                   </label>
                   <input
@@ -1905,20 +1898,20 @@ ${mapLink}${noVisitsText}
                     placeholder="Barrio San José, Bulevar Central..."
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Tipo de Territorio
                   </label>
                   <select
                     value={formData.type}
                     onChange={e => setFormData({ ...formData, type: e.target.value as TerritoryType })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="residencial">Residencial</option>
                     <option value="negocios">Negocios / Comercial</option>
@@ -1930,7 +1923,7 @@ ${mapLink}${noVisitsText}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                     Zona o Sector
                   </label>
                   <input
@@ -1938,13 +1931,13 @@ ${mapLink}${noVisitsText}
                     placeholder="Zona Norte, Centro, Sector Este..."
                     value={formData.zone}
                     onChange={e => setFormData({ ...formData, zone: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Cantidad Estimada de Hogares / Puertas
                 </label>
                 <input
@@ -1953,12 +1946,12 @@ ${mapLink}${noVisitsText}
                   max={5000}
                   value={formData.estimatedHomes}
                   onChange={e => setFormData({ ...formData, estimatedHomes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Límites del Territorio (Calles / Avenidas que lo delimitan)
                 </label>
                 <textarea
@@ -1966,12 +1959,12 @@ ${mapLink}${noVisitsText}
                   placeholder="Ej: Norte: Calle 4 | Sur: Av. Libertad | Este: Quebrada | Oeste: Carrera 10"
                   value={formData.boundsDescription}
                   onChange={e => setFormData({ ...formData, boundsDescription: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Enlace de Mapa Digital (Google Maps o similar)
                 </label>
                 <input
@@ -1979,12 +1972,12 @@ ${mapLink}${noVisitsText}
                   placeholder="https://maps.google.com/?q=..."
                   value={formData.mapUrl}
                   onChange={e => setFormData({ ...formData, mapUrl: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Observaciones Generales
                 </label>
                 <textarea
@@ -1992,24 +1985,24 @@ ${mapLink}${noVisitsText}
                   placeholder="Recomendaciones de horario, estacionamiento, precauciones..."
                   value={formData.notes}
                   onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-200 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => {
                     setIsCreatingNew(false);
                     setEditTerritoryModal(null);
                   }}
-                  className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium rounded-lg"
+                  className="px-4 py-2 text-sm text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5] font-medium rounded-xl cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-xs cursor-pointer"
                 >
                   {isCreatingNew ? 'Guardar Territorio' : 'Guardar Cambios'}
                 </button>

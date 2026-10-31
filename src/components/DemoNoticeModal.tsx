@@ -33,12 +33,12 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-xs animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Bienvenida al modo de prueba de Kongre"
     >
-      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -49,7 +49,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-[10px] font-extrabold uppercase tracking-wide mb-1">
                 Entorno de Prueba
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight">
                 ¡Bienvenido al modo de prueba de Kongre!
               </h3>
             </div>
@@ -57,7 +57,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer"
             title="Cerrar"
             aria-label="Cerrar aviso del modo de prueba"
           >
@@ -66,46 +66,46 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
         </div>
 
         {/* Description (Organized wording adapted for Kongre) */}
-        <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+        <div className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] space-y-2 leading-relaxed">
           <p>
             Este es un entorno de demostración con datos predefinidos para una <strong>congregación modelo imaginaria</strong>.
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
             Funciona de manera 100% local en tu dispositivo sin conexión a la nube de Supabase, por lo que puedes explorar y probar todas las herramientas sin afectar datos reales.
           </p>
         </div>
 
         {/* Feature Highlights Grid */}
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
+          <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-100 dark:border-[#27272A] flex items-start gap-2.5">
             <Calendar className="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block">Reuniones y S-89</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Programas de entre semana y fin de semana con asignaciones.</span>
+              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7] block">Reuniones y S-89</span>
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Programas de entre semana y fin de semana con asignaciones.</span>
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
+          <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-100 dark:border-[#27272A] flex items-start gap-2.5">
             <Users className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block">Publicadores</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Cuerpo de ancianos, siervos, precursores y grupos.</span>
+              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7] block">Publicadores</span>
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Cuerpo de ancianos, siervos, precursores y grupos.</span>
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
+          <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-100 dark:border-[#27272A] flex items-start gap-2.5">
             <MapPin className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block">Territorios y Carritos</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Control de manzanas, mapas y turnos metropolitanos.</span>
+              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7] block">Territorios y Carritos</span>
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Control de manzanas, mapas y turnos metropolitanos.</span>
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
+          <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/50 border border-zinc-100 dark:border-[#27272A] flex items-start gap-2.5">
             <Shield className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block">Selector de Roles</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Prueba cómo ve la app un coordinador, anciano o publicador.</span>
+              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7] block">Selector de Roles</span>
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Prueba cómo ve la app un coordinador, anciano o publicador.</span>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
               onClose();
               onOpenRegisterModal();
             }}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
           >
             <Building2 className="w-4 h-4 text-indigo-500" />
             <span>Registrar mi Congregación</span>

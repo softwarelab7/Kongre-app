@@ -46,7 +46,7 @@ export const LITERATURE_CATEGORY_LABELS: Record<
   otro: {
     label: 'Otros Artículos',
     iconName: 'Package',
-    color: 'bg-slate-100 text-slate-800 border-slate-200',
+    color: 'bg-zinc-100 text-zinc-800 border-zinc-200',
   },
 };
 
@@ -56,7 +56,7 @@ export const SPECIAL_ORDER_STATUS_CONFIG: Record<
 > = {
   solicitado: {
     label: 'Solicitado',
-    badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+    badgeClass: 'bg-zinc-100 text-zinc-700 border-zinc-200',
   },
   pedido_a_betel: {
     label: 'Pedido a Sucursal',

@@ -128,14 +128,14 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-zinc-950/75 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label="Programa mensual para la cartelera"
     >
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden">
         {/* Cabecera del Modal */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between gap-4">
+        <div className="px-6 py-4 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/60 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center shrink-0">
               <Calendar size={20} />
@@ -144,7 +144,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full">
                 Tablero de Anuncios Oficial
               </span>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-0.5">
                 Programa Mensual para la Cartelera (VMC)
               </h3>
             </div>
@@ -166,7 +166,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 text-xs font-bold transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 text-xs font-bold transition-colors cursor-pointer"
               title="Imprimir directamente"
               aria-label="Imprimir programa mensual"
             >
@@ -189,7 +189,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               type="button"
               onClick={onClose}
               aria-label="Cerrar programa mensual para la cartelera"
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -197,26 +197,26 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
         </div>
 
         {/* Barra selectora de mes */}
-        <div className="px-6 py-2.5 bg-slate-100/60 dark:bg-slate-800/40 border-b border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
+        <div className="px-6 py-2.5 bg-zinc-100/60 dark:bg-[#18181F]/40 border-b border-zinc-200 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-1 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer"
+              className="p-1 rounded-lg text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 cursor-pointer"
               title="Mes anterior"
               aria-label="Mes anterior"
             >
               <ChevronLeft size={18} />
             </button>
 
-            <span className="text-sm font-bold text-slate-900 dark:text-white min-w-[140px] text-center">
+            <span className="text-sm font-bold text-zinc-900 dark:text-white min-w-[140px] text-center">
               {MONTHS_ES[selectedMonth]} {selectedYear}
             </span>
 
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-1 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer"
+              className="p-1 rounded-lg text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 cursor-pointer"
               title="Mes siguiente"
               aria-label="Mes siguiente"
             >
@@ -224,7 +224,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
             </button>
           </div>
 
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
             {monthWeeks.length} semanas en este mes • Orientación apaisada (A4 Horizontal)
           </div>
         </div>
@@ -237,14 +237,14 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
         )}
 
         {/* ── VISTA PREVIA DEL CARTEL EN PANTALLA ── */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-100 dark:bg-slate-950">
-          <div className="printable-billboard max-w-5xl mx-auto bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-300 p-5 font-sans min-w-[760px]">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 bg-zinc-100 dark:bg-zinc-950">
+          <div className="printable-billboard max-w-5xl mx-auto bg-white text-zinc-900 rounded-2xl shadow-xl border border-zinc-300 p-5 font-sans min-w-[760px]">
             {/* Cabecera del cartel estilo Salón del Reino */}
-            <div className="bg-slate-900 text-white p-3.5 rounded-xl text-center mb-4">
+            <div className="bg-zinc-900 text-white p-3.5 rounded-xl text-center mb-4">
               <h2 className="text-base sm:text-lg font-black uppercase tracking-wider">
                 PROGRAMA DE LA REUNIÓN VIDA Y MINISTERIO CRISTIANOS
               </h2>
-              <p className="text-xs font-medium text-slate-300 mt-0.5">
+              <p className="text-xs font-medium text-zinc-300 mt-0.5">
                 CONGREGACIÓN {congregationName.toUpperCase()} — {MONTHS_ES[selectedMonth].toUpperCase()} DE {selectedYear}
               </p>
             </div>
@@ -263,14 +263,14 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
                 return (
                   <div
                     key={prog.id || idx}
-                    className="border border-slate-300 rounded-xl overflow-hidden bg-white flex flex-col text-xs shadow-2xs"
+                    className="border border-zinc-300 rounded-xl overflow-hidden bg-white flex flex-col text-xs shadow-2xs"
                   >
                     {/* Título de la semana */}
-                    <div className="bg-slate-100 p-2 text-center border-b border-slate-200">
-                      <span className="font-extrabold text-[11px] text-slate-900 block leading-tight">
+                    <div className="bg-zinc-100 p-2 text-center border-b border-zinc-200">
+                      <span className="font-extrabold text-[11px] text-zinc-900 block leading-tight">
                         {prog.rango_semana || `Semana ${prog.semana_fecha}`}
                       </span>
-                      <span className="text-[10px] text-slate-600 block mt-0.5">
+                      <span className="text-[10px] text-zinc-600 block mt-0.5">
                         Pres: <strong>{presPart?.asignado_nombre || '---'}</strong>
                       </span>
                     </div>
@@ -282,18 +282,18 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
                           Tesoros de la Biblia
                         </div>
                         {tesoros.length === 0 ? (
-                          <p className="text-[10px] text-slate-400 italic">Sin datos</p>
+                          <p className="text-[10px] text-zinc-400 italic">Sin datos</p>
                         ) : (
                           tesoros.map((tp) => (
                             <div key={tp.id} className="mb-1 text-[10px] leading-tight">
-                              <span className="font-semibold text-slate-800 block">
+                              <span className="font-semibold text-zinc-800 block">
                                 {tp.tipo === 'discurso_tesoros'
                                   ? 'Discurso (10 min)'
                                   : tp.tipo === 'busquemos_perlas'
                                   ? 'Perlas (10 min)'
                                   : 'Lectura de la Biblia'}
                               </span>
-                              <span className="text-slate-900 font-medium pl-1 block">
+                              <span className="text-zinc-900 font-medium pl-1 block">
                                 • {tp.asignado_nombre || '(Sin asignar)'}
                               </span>
                             </div>
@@ -307,19 +307,19 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
                           Seamos Mejores Maestros
                         </div>
                         {maestros.length === 0 ? (
-                          <p className="text-[10px] text-slate-400 italic">Sin datos</p>
+                          <p className="text-[10px] text-zinc-400 italic">Sin datos</p>
                         ) : (
                           maestros.map((mp) => (
                             <div key={mp.id} className="mb-1 text-[10px] leading-tight">
-                              <span className="font-semibold text-slate-800 block truncate" title={mp.titulo}>
+                              <span className="font-semibold text-zinc-800 block truncate" title={mp.titulo}>
                                 {mp.es_clase_auxiliar ? '[Aux] ' : ''}{mp.titulo}
                               </span>
-                              <span className="text-slate-900 font-medium pl-1 block">
+                              <span className="text-zinc-900 font-medium pl-1 block">
                                 • {mp.asignado_nombre || '(Sin asignar)'}
                                 {mp.asignado_auxiliar_nombre ? ` / ${mp.asignado_auxiliar_nombre}` : ''}
                               </span>
                               {mp.leccion_numero && (
-                                <span className="text-[9px] text-slate-500 pl-1 block">
+                                <span className="text-[9px] text-zinc-500 pl-1 block">
                                   Lección #{mp.leccion_numero}
                                 </span>
                               )}
@@ -334,14 +334,14 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
                           Nuestra Vida Cristiana
                         </div>
                         {vida.length === 0 ? (
-                          <p className="text-[10px] text-slate-400 italic">Sin datos</p>
+                          <p className="text-[10px] text-zinc-400 italic">Sin datos</p>
                         ) : (
                           vida.map((vp) => (
                             <div key={vp.id} className="mb-1 text-[10px] leading-tight">
-                              <span className="font-semibold text-slate-800 block truncate" title={vp.titulo}>
+                              <span className="font-semibold text-zinc-800 block truncate" title={vp.titulo}>
                                 {vp.titulo}
                               </span>
-                              <span className="text-slate-900 font-medium pl-1 block">
+                              <span className="text-zinc-900 font-medium pl-1 block">
                                 • {vp.asignado_nombre || '(Sin asignar)'}
                               </span>
                             </div>
@@ -363,7 +363,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
             </div>
 
             {/* Pie de cartelera */}
-            <div className="mt-4 pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
+            <div className="mt-4 pt-2 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500">
               <span>Cartelera Oficial del Salón del Reino • Vida y Ministerio Cristianos</span>
               <span>Generado con Kongre el {new Date().toLocaleDateString('es-ES')}</span>
             </div>
@@ -371,12 +371,12 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
         </div>
 
         {/* Footer del Modal */}
-        <div className="px-6 py-3 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+        <div className="px-6 py-3 border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/80 flex items-center justify-between text-xs text-zinc-500">
           <span>El PDF se adapta automáticamente a 4 o 5 semanas en formato horizontal A4.</span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 font-bold transition-colors cursor-pointer"
+            className="px-4 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 font-bold transition-colors cursor-pointer"
           >
             Cerrar
           </button>

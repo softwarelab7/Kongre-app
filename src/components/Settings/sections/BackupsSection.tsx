@@ -159,24 +159,24 @@ export const BackupsSection: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
+      <div className="pb-3 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+          <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Copias de Seguridad y Respaldo Cifrado
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Descargas locales y protección con cifrado militar AES-256
             </p>
           </div>
         </div>
       </div>
 
-      <p className="text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
         Exporta todos los datos teocráticos de la congregación. Puedes proteger tu copia con una clave de cifrado militar AES-256 para que nadie sin la contraseña pueda leer el archivo ni acceder a los registros.
       </p>
 
@@ -206,7 +206,7 @@ export const BackupsSection: React.FC = () => {
         <button
           type="button"
           onClick={exportBackupJSON}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-[#27272A] hover:bg-zinc-800 dark:hover:bg-[#3F3F46] text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
         >
           <Download className="w-4 h-4" />
           <span>Descargar JSON Estándar</span>
@@ -224,37 +224,37 @@ export const BackupsSection: React.FC = () => {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer border border-slate-200 dark:border-slate-700"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-[#27272A]"
         >
-          <Upload className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <Upload className="w-4 h-4 text-zinc-500 dark:text-[#A1A1AA]" />
           <span>Restaurar Copia de Seguridad</span>
         </button>
       </div>
 
       {/* EXPORT ENCRYPTED BACKUP MODAL */}
       {showEncryptExportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <FileKey className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                   Exportar Respaldo con Cifrado Militar
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEncryptExportModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleExportEncryptedSubmit} className="space-y-3.5 text-xs">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Se aplicará cifrado <strong>AES-256-GCM</strong> con 100.000 iteraciones de derivación PBKDF2. El archivo descargado no podrá ser abierto por nadie que no conozca esta contraseña.
               </p>
 
@@ -265,7 +265,7 @@ export const BackupsSection: React.FC = () => {
               )}
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Contraseña de Cifrado:
                 </label>
                 <div className="relative">
@@ -274,13 +274,13 @@ export const BackupsSection: React.FC = () => {
                     value={exportPassphrase}
                     onChange={(e) => setExportPassphrase(e.target.value)}
                     placeholder="Mínimo 6 caracteres"
-                    className="w-full p-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full p-2.5 pr-10 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowExportPassphrase(!showExportPassphrase)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5]"
                   >
                     {showExportPassphrase ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -288,7 +288,7 @@ export const BackupsSection: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Confirmar Contraseña:
                 </label>
                 <input
@@ -296,16 +296,16 @@ export const BackupsSection: React.FC = () => {
                   value={confirmExportPassphrase}
                   onChange={(e) => setConfirmExportPassphrase(e.target.value)}
                   placeholder="Repita la contraseña"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   required
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => setShowEncryptExportModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -325,14 +325,14 @@ export const BackupsSection: React.FC = () => {
 
       {/* DECRYPT AND RESTORE MODAL */}
       {showDecryptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/50 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
                   <Lock className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                   Archivo Cifrado Detectado
                 </h4>
               </div>
@@ -342,14 +342,14 @@ export const BackupsSection: React.FC = () => {
                   setShowDecryptModal(false);
                   setPendingEncryptedJson(null);
                 }}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleDecryptRestore} className="space-y-3.5 text-xs">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 El archivo seleccionado está protegido con cifrado AES-256. Ingrese la contraseña con la que fue creado para descifrarlo en su navegador y restaurar los datos:
               </p>
 
@@ -360,7 +360,7 @@ export const BackupsSection: React.FC = () => {
               )}
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block font-bold text-zinc-700 dark:text-[#A1A1AA] mb-1">
                   Contraseña de Descifrado:
                 </label>
                 <div className="relative">
@@ -369,28 +369,28 @@ export const BackupsSection: React.FC = () => {
                     value={decryptPassphrase}
                     onChange={(e) => setDecryptPassphrase(e.target.value)}
                     placeholder="Ingrese la contraseña del respaldo"
-                    className="w-full p-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full p-2.5 pr-10 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                     required
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => setShowDecryptPassphrase(!showDecryptPassphrase)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5]"
                   >
                     {showDecryptPassphrase ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
                 <button
                   type="button"
                   onClick={() => {
                     setShowDecryptModal(false);
                     setPendingEncryptedJson(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>

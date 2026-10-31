@@ -89,20 +89,20 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
   return (
     <aside
       aria-label="Panel de Estudio e Inspector"
-      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[360px] md:w-[380px] bg-white dark:bg-[#121216] border-l border-slate-200 dark:border-[#27272A] shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-200"
+      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[360px] md:w-[380px] bg-white dark:bg-[#121216] border-l border-zinc-200 dark:border-[#27272A] shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-200"
     >
       {/* Top Header */}
-      <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100 dark:border-[#27272A]">
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-zinc-100 dark:border-[#27272A]">
         <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <h2 className="text-xs font-bold tracking-tight text-slate-900 dark:text-zinc-100 uppercase">
+          <h2 className="text-xs font-bold tracking-tight text-zinc-900 dark:text-zinc-100 uppercase">
             Panel de Estudio
           </h2>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
           title="Cerrar panel de estudio"
         >
           <X className="w-4 h-4" />
@@ -110,14 +110,14 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
       </div>
 
       {/* Tabs Selector: [Referencias] [Notas] */}
-      <div className="flex items-center p-2 border-b border-slate-100 dark:border-[#27272A] bg-slate-50 dark:bg-[#09090B]">
+      <div className="flex items-center p-2 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50 dark:bg-[#09090B]">
         <button
           type="button"
           onClick={() => setActiveTab('refs')}
           className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
             activeTab === 'refs'
-              ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-[#27272A]'
-              : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs border border-zinc-200/80 dark:border-[#27272A]'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
           }`}
         >
           <BookOpen className="w-3.5 h-3.5" />
@@ -129,8 +129,8 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
           onClick={() => setActiveTab('notes')}
           className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
             activeTab === 'notes'
-              ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-[#27272A]'
-              : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs border border-zinc-200/80 dark:border-[#27272A]'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -153,10 +153,10 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
                     Referencia activa
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                   {activeReference.title}
                 </h3>
-                <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed font-serif">
+                <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed font-serif">
                   «{activeReference.extract}»
                 </p>
               </div>
@@ -164,7 +164,7 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
 
             {references.length > 0 ? (
               <div className="space-y-2">
-                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                   Todas las Referencias del Documento
                 </h4>
                 {references.map((ref) => {
@@ -175,18 +175,18 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
                       className={`p-3 rounded-xl border transition-all ${
                         isCurrent
                           ? 'border-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/30'
-                          : 'border-slate-200/80 dark:border-[#27272A] bg-white dark:bg-[#18181F]'
+                          : 'border-zinc-200/80 dark:border-[#27272A] bg-white dark:bg-[#18181F]'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                           {ref.code}
                         </span>
-                        <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 truncate">
+                        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">
                           {ref.title}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-3 leading-relaxed">
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed">
                         {ref.extract}
                       </p>
                     </div>
@@ -195,7 +195,7 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
               </div>
             ) : (
               !activeReference && (
-                <div className="py-12 text-center text-slate-400 dark:text-zinc-500 text-xs">
+                <div className="py-12 text-center text-zinc-400 dark:text-zinc-500 text-xs">
                   <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
                   <p>Toca un token de referencia [Ref] dentro del texto para inspeccionar su contenido aquí.</p>
                 </div>
@@ -207,7 +207,7 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
           <div className="space-y-4">
             {/* Color Marker Selector */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                 Color de Marcador
               </label>
               <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
             {/* Note Textarea with AutoSave */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                   Nota Vinculada
                 </label>
                 {saveStatus && (
@@ -244,13 +244,13 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Escribe tus notas personales, observaciones para la reunión o comentarios teocráticos..."
-                className="w-full p-3 rounded-xl border border-slate-200 dark:border-[#27272A] bg-slate-50/70 dark:bg-[#18181F] text-slate-900 dark:text-zinc-100 text-xs leading-relaxed focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-[#121216] focus:outline-hidden transition"
+                className="w-full p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F] text-zinc-900 dark:text-zinc-100 text-xs leading-relaxed focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-[#121216] focus:outline-hidden transition"
               />
             </div>
 
             {/* Tags Pills [#Tag1] [#Tag2] */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                 Etiquetas (#Tags)
               </label>
               <div className="flex flex-wrap gap-1.5 mb-2">
@@ -277,9 +277,9 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
                   onChange={(e) => setNewTagInput(e.target.value)}
                   onKeyDown={handleAddTag}
                   placeholder="Escribe una etiqueta y presiona Enter..."
-                  className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 dark:border-[#27272A] bg-slate-50 dark:bg-[#18181F] text-xs text-slate-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full pl-8 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
-                <Tag className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                <Tag className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
               </div>
             </div>
           </div>

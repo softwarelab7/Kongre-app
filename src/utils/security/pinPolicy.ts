@@ -21,7 +21,7 @@ export function evaluatePinStrength(pin: string): PinStrengthResult {
     return {
       score: 0,
       label: 'Muy corto',
-      color: 'bg-slate-300 text-slate-500',
+      color: 'bg-zinc-300 text-zinc-500',
       isWeak: true,
       message: 'Mínimo 6 caracteres o dígitos'
     };

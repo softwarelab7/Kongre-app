@@ -184,7 +184,7 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
       )}
 
       {/* CONTENEDOR PRINCIPAL S-21 */}
-      <section className="bg-white dark:bg-[#0f1623] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs overflow-hidden">
+      <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
         {/* Cabecera Editorial */}
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
@@ -530,7 +530,7 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
       </section>
 
       {/* GRÁFICO DE TENDENCIA ANUAL */}
-      <section className="bg-white dark:bg-[#0f1623] p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs">
+      <section className="bg-white dark:bg-[#121216] p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div className="flex items-center gap-2.5">
             <BarChart3 size={18} className="text-amber-500" />

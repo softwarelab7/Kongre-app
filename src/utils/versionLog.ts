@@ -25,19 +25,46 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.40';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.41';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.29.8040';
-export const BUILD_DATE = '29 de Octubre, 2026';
+export const CURRENT_BUILD_CODE = '2026.10.31.8041';
+export const BUILD_DATE = '31 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0-alpha.41',
+    buildCode: '2026.10.31.8041',
+    date: '31 de Octubre, 2026',
+    title: 'Estandarización Visual Táctil Neutra JW Library, Erradicación de Paneles Saturados y Aislamiento de Reuniones',
+    isCurrent: true,
+    highlight: 'Estandarización estética integral en toda la aplicación adoptando la paleta táctil neutra de JW Library (superficies AMOLED oscuras, bordes sutiles y botones monocromáticos), eliminación de la barra de pestañas en el catálogo y desacoplamiento estricto del ministerio personal dentro de la sección de reuniones.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Estandarización Visual Estilo JW Library en Toda la Aplicación (index.css, CleaningDutiesTab.tsx, CarritosTab.tsx, CategoryHubTab.tsx): Eliminación completa de paneles inundados de color saturado (rojos oscuros, púrpuras, ámbar y esmeraldas invasivos). Sustitución por superficies táctiles neutras AMOLED (#121216 y #18181F), bordes sutiles de zinc (#27272A), botones de acción principal en blanco/negro y micropuntos semánticos para alertas de choques e indicadores de estado.',
+      },
+      {
+        category: 'improvement',
+        text: 'Depuración y Simplificación del Catálogo de Módulos (CategoryHubTab.tsx): Eliminación de la barra superior horizontal de categorías y búsqueda. Presentación directa y limpia de los módulos organizados por departamentos teocráticos oficiales.',
+      },
+      {
+        category: 'fix',
+        text: 'Aislamiento Estricto del Departamento de Reuniones (CategoryHubTab.tsx, Navbar.tsx): Desacople total del ministerio personal de las reuniones de congregación. La vista de Reuniones muestra exclusivamente los 4 módulos correspondientes (Programa de Reuniones, Hojas S-89, Discursos Públicos y Hospitalidad de Oradores), manteniendo el ministerio personal de forma privada en el portal del publicador.',
+      },
+      {
+        category: 'improvement',
+        text: 'Neutralización del Detector de Choques y Módulos de Predicación Pública (CleaningDutiesTab.tsx, CarritosTab.tsx): Rediseño del panel de choques de deberes a estética ejecutiva limpia con botones táctiles de reemplazo; estandarización de tarjetas de turnos de carritos, matriz de equidad, tarjetas de métricas e indicadores de horario.',
+      },
+    ],
+  },
   {
     version: '0.1.0-alpha.40',
     buildCode: '2026.10.29.8040',
     date: '29 de Octubre, 2026',
     title: 'PINs Personales v2 con Sal por Publicador, CSP Estricto en PC, Resiliencia de Contexto y Actualización CLM',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Fortalecimiento de la seguridad con derivación de PIN personal v2 (sal única por publicador con PBKDF2), política CSP estricta en la app de escritorio Tauri, prevención de fallos de montaje mediante hooks opcionales y sincronización de lecturas bíblicas con Jeremías 38-48.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

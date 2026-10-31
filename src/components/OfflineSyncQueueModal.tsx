@@ -202,31 +202,31 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
         return {
           label: 'Asistencia S-88',
           icon: Users,
-          bg: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+          dotColor: 'bg-emerald-500',
         };
       case 'UPDATE_SERVICE_REPORT':
         return {
           label: 'Informe S-21',
           icon: FileText,
-          bg: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+          dotColor: 'bg-blue-500',
         };
       case 'UPDATE_SCHEDULE':
         return {
           label: 'Programación',
           icon: Calendar,
-          bg: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+          dotColor: 'bg-indigo-500',
         };
       case 'UPDATE_TERRITORY':
         return {
           label: 'Territorio',
           icon: MapPin,
-          bg: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+          dotColor: 'bg-amber-500',
         };
       default:
         return {
           label: 'Congregación',
           icon: Database,
-          bg: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+          dotColor: 'bg-zinc-500',
         };
     }
   };
@@ -244,32 +244,32 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Cola de sincronización offline"
     >
       <div
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-2xl bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#121216]/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs">
               <Database className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg">
+                <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base sm:text-lg">
                   Cola de Sincronización Offline (IndexedDB)
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                   Supabase
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Almacenamiento persistente en el dispositivo para uso sin conexión
               </p>
             </div>
@@ -278,27 +278,27 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar cola de sincronización offline"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Status Strip */}
-        <div className="px-5 py-3 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-5 py-3 bg-zinc-50 dark:bg-zinc-950/60 border-b border-zinc-100 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-3 text-xs">
           {/* Connectivity Status */}
           <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-600 dark:text-slate-400">Estado de Red:</span>
+            <span className="font-medium text-zinc-600 dark:text-[#A1A1AA]">Estado de Red:</span>
             {isOnline ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold text-[11px]">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <Wifi className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-medium text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <Wifi className="w-3.5 h-3.5 text-emerald-500" />
                 Conectado
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 font-semibold text-[11px]">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <WifiOff className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-medium text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                <WifiOff className="w-3.5 h-3.5 text-amber-500" />
                 Sin Conexión (Offline)
               </span>
             )}
@@ -306,12 +306,12 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
 
           {/* Pending counter & quick checkpoint action */}
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 dark:text-slate-400">Pendientes en cola:</span>
+            <span className="text-zinc-500 dark:text-[#A1A1AA]">Pendientes en cola:</span>
             <span
-              className={`font-extrabold px-2 py-0.5 rounded-md border ${
+              className={`font-mono tabular-nums font-bold px-2 py-0.5 rounded-md border text-xs ${
                 stats.pendingCount > 0
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-2xs'
+                  : 'bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#E4E4E7] border-zinc-200 dark:border-[#27272A]'
               }`}
             >
               {stats.pendingCount}
@@ -319,7 +319,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
             <button
               type="button"
               onClick={handleEnqueueCheckpoint}
-              className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-semibold text-[11px] transition cursor-pointer active:scale-95"
+              className="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-medium text-[11px] transition cursor-pointer active:scale-95"
               title="Encolar un respaldo manual para verificar la cola en tiempo real"
             >
               + Encolar respaldo
@@ -329,17 +329,11 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
 
         {/* Feedback message if any */}
         {syncFeedback && (
-          <div
-            className={`px-5 py-2.5 text-xs flex items-center gap-2 ${
-              syncFeedback.type === 'success'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-b border-emerald-200 dark:border-emerald-800'
-                : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border-b border-rose-200 dark:border-rose-800'
-            }`}
-          >
+          <div className="px-5 py-2.5 text-xs flex items-center gap-2 bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-200 border-b border-zinc-200 dark:border-[#27272A]">
             {syncFeedback.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
             ) : (
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             )}
             <span>{syncFeedback.message}</span>
           </div>
@@ -352,16 +346,16 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
               <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/50 dark:border-emerald-800/50">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">
+              <h4 className="font-bold text-zinc-800 dark:text-[#E4E4E7] text-sm mb-1">
                 Cola al día y sincronizada
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-md mx-auto leading-relaxed">
                 No hay modificaciones pendientes en cola. Cuando realices cambios en modo fuera de línea (marcar asistencia, editar informes, etc.), se guardarán automáticamente aquí en IndexedDB.
               </p>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 px-1">
+              <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-[#71717A] px-1">
                 <span>Modificaciones registradas ({items.length})</span>
                 {items.some((i) => i.status === 'synced') && (
                   <button
@@ -384,25 +378,24 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
                 return (
                   <div
                     key={item.id}
-                    className="p-3 rounded-xl border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-slate-800/60 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+                    className="p-3 rounded-xl border border-zinc-200/90 dark:border-[#27272A]/90 bg-white dark:bg-[#18181F]/60 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
                   >
                     <div className="flex items-start gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-700/60 flex items-center justify-center text-zinc-600 dark:text-[#D4D4D8] shrink-0 mt-0.5">
                         <BadgeIcon className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${badge.bg}`}
-                          >
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                            <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor} shrink-0`} />
                             {badge.label}
                           </span>
-                          <span className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                          <span className="text-[11px] text-zinc-400 dark:text-[#71717A] flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {formatDate(item.timestamp)}
                           </span>
                         </div>
-                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                        <p className="text-xs font-semibold text-zinc-800 dark:text-[#E4E4E7]">
                           {item.description}
                         </p>
                         {item.lastError && (
@@ -415,20 +408,20 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
 
                     <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       {isPending && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-semibold">
-                          <Clock className="w-3 h-3 text-amber-500" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#3E3E42] text-[11px] font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                           En cola (IndexedDB)
                         </span>
                       )}
                       {isSyncing && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-semibold">
-                          <RefreshCw className="w-3 h-3 animate-spin text-indigo-500" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#3E3E42] text-[11px] font-medium">
+                          <RefreshCw className="w-3 h-3 animate-spin text-zinc-400" />
                           Sincronizando...
                         </span>
                       )}
                       {isSynced && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold">
-                          <Check className="w-3 h-3 text-emerald-500" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#3E3E42] text-[11px] font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                           Sincronizado
                         </span>
                       )}
@@ -436,7 +429,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleRemove(item.id)}
-                        className="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                        className="p-1 rounded text-zinc-400 hover:text-rose-500 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
                         title="Descartar de la cola"
                         aria-label={`Descartar de la cola: ${item.description}`}
                       >
@@ -450,20 +443,20 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
           )}
 
           {/* Informational Callout */}
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200 text-xs">
+          <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/40 border border-zinc-200/80 dark:border-[#27272A] text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-1.5">
+            <div className="flex items-center gap-1.5 font-bold text-zinc-800 dark:text-[#E4E4E7] text-xs">
               <ShieldCheck className="w-4 h-4 text-indigo-500" />
               <span>Garantía de Cero Pérdida de Datos con Supabase</span>
             </div>
-            <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-[#A1A1AA]">
               Tus modificaciones de asistencia a reuniones, conteos, e informes de predicación quedan resguardadas de inmediato en la base de datos <strong>IndexedDB</strong> de tu navegador o dispositivo móvil. En cuanto vuelvas a tener señal WiFi o red celular, el motor de sincronización transmitirá automáticamente los datos cifrados con <strong>AES-256-GCM</strong> hacia <strong>Supabase</strong>.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+        <div className="px-5 py-3 border-t border-zinc-100 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121216]/70 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-[11px] text-zinc-400 dark:text-[#71717A] flex items-center gap-1.5">
             <Database className="w-3.5 h-3.5 text-indigo-500" />
             <span>IndexedDB: kongre_offline_sync_db (v1)</span>
           </div>
@@ -472,7 +465,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-initial px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors"
+              className="flex-1 sm:flex-initial px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] text-xs font-semibold transition-colors"
             >
               Cerrar
             </button>
@@ -480,7 +473,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
               type="button"
               onClick={handleManualSync}
               disabled={isProcessing || !isOnline}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isProcessing ? 'animate-spin' : ''}`} />
               <span>{isProcessing ? 'Sincronizando...' : 'Sincronizar ahora con Supabase'}</span>

@@ -1094,11 +1094,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
 
   return (
-    <div className="min-h-dvh w-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
+    <div className="min-h-dvh w-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
       {/* =====================================================================
           TOP NAVIGATION BAR (Inspired by about.organized-app.com & guide.organized-app.com)
           ===================================================================== */}
-      <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80">
+      <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#121216]/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-[#27272A]/80">
         <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
           {/* Left: Brand Identity (Unified with App Brand & AnimatedLogo) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -1115,7 +1115,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
           </div>
 
           {/* Center: Switch between About (about.organized-app.com style) & Guide (guide.organized-app.com style) */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+          <nav className="hidden md:flex items-center gap-1 bg-zinc-100/90 dark:bg-[#18181F]/80 p-1 rounded-xl border border-zinc-200/70 dark:border-[#27272A]/70">
             {[
               { id: 'about' as WebsiteSection, label: 'Acerca de Kongre', icon: Compass },
               { id: 'guide' as WebsiteSection, label: 'Guía de Usuario (Docs)', icon: BookOpen },
@@ -1133,8 +1133,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                      : 'text-zinc-600 dark:text-[#D4D4D8] hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -1179,7 +1179,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
         </div>
 
         {/* Mobile Secondary Tab Bar (3-column full-width segmented bar, zero clipping) */}
-        <div className="md:hidden border-t border-slate-200/70 dark:border-slate-800/70 px-2.5 py-1.5 grid grid-cols-3 gap-1 bg-slate-50/90 dark:bg-slate-900/90">
+        <div className="md:hidden border-t border-zinc-200/70 dark:border-[#27272A]/70 px-2.5 py-1.5 grid grid-cols-3 gap-1 bg-zinc-50/90 dark:bg-[#121216]/90">
           {[
             { id: 'about' as WebsiteSection, shortLabel: 'Acerca de', fullLabel: 'Acerca de Kongre', icon: Compass },
             { id: 'guide' as WebsiteSection, shortLabel: 'Guía', fullLabel: 'Guía de Usuario', icon: BookOpen },
@@ -1198,7 +1198,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 className={`px-2 py-1.5 rounded-lg text-[11.5px] sm:text-xs font-bold inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-all cursor-pointer min-w-0 ${
                   isActive
                     ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800/60'
+                    : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-200/60 dark:hover:bg-[#27272A]/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -1224,7 +1224,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-slate-900 dark:via-indigo-950/50 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden"
+              className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-zinc-900 dark:via-indigo-950/50 dark:to-zinc-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden"
             >
               {/* Floating ambient glow orbs */}
               <motion.div
@@ -1263,7 +1263,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.12]"
+                    className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-zinc-900 dark:text-white leading-[1.12]"
                   >
                     Simplifica y organiza toda la vida de tu congregación en un solo lugar.
                   </motion.h1>
@@ -1272,7 +1272,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl"
+                    className="text-sm sm:text-base text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl"
                   >
                     <strong>Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
                   </motion.p>
@@ -1303,7 +1303,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       whileTap={{ scale: 0.97 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => setActiveSection('downloads')}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm shadow-2xs cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-100 border border-zinc-200 dark:border-[#27272A] font-bold text-sm shadow-2xs cursor-pointer"
                     >
                       <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <span>Instalar en PC / Móvil</span>
@@ -1327,7 +1327,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.35 }}
-                    className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-t border-indigo-100/90 dark:border-slate-800"
+                    className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-zinc-600 dark:text-[#D4D4D8] border-t border-indigo-100/90 dark:border-[#27272A]"
                   >
                     <span className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -1351,22 +1351,22 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                   className="lg:col-span-5 xl:col-span-5"
                 >
-                  <div className="rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-2xl p-4 sm:p-5 space-y-3.5 relative overflow-hidden backdrop-blur-xl group">
+                  <div className="rounded-3xl bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/90 dark:border-[#27272A] shadow-2xl p-4 sm:p-5 space-y-3.5 relative overflow-hidden backdrop-blur-xl group">
                     {/* Ambient subtle card glow */}
                     <div className="absolute -top-16 -right-16 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
 
                     {/* Cockpit Window Header (macOS style window buttons + Congregation Live Badge) */}
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
                           <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
                         </div>
-                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 pl-1.5 flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-zinc-700 dark:text-[#D4D4D8] pl-1.5 flex items-center gap-1.5">
                           <span>Kongre</span>
-                          <span className="text-slate-400 dark:text-slate-500 font-normal">·</span>
-                          <span className="font-normal text-slate-500 dark:text-slate-400">Congregación Central</span>
+                          <span className="text-zinc-400 dark:text-[#71717A] font-normal">·</span>
+                          <span className="font-normal text-zinc-500 dark:text-[#A1A1AA]">Congregación Central</span>
                         </span>
                       </div>
 
@@ -1377,7 +1377,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </div>
 
                     {/* Interactive Cockpit Tabs */}
-                    <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-[11px] font-bold">
+                    <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F]/80 text-[11px] font-bold">
                       {[
                         { id: 'reuniones' as const, label: 'Reunión' },
                         { id: 'asistencia' as const, label: 'S-88' },
@@ -1392,8 +1392,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             onClick={() => setHeroPreviewTab(tab.id)}
                             className={`py-1 rounded-lg text-center transition-all cursor-pointer ${
                               isTabActive
-                                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-black'
-                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                                ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-black'
+                                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                             }`}
                           >
                             {tab.label}
@@ -1414,7 +1414,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 space-y-2.5 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span className="font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                               <span>Reunión Vida y Ministerio</span>
                             </span>
@@ -1423,17 +1423,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </span>
                           </div>
 
-                          <div className="space-y-1.5 bg-white dark:bg-slate-850 p-2.5 rounded-xl border border-indigo-100/80 dark:border-indigo-900/40">
+                          <div className="space-y-1.5 bg-white dark:bg-zinc-850 p-2.5 rounded-xl border border-indigo-100/80 dark:border-indigo-900/40">
                             <div className="flex items-center justify-between text-[11px]">
-                              <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                                 Tesoros de la Biblia (10 min)
                               </span>
-                              <span className="text-slate-500 dark:text-slate-400 font-medium shrink-0 ml-2">
+                              <span className="text-zinc-500 dark:text-[#A1A1AA] font-medium shrink-0 ml-2">
                                 C. Mendoza
                               </span>
                             </div>
-                            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800">
-                              <span className="text-slate-600 dark:text-slate-300 truncate">
+                            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-zinc-100 dark:border-[#27272A]">
+                              <span className="text-zinc-600 dark:text-[#D4D4D8] truncate">
                                 Lectura de la Biblia (S-89)
                               </span>
                               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
@@ -1442,7 +1442,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="flex items-center justify-between text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
                             <span>JW.ORG EPUB Importado</span>
                             <span className="text-indigo-600 dark:text-indigo-400 font-bold">Historial S-38 al día</span>
                           </div>
@@ -1459,7 +1459,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/60 space-y-2.5 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span className="font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5">
                               <Users className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               <span>Contador S-88 en Vivo</span>
                             </span>
@@ -1469,18 +1469,18 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           </div>
 
                           <div className="grid grid-cols-2 gap-2 text-center">
-                            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-emerald-100 dark:border-emerald-900/40">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Auditorio</span>
-                              <span className="text-xl font-black text-slate-900 dark:text-white">96</span>
+                            <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-emerald-100 dark:border-emerald-900/40">
+                              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Auditorio</span>
+                              <span className="text-xl font-black text-zinc-900 dark:text-white">96</span>
                             </div>
-                            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-emerald-100 dark:border-emerald-900/40">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Zoom</span>
+                            <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-emerald-100 dark:border-emerald-900/40">
+                              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Zoom</span>
                               <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">32</span>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 px-1">
-                            <span>Total Reunión: <strong className="text-slate-900 dark:text-white">128</strong></span>
+                          <div className="flex items-center justify-between text-[11px] font-bold text-zinc-700 dark:text-[#D4D4D8] px-1">
+                            <span>Total Reunión: <strong className="text-zinc-900 dark:text-white">128</strong></span>
                             <span className="text-emerald-600 dark:text-emerald-400 font-mono">Promedio Mensual: 122</span>
                           </div>
                         </motion.div>
@@ -1496,7 +1496,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/60 space-y-2.5 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span className="font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5">
                               <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                               <span>Territorio #14 · Los Álamos</span>
                             </span>
@@ -1505,17 +1505,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </span>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-amber-100 dark:border-amber-900/40 space-y-1.5">
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-amber-100 dark:border-amber-900/40 space-y-1.5">
                             <div className="flex items-center justify-between text-[11px]">
-                              <span className="font-bold text-slate-800 dark:text-slate-200">Asignado a: Grupo 2</span>
+                              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">Asignado a: Grupo 2</span>
                               <span className="text-amber-600 dark:text-amber-400 font-bold">78% Cubierto</span>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                            <div className="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-700 overflow-hidden">
                               <div className="h-full bg-amber-500 rounded-full w-[78%]" />
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="flex items-center justify-between text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
                             <span>2 direcciones «No Visitar»</span>
                             <span className="text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1">
                               <QrCode className="w-3 h-3" /> Tarjeta Digital Activa
@@ -1534,7 +1534,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           className="p-3.5 rounded-2xl bg-violet-50/70 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/60 space-y-2.5 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span className="font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5">
                               <Clock className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                               <span>Ministerio & Precursores</span>
                             </span>
@@ -1543,17 +1543,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </span>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-violet-100 dark:border-violet-900/40 space-y-1.5">
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-violet-100 dark:border-violet-900/40 space-y-1.5">
                             <div className="flex items-center justify-between text-[11px]">
-                              <span className="font-bold text-slate-800 dark:text-slate-200">Meta de Horas (Precursor)</span>
+                              <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">Meta de Horas (Precursor)</span>
                               <span className="text-violet-600 dark:text-violet-400 font-mono font-bold">42 / 50 hrs</span>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                            <div className="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-700 overflow-hidden">
                               <div className="h-full bg-violet-600 rounded-full w-[84%]" />
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="flex items-center justify-between text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
                             <span>3 Cursos Bíblicos</span>
                             <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Informe mensual listo</span>
                           </div>
@@ -1562,8 +1562,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </AnimatePresence>
 
                     {/* Cockpit Action Launcher: Minimalista, Serio y Unificado */}
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
+                    <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
+                      <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">
                         Congregación de muestra interactiva
                       </span>
                       <DemoModeButton onClick={onStartDemoMode} size="sm" />
@@ -1585,10 +1585,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   Flujo de Trabajo Sencillo y Seguro
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
                   Cómo funciona Kongre en tu congregación
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8]">
                   Una transición sin fricción para hermanos de todas las edades y niveles de experiencia tecnológica.
                 </p>
               </div>
@@ -1596,45 +1596,45 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
                 >
                   <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-black text-base flex items-center justify-center">
                     1
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                     Configuración en 2 Minutos
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     El Coordinador o Secretario crea la congregación desde cualquier dispositivo. Cero servidores complicados ni configuraciones técnicas.
                   </p>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
                 >
                   <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400 font-black text-base flex items-center justify-center">
                     2
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                     Acceso con PIN y Roles Teocráticos
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     Cada hermano recibe un código de invitación y PIN personal. Cada uno ve exactamente lo que le corresponde según sus privilegios.
                   </p>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
                 >
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 font-black text-base flex items-center justify-center">
                     3
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                     100% Offline con Sincronización P2P
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     Funciona en el Salón del Reino y en la predicación sin señal. Cuando hay conexión, los datos se sincronizan cifrados de extremo a extremo.
                   </p>
                 </motion.div>
@@ -1654,16 +1654,16 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Herramientas para Cada Hermano
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                  <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mt-0.5">
                     ¿Para quién está diseñada Kongre?
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic mt-1">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] italic mt-1">
                     «Que todas las cosas se hagan de forma digna y ordenada» — 1 Corintios 14:40
                   </p>
                 </div>
 
                 {/* Animated Role Tabs with Sliding Pill & Emblems */}
-                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-slate-200/70 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/60 dark:border-slate-800">
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-zinc-200/70 dark:bg-[#121216] p-1.5 rounded-2xl border border-zinc-300/60 dark:border-[#27272A]">
                   {ROLE_PERSONAS.map((role) => {
                     const isSelected = role.id === selectedRolePersona;
                     const RoleIcon =
@@ -1685,7 +1685,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         className={`relative px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-colors cursor-pointer shrink-0 z-10 flex items-center gap-1.5 ${
                           isSelected
                             ? 'text-white'
-                            : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                            : 'text-zinc-700 dark:text-[#D4D4D8] hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
                         {isSelected && (
@@ -1711,17 +1711,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-10 shadow-sm"
+                  className="rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] p-6 sm:p-8 lg:p-10 shadow-sm"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     <div className="lg:col-span-5 space-y-4">
                       <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                         {activePersona.badge}
                       </span>
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-snug">
+                      <h3 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white leading-snug">
                         {activePersona.headline}
                       </h3>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                         {activePersona.description}
                       </p>
 
@@ -1742,7 +1742,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           whileHover={{ scale: 1.04, y: -1 }}
                           whileTap={{ scale: 0.96 }}
                           onClick={() => onGoToPortal()}
-                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition-colors cursor-pointer group"
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-xs transition-colors cursor-pointer group"
                         >
                           <span>Ingresar ahora</span>
                           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -1758,7 +1758,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.35, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
                           whileHover={{ y: -3, scale: 1.015 }}
-                          className="p-4 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-1.5 transition-shadow hover:shadow-md"
+                          className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-[#18181F]/50 border border-zinc-200/70 dark:border-[#27272A]/60 space-y-1.5 transition-shadow hover:shadow-md"
                         >
                           <div className="flex items-center gap-2">
                             <motion.div
@@ -1769,11 +1769,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             >
                               <Check className="w-3.5 h-3.5" />
                             </motion.div>
-                            <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-snug">
+                            <h4 className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white leading-snug">
                               {feat.title}
                             </h4>
                           </div>
-                          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                          <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed pl-8">
                             {feat.detail}
                           </p>
                         </motion.div>
@@ -1797,7 +1797,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Módulos Teocráticos Integrados
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                  <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mt-0.5">
                     Funciones que ahorran horas de trabajo cada semana
                   </h2>
                 </div>
@@ -1819,7 +1819,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-indigo-50/80 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-indigo-200/80 dark:border-indigo-800/70 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-indigo-50/80 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-indigo-200/80 dark:border-indigo-800/70 shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1831,7 +1831,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                             Reuniones y Automatización
                           </span>
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                          <h3 className="text-lg font-black text-zinc-900 dark:text-white">
                             Programación Semanal y Hojas S-89
                           </h3>
                         </div>
@@ -1841,14 +1841,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl">
                       Carga los datos de las reuniones desde los programas oficiales de jw.org sin copiar y pegar. Asigna partes estudiantiles respetando el historial S-38 de cada publicador y envía las hojas de asignación S-89 por WhatsApp en un toque.
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Detección de choques</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Exportar PDF oficial</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Historial S-38 automático</span>
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Detección de choques</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Exportar PDF oficial</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Historial S-38 automático</span>
                     </div>
                   </div>
 
@@ -1868,7 +1868,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -1879,19 +1879,19 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                           Auditorio & Zoom
                         </span>
-                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                           Contador S-88 Táctil
                         </h3>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                       Herramienta táctil para acomodadores con botones rápidos (+ / -) que calcula promedios mensuales y anuales oficiales para el formulario S-88.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleOpenGuideArticle('attendance-counter-s88')}
-                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full py-2 px-3.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F]/70 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
                   >
                     <span>Ver guía de asistencia</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -1904,7 +1904,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -1915,19 +1915,19 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
                           Ministerio y Metas
                         </span>
-                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                           Cronómetro e Informes
                         </h3>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                       Lleva el tiempo exacto en el celular sin gastar batería. Control de cursos bíblicos, solicitud de precursor auxiliar e informes delegados de familia.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleOpenGuideArticle('ministry-timer-studies')}
-                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full py-2 px-3.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F]/70 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
                   >
                     <span>Cómo reportar ministerio</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -1940,7 +1940,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-amber-50/70 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-amber-200/80 dark:border-amber-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-amber-50/70 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-amber-200/80 dark:border-amber-800/60 shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1952,7 +1952,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                             Territorios GPS y Carritos
                           </span>
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                          <h3 className="text-lg font-black text-zinc-900 dark:text-white">
                             Mapas Digitales Interactivos (S-13) y Exhibidores
                           </h3>
                         </div>
@@ -1962,14 +1962,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl">
                       Dibuja polígonos interactivos con OpenStreetMap, marca direcciones «No visitar» para proteger la privacidad de los vecinos y comparte la tarjeta digital por QR con el conductor del grupo sin imprimir papel.
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Registro oficial S-13</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Turnos de Carritos PPE</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Direcciones No Visitar</span>
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Registro oficial S-13</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Turnos de Carritos PPE</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Direcciones No Visitar</span>
                     </div>
                   </div>
 
@@ -1989,7 +1989,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -2000,19 +2000,19 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                           Secretaría y Registros
                         </span>
-                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
                           Fichas S-21 e Informe S-1
                         </h3>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                       Genera automáticamente las tarjetas de registro de publicador S-21 para el año de servicio y consolida los totales para el informe mensual S-1 a la sucursal.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleOpenGuideArticle('persons-groups-s21')}
-                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full py-2 px-3.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F]/70 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
                   >
                     <span>Ver secretaría y S-21</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -2025,7 +2025,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-violet-50/70 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-violet-200/80 dark:border-violet-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-violet-50/70 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-violet-200/80 dark:border-violet-800/60 shadow-sm flex flex-col justify-between gap-5 group"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -2037,7 +2037,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
                             Fin de Semana y Salón
                           </span>
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                          <h3 className="text-lg font-black text-zinc-900 dark:text-white">
                             Discursos Públicos, Hospitalidad y Tablero TV
                           </h3>
                         </div>
@@ -2047,14 +2047,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl">
                       Coordina oradores locales y visitantes, hospitalidad, turnos de limpieza, acomodadores y proyecta en pantalla completa el Tablero Digital en el monitor del Salón del Reino con diseño de alta visibilidad.
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Temas de discursos oficiales</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Cronograma de hospitalidad</span>
-                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Atajos de cabina de sonido</span>
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Temas de discursos oficiales</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Cronograma de hospitalidad</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">✓ Atajos de cabina de sonido</span>
                     </div>
                   </div>
 
@@ -2076,7 +2076,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-3xl bg-slate-900 text-white p-6 sm:p-10 border border-slate-800 shadow-xl space-y-6 relative overflow-hidden"
+              className="rounded-3xl bg-zinc-900 text-white p-6 sm:p-10 border border-zinc-800 shadow-xl space-y-6 relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -2101,7 +2101,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
                   Tus datos pertenecen únicamente a tu congregación
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
                   Sabemos lo importante que es proteger la información personal de los hermanos. Por eso Kongre ha sido construida desde cero con estándares de seguridad criptográfica y almacenamiento local prioritario.
                 </p>
               </div>
@@ -2146,7 +2146,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     >
                       <Icon className={`w-5 h-5 ${item.color}`} />
                       <h3 className="text-sm font-bold text-white">{item.title}</h3>
-                      <p className="text-xs text-slate-300 leading-relaxed">{item.desc}</p>
+                      <p className="text-xs text-zinc-300 leading-relaxed">{item.desc}</p>
                     </motion.div>
                   );
                 })}
@@ -2173,14 +2173,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.5 }}
-              className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-5 shadow-xs"
+              className="rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] p-6 sm:p-8 space-y-5 shadow-xs"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Respuestas Rápidas
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white">
                     Preguntas Frecuentes (FAQ)
                   </h2>
                 </div>
@@ -2195,7 +2195,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </motion.button>
               </div>
 
-              <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
+              <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800">
                 {FAQ_ITEMS.map((faq, idx) => {
                   const isOpen = openFaqIndex === idx;
                   return (
@@ -2207,7 +2207,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
                         className="w-full flex items-center justify-between gap-4 text-left py-1 cursor-pointer group"
                       >
-                        <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {faq.question}
                         </span>
                         <motion.div
@@ -2216,7 +2216,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           className="shrink-0"
                         >
                           <ChevronDown
-                            className={`w-4 h-4 ${isOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}
+                            className={`w-4 h-4 ${isOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400'}`}
                           />
                         </motion.div>
                       </motion.button>
@@ -2229,7 +2229,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                             className="overflow-hidden"
                           >
-                            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pr-6">
+                            <p className="mt-2 text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed pr-6">
                               {faq.answer}
                             </p>
                           </motion.div>
@@ -2247,7 +2247,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.55 }}
-              className="rounded-3xl bg-linear-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white p-8 sm:p-12 border border-indigo-800/80 shadow-2xl relative overflow-hidden text-center space-y-6"
+              className="rounded-3xl bg-linear-to-br from-indigo-900 via-indigo-950 to-zinc-950 text-white p-8 sm:p-12 border border-indigo-800/80 shadow-2xl relative overflow-hidden text-center space-y-6"
             >
               <div className="absolute -top-24 -left-24 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -2271,7 +2271,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onGoToPortal()}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm shadow-lg transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-900 font-bold text-sm shadow-lg transition-all cursor-pointer"
                 >
                   <KeyRound className="w-4 h-4 text-indigo-600" />
                   <span>Usar Kongre en el Navegador</span>
@@ -2303,7 +2303,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-3xl bg-linear-to-r from-white via-indigo-50/30 to-white dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs"
+              className="rounded-3xl bg-linear-to-r from-white via-indigo-50/30 to-white dark:from-zinc-900 dark:via-indigo-950/20 dark:to-zinc-900 border border-zinc-200/90 dark:border-[#27272A] p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs"
             >
               <div className="flex items-center gap-3.5">
                 <motion.div
@@ -2315,14 +2315,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </motion.div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                    <h1 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                       Guía Oficial de Usuario de Kongre
                     </h1>
                     <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-indigo-100/90 dark:bg-indigo-950/90 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
                       {DOC_ARTICLES.length} artículos
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                     Documentación oficial paso a paso sobre instalación, roles teocráticos y uso diario.
                   </p>
                 </div>
@@ -2331,19 +2331,19 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               {/* Search Input + Clear button + Mobile Quick Jump */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
                 <div className="relative w-full sm:w-80">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={docSearchQuery}
                     onChange={(e) => setDocSearchQuery(e.target.value)}
                     placeholder="Buscar en la guía (ej. iOS, S-89, PIN, roles)..."
-                    className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
+                    className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A] text-xs font-medium text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
                   />
                   {docSearchQuery && (
                     <button
                       type="button"
                       onClick={() => setDocSearchQuery('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition cursor-pointer"
                       title="Limpiar búsqueda"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -2381,17 +2381,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             {/* 3-Column Balanced Docusaurus Layout (Left Sidebar + Center Article + Right TOC) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
               {/* LEFT SIDEBAR: Redesigned and Animated Navigation Menu */}
-              <aside className="hidden lg:block lg:col-span-3 xl:col-span-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-3.5 shadow-xs">
+              <aside className="hidden lg:block lg:col-span-3 xl:col-span-3 bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/90 dark:border-[#27272A] p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-3.5 shadow-xs">
                 {/* Sidebar Header & Controls */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                       <FileText className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                    <span className="text-xs font-black uppercase tracking-wider text-zinc-800 dark:text-[#E4E4E7]">
                       Contenido
                     </span>
-                    <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA]">
                       {filteredDocs.length}
                     </span>
                   </div>
@@ -2401,7 +2401,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleToggleAllCategories}
-                    className="px-2 py-1 rounded-lg text-[10.5px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1 transition cursor-pointer"
+                    className="px-2 py-1 rounded-lg text-[10.5px] font-bold text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#27272A] inline-flex items-center gap-1 transition cursor-pointer"
                     title={allCategoriesExpanded ? 'Colapsar todas las carpetas' : 'Expandir todas las carpetas'}
                   >
                     <ChevronsUpDown className="w-3 h-3" />
@@ -2443,8 +2443,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           onClick={() => toggleCategoryAccordion(section.id)}
                           className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-bold transition-all cursor-pointer group ${
                             hasActiveDoc
-                              ? 'bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white'
-                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800/50'
+                              ? 'bg-zinc-100/80 dark:bg-[#18181F]/80 text-zinc-900 dark:text-white'
+                              : 'text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-100/60 dark:hover:bg-[#27272A]/50'
                           }`}
                         >
                           <div className="flex items-center gap-2 min-w-0">
@@ -2452,7 +2452,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                               className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                                 hasActiveDoc
                                   ? 'bg-indigo-600 text-white'
-                                  : 'bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                                  : 'bg-zinc-200/70 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
                               }`}
                             >
                               <SectionIcon className="w-3 h-3" />
@@ -2461,14 +2461,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-zinc-200/60 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA]">
                               {sectionArticles.length}
                             </span>
                             <motion.div
                               animate={{ rotate: isExpanded ? 0 : -90 }}
                               transition={{ duration: 0.2 }}
                             >
-                              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200" />
+                              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200" />
                             </motion.div>
                           </div>
                         </motion.button>
@@ -2481,7 +2481,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
                               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                              className="overflow-hidden space-y-0.5 pl-2.5 border-l-2 border-indigo-100 dark:border-slate-800 ml-4 py-0.5"
+                              className="overflow-hidden space-y-0.5 pl-2.5 border-l-2 border-indigo-100 dark:border-[#27272A] ml-4 py-0.5"
                             >
                               {sectionArticles.map((doc) => {
                                 const isSelected = activeDoc.id === doc.id;
@@ -2498,20 +2498,20 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                                     className={`w-full text-left px-2.5 py-2 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-between gap-2 ${
                                       isSelected
                                         ? 'bg-indigo-600 text-white font-extrabold shadow-xs shadow-indigo-600/30'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50 font-medium'
+                                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/70 dark:hover:bg-[#27272A]/50 font-medium'
                                     }`}
                                   >
                                     <div className="flex items-center gap-2 min-w-0">
                                       <span
                                         className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                          isSelected ? 'bg-white' : 'bg-slate-300 dark:bg-slate-600'
+                                          isSelected ? 'bg-white' : 'bg-zinc-300 dark:bg-zinc-600'
                                         }`}
                                       />
                                       <span className="truncate leading-tight">{doc.title}</span>
                                     </div>
                                     <span
                                       className={`text-[10px] font-mono shrink-0 ${
-                                        isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-500'
+                                        isSelected ? 'text-indigo-100' : 'text-zinc-400 dark:text-[#71717A]'
                                       }`}
                                     >
                                       {doc.readTime}
@@ -2537,50 +2537,50 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-9 shadow-xs space-y-6"
+                    className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/90 dark:border-[#27272A] p-6 sm:p-9 shadow-xs space-y-6"
                   >
                     {/* Breadcrumbs (Docusaurus style: 🏠 > Category > Article) */}
                     <nav
                       aria-label="Breadcrumb"
-                      className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
+                      className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 dark:text-[#A1A1AA]"
                     >
                       <button
                         type="button"
                         onClick={() => setSelectedDocId('app-overview')}
-                        className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                        className="p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-500 hover:text-indigo-600 transition cursor-pointer"
                         title="Inicio de la Guía"
                       >
                         <Home className="w-3.5 h-3.5" />
                       </button>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-semibold text-slate-600 dark:text-slate-300">
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
+                      <span className="font-semibold text-zinc-600 dark:text-[#D4D4D8]">
                         {activeDoc.categoryLabel}
                       </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
                       <span className="font-bold text-indigo-600 dark:text-indigo-400 truncate max-w-[220px] sm:max-w-none">
                         {activeDoc.title}
                       </span>
                     </nav>
 
                     {/* Article Title & Metadata */}
-                    <div className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-5">
-                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    <div className="space-y-3 border-b border-zinc-100 dark:border-[#27272A] pb-5">
+                      <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
                         {activeDoc.title}
                       </h2>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                         {activeDoc.summary}
                       </p>
 
                       <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] font-semibold">
                           <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           <span>Para: {activeDoc.audience}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] font-mono">
                           <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           <span>{activeDoc.menuPath}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA]">
                           <Clock className="w-3.5 h-3.5" />
                           <span>{activeDoc.readTime}</span>
                         </span>
@@ -2610,14 +2610,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           id={step.id}
                           whileHover={{ y: -2, scale: 1.006 }}
                           transition={{ duration: 0.2 }}
-                          className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-2 scroll-mt-24 transition-shadow hover:shadow-md"
+                          className="p-4 sm:p-5 rounded-2xl bg-zinc-50/90 dark:bg-[#18181F]/50 border border-zinc-200/70 dark:border-[#27272A]/60 space-y-2 scroll-mt-24 transition-shadow hover:shadow-md"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2.5">
                               <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-2xs">
                                 {index + 1}
                               </span>
-                              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                              <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                 {step.title}
                               </h3>
                             </div>
@@ -2627,7 +2627,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                          <p className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] leading-relaxed pl-8">
                             {step.detail}
                           </p>
                         </motion.div>
@@ -2637,19 +2637,19 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     {/* Embedded RBAC Matrix Table when on roles-permissions */}
                     {activeDoc.id === 'roles-permissions' && (
                       <div className="space-y-2 pt-2">
-                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                           Tabla de Permisos por Nombramiento
                         </h3>
-                        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-[#27272A]">
                           <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                              <tr className="bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
+                              <tr className="bg-zinc-100 dark:bg-[#18181F]/90 text-zinc-700 dark:text-[#E4E4E7] border-b border-zinc-200 dark:border-[#27272A]">
                                 <th className="py-2.5 px-3 font-extrabold">Rol</th>
                                 <th className="py-2.5 px-3 font-extrabold">Alcance</th>
                                 <th className="py-2.5 px-3 font-extrabold">Permisos en Kongre</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200/70 dark:divide-slate-800">
+                            <tbody className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
                               {RBAC_DOCUMENTATION_MATRIX.map((row) => (
                                 <tr
                                   key={row.role}
@@ -2658,10 +2658,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                                   <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
                                     {row.role}
                                   </td>
-                                  <td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                  <td className="py-2.5 px-3 font-semibold text-zinc-700 dark:text-[#D4D4D8] whitespace-nowrap">
                                     {row.scope}
                                   </td>
-                                  <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                                  <td className="py-2.5 px-3 text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                                     {row.permissions}
                                   </td>
                                 </tr>
@@ -2703,7 +2703,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     )}
 
                     {/* Previous / Next Article Pagination with Motion Spring Physics */}
-                    <div className="pt-5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="pt-5 border-t border-zinc-100 dark:border-[#27272A] grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {prevDoc ? (
                         <motion.button
                           type="button"
@@ -2714,14 +2714,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             setSelectedDocId(prevDoc.id);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
-                          className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-left transition cursor-pointer flex items-center gap-3 group bg-white dark:bg-slate-900 shadow-2xs hover:shadow-sm"
+                          className="p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 text-left transition cursor-pointer flex items-center gap-3 group bg-white dark:bg-[#121216] shadow-2xs hover:shadow-sm"
                         >
-                          <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 shrink-0 group-hover:-translate-x-1 transition-transform" />
+                          <ArrowLeft className="w-4 h-4 text-zinc-400 group-hover:text-indigo-600 shrink-0 group-hover:-translate-x-1 transition-transform" />
                           <div className="min-w-0">
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                               Anterior
                             </span>
-                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                            <span className="block text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                               {prevDoc.title}
                             </span>
                           </div>
@@ -2740,13 +2740,13 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             setSelectedDocId(nextDoc.id);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
-                          className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition cursor-pointer flex items-center justify-end gap-3 group bg-white dark:bg-slate-900 shadow-2xs hover:shadow-sm"
+                          className="p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition cursor-pointer flex items-center justify-end gap-3 group bg-white dark:bg-[#121216] shadow-2xs hover:shadow-sm"
                         >
                           <div className="min-w-0">
                             <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                               Siguiente
                             </span>
-                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                            <span className="block text-xs font-bold text-zinc-800 dark:text-[#E4E4E7] truncate">
                               {nextDoc.title}
                             </span>
                           </div>
@@ -2767,12 +2767,12 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 transition={{ duration: 0.45 }}
                 className="hidden lg:block lg:col-span-3 xl:col-span-3 space-y-4 sticky top-20"
               >
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 space-y-3 shadow-xs">
-                  <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/90 dark:border-[#27272A] p-4 sm:p-5 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-[#71717A]">
                     <Compass className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>En esta página</span>
                   </div>
-                  <ul className="space-y-2 text-xs border-l-2 border-slate-100 dark:border-slate-800 pl-3">
+                  <ul className="space-y-2 text-xs border-l-2 border-zinc-100 dark:border-[#27272A] pl-3">
                     {activeDoc.steps.map((step, i) => (
                       <li key={step.id}>
                         <a
@@ -2782,7 +2782,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             const el = document.getElementById(step.id);
                             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                           }}
-                          className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium block leading-snug transition hover:translate-x-1"
+                          className="text-zinc-600 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 font-medium block leading-snug transition hover:translate-x-1"
                         >
                           {i + 1}. {step.title}
                         </a>
@@ -2792,7 +2792,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </div>
 
                 {/* Quick Action Box in Sidebar with Motion button */}
-                <div className="rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/80 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-4 sm:p-5 space-y-3 shadow-xs">
+                <div className="rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/80 dark:from-indigo-950/40 dark:via-zinc-900 dark:to-zinc-900 border border-indigo-200/80 dark:border-indigo-800/70 p-4 sm:p-5 space-y-3 shadow-xs">
                   <div className="text-xs font-extrabold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
                     <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>¿Listo para abrir la app?</span>
@@ -2853,10 +2853,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 <Download className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                 <span>Instalación Oficial · 100% Offline · v{CURRENT_APP_VERSION}</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
                 Instala Kongre en tu dispositivo
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-lg mx-auto">
                 Sin intermediarios ni registros en tiendas. Elige tu dispositivo para comenzar de inmediato.
               </p>
             </motion.div>
@@ -2869,7 +2869,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
                 whileHover={{ y: -2 }}
-                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
+                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-[#121216]/95 backdrop-blur-xl border border-zinc-200/90 dark:border-[#27272A] shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
               >
                 <div className="space-y-3">
                   {/* Top Header */}
@@ -2878,7 +2878,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                         PWA Oficial · Windows, macOS, Android & iOS
                       </span>
-                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                      <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white tracking-tight">
                         Aplicación Web & PWA
                       </h2>
                     </div>
@@ -2888,22 +2888,22 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   </div>
 
                   {/* QR Code Presentation Box (Compact) */}
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 flex items-center gap-3">
-                    <div className="relative p-1 rounded-lg bg-white shadow-xs shrink-0 border border-slate-200/70">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-750 flex items-center gap-3">
+                    <div className="relative p-1 rounded-lg bg-white shadow-xs shrink-0 border border-zinc-200/70">
                       <canvas ref={qrCanvasRef} className="block w-20 h-20 rounded" />
                     </div>
                     <div className="space-y-1 min-w-0 flex-1">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-white">
                         <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         <span>Apunta tu cámara móvil o PC</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                      <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] leading-tight">
                         Abre la app al instante con soporte 100% desconectado.
                       </p>
                       <button
                         type="button"
                         onClick={handleCopyPortalLink}
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 transition cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-white dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-[#E4E4E7] transition cursor-pointer shadow-2xs"
                       >
                         {qrCopied ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3 h-3" />}
                         <span>{qrCopied ? '¡Enlace copiado!' : 'Copiar enlace'}</span>
@@ -2913,14 +2913,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
                   {/* OS / Platform Clean Instructions */}
                   <div className="space-y-1.5">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs font-bold gap-0.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 rounded-lg bg-zinc-100 dark:bg-[#18181F] p-0.5 text-xs font-bold gap-0.5">
                       <button
                         type="button"
                         onClick={() => setSelectedMobileTab('windows')}
                         className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'windows'
-                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
-                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
                         <Laptop className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -2931,11 +2931,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         onClick={() => setSelectedMobileTab('mac')}
                         className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'mac'
-                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
-                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
-                        <Apple className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
+                        <Apple className="w-3.5 h-3.5 text-zinc-700 dark:text-[#D4D4D8]" />
                         <span>macOS</span>
                       </button>
                       <button
@@ -2943,8 +2943,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         onClick={() => setSelectedMobileTab('android')}
                         className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'android'
-                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
-                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
                         <Smartphone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -2955,8 +2955,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         onClick={() => setSelectedMobileTab('ios')}
                         className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'ios'
-                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
-                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
                         <Apple className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -2964,7 +2964,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       </button>
                     </div>
 
-                    <div className="p-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/70 text-[11px] leading-snug text-slate-600 dark:text-slate-300">
+                    <div className="p-2 rounded-xl bg-zinc-50/80 dark:bg-[#18181F]/40 border border-zinc-200/70 dark:border-[#27272A]/70 text-[11px] leading-snug text-zinc-600 dark:text-[#D4D4D8]">
                       {selectedMobileTab === 'windows' ? (
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono font-bold text-blue-600 dark:text-blue-400 shrink-0">Instalación:</span>
@@ -2972,7 +2972,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         </div>
                       ) : selectedMobileTab === 'mac' ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300 shrink-0">Instalación:</span>
+                          <span className="font-mono font-bold text-zinc-700 dark:text-[#D4D4D8] shrink-0">Instalación:</span>
                           <span>Abre en Safari → <strong>Archivo</strong> → <strong>«Agregar al Dock»</strong> (o en Chrome: menú <strong>⋮</strong> → <strong>«Instalar»</strong>).</span>
                         </div>
                       ) : selectedMobileTab === 'android' ? (
@@ -2997,7 +2997,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => onGoToPortal()}
-                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md transition-all cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
                     <span>Abrir Portal Web en este Dispositivo</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -3011,7 +3011,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
                 whileHover={{ y: -2 }}
-                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
+                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-[#121216]/95 backdrop-blur-xl border border-zinc-200/90 dark:border-[#27272A] shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
               >
                 <div className="space-y-3">
                   {/* Top Header */}
@@ -3020,7 +3020,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                         Rust Nativo · Linux (Salón & Cabina)
                       </span>
-                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                      <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white tracking-tight">
                         En Computadora / Linux
                       </h2>
                     </div>
@@ -3032,7 +3032,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   {/* OS Selector Pills (3 options for Linux) */}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-[10.5px]">
-                      <span className="font-bold text-slate-500 dark:text-slate-400">
+                      <span className="font-bold text-zinc-500 dark:text-[#A1A1AA]">
                         Paquete para Linux:
                       </span>
                       {selectedPcOs === detectedPlatform.id && (
@@ -3060,18 +3060,18 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             className={`py-1.5 px-2 rounded-xl text-center border transition-all cursor-pointer relative ${
                               isSelected
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm font-extrabold'
-                                : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                                : 'bg-zinc-50 dark:bg-[#18181F]/70 border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#D4D4D8] hover:border-indigo-300'
                             }`}
                           >
                             <div className="flex items-center justify-center gap-1 text-xs">
                               <Icon className="w-3 h-3" />
                               <span>{item.name}</span>
                             </div>
-                            <div className={`text-[9.5px] font-mono mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                            <div className={`text-[9.5px] font-mono mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-zinc-400'}`}>
                               {item.ext}
                             </div>
                             {isDetected && !isSelected && (
-                              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" title="Detectado" />
+                              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#121216]" title="Detectado" />
                             )}
                           </button>
                         );
@@ -3083,10 +3083,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <div className="p-2.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-slate-900 dark:text-white">
+                        <span className="font-extrabold text-zinc-900 dark:text-white">
                           {PLATFORMS_DATA[selectedPcOs]?.name} ({PLATFORMS_DATA[selectedPcOs]?.primaryFile.ext})
                         </span>
-                        <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80">
+                        <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-300 border border-indigo-200/80">
                           {PLATFORMS_DATA[selectedPcOs]?.architecture || '64-bit'}
                         </span>
                       </div>
@@ -3095,7 +3095,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-1 text-[10.5px] text-slate-600 dark:text-slate-300 font-medium pt-1 border-t border-indigo-100/80 dark:border-indigo-900/60">
+                    <div className="grid grid-cols-2 gap-1 text-[10.5px] text-zinc-600 dark:text-[#D4D4D8] font-medium pt-1 border-t border-indigo-100/80 dark:border-indigo-900/60">
                       <span className="flex items-center gap-1">
                         <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <span>Modo Cabina & Salón</span>
@@ -3134,7 +3134,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     <button
                       type="button"
                       onClick={() => setDesktopModalOpen(true)}
-                      className="text-[10.5px] font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                      className="text-[10.5px] font-semibold text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
                     >
                       Ver sumas SHA-256 e instaladores avanzados para Linux
                     </button>
@@ -3144,17 +3144,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             </div>
 
             {/* TRUST GUARANTEE: Ultra-slim Single Line Pill Strip */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 py-1 px-4 rounded-full bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 relative z-10">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 py-1 px-4 rounded-full bg-zinc-100/70 dark:bg-[#18181F]/60 border border-zinc-200/80 dark:border-[#27272A] text-[11px] text-zinc-600 dark:text-[#A1A1AA] relative z-10">
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <CloudOff className="w-3.5 h-3.5 text-indigo-500" />
                 <span>100% Offline-First</span>
               </span>
-              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+              <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">•</span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-violet-500" />
                 <span>Cifrado AES-256 Local</span>
               </span>
-              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+              <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">•</span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <Zap className="w-3.5 h-3.5 text-emerald-500" />
                 <span>100% Gratuito y Privado</span>

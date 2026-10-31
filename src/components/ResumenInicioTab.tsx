@@ -157,7 +157,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           1. HEADER TITLE (EXACT REFERENCE: Panorama General)
          ========================================================================= */}
       <div className="flex items-center justify-between gap-2.5 flex-wrap">
-        <p className="text-xs text-slate-400 font-medium truncate">
+        <p className="text-xs text-zinc-400 font-medium truncate">
           Sincronización activa • Datos en tiempo real
         </p>
 
@@ -165,7 +165,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('inicio')}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25 text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95"
             title="Ir al Menú Principal del Publicador (Cronómetro, Revisitas y Estudios)"
           >
             <Timer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -175,12 +175,12 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           <button
             type="button"
             onClick={handleOpenPins}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/25 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95 shrink-0"
             title="Ver directorio de PINs de los publicadores y la congregación"
           >
-            <KeyRound className="w-3.5 h-3.5 text-amber-500" />
+            <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span>PINs</span>
-            <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full">
+            <span className="bg-amber-500/20 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 text-[10px] font-mono tabular-nums font-bold px-1.5 py-0.2 rounded-full">
               {publisherPinsCount}
             </span>
           </button>
@@ -194,20 +194,20 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 1: TOTAL */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group active:scale-[0.98]"
+          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               TOTAL
             </span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 group-hover:scale-110 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.total}
           </div>
-          <div className="text-xs font-semibold text-emerald-500 mt-2 flex items-center gap-1">
+          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2 flex items-center gap-1 font-mono tabular-nums">
             <span>{publisherStats.activityPct}% Actividad</span>
           </div>
         </div>
@@ -215,20 +215,20 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 2: ANCIANOS */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               ANCIANOS
             </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-500 group-hover:scale-110 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.elders}
           </div>
-          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             Cuerpo
           </div>
         </div>
@@ -236,17 +236,17 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 3: PRECURSORES */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               PRECURSORES
             </span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 group-hover:scale-110 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Heart className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.regularPioneers}
           </div>
           <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
@@ -257,20 +257,20 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 4: ASISTENCIA */}
         <div
           onClick={() => setActiveTab('asistencia')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               ASISTENCIA
             </span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 group-hover:scale-110 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {attendanceStats.midweek}
           </div>
-          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             Media
           </div>
         </div>
@@ -278,20 +278,20 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 5: INFORMES */}
         <div
           onClick={() => setActiveTab('informes_servicio')}
-          className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               INFORMES
             </span>
-            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-500 group-hover:scale-110 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             0
           </div>
-          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             S-4 del Mes
           </div>
         </div>
@@ -322,17 +322,17 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Card 1: Resumen de Publicadores */}
-        <div className="lg:col-span-8 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs">
+        <div className="lg:col-span-8 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
                 <Users className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                   Resumen de Publicadores
                 </h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   Distribución teocrática de responsabilidades
                 </p>
               </div>
@@ -349,44 +349,44 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Ancianos
               </span>
-              <span className="text-lg font-black text-slate-900 dark:text-white mt-0.5 block">
+              <span className="text-lg font-mono font-black tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 block">
                 {publisherStats.elders}
               </span>
-              <span className="text-[10px] text-slate-500">Cuerpo activo</span>
+              <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Cuerpo activo</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Siervos
               </span>
-              <span className="text-lg font-black text-slate-900 dark:text-white mt-0.5 block">
+              <span className="text-lg font-mono font-black tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 block">
                 {publisherStats.servants}
               </span>
-              <span className="text-[10px] text-slate-500">Ministeriales</span>
+              <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Ministeriales</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Precursores
               </span>
-              <span className="text-lg font-black text-slate-900 dark:text-white mt-0.5 block">
+              <span className="text-lg font-mono font-black tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 block">
                 {publisherStats.regularPioneers}
               </span>
-              <span className="text-[10px] text-slate-500">Regulares</span>
+              <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Regulares</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Total
               </span>
-              <span className="text-lg font-black text-slate-900 dark:text-white mt-0.5 block">
+              <span className="text-lg font-mono font-black tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 block">
                 {publisherStats.total}
               </span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono tabular-nums">
                 100% actividad
               </span>
             </div>
@@ -394,16 +394,16 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         </div>
 
         {/* Card 2: Acciones Rápidas */}
-        <div className="lg:col-span-4 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs">
+        <div className="lg:col-span-4 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/80 text-purple-600 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
               <Zap className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Acciones Rápidas
               </h3>
-              <p className="text-[11px] text-slate-400">Accesos directos teocráticos</p>
+              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Accesos directos teocráticos</p>
             </div>
           </div>
 
@@ -411,7 +411,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('programacion')}
-              className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
             >
               <Calendar className="w-4 h-4 text-indigo-500 shrink-0" />
               <span className="truncate">Programa</span>
@@ -420,16 +420,16 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('asistencia')}
-              className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
             >
-              <TrendingUp className="w-4 h-4 text-emerald-500 shrink-0" />
+              <TrendingUp className="w-4 h-4 text-teal-500 shrink-0" />
               <span className="truncate">Asistencia</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('s89')}
-              className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
             >
               <Award className="w-4 h-4 text-amber-500 shrink-0" />
               <span className="truncate">Hojas S-89</span>
@@ -439,9 +439,9 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <button
                 type="button"
                 onClick={onOpenTimerModal}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+                className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
               >
-                <Timer className="w-4 h-4 text-purple-500 shrink-0" />
+                <Timer className="w-4 h-4 text-indigo-500 shrink-0" />
                 <span className="truncate">Modo Atril</span>
               </button>
             )}
@@ -450,7 +450,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <button
                 type="button"
                 onClick={onOpenKioskModal}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+                className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
               >
                 <Tv className="w-4 h-4 text-sky-500 shrink-0" />
                 <span className="truncate">Pantalla Salón</span>
@@ -460,20 +460,20 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('territorios')}
-              className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
+              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
             >
-              <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+              <MapPin className="w-4 h-4 text-teal-500 shrink-0" />
               <span className="truncate">Territorios</span>
             </button>
 
             <button
               type="button"
               onClick={handleOpenPins}
-              className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 hover:text-amber-700 dark:hover:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 text-xs font-bold text-amber-800 dark:text-amber-200 transition-all cursor-pointer shadow-2xs"
+              className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 dark:bg-amber-950/30 hover:bg-amber-500/15 dark:hover:bg-amber-900/40 border border-amber-500/25 text-xs font-bold text-amber-800 dark:text-amber-300 transition-all cursor-pointer shadow-xs"
             >
               <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
               <span className="truncate">Ver PINs</span>
-              <span className="ml-auto text-[10px] bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 px-1.5 py-0.5 rounded-full font-mono">
+              <span className="ml-auto text-[10px] bg-amber-500/20 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-1.5 py-0.5 rounded-full font-mono tabular-nums">
                 {publisherPinsCount}
               </span>
             </button>

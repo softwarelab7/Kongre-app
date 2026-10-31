@@ -88,19 +88,19 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-md bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
         {/* Encabezado */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-850">
+        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">
+              <h3 className="font-bold text-zinc-900 dark:text-white text-base sm:text-lg">
                 Verificación en Dos Pasos
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 {publisherName ? `Cuenta de: ${publisherName}` : 'Seguridad Teocrática'}
               </p>
             </div>
@@ -108,7 +108,7 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-full hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,8 +117,8 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
         {/* Contenido */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {errorMsg && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-shake">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 text-xs flex items-start gap-2.5 shadow-xs animate-shake">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
               <span>{errorMsg}</span>
             </div>
           )}
@@ -126,13 +126,13 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
           {!useBackupMode ? (
             <div className="space-y-4">
               <div className="text-center space-y-1">
-                <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-2 border border-indigo-200/50">
-                  <Smartphone className="w-5 h-5" />
+                <div className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto mb-2 border border-zinc-200 dark:border-[#27272A]">
+                  <Smartphone className="w-5 h-5 text-zinc-500" />
                 </div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                <h4 className="font-bold text-zinc-900 dark:text-white text-sm">
                   Código de Microsoft Authenticator
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Abre tu aplicación de autenticación e ingresa el código temporal de 6 dígitos.
                 </p>
               </div>
@@ -147,7 +147,7 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
                   value={code}
                   onChange={handleCodeChange}
                   disabled={isVerifying}
-                  className="w-full text-center text-3xl font-mono tracking-[0.35em] font-extrabold py-3 px-3 rounded-2xl border-2 border-indigo-400/80 dark:border-indigo-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm disabled:opacity-60"
+                  className="w-full text-center text-3xl font-mono tracking-[0.35em] font-extrabold py-3 px-3 rounded-2xl border-2 border-zinc-300 dark:border-[#27272A] focus:border-zinc-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-zinc-500/10 shadow-xs disabled:opacity-60"
                   autoFocus
                 />
               </div>
@@ -155,13 +155,13 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
           ) : (
             <div className="space-y-4">
               <div className="text-center space-y-1">
-                <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-2 border border-amber-200/50">
-                  <KeyRound className="w-5 h-5" />
+                <div className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto mb-2 border border-zinc-200 dark:border-[#27272A]">
+                  <KeyRound className="w-5 h-5 text-amber-500" />
                 </div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                <h4 className="font-bold text-zinc-900 dark:text-white text-sm">
                   Código de Respaldo de Emergencia
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                   Escribe uno de los 8 códigos de respaldo guardados durante la configuración (ej: <code>A4B8-92EF</code>).
                 </p>
               </div>
@@ -174,7 +174,7 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
                   value={code}
                   onChange={handleCodeChange}
                   disabled={isVerifying}
-                  className="w-full text-center text-xl font-mono tracking-widest font-extrabold py-3 px-3 rounded-2xl border-2 border-amber-400 dark:border-amber-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-amber-500/20 shadow-sm uppercase disabled:opacity-60"
+                  className="w-full text-center text-xl font-mono tracking-widest font-extrabold py-3 px-3 rounded-2xl border-2 border-zinc-300 dark:border-[#27272A] focus:border-zinc-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-zinc-500/10 shadow-xs uppercase disabled:opacity-60"
                   autoFocus
                 />
               </div>
@@ -182,16 +182,16 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
           )}
 
           {/* Opción de Recordar Dispositivo por 30 días */}
-          <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/70 dark:border-slate-800 flex items-start gap-2.5">
+          <div className="p-3 bg-zinc-50 dark:bg-[#18181F]/60 rounded-2xl border border-zinc-200/70 dark:border-[#27272A] flex items-start gap-2.5">
             <input
               type="checkbox"
               id="trust-device-check"
               checked={trustDevice}
               onChange={(e) => setTrustDevice(e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 cursor-pointer"
+              className="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-600 cursor-pointer"
             />
-            <label htmlFor="trust-device-check" className="text-xs text-slate-600 dark:text-slate-300 cursor-pointer select-none">
-              <strong className="block text-slate-900 dark:text-white">Recordar este dispositivo por 30 días</strong>
+            <label htmlFor="trust-device-check" className="text-xs text-zinc-600 dark:text-[#D4D4D8] cursor-pointer select-none">
+              <strong className="block text-zinc-900 dark:text-white">Recordar este dispositivo por 30 días</strong>
               No se te volverá a pedir el código en este navegador durante el próximo mes.
             </label>
           </div>
@@ -219,14 +219,14 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isVerifying}
-              className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] text-xs font-semibold hover:bg-zinc-50 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isVerifying || code.trim().length < (useBackupMode ? 8 : 6)}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-indigo-600/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 disabled:opacity-50 text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
             >
               {isVerifying ? (
                 <>

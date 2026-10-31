@@ -197,13 +197,13 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="flex flex-col text-zinc-900 dark:text-[#F4F4F5] transition-colors">
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[300] bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-3 duration-200">
           <Sparkles size={18} className="animate-spin text-amber-300" />
           <span className="text-sm font-semibold">{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="ml-2 hover:opacity-80">
+          <button onClick={() => setToastMessage(null)} className="ml-2 hover:opacity-80 cursor-pointer">
             <X size={16} />
           </button>
         </div>
@@ -212,12 +212,12 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
       {/* Main Container */}
       <div className="w-full space-y-4 sm:space-y-6">
         {/* Barra de Acciones de Precursores Auxiliares */}
-        <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
           <div className="hidden sm:flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+            <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 font-mono tabular-nums">
               Formulario S-205
             </span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA]">
               Gestión y aprobación de solicitudes del comité de servicio
             </span>
           </div>
@@ -227,7 +227,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
             <button
               onClick={() => window.print()}
               title="Imprimir el registro de solicitudes aprobadas para el comité"
-              className="px-3 py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer active:scale-95"
+              className="px-3 py-2.5 rounded-xl border border-zinc-200/80 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] transition-colors flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer active:scale-95"
             >
               <Printer size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">Imprimir Registro</span>
@@ -250,24 +250,24 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
         {/* 5 KPI Metric Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
           {/* Total Solicitudes */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
-            <div className="flex items-center justify-between text-zinc-400 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between transition-colors">
+            <div className="flex items-center justify-between text-zinc-400 dark:text-[#A1A1AA] mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 Total Solicitudes
               </span>
-              <Award size={18} className="text-zinc-400" />
+              <Award size={18} className="text-zinc-400 dark:text-[#A1A1AA]" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                 {stats.total}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">registradas</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-medium">registradas</span>
             </div>
-            <div className="text-[11px] text-zinc-400 mt-1">Año de servicio activo</div>
+            <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Año de servicio activo</div>
           </div>
 
           {/* Pendientes de Revisión */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between transition-colors">
             <div className="flex items-center justify-between text-amber-500 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                 Pendientes
@@ -275,18 +275,18 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
               <Clock size={18} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 font-mono tabular-nums">
                 {stats.pending}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">por revisar</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-medium">por revisar</span>
             </div>
-            <div className="text-[11px] text-zinc-400 mt-1">
+            <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">
               {stats.pending > 0 ? 'Requieren acción del comité' : 'Al día, sin pendientes'}
             </div>
           </div>
 
           {/* Aprobadas */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between transition-colors">
             <div className="flex items-center justify-between text-emerald-500 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Aprobadas
@@ -294,46 +294,46 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
               <CheckCircle size={18} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
                 {stats.approved}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">aprobadas</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-medium">aprobadas</span>
             </div>
-            <div className="text-[11px] text-zinc-400 mt-1">Comité de servicio conforme</div>
+            <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Comité de servicio conforme</div>
           </div>
 
           {/* Meta 30 Horas */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
-            <div className="flex items-center justify-between text-indigo-500 mb-2">
+          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between transition-colors">
+            <div className="flex items-center justify-between text-indigo-500 dark:text-indigo-400 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 Meta 30 Horas
               </span>
               <Target size={18} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                 {stats.target30}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">estándar</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-medium">estándar</span>
             </div>
-            <div className="text-[11px] text-zinc-400 mt-1">Requisito regular</div>
+            <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Requisito regular</div>
           </div>
 
           {/* Meta 15 Horas */}
-          <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#131d2e] p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
-            <div className="flex items-center justify-between text-sky-500 mb-2">
+          <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between transition-colors">
+            <div className="flex items-center justify-between text-sky-500 dark:text-sky-400 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
                 Meta 15 Horas
               </span>
               <Sparkles size={18} />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-sky-600 dark:text-sky-400 font-mono">
+              <span className="text-2xl sm:text-3xl font-extrabold text-sky-600 dark:text-sky-400 font-mono tabular-nums">
                 {stats.target15}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">especiales</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-medium">especiales</span>
             </div>
-            <div className="text-[11px] text-zinc-400 mt-1">Campaña / Visita SC</div>
+            <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Campaña / Visita SC</div>
           </div>
         </div>
 
@@ -342,7 +342,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock size={18} className="text-amber-500" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-[#F4F4F5]">
                 Pendientes de Revisión por el Comité ({pendingRequests.length})
               </h3>
             </div>
@@ -354,12 +354,12 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
           </div>
 
           {pendingRequests.length === 0 ? (
-            <div className="bg-white dark:bg-[#131d2e] border border-zinc-200/80 dark:border-white/[0.06] rounded-2xl p-8 text-center text-zinc-500 dark:text-zinc-400 shadow-sm">
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-8 text-center text-zinc-500 dark:text-[#A1A1AA] transition-colors">
               <ShieldCheck size={32} className="mx-auto text-emerald-500 mb-2" />
-              <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+              <h4 className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5]">
                 ¡Todas las solicitudes están al día!
               </h4>
-              <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+              <p className="text-xs text-zinc-400 dark:text-[#A1A1AA] mt-1 max-w-sm mx-auto">
                 No hay solicitudes de precursor auxiliar pendientes de resolución por el Comité de
                 Servicio.
               </p>
@@ -376,16 +376,16 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                 return (
                   <div
                     key={req.id}
-                    className="bg-white dark:bg-[#162032] border-2 border-amber-400/40 dark:border-amber-500/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4"
+                    className="bg-white dark:bg-[#121216] border-2 border-amber-400/40 dark:border-amber-500/30 rounded-2xl p-5 transition-all flex flex-col justify-between gap-4"
                   >
                     <div>
                       {/* Top Header of Card */}
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div>
-                          <h4 className="font-bold text-base text-zinc-900 dark:text-white leading-tight">
+                          <h4 className="font-bold text-base text-zinc-900 dark:text-[#F4F4F5] leading-tight">
                             {pubName}
                           </h4>
-                          <p className="text-xs text-zinc-400 mt-0.5">
+                          <p className="text-xs text-zinc-400 dark:text-[#A1A1AA] mt-0.5 font-mono tabular-nums">
                             Solicitado el {req.requestDate || (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : 'Recientemente')}
                           </p>
                         </div>
@@ -395,16 +395,16 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                       </div>
 
                       {/* Details Box */}
-                      <div className="bg-zinc-50 dark:bg-black/25 rounded-xl p-3 space-y-2 border border-zinc-200/60 dark:border-white/[0.05]">
+                      <div className="bg-zinc-50 dark:bg-[#18181F] rounded-xl p-3 space-y-2 border border-zinc-200/60 dark:border-[#27272A]">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-zinc-500">Mes de Servicio:</span>
-                          <span className="font-bold text-zinc-800 dark:text-zinc-200">
-                            {monthName} {year}
+                          <span className="text-zinc-500 dark:text-[#A1A1AA]">Mes de Servicio:</span>
+                          <span className="font-bold text-zinc-800 dark:text-[#F4F4F5]">
+                            {monthName} <span className="font-mono tabular-nums">{year}</span>
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-zinc-500">Meta Requerida:</span>
-                          <span className="font-bold font-mono px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
+                          <span className="text-zinc-500 dark:text-[#A1A1AA]">Meta Requerida:</span>
+                          <span className="font-bold font-mono tabular-nums px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
                             {hours} Horas
                           </span>
                         </div>
@@ -415,7 +415,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                           </div>
                         )}
                         {note && (
-                          <div className="mt-2 text-xs italic text-zinc-600 dark:text-zinc-300 border-l-2 border-indigo-400 pl-2 pt-0.5">
+                          <div className="mt-2 text-xs italic text-zinc-600 dark:text-[#A1A1AA] border-l-2 border-indigo-400 pl-2 pt-0.5">
                             "{note}"
                           </div>
                         )}
@@ -423,17 +423,17 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                     </div>
 
                     {/* Actions: Approve / Reject / Edit */}
-                    <div className="space-y-2 pt-1 border-t border-zinc-100 dark:border-white/[0.06]">
+                    <div className="space-y-2 pt-1 border-t border-zinc-100 dark:border-[#27272A]">
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleUpdateStatus(req, 'aprobada')}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-emerald-500/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
                         >
                           <CheckCircle size={15} /> Aprobar
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(req, 'rechazada')}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold transition-all border border-rose-200 dark:border-rose-500/30"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold transition-all border border-rose-200 dark:border-rose-500/30 cursor-pointer"
                         >
                           <XCircle size={15} /> Rechazar
                         </button>
@@ -445,13 +445,13 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                             setEditingRequest(req);
                             setIsModalOpen(true);
                           }}
-                          className="p-1.5 text-zinc-400 hover:text-indigo-600 text-xs flex items-center gap-1"
+                          className="p-1.5 text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 text-xs flex items-center gap-1 cursor-pointer"
                         >
                           <Edit2 size={13} /> Editar datos
                         </button>
                         <button
                           onClick={() => setRequestToDelete(req)}
-                          className="p-1.5 text-zinc-400 hover:text-rose-600 text-xs flex items-center gap-1"
+                          className="p-1.5 text-zinc-400 dark:text-[#A1A1AA] hover:text-rose-600 dark:hover:text-rose-400 text-xs flex items-center gap-1 cursor-pointer"
                         >
                           <Trash2 size={13} /> Eliminar
                         </button>
@@ -467,31 +467,31 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
         {/* SECTION 2: SEARCH & FILTER + HISTORICAL DIRECTORY TABLE */}
         <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white flex items-center gap-2">
-              <Award size={18} className="text-indigo-500" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <Award size={18} className="text-indigo-500 dark:text-indigo-400" />
               Directorio e Historial de Solicitudes ({filteredRequests.length})
             </h3>
           </div>
 
           {/* Filter Bar */}
-          <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-zinc-200/80 dark:border-white/[0.06] shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 transition-colors">
             {/* Search Input */}
             <div className="relative flex-1 min-w-[240px]">
               <Search
                 size={18}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-[#A1A1AA] pointer-events-none"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por hermano, mes u observaciones..."
-                className="w-full bg-zinc-50 dark:bg-black/20 border border-zinc-200 dark:border-white/[0.1] rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-white cursor-pointer"
                 >
                   <X size={15} />
                 </button>
@@ -500,7 +500,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
 
             {/* Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-              <span className="text-xs font-semibold text-zinc-400 mr-1 hidden sm:inline">Estado:</span>
+              <span className="text-xs font-semibold text-zinc-400 dark:text-[#A1A1AA] mr-1 hidden sm:inline">Estado:</span>
               {[
                 { id: 'all', label: 'Todos' },
                 { id: 'aprobada', label: 'Aprobadas' },
@@ -510,10 +510,10 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                 <button
                   key={st.id}
                   onClick={() => setStatusFilter(st.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                     statusFilter === st.id
-                      ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                      : 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200'
+                      ? 'bg-zinc-900 text-white dark:bg-[#18181F] dark:text-[#F4F4F5] dark:border dark:border-[#27272A] shadow-xs'
+                      : 'bg-zinc-100 dark:bg-[#18181F]/40 text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#18181F]'
                   }`}
                 >
                   {st.label}
@@ -521,7 +521,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
               ))}
 
               {/* Hours Filter */}
-              <div className="flex items-center gap-1 border-l border-zinc-200 dark:border-white/[0.08] pl-2 ml-1">
+              <div className="flex items-center gap-1 border-l border-zinc-200 dark:border-[#27272A] pl-2 ml-1">
                 {[
                   { id: 'all', label: 'Horas' },
                   { id: '30', label: '30h' },
@@ -530,10 +530,10 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                   <button
                     key={hf.id}
                     onClick={() => setHoursFilter(hf.id as any)}
-                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer font-mono tabular-nums ${
                       hoursFilter === hf.id
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200'
+                        : 'bg-zinc-100 dark:bg-[#18181F]/40 text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#18181F]'
                     }`}
                   >
                     {hf.label}
@@ -545,14 +545,14 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
 
           {/* Directory Table */}
           {filteredRequests.length === 0 ? (
-            <div className="bg-white dark:bg-[#131d2e] border border-zinc-200/80 dark:border-white/[0.06] rounded-2xl p-8 text-center text-zinc-500 shadow-sm">
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-8 text-center text-zinc-500 dark:text-[#A1A1AA] transition-colors">
               No se encontraron solicitudes con los filtros aplicados.
             </div>
           ) : (
-            <div className="bg-white dark:bg-[#131d2e] border border-zinc-200/80 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl overflow-hidden transition-colors">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-300">
-                  <thead className="bg-zinc-50 dark:bg-black/25 text-[11px] uppercase font-bold text-zinc-400 border-b border-zinc-200/80 dark:border-white/[0.06]">
+                <table className="w-full text-left text-sm text-zinc-600 dark:text-[#A1A1AA]">
+                  <thead className="bg-zinc-50 dark:bg-[#18181F] text-[11px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-[#27272A]">
                     <tr>
                       <th className="px-5 py-3.5">Publicador</th>
                       <th className="px-5 py-3.5">Mes / Año</th>
@@ -564,7 +564,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                       <th className="px-5 py-3.5 text-right">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.04]">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                     {filteredRequests.map((req) => {
                       const pubName = getPublisherName(req.publisherId, req.publisher_nid);
                       const monthName = MONTH_NAMES[req.month !== undefined ? req.month : (req.mes ?? 0)];
@@ -575,21 +575,21 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                       return (
                         <tr
                           key={req.id}
-                          className="hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] transition-colors"
+                          className="hover:bg-zinc-50/60 dark:hover:bg-[#18181F]/40 transition-colors"
                         >
                           {/* Publicador */}
-                          <td className="px-5 py-3.5 font-bold text-zinc-900 dark:text-white">
+                          <td className="px-5 py-3.5 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {pubName}
                           </td>
 
                           {/* Mes / Año */}
-                          <td className="px-5 py-3.5 font-medium">
-                            {monthName} {year}
+                          <td className="px-5 py-3.5 font-medium text-zinc-700 dark:text-[#F4F4F5]">
+                            {monthName} <span className="font-mono tabular-nums">{year}</span>
                           </td>
 
                           {/* Horas */}
                           <td className="px-5 py-3.5 text-center">
-                            <span className="font-mono font-bold px-2 py-0.5 rounded text-xs bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300">
+                            <span className="font-mono tabular-nums font-bold px-2 py-0.5 rounded text-xs bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]">
                               {hours}h
                             </span>
                           </td>
@@ -606,7 +606,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                           </td>
 
                           {/* Fecha Solicitud */}
-                          <td className="px-5 py-3.5 text-xs text-zinc-500 font-mono">
+                          <td className="px-5 py-3.5 text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                             {req.requestDate || (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : '—')}
                           </td>
 
@@ -615,10 +615,10 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                             <span
                               className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full border ${
                                 status === 'aprobada'
-                                  ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                   : status === 'rechazada'
-                                  ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
-                                  : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20'
+                                  ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                               }`}
                             >
                               {status}
@@ -628,7 +628,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                           {/* Respuesta / Comité */}
                           <td className="px-5 py-3.5 text-xs">
                             {req.responseDate || req.fecha_respuesta ? (
-                              <span className="text-zinc-500 font-mono">
+                              <span className="text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                                 {req.responseDate || new Date(req.fecha_respuesta!).toLocaleDateString()}
                               </span>
                             ) : (
@@ -644,7 +644,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleSendApprovalWhatsApp(req)}
-                                  className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                                  className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors cursor-pointer"
                                   title="Enviar felicitación / notificación por WhatsApp"
                                 >
                                   <MessageCircle size={15} />
@@ -657,7 +657,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                                   setEditingRequest(req);
                                   setIsModalOpen(true);
                                 }}
-                                className="p-1.5 rounded-lg text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-white/[0.05] transition-colors"
+                                className="p-1.5 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                                 title="Editar solicitud"
                               >
                                 <Edit2 size={14} />
@@ -666,7 +666,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setRequestToDelete(req)}
-                                className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 dark:hover:bg-white/[0.05] transition-colors"
+                                className="p-1.5 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
                                 title="Eliminar solicitud"
                               >
                                 <Trash2 size={14} />
@@ -698,42 +698,42 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {requestToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[280] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#131d2e] rounded-2xl p-6 max-w-md w-full border border-zinc-200 dark:border-white/[0.08] shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[280] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 max-w-md w-full border border-zinc-200 dark:border-[#27272A] space-y-4">
             <div className="flex items-center gap-3 text-rose-500">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
                 <Trash2 size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-base text-zinc-900 dark:text-white">
+                <h3 className="font-bold text-base text-zinc-900 dark:text-[#F4F4F5]">
                   ¿Eliminar esta solicitud?
                 </h3>
-                <p className="text-xs text-zinc-500">Esta acción removerá el registro del archivo.</p>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Esta acción removerá el registro del archivo.</p>
               </div>
             </div>
 
-            <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-black/20 p-3 rounded-xl border border-zinc-200 dark:border-white/[0.06]">
+            <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A]">
               Hermano:{' '}
-              <strong className="text-zinc-900 dark:text-white">
+              <strong className="text-zinc-900 dark:text-[#F4F4F5]">
                 {getPublisherName(requestToDelete.publisherId, requestToDelete.publisher_nid)}
               </strong>
-              <span className="block text-zinc-400 mt-0.5">
+              <span className="block text-zinc-400 dark:text-[#A1A1AA] mt-0.5">
                 Mes: {MONTH_NAMES[requestToDelete.month !== undefined ? requestToDelete.month : (requestToDelete.mes ?? 0)]}{' '}
-                {requestToDelete.year || requestToDelete.anio} (
-                {requestToDelete.targetHours || requestToDelete.meta_horas} horas)
+                <span className="font-mono tabular-nums">{requestToDelete.year || requestToDelete.anio}</span> (
+                <span className="font-mono tabular-nums">{requestToDelete.targetHours || requestToDelete.meta_horas}</span> horas)
               </span>
             </p>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setRequestToDelete(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05]"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-500/20"
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer"
               >
                 Confirmar Eliminación
               </button>

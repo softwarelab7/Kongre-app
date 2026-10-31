@@ -66,7 +66,7 @@ export const EmergencyContactsSection: React.FC<EmergencyContactsSectionProps> =
     .slice(0, 6);
 
   return (
-    <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-xs space-y-6 animate-in fade-in duration-300">
+    <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-6 animate-in fade-in duration-300">
       {/* CABECERA EDITORIAL */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.05]">
         <div className="flex items-start gap-3.5">
@@ -113,7 +113,7 @@ export const EmergencyContactsSection: React.FC<EmergencyContactsSectionProps> =
                   className="fixed inset-0 z-[105]"
                   onClick={() => setShowSearchResults(false)}
                 />
-                <div className="absolute z-[110] left-0 right-0 mt-1.5 bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.08] rounded-2xl shadow-xl max-h-56 overflow-y-auto divide-y divide-zinc-100 dark:divide-white/[0.04]">
+                <div className="absolute z-[110] left-0 right-0 mt-1.5 bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-2xl shadow-xl max-h-56 overflow-y-auto divide-y divide-zinc-100 dark:divide-[#27272A]">
                   {matchingDirectoryPublishers.length === 0 ? (
                     <div className="p-3 text-xs text-zinc-400 text-center">
                       No se encontraron hermanos con ese nombre

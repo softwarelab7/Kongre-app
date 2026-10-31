@@ -50,33 +50,33 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
       icon: Sun,
       recommendedFor: 'Preparación de reuniones durante el día y secretaría',
       previewBg: 'bg-[#F8FAFC]',
-      previewBorder: 'border-slate-200',
+      previewBorder: 'border-zinc-200',
       accentColor: 'text-amber-500 bg-amber-50 border-amber-200',
     },
   ];
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label="Tema de visualización"
     >
       <div
-        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+        className="w-full max-w-lg bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Tema de Visualización
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Selecciona la ambientación según el lugar de trabajo o la reunión
               </p>
             </div>
@@ -84,7 +84,7 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
           <button
             onClick={onClose}
             aria-label="Cerrar selector de tema"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-600 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,7 +105,7 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
                 className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 relative cursor-pointer ${
                   isSelected
                     ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 ring-2 ring-indigo-500/20 shadow-xs'
-                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-800/60'
+                    : 'border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-[#3F3F46] bg-white dark:bg-[#18181F]'
                 }`}
               >
                 <div
@@ -116,15 +116,15 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
 
                 <div className="flex-1 min-w-0 pr-6">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                       {opt.title}
                     </h4>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] mt-1 leading-relaxed">
                     {opt.subtitle}
                   </p>
-                  <div className="mt-2 text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-600" />
+                  <div className="mt-2 text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600" />
                     <span>{opt.recommendedFor}</span>
                   </div>
                 </div>
@@ -140,14 +140,14 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
         </div>
 
         {/* Footer info tip */}
-        <div className="px-5 sm:px-6 py-4 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="px-5 sm:px-6 py-4 bg-zinc-50 dark:bg-[#09090B] border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs text-zinc-500 dark:text-[#A1A1AA]">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
             <span>El tema seleccionado se guarda automáticamente en este dispositivo.</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold hover:opacity-90 transition text-xs shadow-xs"
+            className="px-4 py-2 rounded-xl bg-zinc-900 text-white dark:bg-[#F4F4F5] dark:text-[#09090B] font-semibold hover:opacity-90 transition text-xs shadow-xs cursor-pointer"
           >
             Listo
           </button>

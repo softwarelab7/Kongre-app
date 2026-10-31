@@ -35,6 +35,64 @@
     color: #2c221e;
   }
 
+  /* Flat & Crisp Rules para Modo Sepia en toda la app */
+  html.theme-sepia .bg-white,
+  [data-theme="sepia"] .bg-white {
+    background-color: #eae0c8 !important;
+  }
+
+  html.theme-sepia .bg-slate-50,
+  html.theme-sepia .bg-slate-100,
+  html.theme-sepia .bg-zinc-50,
+  html.theme-sepia .bg-zinc-100,
+  [data-theme="sepia"] .bg-slate-50,
+  [data-theme="sepia"] .bg-slate-100,
+  [data-theme="sepia"] .bg-zinc-50,
+  [data-theme="sepia"] .bg-zinc-100 {
+    background-color: #dfd3b6 !important;
+  }
+
+  html.theme-sepia .border-slate-200,
+  html.theme-sepia .border-slate-100,
+  html.theme-sepia .border-slate-300,
+  html.theme-sepia .border-zinc-200,
+  html.theme-sepia .border-zinc-100,
+  html.theme-sepia .border-zinc-300,
+  [data-theme="sepia"] .border-slate-200,
+  [data-theme="sepia"] .border-slate-100,
+  [data-theme="sepia"] .border-slate-300,
+  [data-theme="sepia"] .border-zinc-200,
+  [data-theme="sepia"] .border-zinc-100,
+  [data-theme="sepia"] .border-zinc-300 {
+    border-color: #d0c2a2 !important;
+  }
+
+  html.theme-sepia .text-slate-900,
+  html.theme-sepia .text-slate-800,
+  html.theme-sepia .text-zinc-900,
+  html.theme-sepia .text-zinc-800,
+  [data-theme="sepia"] .text-slate-900,
+  [data-theme="sepia"] .text-slate-800,
+  [data-theme="sepia"] .text-zinc-900,
+  [data-theme="sepia"] .text-zinc-800 {
+    color: #2c221e !important;
+  }
+
+  html.theme-sepia .text-slate-500,
+  html.theme-sepia .text-slate-600,
+  html.theme-sepia .text-slate-400,
+  html.theme-sepia .text-zinc-500,
+  html.theme-sepia .text-zinc-600,
+  html.theme-sepia .text-zinc-400,
+  [data-theme="sepia"] .text-slate-500,
+  [data-theme="sepia"] .text-slate-600,
+  [data-theme="sepia"] .text-slate-400,
+  [data-theme="sepia"] .text-zinc-500,
+  [data-theme="sepia"] .text-zinc-600,
+  [data-theme="sepia"] .text-zinc-400 {
+    color: #5c4b3b !important;
+  }
+
   /* Cabina de Audio/Video & Acomodadores (Auditorio) Mode */
   html.dark.theme-cabina body,
   [data-theme="cabina"] body {

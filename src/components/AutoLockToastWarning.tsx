@@ -41,18 +41,18 @@ export const AutoLockToastWarning: React.FC = () => {
         fraction={remainingSeconds / 60}
         state={autoLockState}
       >
-        <span className="text-sm font-black tabular-nums text-slate-900 dark:text-white">
+        <span className="text-sm font-black tabular-nums text-zinc-900 dark:text-white">
           {remainingSeconds}
         </span>
       </AutoLockRing>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-900 dark:text-white">
           <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>Se bloqueará por inactividad</span>
         </div>
-        <p className="text-[11.5px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-          en <span className="font-bold text-slate-800 dark:text-slate-200">{formatMmSs(remainingSeconds)}</span>. Toca la pantalla o presiona una tecla para continuar.
+        <p className="text-[11.5px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 leading-snug">
+          en <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">{formatMmSs(remainingSeconds)}</span>. Toca la pantalla o presiona una tecla para continuar.
         </p>
       </div>
     </div>

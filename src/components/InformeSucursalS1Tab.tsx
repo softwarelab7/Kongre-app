@@ -163,16 +163,16 @@ export const InformeSucursalS1Tab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 pb-16">
       {/* Barra Unificada de Sub-pestañas, Mes y Acciones S-1 */}
-      <div className="print:hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col gap-3">
+      <div className="print:hidden bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-3.5 sm:p-4 flex flex-col gap-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
           {/* SUBTABS NAVIGATION - 2-column grid on mobile so nothing clips */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 p-1.5 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] p-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
             <button
               onClick={() => setActiveSubTab('resumen')}
               className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'resumen'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
               }`}
             >
               <span className="truncate">Formulario S-1</span>
@@ -181,8 +181,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
               onClick={() => setActiveSubTab('asistencia')}
               className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'asistencia'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
               }`}
             >
               <span className="truncate">Asistencia (S-88)</span>
@@ -191,8 +191,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
               onClick={() => setActiveSubTab('predicacion')}
               className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'predicacion'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
               }`}
             >
               <span className="truncate">Ministerio</span>
@@ -201,13 +201,13 @@ export const InformeSucursalS1Tab: React.FC = () => {
               onClick={() => setActiveSubTab('pendientes')}
               className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeSubTab === 'pendientes'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
               }`}
             >
               <span className="truncate">Pendientes</span>
               {metrics.missingPublishers.length > 0 && (
-                <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full shrink-0 ${
+                <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full shrink-0 font-mono tabular-nums ${
                   activeSubTab === 'pendientes'
                     ? 'bg-white text-indigo-700'
                     : 'bg-amber-500 text-white'
@@ -222,7 +222,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
           <div className="grid grid-cols-3 sm:flex items-center gap-2">
             <button
               onClick={handleCopySummary}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
               title="Copiar resumen para WhatsApp o Ancianos"
             >
               {copiedSuccess ? (
@@ -240,7 +240,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
               title="Imprimir Formulario S-1 Oficial"
             >
               <Printer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -249,7 +249,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={openJwHubPortal}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all cursor-pointer active:scale-95"
               title="Abrir portal oficial hub.jw.org en nueva pestaña"
             >
               <ExternalLink className="w-3.5 h-3.5 shrink-0" />
@@ -259,11 +259,11 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Month Picker & Submission Status Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-100 dark:border-[#27272A]">
           <div className="flex items-center justify-between sm:justify-start gap-2">
             <button
               onClick={handlePrevMonth}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+              className="p-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
               title="Mes anterior"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -273,10 +273,10 @@ export const InformeSucursalS1Tab: React.FC = () => {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full appearance-none bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono tabular-nums cursor-pointer"
               >
                 {allMonthsList.map((m) => (
-                  <option key={m.monthKey} value={m.monthKey} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                  <option key={m.monthKey} value={m.monthKey} className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">
                     {m.label}
                   </option>
                 ))}
@@ -286,33 +286,33 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={handleNextMonth}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+              className="p-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
               title="Mes siguiente"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
 
-            <span className="text-xs text-slate-500 dark:text-slate-400 hidden md:inline ml-1">
-              Año teocrático <strong className="text-slate-800 dark:text-slate-200">{metrics.serviceYear}</strong>
+            <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] hidden md:inline ml-1">
+              Año teocrático <strong className="text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.serviceYear}</strong>
             </span>
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-2">
             {metrics.submissionStatus === 'enviado' ? (
-              <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-xl">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">Enviado a Sucursal</span>
+              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1.5 rounded-xl">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Enviado a Sucursal</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl">
-                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span className="text-xs font-bold text-amber-700 dark:text-amber-300">Pendiente de Envío</span>
+              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1.5 rounded-xl">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Pendiente de Envío</span>
               </div>
             )}
 
             <button
               onClick={handleOpenSubmitModal}
-              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span>{metrics.submissionStatus === 'enviado' ? 'Detalles' : 'Marcar Envío'}</span>
@@ -324,103 +324,103 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {/* KPI RIBBON CARDS */}
       <div className="print:hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Card 1: Publicadores que informaron */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Publicadores</span>
             <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] tracking-tight font-mono tabular-nums">
               {metrics.totalPublishersReporting}
-              <span className="text-xs text-slate-400 font-normal"> / {metrics.totalActivePublishers}</span>
+              <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-normal font-mono tabular-nums"> / {metrics.totalActivePublishers}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <div className="flex-1 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div className="flex-1 h-1.5 rounded-full bg-zinc-100 dark:bg-[#18181F] overflow-hidden border border-zinc-200/50 dark:border-[#27272A]">
                 <div
                   className="h-full bg-indigo-600 rounded-full"
                   style={{ width: `${Math.min(100, metrics.completionPercentage)}%` }}
                 />
               </div>
-              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">{metrics.completionPercentage}%</span>
+              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold font-mono tabular-nums">{metrics.completionPercentage}%</span>
             </div>
           </div>
         </div>
 
         {/* Card 2: Promedio Entre Semana */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Entre Semana</span>
             <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
+            <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight font-mono tabular-nums">
               {metrics.midweekAverage}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-              {metrics.midweekMeetingsCount} reuniones • Prom. S-88
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
+              <span className="font-mono tabular-nums">{metrics.midweekMeetingsCount}</span> reuniones • Prom. S-88
             </span>
           </div>
         </div>
 
         {/* Card 3: Promedio Fin de Semana */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Fin de Semana</span>
             <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight font-mono tabular-nums">
               {metrics.weekendAverage}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-              {metrics.weekendMeetingsCount} reuniones • Prom. S-88
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
+              <span className="font-mono tabular-nums">{metrics.weekendMeetingsCount}</span> reuniones • Prom. S-88
             </span>
           </div>
         </div>
 
         {/* Card 4: Promedio Combinado */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Prom. General</span>
             <Sparkles className="w-4 h-4 text-amber-500" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight">
+            <div className="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight font-mono tabular-nums">
               {metrics.combinedAverage}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-              Máx: <strong className="text-slate-700 dark:text-slate-200">{metrics.highestAttendance}</strong> asistentes
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
+              Máx: <strong className="text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.highestAttendance}</strong> asistentes
             </span>
           </div>
         </div>
 
         {/* Card 5: Horas Totales */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Horas Totales</span>
             <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
+            <div className="text-2xl font-black text-purple-600 dark:text-purple-400 tracking-tight font-mono tabular-nums">
               {metrics.totalCongregationHours}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-              {metrics.pioneersReporting + metrics.auxPioneersReporting} precursores
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">
+              <span className="font-mono tabular-nums">{metrics.pioneersReporting + metrics.auxPioneersReporting}</span> precursores
             </span>
           </div>
         </div>
 
         {/* Card 6: Cursos Bíblicos */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Cursos Bíblicos</span>
             <BookOpen className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
+            <div className="text-2xl font-black text-teal-600 dark:text-teal-400 tracking-tight font-mono tabular-nums">
               {metrics.totalBibleStudies}
             </div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400">Estudios informados</span>
+            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Estudios informados</span>
           </div>
         </div>
       </div>
@@ -429,45 +429,45 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {activeSubTab === 'resumen' && (
         <div className="space-y-6">
           {/* Main S-1 Official Preview Box */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xs">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl overflow-hidden shadow-2xs">
             {/* JW Official Banner */}
-            <div className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold tracking-wider uppercase mb-1.5">
                   <FileBarChart className="w-3.5 h-3.5" />
                   Formulario Oficial S-1-S
                 </div>
-                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-[#F4F4F5]">
                   Informe de la Congregación a la Sucursal
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {metrics.congregationName} (#{metrics.congregationNumber}) • Circuito {metrics.circuitNumber} • {metrics.monthNameFull} {metrics.year}
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                  {metrics.congregationName} (#{metrics.congregationNumber}) • Circuito {metrics.circuitNumber} • {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span>
                 </p>
               </div>
 
               <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Coordinador / Secretario:</span>
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{metrics.coordinatorName}</span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Año de servicio: <strong className="text-slate-800 dark:text-slate-200">{metrics.serviceYear}</strong>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Coordinador / Secretario:</span>
+                <span className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5]">{metrics.coordinatorName}</span>
+                <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                  Año de servicio: <strong className="text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.serviceYear}</strong>
                 </span>
               </div>
             </div>
 
             {/* TABLA 1: ASISTENCIA A LAS REUNIONES (S-88) */}
-            <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="p-4 sm:p-6 border-b border-zinc-200 dark:border-[#27272A] space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
                   1. Asistencia a las Reuniones (Formulario S-88)
                 </h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">Datos consolidados del mes</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] hidden sm:inline">Datos consolidados del mes</span>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-[#27272A]">
                 <table className="w-full text-left border-collapse text-xs sm:text-sm">
                   <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold">
+                    <tr className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] font-bold">
                       <th className="py-3 px-4">Tipo de Reunión</th>
                       <th className="py-3 px-4 text-center">Reuniones</th>
                       <th className="py-3 px-4 text-center">Total</th>
@@ -478,57 +478,57 @@ export const InformeSucursalS1Tab: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200">
-                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
-                        Reunión Entre Semana <span className="text-slate-500 dark:text-slate-400 text-xs block font-normal">(Vida y Ministerio Cristianos)</span>
+                  <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A] text-zinc-700 dark:text-[#F4F4F5]">
+                    <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                        Reunión Entre Semana <span className="text-zinc-500 dark:text-[#A1A1AA] text-xs block font-normal">(Vida y Ministerio Cristianos)</span>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.midweekMeetingsCount}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.midweekTotalAttendance}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.midweekInPersonAvg}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.midweekZoomAvg}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-black text-indigo-600 dark:text-indigo-400 text-base bg-indigo-50/40 dark:bg-indigo-950/20">
+                      <td className="py-3.5 px-4 text-center font-black text-indigo-600 dark:text-indigo-400 text-base bg-indigo-50/40 dark:bg-indigo-950/20 font-mono tabular-nums">
                         {metrics.midweekAverage}
                       </td>
                     </tr>
-                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
-                        Reunión Fin de Semana <span className="text-slate-500 dark:text-slate-400 text-xs block font-normal">(Discurso Público y La Atalaya)</span>
+                    <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                        Reunión Fin de Semana <span className="text-zinc-500 dark:text-[#A1A1AA] text-xs block font-normal">(Discurso Público y La Atalaya)</span>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.weekendMeetingsCount}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.weekendTotalAttendance}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.weekendInPersonAvg}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.weekendZoomAvg}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-black text-emerald-600 dark:text-emerald-400 text-base bg-emerald-50/40 dark:bg-emerald-950/20">
+                      <td className="py-3.5 px-4 text-center font-black text-emerald-600 dark:text-emerald-400 text-base bg-emerald-50/40 dark:bg-emerald-950/20 font-mono tabular-nums">
                         {metrics.weekendAverage}
                       </td>
                     </tr>
                   </tbody>
                   <tfoot>
-                    <tr className="bg-slate-50 dark:bg-slate-800/70 font-bold text-slate-700 dark:text-slate-200 border-t border-slate-200 dark:border-slate-800">
+                    <tr className="bg-zinc-50 dark:bg-[#18181F] font-bold text-zinc-700 dark:text-[#F4F4F5] border-t border-zinc-200 dark:border-[#27272A]">
                       <td className="py-3 px-4">Totales y Promedio General</td>
-                      <td className="py-3 px-4 text-center">{metrics.totalMeetingsHeld}</td>
-                      <td className="py-3 px-4 text-center">{metrics.totalAttendanceCumulative}</td>
+                      <td className="py-3 px-4 text-center font-mono tabular-nums">{metrics.totalMeetingsHeld}</td>
+                      <td className="py-3 px-4 text-center font-mono tabular-nums">{metrics.totalAttendanceCumulative}</td>
                       <td className="py-3 px-4 text-center" colSpan={2}>
-                        Máxima Asistencia: <strong className="text-slate-900 dark:text-white">{metrics.highestAttendance}</strong>
+                        Máxima Asistencia: <strong className="text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.highestAttendance}</strong>
                       </td>
-                      <td className="py-3 px-4 text-center font-black text-amber-600 dark:text-amber-400 text-base bg-amber-50/60 dark:bg-amber-950/30">
+                      <td className="py-3 px-4 text-center font-black text-zinc-900 dark:text-[#F4F4F5] text-base bg-zinc-100 dark:bg-[#121216] font-mono tabular-nums">
                         {metrics.combinedAverage}
                       </td>
                     </tr>
@@ -544,15 +544,17 @@ export const InformeSucursalS1Tab: React.FC = () => {
                   <Award className="w-4 h-4" />
                   2. Actividad en el Ministerio del Campo (S-4 / S-1)
                 </h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {metrics.totalPublishersReporting} de {metrics.totalActivePublishers} publicadores informaron ({metrics.completionPercentage}%)
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                  <strong className="text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.totalPublishersReporting}</strong> de{' '}
+                  <strong className="text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.totalActivePublishers}</strong> publicadores informaron (
+                  <span className="font-mono tabular-nums font-bold text-indigo-600 dark:text-indigo-400">{metrics.completionPercentage}%</span>)
                 </span>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-[#27272A]">
                 <table className="w-full text-left border-collapse text-xs sm:text-sm">
                   <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold">
+                    <tr className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] font-bold">
                       <th className="py-3 px-4">Clasificación Teocrática</th>
                       <th className="py-3 px-4 text-center">Informaron</th>
                       <th className="py-3 px-4 text-center">Horas</th>
@@ -560,93 +562,94 @@ export const InformeSucursalS1Tab: React.FC = () => {
                       <th className="py-3 px-4 text-center">Cursos Bíblicos</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200">
-                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A] text-zinc-700 dark:text-[#F4F4F5]">
+                    <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                         Publicadores Regulares
-                        <span className="text-slate-500 dark:text-slate-400 text-xs block font-normal">Bautizados y no bautizados que participaron</span>
+                        <span className="text-zinc-500 dark:text-[#A1A1AA] text-xs block font-normal">Bautizados y no bautizados que participaron</span>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-slate-900 dark:text-white">
+                      <td className="py-3.5 px-4 text-center font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                         {metrics.regularPublishersReporting}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.regularPublishersHours > 0 ? `${metrics.regularPublishersHours} hrs` : '—'}
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-400">—</td>
-                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-400">—</td>
+                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400 font-mono tabular-nums">
                         {metrics.regularPublishersStudies}
                       </td>
                     </tr>
 
-                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                    <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                         Precursores Auxiliares
-                        <span className="text-slate-500 dark:text-slate-400 text-xs block font-normal">
-                          {metrics.auxPioneerTarget30} de 30 hrs • {metrics.auxPioneerTarget15} de 15 hrs (aprobadas)
+                        <span className="text-zinc-500 dark:text-[#A1A1AA] text-xs block font-normal">
+                          <span className="font-mono tabular-nums">{metrics.auxPioneerTarget30}</span> de 30 hrs •{' '}
+                          <span className="font-mono tabular-nums">{metrics.auxPioneerTarget15}</span> de 15 hrs (aprobadas)
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-amber-600 dark:text-amber-400">
+                      <td className="py-3.5 px-4 text-center font-bold text-amber-600 dark:text-amber-400 font-mono tabular-nums">
                         {metrics.auxPioneersReporting}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.auxPioneerHours} hrs
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.auxPioneerAvgHours} hrs/prec
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400">
+                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400 font-mono tabular-nums">
                         {metrics.auxPioneerStudies}
                       </td>
                     </tr>
 
-                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                    <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                         Precursores Regulares
-                        <span className="text-slate-500 dark:text-slate-400 text-xs block font-normal">Asignados formalmente en la congregación</span>
+                        <span className="text-zinc-500 dark:text-[#A1A1AA] text-xs block font-normal">Asignados formalmente en la congregación</span>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-indigo-600 dark:text-indigo-400">
+                      <td className="py-3.5 px-4 text-center font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                         {metrics.pioneersReporting}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-semibold">
+                      <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                         {metrics.pioneerHours} hrs
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-500 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                         {metrics.pioneerAvgHours} hrs/prec
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400">
+                      <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400 font-mono tabular-nums">
                         {metrics.pioneerStudies}
                       </td>
                     </tr>
 
                     {metrics.specialPioneersReporting > 0 && (
-                      <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                        <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                      <tr className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
+                        <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-[#F4F4F5]">
                           Precursores Especiales / Misioneros
                         </td>
-                        <td className="py-3.5 px-4 text-center font-bold text-purple-600 dark:text-purple-400">
+                        <td className="py-3.5 px-4 text-center font-bold text-purple-600 dark:text-purple-400 font-mono tabular-nums">
                           {metrics.specialPioneersReporting}
                         </td>
-                        <td className="py-3.5 px-4 text-center font-semibold">
+                        <td className="py-3.5 px-4 text-center font-semibold font-mono tabular-nums">
                           {metrics.specialPioneerHours} hrs
                         </td>
-                        <td className="py-3.5 px-4 text-center text-slate-400">—</td>
-                        <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400">
+                        <td className="py-3.5 px-4 text-center text-zinc-400">—</td>
+                        <td className="py-3.5 px-4 text-center font-bold text-teal-600 dark:text-teal-400 font-mono tabular-nums">
                           {metrics.specialPioneerStudies}
                         </td>
                       </tr>
                     )}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-slate-50 dark:bg-slate-800/70 font-bold text-slate-800 dark:text-slate-200 border-t border-slate-200 dark:border-slate-800">
-                      <td className="py-3.5 px-4 text-slate-900 dark:text-white">TOTAL CONSOLIDADO S-1</td>
-                      <td className="py-3.5 px-4 text-center font-black text-base text-indigo-600 dark:text-indigo-400">
+                    <tr className="bg-zinc-50 dark:bg-[#18181F] font-bold text-zinc-800 dark:text-[#F4F4F5] border-t border-zinc-200 dark:border-[#27272A]">
+                      <td className="py-3.5 px-4 text-zinc-900 dark:text-[#F4F4F5]">TOTAL CONSOLIDADO S-1</td>
+                      <td className="py-3.5 px-4 text-center font-black text-base text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                         {metrics.totalPublishersReporting}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-black text-base text-purple-600 dark:text-purple-400">
+                      <td className="py-3.5 px-4 text-center font-black text-base text-purple-600 dark:text-purple-400 font-mono tabular-nums">
                         {metrics.totalCongregationHours} hrs
                       </td>
-                      <td className="py-3.5 px-4 text-center text-slate-400">—</td>
-                      <td className="py-3.5 px-4 text-center font-black text-base text-teal-600 dark:text-teal-400">
+                      <td className="py-3.5 px-4 text-center text-zinc-400">—</td>
+                      <td className="py-3.5 px-4 text-center font-black text-base text-teal-600 dark:text-teal-400 font-mono tabular-nums">
                         {metrics.totalBibleStudies}
                       </td>
                     </tr>
@@ -656,27 +659,27 @@ export const InformeSucursalS1Tab: React.FC = () => {
             </div>
 
             {/* OBSERVACIONES Y ESTADO DE ENVÍO */}
-            <div className="p-4 sm:p-6 bg-slate-50/80 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            <div className="p-4 sm:p-6 bg-zinc-50/80 dark:bg-[#18181F]/50 border-t border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Estado en JW Hub:</span>
+                  <span className="text-xs font-bold text-zinc-600 dark:text-[#A1A1AA]">Estado en JW Hub:</span>
                   {metrics.submissionStatus === 'enviado' ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <CheckCircle2 className="w-3 h-3" /> Enviado Oficialmente
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Enviado Oficialmente
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                      <Clock className="w-3 h-3" /> Pendiente de Envío
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Pendiente de Envío
                     </span>
                   )}
                 </div>
                 {currentS1Record?.submittedAt && (
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Fecha de envío: {new Date(currentS1Record.submittedAt).toLocaleDateString()} • Por: {currentS1Record.submittedBy || 'Secretario'}
+                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                    Fecha de envío: <span className="font-mono tabular-nums">{new Date(currentS1Record.submittedAt).toLocaleDateString()}</span> • Por: {currentS1Record.submittedBy || 'Secretario'}
                   </p>
                 )}
                 {currentS1Record?.notes && (
-                  <p className="text-xs text-slate-600 dark:text-slate-300 italic">
+                  <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] italic">
                     "{currentS1Record.notes}"
                   </p>
                 )}
@@ -698,54 +701,54 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {/* VIEW CONTENT: ASISTENCIA A REUNIONES (S-88) */}
       {activeSubTab === 'asistencia' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Desglose Semanal de Asistencia • {metrics.monthNameFull} {metrics.year}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Conteo por reunión, asistencia presencial en el salón y conexiones vía Zoom</p>
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">Desglose Semanal de Asistencia • {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span></h3>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Conteo por reunión, asistencia presencial en el salón y conexiones vía Zoom</p>
               </div>
             </div>
 
             <div className="space-y-3">
               {metrics.meetingSessions.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="p-8 text-center text-zinc-500 dark:text-[#A1A1AA] bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A]">
                   No hay semanas registradas para el mes seleccionado.
                 </div>
               ) : (
                 metrics.meetingSessions.map((session, idx) => (
                   <div
                     key={session.weekId || idx}
-                    className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="p-4 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div>
-                      <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 block">Semana {idx + 1}</span>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">
-                        Inicia: {session.startDate}
+                      <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 block font-mono tabular-nums">Semana {idx + 1}</span>
+                      <span className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                        Inicia: <span className="font-mono tabular-nums">{session.startDate}</span>
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-700 text-center">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Entre Semana Salón</span>
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">{session.midweekInPerson}</span>
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Entre Semana Salón</span>
+                        <span className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{session.midweekInPerson}</span>
                       </div>
-                      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-700 text-center">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Entre Semana Zoom</span>
-                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{session.midweekZoom}</span>
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Entre Semana Zoom</span>
+                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{session.midweekZoom}</span>
                       </div>
-                      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-700 text-center">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Fin de Semana Salón</span>
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">{session.weekendInPerson}</span>
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Fin de Semana Salón</span>
+                        <span className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{session.weekendInPerson}</span>
                       </div>
-                      <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-700 text-center">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Fin de Semana Zoom</span>
-                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{session.weekendZoom}</span>
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                        <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Fin de Semana Zoom</span>
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">{session.weekendZoom}</span>
                       </div>
                     </div>
 
-                    <div className="text-right flex sm:block items-center justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200 dark:border-slate-700">
-                      <span className="text-xs sm:text-[10px] text-slate-500 dark:text-slate-400 block">Total Semana</span>
-                      <span className="text-base font-black text-amber-600 dark:text-amber-400">
+                    <div className="text-right flex sm:block items-center justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-200 dark:border-[#27272A]">
+                      <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Total Semana</span>
+                      <span className="text-base font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums">
                         {session.midweekTotal + session.weekendTotal}
                       </span>
                     </div>
@@ -761,22 +764,22 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {activeSubTab === 'predicacion' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Precursores Auxiliares */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
                 <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
                   <Award className="w-4 h-4" />
-                  Precursores Auxiliares ({metrics.auxPioneersReporting})
+                  Precursores Auxiliares (<span className="font-mono tabular-nums">{metrics.auxPioneersReporting}</span>)
                 </h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Solicitudes aprobadas e informe del mes</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Solicitudes aprobadas e informe del mes</span>
               </div>
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] px-2.5 py-1 rounded-lg font-mono tabular-nums">
                 {metrics.auxPioneerHours} hrs totales
               </span>
             </div>
 
             {metrics.auxPioneerList.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/70 dark:border-slate-800">
+              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                 No hay precursores auxiliares registrados para este mes.
               </div>
             ) : (
@@ -784,15 +787,15 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 {metrics.auxPioneerList.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-bold text-slate-900 dark:text-white block">{p.name}</span>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Grupo {p.groupNumber || '—'}</span>
+                      <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{p.name}</span>
+                      <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Grupo {p.groupNumber || '—'}</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-bold text-amber-600 dark:text-amber-400 text-sm block">{p.hours} hrs</span>
-                      <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">{p.bibleStudies} cursos</span>
+                      <span className="font-bold text-amber-600 dark:text-amber-400 text-sm block font-mono tabular-nums">{p.hours} hrs</span>
+                      <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold font-mono tabular-nums">{p.bibleStudies} cursos</span>
                     </div>
                   </div>
                 ))}
@@ -801,22 +804,22 @@ export const InformeSucursalS1Tab: React.FC = () => {
           </div>
 
           {/* Precursores Regulares */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
                 <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                   <Award className="w-4 h-4" />
-                  Precursores Regulares ({metrics.pioneersReporting})
+                  Precursores Regulares (<span className="font-mono tabular-nums">{metrics.pioneersReporting}</span>)
                 </h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Asignados en la congregación</span>
+                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Asignados en la congregación</span>
               </div>
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] px-2.5 py-1 rounded-lg font-mono tabular-nums">
                 {metrics.pioneerHours} hrs totales
               </span>
             </div>
 
             {metrics.pioneerList.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/70 dark:border-slate-800">
+              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
                 No hay precursores regulares registrados con informe este mes.
               </div>
             ) : (
@@ -824,15 +827,15 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 {metrics.pioneerList.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-bold text-slate-900 dark:text-white block">{p.name}</span>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Grupo {p.groupNumber || '—'}</span>
+                      <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{p.name}</span>
+                      <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Grupo {p.groupNumber || '—'}</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm block">{p.hours} hrs</span>
-                      <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">{p.bibleStudies} cursos</span>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm block font-mono tabular-nums">{p.hours} hrs</span>
+                      <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold font-mono tabular-nums">{p.bibleStudies} cursos</span>
                     </div>
                   </div>
                 ))}
@@ -844,38 +847,39 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
       {/* VIEW CONTENT: PENDIENTES DE INFORME */}
       {activeSubTab === 'pendientes' && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
-                Publicadores Pendientes de Informe ({metrics.missingPublishers.length})
+                Publicadores Pendientes de Informe (<span className="font-mono tabular-nums">{metrics.missingPublishers.length}</span>)
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Hermanos activos que aún no han entregado su informe de predicación para {metrics.monthNameFull} {metrics.year}
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                Hermanos activos que aún no han entregado su informe de predicación para {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span>
               </p>
             </div>
-            <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-xl self-start sm:self-center">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1 rounded-xl self-start sm:self-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               Faltan por informar antes de cerrar el S-1
             </span>
           </div>
 
           {metrics.missingPublishers.length === 0 ? (
-            <div className="p-8 text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-2">
-              <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-600 dark:text-emerald-400" />
-              <p className="text-sm font-bold">¡Todos los publicadores activos han informado!</p>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400">El 100% de la congregación está contabilizado para el Formulario S-1.</p>
+            <div className="p-8 text-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+              <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500" />
+              <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">¡Todos los publicadores activos han informado!</p>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">El 100% de la congregación está contabilizado para el Formulario S-1.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {metrics.missingPublishers.map((pub) => (
                 <div
                   key={pub.id}
-                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between text-xs"
+                  className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between text-xs"
                 >
                   <div>
-                    <span className="font-bold text-slate-900 dark:text-white block">{pub.name}</span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{pub.name}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                       Grupo {pub.groupNumber || '—'} • {pub.privilege || 'Publicador'}
                     </span>
                   </div>
@@ -903,22 +907,22 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {/* MODAL: SUBMISSION DETAILS / REGISTRAR ENVÍO JW HUB */}
       {showSubmissionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-150">
-            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-150">
+            <div className="p-5 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50 dark:bg-[#18181F]">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <Send className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Registro de Envío a la Sucursal (JW Hub)</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Mes: {metrics.monthNameFull} {metrics.year}
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">Registro de Envío a la Sucursal (JW Hub)</h3>
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                    Mes: {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span>
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowSubmissionModal(false)}
-                className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
+                className="p-1.5 rounded-lg hover:bg-zinc-200/70 dark:hover:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -926,7 +930,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <div className="p-5 space-y-4 text-xs">
               <div>
-                <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">
+                <label className="text-zinc-700 dark:text-[#F4F4F5] font-bold block mb-1">
                   Hermano responsable del envío (Secretario / Coordinador):
                 </label>
                 <input
@@ -934,12 +938,12 @@ export const InformeSucursalS1Tab: React.FC = () => {
                   value={submitForm.submittedBy}
                   onChange={(e) => setSubmitForm({ ...submitForm, submittedBy: e.target.value })}
                   placeholder="Ej. Carlos Mendoza (Secretario)"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3.5 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">
+                <label className="text-zinc-700 dark:text-[#F4F4F5] font-bold block mb-1">
                   Código o Número de Recibo de JW Hub (opcional):
                 </label>
                 <input
@@ -947,12 +951,12 @@ export const InformeSucursalS1Tab: React.FC = () => {
                   value={submitForm.confirmationNumber}
                   onChange={(e) => setSubmitForm({ ...submitForm, confirmationNumber: e.target.value })}
                   placeholder="Ej. JWHUB-202610-10582"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3.5 py-2.5 text-zinc-900 dark:text-[#F4F4F5] text-xs font-mono tabular-nums focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">
+                <label className="text-zinc-700 dark:text-[#F4F4F5] font-bold block mb-1">
                   Notas u Observaciones Teocráticas:
                 </label>
                 <textarea
@@ -960,7 +964,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
                   value={submitForm.notes}
                   onChange={(e) => setSubmitForm({ ...submitForm, notes: e.target.value })}
                   placeholder="Ej. Se incluyeron 2 publicadores que entregaron informe tardío..."
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl p-3 text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -972,11 +976,11 @@ export const InformeSucursalS1Tab: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div className="p-5 bg-zinc-50 dark:bg-[#18181F] border-t border-zinc-200 dark:border-[#27272A] flex items-center justify-between">
               {metrics.submissionStatus === 'enviado' ? (
                 <button
                   onClick={handleRevertSubmission}
-                  className="px-3.5 py-2 text-xs font-bold rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors"
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
                 >
                   Revertir a Pendiente
                 </button>
@@ -987,13 +991,13 @@ export const InformeSucursalS1Tab: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowSubmissionModal(false)}
-                  className="px-3.5 py-2 text-xs font-bold rounded-xl hover:bg-slate-200/70 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl hover:bg-zinc-200/70 dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#A1A1AA] cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleConfirmSubmission}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Guardar como Enviado</span>

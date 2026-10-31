@@ -67,17 +67,17 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   setNotifPrefs,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-      <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
+      <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-violet-50 dark:bg-violet-950 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold shrink-0">
             <BellRing className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
               Preferencias de Notificación de Asignaciones
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Personaliza con cuántos días de anticipación deseas recibir los recordatorios automáticos en este dispositivo
             </p>
           </div>
@@ -85,13 +85,13 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
         <div className="flex items-center gap-2 flex-wrap">
           {notifPermission === 'granted' ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Permiso del Navegador Activo</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-              <BellRing className="w-4 h-4 text-amber-600" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">
+              <BellRing className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <span>Usa la guía inferior para suscribirte</span>
             </span>
           )}
@@ -102,10 +102,10 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         <div
           className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-in fade-in duration-200 ${
             notifFeedbackMsg.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
               : notifFeedbackMsg.type === 'error'
-              ? 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-              : 'bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200'
+              ? 'bg-rose-500/10 border border-rose-500/20 text-rose-800 dark:text-rose-300'
+              : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-800 dark:text-indigo-300'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           <button
             type="button"
             onClick={() => setNotifFeedbackMsg(null)}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -146,12 +146,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
       {/* Interruptor General + Selección de Publicador */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-bold text-slate-900 dark:text-white block mb-0.5">
+            <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] block mb-0.5">
               Recordatorios Automáticos de Asignaciones
             </span>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Recibe avisos automáticos antes de tus discursos, partes estudiantiles, lecturas, oraciones, deberes o turnos de predicación.
             </p>
           </div>
@@ -169,12 +169,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               }
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
+            <div className="w-11 h-6 bg-zinc-200 dark:bg-[#27272A] peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 dark:after:border-[#27272A] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
           </label>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-          <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 flex items-center gap-1.5">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+          <label className="block text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1.5 flex items-center gap-1.5">
             <User className="w-4 h-4 text-violet-600 dark:text-violet-400" />
             <span>Publicador asociado para los recordatorios:</span>
           </label>
@@ -195,7 +195,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   : undefined
               );
             }}
-            className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold"
+            className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] text-xs font-semibold focus:outline-hidden"
           >
             {publishers.map((p) => (
               <option key={p.id} value={p.id}>
@@ -207,18 +207,18 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       </div>
 
       {/* Días de anticipación (1, 2, 3, 5 o 7 días antes) */}
-      <div className="p-5 rounded-2xl bg-violet-50/40 dark:bg-violet-950/20 border border-violet-200/70 dark:border-violet-800/40 space-y-4">
+      <div className="p-5 rounded-2xl bg-violet-50/40 dark:bg-violet-950/20 border border-violet-200/70 dark:border-violet-900/40 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
               <Calendar className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               <span>Días de Anticipación del Recordatorio Automático</span>
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Elige cuántos días antes de la fecha de tu asignación quieres que el sistema envíe el recordatorio.
             </p>
           </div>
-          <span className="px-3 py-1 rounded-xl bg-violet-600 text-white text-xs font-extrabold self-start sm:self-auto">
+          <span className="px-3 py-1 rounded-xl bg-violet-600 text-white text-xs font-bold font-mono tabular-nums self-start sm:self-auto">
             Seleccionado:{' '}
             {notifPrefs.notifyDaysBefore === 1
               ? '1 día antes'
@@ -273,12 +273,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? 'bg-violet-600 text-white border-violet-600 shadow-md ring-2 ring-violet-500/30'
-                    : 'bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:border-violet-400'
+                    : 'bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] border-zinc-200 dark:border-[#27272A] hover:border-violet-400'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-sm font-extrabold">{option.title}</span>
+                    <span className="text-sm font-extrabold font-mono tabular-nums">{option.title}</span>
                     {isSelected && <CheckCircle2 className="w-4 h-4 text-white shrink-0" />}
                   </div>
                   <span
@@ -291,7 +291,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                 </div>
                 <p
                   className={`text-[11px] leading-snug ${
-                    isSelected ? 'text-violet-100/90' : 'text-slate-500 dark:text-slate-400'
+                    isSelected ? 'text-violet-100/90' : 'text-zinc-500 dark:text-[#A1A1AA]'
                   }`}
                 >
                   {option.desc}
@@ -303,8 +303,8 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
         {/* Hora preferida y recordatorio del mismo día */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-            <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+            <label className="block text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] mb-1 flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               <span>Hora preferida para recibir el aviso anticipado:</span>
             </label>
@@ -316,7 +316,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
                   `Hora del recordatorio actualizada a las ${e.target.value}.`
                 )
               }
-              className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold mt-1"
+              className="w-full p-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-xs font-bold mt-1 focus:outline-hidden"
             >
               <option value="07:00">07:00 AM (Mañana temprano)</option>
               <option value="08:00">08:00 AM (Mañana)</option>
@@ -327,12 +327,12 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
             </select>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+              <span className="text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] block">
                 Recordatorio adicional el mismo día de la reunión
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                 Envía una segunda notificación 3 horas antes de que comience tu reunión o turno.
               </span>
             </div>
@@ -355,11 +355,11 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
       {/* Categorías de asignaciones incluidas */}
       <div className="space-y-3 text-xs">
-        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+        <h4 className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] uppercase tracking-wider">
           Tipos de Asignaciones a Notificar
         </h4>
 
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
           <SplashCheckbox
             checked={notifPrefs.notifyDuties}
             onChange={(e: any) =>
@@ -375,7 +375,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           />
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
           <SplashCheckbox
             checked={notifPrefs.notifyCarts}
             onChange={(e: any) =>
@@ -391,7 +391,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           />
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+        <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
           <SplashCheckbox
             checked={notifPrefs.soundEnabled}
             onChange={(e: any) =>
@@ -409,7 +409,7 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
       </div>
 
       {/* Pie de acciones */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-zinc-100 dark:border-[#27272A]">
         <button
           type="button"
           onClick={() =>

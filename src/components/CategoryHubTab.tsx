@@ -83,18 +83,6 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
     isOnline,
   } = useCongregation();
 
-  const [localCategory, setLocalCategory] = useState<string>(initialCategory);
-  const activeCategory = onSelectCategory ? initialCategory : localCategory;
-
-  const handleCategoryChange = (catId: string) => {
-    if (onSelectCategory) {
-      onSelectCategory(catId);
-    } else {
-      setLocalCategory(catId);
-    }
-  };
-
-  const [searchQuery, setSearchQuery] = useState('');
 
   const rawCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
   const displayCongregationName = rawCongregationName
@@ -119,8 +107,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Mi Ministerio Personal',
       shortTitle: 'Publicador',
       icon: NAV_ICONS.inicio,
-      accentBg: 'bg-indigo-50 dark:bg-indigo-950/60',
-      accentText: 'text-indigo-600 dark:text-indigo-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'inicio',
@@ -159,8 +147,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Mi Congregación',
       shortTitle: 'Congregación',
       icon: NAV_ICONS.panorama_general,
-      accentBg: 'bg-violet-50 dark:bg-violet-950/60',
-      accentText: 'text-violet-600 dark:text-violet-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'panorama_general',
@@ -181,8 +169,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Reuniones de Congregación',
       shortTitle: 'Reuniones',
       icon: NAV_ICONS.reuniones,
-      accentBg: 'bg-indigo-50 dark:bg-indigo-950/60',
-      accentText: 'text-indigo-600 dark:text-indigo-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'programacion',
@@ -215,8 +203,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Secretaría y Registros Oficiales',
       shortTitle: 'Secretaría',
       icon: NAV_ICONS.secretaria,
-      accentBg: 'bg-emerald-50 dark:bg-emerald-950/60',
-      accentText: 'text-emerald-600 dark:text-emerald-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'estadisticas_secretaria',
@@ -236,7 +224,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           description: 'Solicitudes mensuales y aprobación oficial del comité',
           icon: NAV_ICONS.precursores_auxiliares,
           badge: pendingAuxPioneersCount || undefined,
-          badgeColor: 'bg-amber-500 text-white',
+          badgeColor: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]',
         },
         {
           id: 'informe_s1',
@@ -275,8 +263,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Predicación y Territorios',
       shortTitle: 'Predicación',
       icon: NAV_ICONS.predicacion,
-      accentBg: 'bg-sky-50 dark:bg-sky-950/60',
-      accentText: 'text-sky-600 dark:text-sky-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'territorios',
@@ -284,7 +272,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           description: 'Asignaciones digitales, mapas, alertas de vencimiento y manzanas',
           icon: NAV_ICONS.territorios,
           badge: overdueTerritoriesCount || undefined,
-          badgeColor: 'bg-rose-500 text-white',
+          badgeColor: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]',
         },
         {
           id: 'grupos_servicio',
@@ -311,8 +299,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Salón del Reino y Servicios',
       shortTitle: 'Salón',
       icon: NAV_ICONS.salon,
-      accentBg: 'bg-amber-50 dark:bg-amber-950/60',
-      accentText: 'text-amber-600 dark:text-amber-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'limpieza_deberes',
@@ -326,7 +314,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           description: 'Cartas, avisos de la congregación y circulares',
           icon: NAV_ICONS.tablero_anuncios,
           badge: pinnedNoticesCount || undefined,
-          badgeColor: 'bg-indigo-600 text-white',
+          badgeColor: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]',
         },
         {
           id: 'mantenimiento',
@@ -359,8 +347,8 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       title: 'Supervisión, Ajustes & Control',
       shortTitle: 'Supervisión',
       icon: NAV_ICONS.supervision,
-      accentBg: 'bg-rose-50 dark:bg-rose-950/60',
-      accentText: 'text-rose-600 dark:text-rose-400',
+      accentBg: 'bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]',
+      accentText: 'text-zinc-700 dark:text-zinc-300',
       items: [
         {
           id: 'conflictos',
@@ -368,7 +356,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           description: 'Cruces de hermanos, dobles partes o no asignados',
           icon: NAV_ICONS.conflictos,
           badge: conflicts.length || undefined,
-          badgeColor: 'bg-amber-500 text-white',
+          badgeColor: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]',
         },
         {
           id: 'equidad',
@@ -419,232 +407,105 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       .filter((dept) => dept.items.length > 0);
   }, [departments, effectiveRoleInfo.id]);
 
-  // Active department or all
-  const filteredDepartments = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-
-    return roleAllowedDepartments
-      .map((dept) => {
-        if (activeCategory !== 'all' && dept.id !== activeCategory) {
-          return null;
-        }
-
-        const matchingItems = dept.items.filter((item) => {
-          if (!q) return true;
-          return (
-            item.label.toLowerCase().includes(q) ||
-            item.description.toLowerCase().includes(q) ||
-            item.id.toLowerCase().includes(q)
-          );
-        });
-
-        if (matchingItems.length === 0) return null;
-
-        return {
-          ...dept,
-          items: matchingItems,
-        };
-      })
-      .filter((dept): dept is DepartmentCategory => dept !== null);
-  }, [roleAllowedDepartments, searchQuery, activeCategory]);
-
-  const activeCategoryTitle = useMemo(() => {
-    if (activeCategory === 'all') return 'Todas las Secciones y Módulos';
-    const found = roleAllowedDepartments.find((d) => d.id === activeCategory);
-    return found?.title || 'Categoría';
-  }, [activeCategory, roleAllowedDepartments]);
-
-  const totalCardsCount = useMemo(() => {
-    return filteredDepartments.reduce((acc, d) => acc + d.items.length, 0);
-  }, [filteredDepartments]);
+  // Si se seleccionó una categoría específica (ej. 'reuniones'), se muestra únicamente ese departamento.
+  // En vista general ('all'), se muestran los departamentos congregacionales sin mezclar el ministerio personal.
+  const displayedDepartments = useMemo(() => {
+    if (initialCategory && initialCategory !== 'all') {
+      const match = roleAllowedDepartments.filter((dept) => dept.id === initialCategory);
+      if (match.length > 0) return match;
+    }
+    return roleAllowedDepartments.filter((dept) => dept.id !== 'inicio');
+  }, [roleAllowedDepartments, initialCategory]);
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto space-y-6 pb-12 select-none">
+    <div className="w-full max-w-[1600px] mx-auto space-y-8 pb-12 select-none">
       {/* =========================================================================
-          BARRA COMPACTA DE CATEGORÍAS Y BÚSQUEDA (ESTILO JW LIBRARY)
+          CUADRÍCULA DE TARJETAS ESTILO JW LIBRARY INTEGRADA EN TODA LA PANTALLA
          ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-[#27272A]">
-        {/* Pestañas Horizontales compactas estilo JW Library */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0">
-          <button
-            type="button"
-            onClick={() => handleCategoryChange('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-              activeCategory === 'all'
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-[#18181F] hover:text-slate-900 dark:hover:text-zinc-100'
-            }`}
-          >
-            Todos los Módulos
-          </button>
+      <div className="space-y-8">
+        {displayedDepartments.map((dept) => {
+          const DeptIcon = dept.icon;
+          return (
+            <section key={dept.id} className="space-y-3.5">
+              {/* Cabecera de Categoría */}
+              <div className="flex items-center px-1">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-7 h-7 rounded-lg ${dept.accentBg} ${dept.accentText} flex items-center justify-center font-bold`}>
+                    <DeptIcon className="w-4 h-4 stroke-[2]" />
+                  </div>
+                  <h2 className="text-sm font-extrabold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                    {dept.title}
+                  </h2>
+                </div>
+              </div>
 
-          {roleAllowedDepartments.map((dept) => {
-            const isCatSelected = activeCategory === dept.id;
-            const DeptIcon = dept.icon;
-            return (
-              <button
-                key={dept.id}
-                type="button"
-                onClick={() => handleCategoryChange(dept.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                  isCatSelected
-                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-[#18181F] hover:text-slate-900 dark:hover:text-zinc-100'
-                }`}
-              >
-                <DeptIcon className="w-3.5 h-3.5 stroke-[2]" />
-                <span>{dept.shortTitle}</span>
-              </button>
-            );
-          })}
-        </div>
+              {/* Cuadrícula de Tarjetas JW Library (3 columnas en PC de ancho completo) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
+                {dept.items.map((item) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        if (typeof window !== 'undefined') {
+                          window.location.hash = `#${item.id}`;
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      className="group relative p-5 rounded-2xl text-left bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/80 dark:hover:bg-[#18181F] shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer flex items-center gap-4.5"
+                    >
+                      {/* Icono Outline Espacioso Estilo JW Library */}
+                      <div
+                        className={`w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${dept.accentBg} ${dept.accentText} group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 shadow-2xs`}
+                      >
+                        <ItemIcon className="w-6 h-6 stroke-[1.8]" />
+                      </div>
 
-        {/* Buscador ultra compacto a la derecha */}
-        <div className="relative w-full sm:w-56 md:w-64 shrink-0">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar módulo..."
-            className="w-full h-8 pl-8 pr-7 text-xs rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-2xs"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              aria-label="Limpiar búsqueda"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
+                      {/* Texto y Título */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1.5">
+                          <h3 className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 group-hover:text-zinc-900 dark:group-hover:text-white leading-snug truncate transition-colors">
+                            {item.label}
+                          </h3>
+                          {item.badge && (
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums shrink-0 ${
+                                item.badgeColor || 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]'
+                              }`}
+                            >
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {/* =========================================================================
-          2. CUADRÍCULA DE TARJETAS ESTILO JW LIBRARY INTEGRADA EN TODA LA PANTALLA
+          ACCESOS RÁPIDOS INFERIORES Y METADATOS
          ========================================================================= */}
-      {filteredDepartments.length === 0 ? (
-        <div className="bg-white dark:bg-[#121216] rounded-3xl p-12 text-center border border-slate-200/90 dark:border-[#27272A] space-y-4">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <Search className="w-6 h-6" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-800 dark:text-zinc-100">
-              No se encontraron tarjetas que coincidan
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-md mx-auto">
-              No hay módulos que coincidan con &quot;{searchQuery}&quot;. Intenta con otro término o restablece los filtros.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchQuery('');
-              handleCategoryChange('all');
-            }}
-            className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-xs hover:bg-indigo-700 cursor-pointer transition-colors"
-          >
-            Ver todos los módulos
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {filteredDepartments.map((dept) => {
-            const DeptIcon = dept.icon;
-            return (
-              <section key={dept.id} className="space-y-3.5">
-                {/* Cabecera de Categoría (Visible en vista 'Todos') */}
-                {activeCategory === 'all' && (
-                  <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-7 h-7 rounded-lg ${dept.accentBg} ${dept.accentText} flex items-center justify-center font-bold`}>
-                        <DeptIcon className="w-4 h-4 stroke-[2]" />
-                      </div>
-                      <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-700 dark:text-zinc-300">
-                        {dept.title}
-                      </h2>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCategoryChange(dept.id)}
-                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Ver solo {dept.shortTitle}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Cuadrícula de Tarjetas JW Library (3 columnas en PC de ancho completo) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
-                  {dept.items.map((item) => {
-                    const ItemIcon = item.icon;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          if (typeof window !== 'undefined') {
-                            window.location.hash = `#${item.id}`;
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }
-                        }}
-                        className="group relative p-5 rounded-2xl text-left bg-white dark:bg-[#121216] border border-slate-200/90 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50/80 dark:hover:bg-[#18181F] shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer flex items-center gap-4.5"
-                      >
-                        {/* Icono Outline Espacioso Estilo JW Library */}
-                        <div
-                          className={`w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${dept.accentBg} ${dept.accentText} group-hover:bg-indigo-600 group-hover:text-white shadow-2xs`}
-                        >
-                          <ItemIcon className="w-6 h-6 stroke-[1.8]" />
-                        </div>
-
-                        {/* Texto y Título */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-1.5">
-                            <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug truncate transition-colors">
-                              {item.label}
-                            </h3>
-                            {item.badge && (
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums shrink-0 ${
-                                  item.badgeColor || 'bg-amber-500 text-white'
-                                }`}
-                              >
-                                {item.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                            {item.description}
-                          </p>
-                        </div>
-
-                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-zinc-600 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-      )}
-
-      {/* =========================================================================
-          3. ACCESOS RÁPIDOS INFERIORES Y METADATOS
-         ========================================================================= */}
-      <div className="pt-8 border-t border-slate-200/80 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+      <div className="pt-8 border-t border-zinc-200/80 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-4 text-xs text-zinc-500">
         <div className="flex items-center gap-3">
           {onOpenPinsModal && (
             <button
               type="button"
               onClick={onOpenPinsModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-amber-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <KeyRound className="w-3.5 h-3.5 text-amber-500" />
+              <KeyRound className="w-3.5 h-3.5 text-zinc-400" />
               <span>Directorio de PINs</span>
             </button>
           )}
@@ -653,9 +514,9 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
             <button
               type="button"
               onClick={onOpenConflictsModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-amber-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+              <AlertTriangle className="w-3.5 h-3.5 text-zinc-400" />
               <span>Centro de Conflictos ({conflicts.length})</span>
             </button>
           )}
@@ -664,9 +525,9 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
             <button
               type="button"
               onClick={onOpenQueueModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-indigo-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <Wifi className={`w-3.5 h-3.5 ${!isOnline ? 'text-amber-500' : 'text-sky-500'}`} />
+              <Wifi className="w-3.5 h-3.5 text-zinc-400" />
               <span>Sincronía Offline ({offlineQueueStats?.pendingCount || 0})</span>
             </button>
           )}
@@ -676,11 +537,11 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           <button
             type="button"
             onClick={onOpenVersionModal}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 dark:bg-[#18181F] border border-slate-200 dark:border-[#27272A] font-semibold text-slate-600 dark:text-zinc-300 cursor-pointer shadow-2xs"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer shadow-2xs"
           >
             <span>Kongre</span>
-            <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">v{CURRENT_APP_VERSION}</span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300">
+            <span className="font-mono text-zinc-700 dark:text-zinc-300 font-bold">v{CURRENT_APP_VERSION}</span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-zinc-200 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300">
               {CURRENT_APP_STAGE}
             </span>
           </button>

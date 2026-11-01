@@ -879,7 +879,7 @@ export const PublishersTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Barra de Acciones de Publicadores */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Input oculto para subir archivo CSV */}
         <input
           type="file"
@@ -894,7 +894,7 @@ export const PublishersTab: React.FC = () => {
             onClick={() => fileInputRef.current?.click()}
             disabled={!canEditPublishers}
             title="Importar publicadores desde archivo CSV"
-            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] rounded-xl text-xs font-semibold transition-all border border-zinc-200/80 dark:border-[#27272A] cursor-pointer disabled:opacity-50 active:scale-95 shadow-xs"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-zinc-200/80 dark:border-white/10 cursor-pointer disabled:opacity-50 active:scale-95 shadow-xs"
           >
             <Upload size={14} /> <span>Importar CSV</span>
           </button>
@@ -902,7 +902,7 @@ export const PublishersTab: React.FC = () => {
           <button
             onClick={handleExportCsv}
             title="Exportar catálogo completo a formato Excel CSV"
-            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] rounded-xl text-xs font-semibold transition-all border border-zinc-200/80 dark:border-[#27272A] cursor-pointer active:scale-95 shadow-xs"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-zinc-200/80 dark:border-white/10 cursor-pointer active:scale-95 shadow-xs"
           >
             <Download size={14} /> <span>Exportar Excel</span>
           </button>
@@ -914,7 +914,7 @@ export const PublishersTab: React.FC = () => {
                 showToast(`¡Se fusionaron ${mergedCount} publicador(es) duplicado(s) exitosamente!`, 'success');
               }}
               title="Fusionar publicadores duplicados detectados"
-              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition-all border border-amber-500/30 cursor-pointer active:scale-95 shadow-xs"
+              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition-all border border-amber-500/30 cursor-pointer active:scale-95 shadow-xs"
             >
               <Sparkles size={14} /> <span>Fusionar <span className="font-mono tabular-nums">({duplicateCount})</span></span>
             </button>
@@ -927,7 +927,7 @@ export const PublishersTab: React.FC = () => {
             setEditingPublisher(null);
             setViewMode('editor');
           }}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs sm:text-sm font-semibold transition-all shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-95"
         >
           <UserPlus size={15} /> <span>Nuevo Publicador</span>
         </button>
@@ -935,9 +935,9 @@ export const PublishersTab: React.FC = () => {
 
       {/* Banner de alerta de duplicados detectados */}
       {duplicateCount > 0 && canEditPublishers && (
-        <div className="bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 dark:text-amber-200">
+        <div className="kg-glass-surface rounded-2xl p-4 border border-amber-500/30 dark:border-amber-500/20 bg-amber-500/10 dark:bg-amber-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 dark:text-amber-200 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400">
+            <div className="p-2.5 bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400">
               <Sparkles size={18} />
             </div>
             <div>
@@ -954,7 +954,7 @@ export const PublishersTab: React.FC = () => {
               const { mergedCount } = cleanDuplicatePublishers();
               showToast(`¡Se fusionaron ${mergedCount} registro(s) duplicado(s) exitosamente!`, 'success');
             }}
-            className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap cursor-pointer active:scale-95"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-amber-600/20 flex items-center gap-1.5 whitespace-nowrap cursor-pointer active:scale-95"
           >
             <Sparkles size={14} /> Unificar Duplicados Ahora
           </button>
@@ -962,132 +962,146 @@ export const PublishersTab: React.FC = () => {
       )}
 
       {/* Panel de Métricas Rápidas Teocráticas (Compacto y Deslizable en Móvil) */}
-      <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0 touch-pan-x">
+      <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0 touch-pan-x">
           <div
             onClick={() => {
               setRoleFilter('all');
               setGenderFilter('all');
               setStatusFilter('active');
             }}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               roleFilter === 'all' && genderFilter === 'all' && statusFilter === 'active'
-                ? 'border-emerald-500/60 ring-2 ring-emerald-500/15 bg-emerald-50/20 dark:bg-emerald-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-emerald-500/40'
+                ? 'border-emerald-500/60 ring-2 ring-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-emerald-500/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Activos</span>
-              <UserCheck size={15} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Activos</span>
+              <div className="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
+                <UserCheck size={14} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.active}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">de <span className="font-mono tabular-nums">{stats.total}</span> reg.</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.active}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">de <span className="font-mono tabular-nums">{stats.total}</span> reg.</div>
           </div>
 
           <div
             onClick={() => setRoleFilter(roleFilter === 'elder' ? 'all' : 'elder')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               roleFilter === 'elder'
-                ? 'border-indigo-500/60 ring-2 ring-indigo-500/15 bg-indigo-50/20 dark:bg-indigo-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-400/40'
+                ? 'border-indigo-500/60 ring-2 ring-indigo-500/20 bg-indigo-50/30 dark:bg-indigo-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Ancianos</span>
-              <Shield size={15} className="text-indigo-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Ancianos</span>
+              <div className="w-6 h-6 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center">
+                <Shield size={14} className="text-indigo-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.elders}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">cuerpo ancianos</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.elders}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">cuerpo ancianos</div>
           </div>
 
           <div
             onClick={() => setRoleFilter(roleFilter === 'servant' ? 'all' : 'servant')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               roleFilter === 'servant'
-                ? 'border-amber-500/60 ring-2 ring-amber-500/15 bg-amber-50/20 dark:bg-amber-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-amber-400/40'
+                ? 'border-amber-500/60 ring-2 ring-amber-500/20 bg-amber-50/30 dark:bg-amber-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-amber-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Siervos</span>
-              <Award size={15} className="text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Siervos</span>
+              <div className="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
+                <Award size={14} className="text-amber-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.servants}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">ministeriales</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.servants}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">ministeriales</div>
           </div>
 
           <div
             onClick={() => setRoleFilter(roleFilter === 'pioneer' ? 'all' : 'pioneer')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               roleFilter === 'pioneer'
-                ? 'border-teal-500/60 ring-2 ring-teal-500/15 bg-teal-50/20 dark:bg-teal-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-teal-400/40'
+                ? 'border-teal-500/60 ring-2 ring-teal-500/20 bg-teal-50/30 dark:bg-teal-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-teal-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Precursores</span>
-              <Sparkles size={15} className="text-teal-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Precursores</span>
+              <div className="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/20 flex items-center justify-center">
+                <Sparkles size={14} className="text-teal-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.pioneers}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">regulares/aux.</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.pioneers}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">regulares/aux.</div>
           </div>
 
           <div
             onClick={() => setGenderFilter(genderFilter === 'brothers' ? 'all' : 'brothers')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               genderFilter === 'brothers'
-                ? 'border-blue-500/60 ring-2 ring-blue-500/15 bg-blue-50/20 dark:bg-blue-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-blue-400/40'
+                ? 'border-blue-500/60 ring-2 ring-blue-500/20 bg-blue-50/30 dark:bg-blue-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-blue-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Hermanos</span>
-              <Users size={15} className="text-blue-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Hermanos</span>
+              <div className="w-6 h-6 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
+                <Users size={14} className="text-blue-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.brothers}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">varones</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.brothers}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">varones</div>
           </div>
 
           <div
             onClick={() => setGenderFilter(genderFilter === 'sisters' ? 'all' : 'sisters')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               genderFilter === 'sisters'
-                ? 'border-pink-500/60 ring-2 ring-pink-500/15 bg-pink-50/20 dark:bg-pink-950/20'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-pink-400/40'
+                ? 'border-pink-500/60 ring-2 ring-pink-500/20 bg-pink-50/30 dark:bg-pink-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-pink-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Hermanas</span>
-              <Users size={15} className="text-pink-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Hermanas</span>
+              <div className="w-6 h-6 rounded-lg bg-pink-500/10 dark:bg-pink-500/20 flex items-center justify-center">
+                <Users size={14} className="text-pink-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.sisters}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">mujeres</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.sisters}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">mujeres</div>
           </div>
 
           <div
             onClick={() => setStatusFilter(statusFilter === 'absent' ? 'all' : 'absent')}
-            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-[#121216] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`kg-card-bento kg-sheen-top p-3 sm:p-4 rounded-2xl border cursor-pointer transition-all group shrink-0 min-w-[115px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               statusFilter === 'absent'
-                ? 'border-rose-500/50 bg-rose-50/20 dark:bg-rose-500/10 ring-2 ring-rose-500/15'
-                : 'border-zinc-200 dark:border-[#27272A] hover:border-rose-400/40'
+                ? 'border-rose-500/60 ring-2 ring-rose-500/20 bg-rose-50/30 dark:bg-rose-950/30'
+                : 'border-zinc-200/80 dark:border-white/10 hover:border-rose-400/40 hover:shadow-md'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">Ausencias</span>
-              <Plane size={15} className="text-rose-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Ausencias</span>
+              <div className="w-6 h-6 rounded-lg bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center">
+                <Plane size={14} className="text-rose-500 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-0.5 sm:mt-1 leading-tight">{stats.absentToday}</div>
-            <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 truncate">fuera hoy</div>
+            <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5 leading-tight">{stats.absentToday}</div>
+            <div className="text-[10px] text-zinc-400 dark:text-zinc-400 mt-0.5 truncate">fuera hoy</div>
           </div>
         </div>
 
         {/* Barra de Filtros, Búsqueda y Modos de Vista */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-3">
+        <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center gap-3">
             {/* Input de Búsqueda */}
             <div className="relative flex-1">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-[#A1A1AA]" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-400" />
               <input
-                className="w-full pl-9 pr-16 py-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-xs font-medium text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                className="w-full pl-10 pr-16 py-2.5 rounded-2xl bg-zinc-100/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
                 placeholder="Buscar por nombre, ID único, teléfono o correo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -1095,7 +1109,7 @@ export const PublishersTab: React.FC = () => {
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] cursor-pointer"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-white cursor-pointer"
                 >
                   Limpiar
                 </button>
@@ -1108,7 +1122,7 @@ export const PublishersTab: React.FC = () => {
                 options={groupOptions}
                 value={groupFilter}
                 onChange={setGroupFilter}
-                buttonClassName="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] cursor-pointer transition-colors"
+                buttonClassName="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-semibold bg-zinc-100/70 text-zinc-700 hover:bg-zinc-200/80 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 cursor-pointer transition-all"
               />
             </div>
 
@@ -1118,19 +1132,19 @@ export const PublishersTab: React.FC = () => {
                 options={assignmentFilterOptions}
                 value={assignmentFilter}
                 onChange={setAssignmentFilter}
-                buttonClassName="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-[#18181F] dark:text-[#F4F4F5] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] cursor-pointer transition-colors"
+                buttonClassName="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-semibold bg-zinc-100/70 text-zinc-700 hover:bg-zinc-200/80 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 cursor-pointer transition-all"
               />
             </div>
 
             {/* Switch de Modo Tarjetas / Modo Tabla */}
-            <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl shrink-0 self-start sm:self-auto">
+            <div className="flex items-center gap-1 p-1 bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl shrink-0 self-start sm:self-auto">
               <button
                 onClick={() => setDisplayLayout('cards')}
                 title="Vista en Tarjetas"
-                className={`p-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   displayLayout === 'cards'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200 dark:border-[#27272A] shadow-xs'
-                    : 'text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
+                    ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white'
                 }`}
               >
                 <LayoutGrid size={15} />
@@ -1139,10 +1153,10 @@ export const PublishersTab: React.FC = () => {
               <button
                 onClick={() => setDisplayLayout('table')}
                 title="Vista en Tabla"
-                className={`p-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   displayLayout === 'table'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200 dark:border-[#27272A] shadow-xs'
-                    : 'text-zinc-500 hover:text-zinc-800 dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5]'
+                    ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white'
                 }`}
               >
                 <TableIcon size={15} />
@@ -1152,8 +1166,8 @@ export const PublishersTab: React.FC = () => {
           </div>
 
           {/* Filtros secundarios: Privilegio, Género, Estado */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pt-2 border-t border-zinc-100 dark:border-[#27272A] text-xs touch-pan-x">
-            <span className="text-[11px] font-semibold text-zinc-400 dark:text-[#A1A1AA] uppercase tracking-wider mr-1 flex items-center gap-1">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 pt-3 border-t border-zinc-200/60 dark:border-white/10 text-xs touch-pan-x">
+            <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-400 uppercase tracking-wider mr-1 flex items-center gap-1">
               <Filter size={12} /> Rol:
             </span>
 
@@ -1168,17 +1182,17 @@ export const PublishersTab: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setRoleFilter(tab.id as RoleFilter)}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer ${
                   roleFilter === tab.id
                     ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
+                    : 'bg-zinc-100/70 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 {tab.label}
               </button>
             ))}
 
-            <div className="h-4 w-px bg-zinc-200 dark:bg-[#27272A] mx-1 hidden sm:block" />
+            <div className="h-4 w-px bg-zinc-200 dark:bg-white/10 mx-1 hidden sm:block" />
 
             {/* Filtro género */}
             {[
@@ -1189,22 +1203,22 @@ export const PublishersTab: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setGenderFilter(tab.id as GenderFilter)}
-                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                className={`px-2.5 py-1.5 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
                   genderFilter === tab.id
-                    ? 'bg-zinc-900 dark:bg-[#F4F4F5] text-white dark:text-[#09090B] shadow-xs'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'
                 }`}
               >
                 {tab.label}
               </button>
             ))}
 
-            <div className="h-4 w-px bg-zinc-200 dark:bg-[#27272A] mx-1 hidden sm:block" />
+            <div className="h-4 w-px bg-zinc-200 dark:bg-white/10 mx-1 hidden sm:block" />
 
             {/* Papelera */}
             <button
               onClick={() => setRoleFilter(roleFilter === 'trash' ? 'all' : 'trash')}
-              className={`ml-auto px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 cursor-pointer text-xs ${
+              className={`ml-auto px-3 py-1.5 rounded-xl font-semibold transition-all flex items-center gap-1.5 cursor-pointer text-xs ${
                 roleFilter === 'trash'
                   ? 'bg-rose-500 text-white shadow-xs'
                   : 'bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400'
@@ -1245,27 +1259,27 @@ export const PublishersTab: React.FC = () => {
                     setEditorInitialTab('all');
                     setViewMode('editor');
                   }}
-                  className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 hover:border-indigo-500/50 hover:bg-zinc-50/50 dark:hover:bg-[#18181F] transition-all cursor-pointer flex flex-col justify-between group relative shadow-xs"
+                  className="kg-card-bento kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 transition-all cursor-pointer flex flex-col justify-between group relative"
                 >
-                  {/* Cabecera de la tarjeta: Avatar, Nombre, Privilegio */}
+                  {/* Cabecera de la tarjeta: Avatar degradado, Nombre, Privilegio */}
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        {/* Avatar */}
+                        {/* Apple-style Gradient Avatar */}
                         <div
-                          className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center border relative ${
+                          className={`w-11 h-11 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-md border relative transition-transform duration-200 group-hover:scale-105 ${
                             isFemale
-                              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-                              : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+                              ? 'bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 text-white border-white/20 shadow-rose-500/25'
+                              : 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-sky-500 text-white border-white/20 shadow-indigo-500/25'
                           }`}
                         >
                           <svg
-                            width="18"
-                            height="18"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="1.8"
+                            strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           >
@@ -1273,27 +1287,27 @@ export const PublishersTab: React.FC = () => {
                             <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                           </svg>
 
-                          {/* Indicador de activo / inactivo en el avatar */}
+                          {/* Indicador de activo / inactivo con halo */}
                           <span
-                            className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#121216] ${
-                              isActive ? 'bg-emerald-500' : 'bg-zinc-400'
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-[#121216] ${
+                              isActive ? 'bg-emerald-500 ring-2 ring-emerald-500/30' : 'bg-zinc-400'
                             }`}
                           />
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1.5">
-                            <h4 className="font-bold text-sm text-zinc-900 dark:text-[#F4F4F5] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            <h4 className="font-bold text-sm text-zinc-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                               {displayName}
                             </h4>
                             <span
                               title="ID Único Inmutable del Publicador"
-                              className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono tabular-nums font-bold bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]"
+                              className="shrink-0 px-1.5 py-0.5 rounded-lg text-[9px] font-mono tabular-nums font-bold bg-zinc-100/80 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10"
                             >
                               {ensureImmutablePublisherCode(p)}
                             </span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1">
                             <span
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1302,7 +1316,7 @@ export const PublishersTab: React.FC = () => {
                                 setViewMode('editor');
                               }}
                               title="Abrir tarjeta de Estado Espiritual"
-                              className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border cursor-pointer hover:opacity-80 transition-opacity ${getBadgeColor(
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border cursor-pointer hover:opacity-85 transition-opacity ${getBadgeColor(
                                 privilegeOrRole,
                                 p
                               )}`}
@@ -1320,7 +1334,7 @@ export const PublishersTab: React.FC = () => {
                                   setViewMode('editor');
                                 }}
                                 title={p.has_dpa ? 'DPA Vigente firmado • Clic para ver tarjeta' : 'Sin DPA o no registrado • Clic para ver tarjeta'}
-                                className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold border cursor-pointer hover:opacity-80 transition-opacity ${
+                                className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold border cursor-pointer hover:opacity-85 transition-opacity ${
                                   p.has_dpa
                                     ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
                                     : 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
@@ -1343,7 +1357,7 @@ export const PublishersTab: React.FC = () => {
                                 if (mDiff < 0 || (mDiff === 0 && today.getDate() < b.getDate())) a--;
                                 if (a >= 0) {
                                   return (
-                                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono tabular-nums font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/60 dark:border-[#27272A]">
+                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono tabular-nums font-semibold bg-zinc-100/80 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10">
                                       {a} años
                                     </span>
                                   );
@@ -1353,7 +1367,7 @@ export const PublishersTab: React.FC = () => {
                             })()}
 
                             {p.marital_status && (
-                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200/40 dark:border-indigo-800/30 capitalize">
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/30 capitalize">
                                 {p.marital_status}
                               </span>
                             )}
@@ -1361,7 +1375,7 @@ export const PublishersTab: React.FC = () => {
                             {isAbsent && (
                               <span
                                 title="Ausencia programada vigente"
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20"
                               >
                                 <Plane size={9} /> Fuera
                               </span>
@@ -1380,39 +1394,39 @@ export const PublishersTab: React.FC = () => {
                         setViewMode('editor');
                       }}
                       title="Abrir tarjeta de Contacto y Ubicación"
-                      className="space-y-2 py-2 text-xs border-t border-b border-zinc-100 dark:border-[#27272A] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-[#18181F]/40 rounded-lg px-1 transition-colors"
+                      className="space-y-2 p-3 my-2 text-xs rounded-2xl bg-zinc-100/60 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 cursor-pointer hover:bg-zinc-200/60 dark:hover:bg-white/10 transition-colors"
                     >
-                      <div className="flex items-center justify-between text-zinc-600 dark:text-[#A1A1AA]">
-                        <span className="text-[11px] font-medium text-zinc-400 dark:text-[#A1A1AA]">Grupo:</span>
+                      <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
+                        <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Grupo:</span>
                         <div onClick={(e) => e.stopPropagation()} className="w-36">
                           <Select
                             options={groupOptions.filter((o) => o.value !== 'all')}
                             value={gid || 'unassigned'}
                             onChange={(val) => handleQuickGroupChange(p, val)}
                             disabled={!canEditPublishers}
-                            buttonClassName="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[11px] font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/60 dark:border-[#27272A]"
+                            buttonClassName="w-full flex items-center justify-between px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-white dark:bg-white/10 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-white/15 border border-zinc-200/80 dark:border-white/10 transition-all"
                           />
                         </div>
                       </div>
 
                       {p.phone && (
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-[#A1A1AA]">Teléfono:</span>
-                          <span className="font-mono tabular-nums font-medium text-zinc-800 dark:text-[#F4F4F5]">{p.phone}</span>
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Teléfono:</span>
+                          <span className="font-mono tabular-nums font-semibold text-zinc-800 dark:text-zinc-200">{p.phone}</span>
                         </div>
                       )}
 
                       {p.email && (
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-[#A1A1AA]">Correo:</span>
-                          <span className="truncate max-w-[170px] text-zinc-500 dark:text-[#A1A1AA]">{p.email}</span>
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Correo:</span>
+                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 font-medium">{p.email}</span>
                         </div>
                       )}
 
                       {(p.address || p.city) && (
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-[#A1A1AA]">Domicilio:</span>
-                          <span className="truncate max-w-[170px] text-zinc-500 dark:text-[#A1A1AA] text-[11px]">
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Domicilio:</span>
+                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 text-[11px]">
                             {[p.address, p.neighborhood, p.city].filter(Boolean).join(', ')}
                           </span>
                         </div>
@@ -1430,10 +1444,10 @@ export const PublishersTab: React.FC = () => {
                       title="Abrir tarjeta de Asignaciones"
                       className="pt-2 cursor-pointer hover:opacity-85 transition-opacity"
                     >
-                      <span className="text-[10px] font-semibold text-zinc-400 dark:text-[#A1A1AA] uppercase tracking-wider block mb-1">
+                      <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-400 uppercase tracking-wider block mb-1.5">
                         Habilitado para:
                       </span>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1.5">
                         {assignmentKeys.length > 0 ? (
                           <>
                             {assignmentKeys.slice(0, 3).map((a) => {
@@ -1457,20 +1471,20 @@ export const PublishersTab: React.FC = () => {
                               return (
                                 <span
                                   key={a}
-                                  className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A]"
+                                  className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10"
                                 >
                                   {label}
                                 </span>
                               );
                             })}
                             {assignmentKeys.length > 3 && (
-                              <span className="text-[10px] font-mono tabular-nums font-semibold text-zinc-400 dark:text-[#A1A1AA] self-center">
+                              <span className="text-[10px] font-mono tabular-nums font-bold text-zinc-400 dark:text-zinc-400 self-center">
                                 +{assignmentKeys.length - 3}
                               </span>
                             )}
                           </>
                         ) : (
-                          <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] italic">Sin asignaciones configuradas</span>
+                          <span className="text-[10px] text-zinc-400 dark:text-zinc-400 italic">Sin asignaciones configuradas</span>
                         )}
                       </div>
                     </div>
@@ -1479,15 +1493,15 @@ export const PublishersTab: React.FC = () => {
                   {/* Acciones Rápidas Inferiores (Llamada, WhatsApp, Editar, Activo, Eliminar) */}
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center justify-between gap-1 pt-3 mt-3 border-t border-zinc-100 dark:border-[#27272A]"
+                    className="flex items-center justify-between gap-1 pt-3.5 mt-3.5 border-t border-zinc-200/60 dark:border-white/10"
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       {cleanPhone && (
                         <>
                           <a
                             href={`tel:${cleanPhone}`}
                             title={`Llamar a ${displayName}`}
-                            className="p-2 sm:p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl text-zinc-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 dark:text-[#A1A1AA] dark:hover:text-indigo-400 transition-colors active:scale-90"
+                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl text-zinc-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 dark:text-zinc-400 dark:hover:text-indigo-400 transition-all hover:scale-110 active:scale-90"
                           >
                             <Phone size={14} />
                           </a>
@@ -1496,7 +1510,7 @@ export const PublishersTab: React.FC = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             title={`Enviar WhatsApp a ${displayName}`}
-                            className="p-2 sm:p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl text-zinc-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 dark:text-[#A1A1AA] dark:hover:text-emerald-400 transition-colors active:scale-90"
+                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl text-zinc-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 dark:text-zinc-400 dark:hover:text-emerald-400 transition-all hover:scale-110 active:scale-90"
                           >
                             <MessageCircle size={14} />
                           </a>
@@ -1507,10 +1521,10 @@ export const PublishersTab: React.FC = () => {
                         onClick={() => handleQuickToggleActive(p)}
                         disabled={!canEditPublishers}
                         title={isActive ? 'Marcar como inactivo' : 'Marcar como activo'}
-                        className={`px-2 py-1 rounded-md text-[10px] font-semibold transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${
                           isActive
-                            ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20'
-                            : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-[#18181F] dark:text-[#A1A1AA] border border-zinc-200/60 dark:border-[#27272A]'
+                            ? 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 dark:text-emerald-400 border border-emerald-500/20 shadow-xs'
+                            : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-white/5 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10'
                         }`}
                       >
                         {isActive ? 'Activo' : 'Inactivo'}
@@ -1524,7 +1538,7 @@ export const PublishersTab: React.FC = () => {
                             disabled={!canEditPublishers}
                             onClick={() => handleRestore(p.id)}
                             title="Restaurar publicador"
-                            className="p-1.5 rounded-lg transition-colors hover:bg-emerald-50 text-emerald-600 dark:hover:bg-emerald-500/10 dark:text-emerald-400 cursor-pointer"
+                            className="p-2 rounded-xl transition-all hover:bg-emerald-50 text-emerald-600 dark:hover:bg-emerald-500/10 dark:text-emerald-400 cursor-pointer hover:scale-110 active:scale-90"
                           >
                             <RefreshCcw size={14} />
                           </button>
@@ -1532,7 +1546,7 @@ export const PublishersTab: React.FC = () => {
                             disabled={!canEditPublishers}
                             onClick={() => handleDelete(p.id)}
                             title="Eliminar definitivamente"
-                            className="p-1.5 rounded-lg transition-colors hover:bg-rose-50 text-rose-600 dark:hover:bg-rose-500/10 dark:text-rose-400 cursor-pointer"
+                            className="p-2 rounded-xl transition-all hover:bg-rose-50 text-rose-600 dark:hover:bg-rose-500/10 dark:text-rose-400 cursor-pointer hover:scale-110 active:scale-90"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -1547,7 +1561,7 @@ export const PublishersTab: React.FC = () => {
                               setViewMode('editor');
                             }}
                             title="Editar ficha teocrática"
-                            className="p-2 sm:p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl transition-colors hover:bg-indigo-50 text-zinc-500 hover:text-indigo-600 dark:hover:bg-[#27272A] dark:text-[#A1A1AA] dark:hover:text-indigo-400 cursor-pointer active:scale-90"
+                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl transition-all hover:bg-indigo-50 text-zinc-500 hover:text-indigo-600 dark:hover:bg-white/10 dark:text-zinc-400 dark:hover:text-indigo-400 cursor-pointer hover:scale-110 active:scale-90"
                           >
                             <Edit2 size={14} />
                           </button>
@@ -1555,7 +1569,7 @@ export const PublishersTab: React.FC = () => {
                             disabled={!canEditPublishers}
                             onClick={() => handleDelete(p.id)}
                             title="Mover a papelera"
-                            className="p-2 sm:p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl transition-colors hover:bg-rose-50 text-zinc-400 hover:text-rose-500 dark:hover:bg-rose-500/10 dark:text-[#A1A1AA] dark:hover:text-rose-400 cursor-pointer active:scale-90"
+                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl transition-all hover:bg-rose-50 text-zinc-400 hover:text-rose-500 dark:hover:bg-rose-500/10 dark:text-zinc-400 dark:hover:text-rose-400 cursor-pointer hover:scale-110 active:scale-90"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -1568,10 +1582,10 @@ export const PublishersTab: React.FC = () => {
             })}
 
             {sortedAndFilteredPublishers.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl shadow-xs">
+              <div className="col-span-full py-16 text-center kg-card-bento kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-sm">
                 <Users size={36} className="mx-auto mb-2 text-zinc-400 opacity-60" />
-                <h4 className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5]">No se encontraron publicadores</h4>
-                <p className="text-xs text-zinc-400 dark:text-[#A1A1AA] mt-1">
+                <h4 className="text-sm font-bold text-zinc-800 dark:text-white">No se encontraron publicadores</h4>
+                <p className="text-xs text-zinc-400 dark:text-zinc-400 mt-1">
                   Ajusta los filtros de búsqueda o agrega un nuevo publicador a la lista.
                 </p>
               </div>
@@ -1579,7 +1593,7 @@ export const PublishersTab: React.FC = () => {
           </div>
         ) : (
           /* VISTA DE TABLA DETALLADA (Detailed Data Table) */
-          <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] shadow-xs">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-white/10 shadow-sm">
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>

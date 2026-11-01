@@ -338,16 +338,16 @@ export const TarjetasS21Tab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Barra de Acciones y Selector de Vista de Tarjetas S-21 */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col gap-3 no-print">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+      <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col gap-3.5 no-print">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Main View Mode Selector - 2-column grid on mobile so nothing clips */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] p-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-zinc-100/80 dark:bg-white/5 p-1.5 rounded-2xl border border-zinc-200/80 dark:border-white/10">
             <button
               onClick={() => setActiveView('fichero')}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeView === 'fichero'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
               }`}
             >
               <Users className="w-3.5 h-3.5 shrink-0" />
@@ -356,10 +356,10 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => setActiveView('tarjeta')}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeView === 'tarjeta'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
               }`}
             >
               <FileText className="w-3.5 h-3.5 shrink-0" />
@@ -368,10 +368,10 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => setActiveView('auditoria_precursores')}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeView === 'auditoria_precursores'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
               }`}
             >
               <Award className="w-3.5 h-3.5 shrink-0" />
@@ -380,10 +380,10 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => setActiveView('pastoral')}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeView === 'pastoral'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -394,9 +394,9 @@ export const TarjetasS21Tab: React.FC = () => {
           {/* Global Action Buttons */}
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
             {/* Service Year Selector */}
-            <div className="flex items-center justify-center gap-1.5 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2">
+            <div className="flex items-center justify-center gap-1.5 bg-zinc-100/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl px-3.5 py-2.5">
               <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">Año:</span>
+              <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Año:</span>
               <select
                 value={selectedServiceYear}
                 onChange={(e) => setSelectedServiceYear(e.target.value)}
@@ -412,10 +412,10 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => setActiveView('formato_local')}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95 ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition cursor-pointer active:scale-95 ${
                 activeView === 'formato_local'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                  : 'bg-zinc-100/80 dark:bg-white/5 hover:bg-zinc-200/80 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/10'
               }`}
             >
               <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -424,7 +424,7 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] rounded-xl text-xs font-bold transition cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-zinc-100/80 dark:bg-white/5 hover:bg-zinc-200/80 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/10 rounded-2xl text-xs font-bold transition cursor-pointer active:scale-95"
             >
               <Download className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">Descargar S-21</span>
@@ -432,7 +432,7 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <button
               onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold transition cursor-pointer shadow-md shadow-indigo-600/25 active:scale-95"
               title="Imprimir Resumen Analítico Interno para la Visita"
             >
               <Printer className="w-3.5 h-3.5 shrink-0" />
@@ -443,12 +443,12 @@ export const TarjetasS21Tab: React.FC = () => {
 
         {/* Quick select publisher dropdown when in tarjeta view */}
         {activeView === 'tarjeta' && (
-          <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
-            <span className="text-xs font-bold text-zinc-500 dark:text-[#A1A1AA]">Publicador seleccionado:</span>
+          <div className="flex items-center justify-between gap-2 pt-3 border-t border-zinc-200/60 dark:border-white/10">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Publicador seleccionado:</span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handlePrevPublisher}
-                className="p-1.5 rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#F4F4F5]"
+                className="p-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/80 dark:bg-white/5 hover:bg-zinc-200/80 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-200 transition-all active:scale-95"
                 title="Publicador anterior"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -456,7 +456,7 @@ export const TarjetasS21Tab: React.FC = () => {
               <select
                 value={selectedPublisherId}
                 onChange={(e) => setSelectedPublisherId(e.target.value)}
-                className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-xs font-bold text-zinc-800 dark:text-[#F4F4F5] max-w-[200px] sm:max-w-xs"
+                className="px-3.5 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/70 dark:bg-white/5 text-xs font-bold text-zinc-800 dark:text-white max-w-[200px] sm:max-w-xs focus:outline-none"
               >
                 {publishers.map((p) => (
                   <option key={p.id} value={p.id} className="bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5]">
@@ -466,7 +466,7 @@ export const TarjetasS21Tab: React.FC = () => {
               </select>
               <button
                 onClick={handleNextPublisher}
-                className="p-1.5 rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-600 dark:text-[#F4F4F5]"
+                className="p-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/80 dark:bg-white/5 hover:bg-zinc-200/80 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-200 transition-all active:scale-95"
                 title="Siguiente publicador"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -477,48 +477,48 @@ export const TarjetasS21Tab: React.FC = () => {
       </div>
 
       {/* KPI Cards (Secretary Dashboard) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A]">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 dark:text-[#A1A1AA] block uppercase">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 no-print">
+        <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all hover:shadow-md">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 dark:text-zinc-400 block uppercase tracking-wider">
             Total Publicadores
           </span>
-          <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.totalPublishers}</span>
-          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">Fichero activo</span>
+          <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-mono tabular-nums block mt-1">{metrics.totalPublishers}</span>
+          <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block mt-0.5">Fichero activo</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A]">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase">
+        <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all hover:shadow-md">
+          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase tracking-wider">
             Al Día (Activos)
           </span>
-          <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">{metrics.activeCount}</span>
+          <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums block mt-1">{metrics.activeCount}</span>
           <span className="text-[11px] text-emerald-700 dark:text-emerald-400/80 block mt-0.5">
             <span className="font-mono tabular-nums">{metrics.totalPublishers > 0 ? Math.round((metrics.activeCount / metrics.totalPublishers) * 100) : 0}%</span> de la congregación
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] cursor-pointer hover:border-amber-400 dark:hover:border-amber-400/60 transition" onClick={() => setActiveView('pastoral')}>
-          <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 block uppercase flex items-center justify-between">
+        <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 cursor-pointer hover:border-amber-400/60 dark:hover:border-amber-400/60 transition-all hover:shadow-md group active:scale-[0.98]" onClick={() => setActiveView('pastoral')}>
+          <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 block uppercase tracking-wider flex items-center justify-between">
             <span>Irregulares</span>
-            <AlertTriangle className="w-3.5 h-3.5" />
+            <AlertTriangle className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
           </span>
-          <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums">{metrics.irregularCount}</span>
+          <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums block mt-1">{metrics.irregularCount}</span>
           <span className="text-[11px] text-amber-700 dark:text-amber-400/80 block mt-0.5">1 a 5 meses pendientes</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] cursor-pointer hover:border-rose-400 dark:hover:border-rose-400/60 transition" onClick={() => setActiveView('pastoral')}>
-          <span className="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 block uppercase flex items-center justify-between">
+        <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 cursor-pointer hover:border-rose-400/60 dark:hover:border-rose-400/60 transition-all hover:shadow-md group active:scale-[0.98]" onClick={() => setActiveView('pastoral')}>
+          <span className="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 block uppercase tracking-wider flex items-center justify-between">
             <span>Inactivos (6+ m)</span>
-            <HelpCircle className="w-3.5 h-3.5" />
+            <HelpCircle className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
           </span>
-          <span className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">{metrics.inactiveCount}</span>
+          <span className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums block mt-1">{metrics.inactiveCount}</span>
           <span className="text-[11px] text-rose-700 dark:text-rose-400/80 block mt-0.5">Visitas de pastoreo</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] col-span-2 sm:col-span-1">
-          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase">
+        <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 col-span-2 sm:col-span-1 transition-all hover:shadow-md">
+          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase tracking-wider">
             Horas Año Servicio
           </span>
-          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{metrics.totalServiceYearHours}</span>
+          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono tabular-nums block mt-1">{metrics.totalServiceYearHours}</span>
           <span className="text-[11px] text-indigo-700 dark:text-indigo-400/80 block mt-0.5">
             <span className="font-mono tabular-nums">{metrics.regularPioneersCount}</span> precursores regulares
           </span>
@@ -531,15 +531,15 @@ export const TarjetasS21Tab: React.FC = () => {
       {activeView === 'fichero' && (
         <div className="space-y-4 no-print">
           {/* Filters Bar */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Buscar por nombre, teléfono o privilegio..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-[#18181F] focus:bg-white dark:focus:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#71717A] rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium"
+                className="w-full pl-10 pr-3 py-2 text-xs bg-zinc-100/70 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-800 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-medium"
               />
             </div>
 
@@ -548,7 +548,7 @@ export const TarjetasS21Tab: React.FC = () => {
               <select
                 value={selectedGroup}
                 onChange={(e) => setSelectedGroup(e.target.value === 'todos' ? 'todos' : Number(e.target.value))}
-                className="px-2.5 py-1.5 text-xs bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl font-bold text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
+                className="px-3 py-2 text-xs bg-zinc-100/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-xl font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer"
               >
                 <option value="todos" className="bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5]">Todos los Grupos</option>
                 {preachingGroups.map((g) => (
@@ -560,20 +560,20 @@ export const TarjetasS21Tab: React.FC = () => {
 
               <button
                 onClick={() => setStatusFilter('todos')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
                   statusFilter === 'todos'
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
+                    : 'bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 Todos
               </button>
               <button
                 onClick={() => setStatusFilter('activos')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
                   statusFilter === 'activos'
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
+                    : 'bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
@@ -582,10 +582,10 @@ export const TarjetasS21Tab: React.FC = () => {
               </button>
               <button
                 onClick={() => setStatusFilter('irregulares')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
                   statusFilter === 'irregulares'
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
+                    : 'bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
@@ -594,10 +594,10 @@ export const TarjetasS21Tab: React.FC = () => {
               </button>
               <button
                 onClick={() => setStatusFilter('inactivos')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
                   statusFilter === 'inactivos'
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
+                    : 'bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
@@ -606,10 +606,10 @@ export const TarjetasS21Tab: React.FC = () => {
               </button>
               <button
                 onClick={() => setStatusFilter('precursores')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 ${
                   statusFilter === 'precursores'
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
+                    : 'bg-zinc-100/80 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10'
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
@@ -620,7 +620,7 @@ export const TarjetasS21Tab: React.FC = () => {
           </div>
 
           {/* Publisher S-21 Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPublishers.map((pub) => {
               const card = buildS21CardForPublisher(pub, selectedServiceYear, monthlyReports);
               const status = determinePublisherStatus(pub, monthlyReports);
@@ -630,11 +630,11 @@ export const TarjetasS21Tab: React.FC = () => {
                 <div
                   key={pub.id}
                   onClick={() => handleSelectPublisher(pub.id)}
-                  className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-500/50 transition cursor-pointer space-y-3 group"
+                  className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 transition-all cursor-pointer space-y-3.5 group"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition flex items-center gap-1.5">
+                      <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition flex items-center gap-1.5">
                         <span>{pub.name}</span>
                         {isPioneer && (
                           <span title="Precursor Regular">
@@ -642,19 +642,19 @@ export const TarjetasS21Tab: React.FC = () => {
                           </span>
                         )}
                       </h3>
-                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] capitalize">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 capitalize mt-0.5">
                         {pub.gender === 'hermano' ? 'Hermano' : 'Hermana'} • Grupo {pub.groupNumber || 'Sin grupo'}
                         {pub.privilege ? ` • ${pub.privilege.replace('_', ' ')}` : ''}
                       </p>
                     </div>
 
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${
                         status.status === 'activo'
-                          ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400'
+                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
                           : status.status === 'irregular'
-                          ? 'bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-400'
-                          : 'bg-rose-100 dark:bg-rose-500/15 text-rose-800 dark:text-rose-400'
+                          ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20'
+                          : 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/20'
                       }`}
                     >
                       {status.status === 'activo' ? 'Al día' : status.status === 'irregular' ? 'Irregular' : 'Inactivo'}
@@ -662,23 +662,23 @@ export const TarjetasS21Tab: React.FC = () => {
                   </div>
 
                   {/* 12 Months Miniature Strip */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium font-mono tabular-nums">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 font-semibold font-mono tabular-nums">
                       <span>Año {selectedServiceYear}</span>
                       <span>{card.totalMonthsActive}/12 meses informados</span>
                     </div>
-                    <div className="grid grid-cols-12 gap-0.5 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-lg border border-zinc-200/50 dark:border-[#27272A]">
+                    <div className="grid grid-cols-12 gap-1 bg-zinc-100/80 dark:bg-white/5 p-1.5 rounded-xl border border-zinc-200/60 dark:border-white/10">
                       {card.months.map((m) => (
                         <div
                           key={m.monthKey}
-                          className={`h-4 rounded-xs text-[8px] flex items-center justify-center font-bold transition ${
+                          className={`h-5 rounded-md text-[8.5px] flex items-center justify-center font-bold transition-all ${
                             m.participated
                               ? m.isAuxiliaryPioneer
-                                ? 'bg-indigo-500 text-white'
-                                : 'bg-emerald-500 text-white'
+                                ? 'bg-indigo-600 text-white shadow-xs'
+                                : 'bg-emerald-500 text-white shadow-xs'
                               : m.hasReport
                               ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
-                              : 'bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-400 dark:text-zinc-500'
+                              : 'bg-white dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 text-zinc-400 dark:text-zinc-500'
                           }`}
                           title={`${m.monthName}: ${m.participated ? (m.hours ? `${m.hours} hrs` : 'Participó') : 'Pendiente'}`}
                         >
@@ -689,18 +689,18 @@ export const TarjetasS21Tab: React.FC = () => {
                   </div>
 
                   {/* Summary Footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-[#27272A] text-xs">
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-200/60 dark:border-white/10 text-xs">
                     <div className="flex items-center gap-3">
                       <div>
-                        <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block">Horas</span>
-                        <span className="font-extrabold text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{card.totalHours || '—'}</span>
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block">Horas</span>
+                        <span className="font-extrabold text-zinc-800 dark:text-white font-mono tabular-nums">{card.totalHours || '—'}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block">Estudios</span>
-                        <span className="font-extrabold text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums">{card.totalBibleStudies}</span>
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block">Estudios</span>
+                        <span className="font-extrabold text-zinc-800 dark:text-white font-mono tabular-nums">{card.totalBibleStudies}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block">Prom. Hrs</span>
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block">Prom. Hrs</span>
                         <span className="font-extrabold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{card.avgHoursPerMonth || '—'}</span>
                       </div>
                     </div>
@@ -712,18 +712,18 @@ export const TarjetasS21Tab: React.FC = () => {
                           e.stopPropagation();
                           handleDownloadOfficialS21ForPublisher(pub);
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-[11px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
                         title="Rellenar y descargar el PDF oficial S-21 cargado"
                       >
                         <Download className="w-3 h-3" />
-                        <span>PDF S-21 Oficial</span>
+                        <span>PDF S-21</span>
                       </button>
 
                       <button
                         type="button"
-                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 flex items-center gap-1"
+                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 flex items-center gap-1 transition-transform group-hover:translate-x-0.5"
                       >
-                        <span>Ver Registro</span>
+                        <span>Ver Ficha</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -742,26 +742,27 @@ export const TarjetasS21Tab: React.FC = () => {
       {activeView === 'tarjeta' && currentPublisher && currentS21Card && (
         <div className="space-y-6">
           {/* Card Action Header */}
+          {/* Card Action Header */}
           <div className="flex items-center justify-between flex-wrap gap-3 no-print">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setActiveView('fichero')}
-                className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer active:scale-95 shrink-0"
+                className="p-2 -ml-1 rounded-2xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-white/10 transition-all cursor-pointer active:scale-90 shrink-0"
                 title="Volver al Fichero"
                 aria-label="Volver al Fichero"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <h2 className="text-base font-bold text-zinc-800 dark:text-[#F4F4F5]">
-                Registro de {currentPublisher.name} <span className="font-mono tabular-nums">({selectedServiceYear})</span>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-white">
+                Registro de {currentPublisher.name} <span className="font-mono tabular-nums text-zinc-400">({selectedServiceYear})</span>
               </h2>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={handleOpenEditPersonal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/70 dark:bg-white/5 hover:bg-zinc-200/80 dark:hover:bg-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-200 transition-all cursor-pointer active:scale-95"
               >
                 <Edit2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Editar Datos Personales S-21</span>
@@ -769,7 +770,7 @@ export const TarjetasS21Tab: React.FC = () => {
 
               <button
                 onClick={() => setActiveView('formato_local')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20 active:scale-95 cursor-pointer"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Cargar / Previsualizar S-21 Oficial</span>
@@ -777,10 +778,10 @@ export const TarjetasS21Tab: React.FC = () => {
 
               <button
                 onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-900 dark:bg-[#27272A] hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-xs font-bold transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-zinc-900 dark:bg-white/10 hover:bg-zinc-800 dark:hover:bg-white/15 text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Rellenar y Descargar S-21 Oficial (PDF)</span>
+                <span>Descargar S-21 Oficial (PDF)</span>
               </button>
             </div>
           </div>
@@ -788,50 +789,50 @@ export const TarjetasS21Tab: React.FC = () => {
           {/* ========================================================== */}
           {/* TARJETA DE CONSULTA INTERNA DEL HISTORIAL DE INFORMES       */}
           {/* ========================================================== */}
-          <div className="bg-white dark:bg-[#121216] border-2 border-zinc-800 dark:border-[#27272A] p-6 sm:p-8 rounded-2xl max-w-4xl mx-auto space-y-6 print:bg-white print:border print:shadow-none print:m-0 print:p-4">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 p-6 sm:p-8 rounded-3xl max-w-4xl mx-auto space-y-6 shadow-xl print:bg-white print:border print:shadow-none print:m-0 print:p-4">
             {/* Header */}
-            <div className="border-b-2 border-zinc-800 dark:border-[#27272A] pb-4 text-center space-y-1">
-              <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-[#A1A1AA] font-bold block print:text-zinc-500">
+            <div className="border-b border-zinc-200/80 dark:border-white/10 pb-4 text-center space-y-1.5">
+              <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-bold block print:text-zinc-500">
                 Vista de Consulta Interna • Para exportar usa el formato oficial S-21 PDF cargado
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] tracking-wider uppercase font-serif print:text-black">
+              <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-wider uppercase font-serif print:text-black">
                 REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
               </h2>
-              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] pt-1 print:text-zinc-700">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-semibold text-zinc-700 dark:text-zinc-400 pt-1 print:text-zinc-700">
                 <span>Congregación: <strong>{settings.congregationName}</strong></span>
                 <span className="hidden sm:inline">•</span>
                 <span>Año de Servicio: <strong className="font-mono tabular-nums">{selectedServiceYear}</strong></span>
                 <span className="hidden sm:inline">•</span>
-                <span className="font-mono bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] px-2 py-0.5 rounded text-[11px] font-bold border border-zinc-200/50 dark:border-[#27272A] print:border-zinc-300">S-21</span>
+                <span className="font-mono bg-zinc-100/80 dark:bg-white/5 text-zinc-800 dark:text-zinc-200 px-2 py-0.5 rounded-lg text-[11px] font-bold border border-zinc-200/80 dark:border-white/10 print:border-zinc-300">S-21</span>
               </div>
             </div>
 
             {/* Biographical & Theocratic Information (Front of S-21) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-zinc-50/70 dark:bg-[#18181F]/70 border border-zinc-300 dark:border-[#27272A] rounded-xl text-xs print:bg-zinc-50 print:border-zinc-300">
+            <div className="kg-card-bento kg-sheen-top grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5 border border-zinc-200/80 dark:border-white/10 rounded-2xl text-xs print:bg-zinc-50 print:border-zinc-300">
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Nombre del Publicador:</span>
-                <p className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm print:text-black">{currentPublisher.name}</p>
-                <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA] print:text-zinc-600">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Nombre del Publicador:</span>
+                <p className="font-bold text-zinc-900 dark:text-white text-sm print:text-black">{currentPublisher.name}</p>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 print:text-zinc-600">
                   {currentPublisher.gender === 'hermano' ? 'Varón (Hermano)' : 'Mujer (Hermana)'}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Fechas Clave:</span>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] print:text-black">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Fechas Clave:</span>
+                <p className="text-zinc-800 dark:text-zinc-200 print:text-black">
                   Nacimiento: <strong className="font-mono tabular-nums">{currentPublisher.birthDate || 'No registrada'}</strong>
                 </p>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] print:text-black">
+                <p className="text-zinc-800 dark:text-zinc-200 print:text-black">
                   Bautismo: <strong className="font-mono tabular-nums">{currentPublisher.baptismDate || 'No registrada'}</strong>
                 </p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Condición Teocrática:</span>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] font-medium print:text-black">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Condición Teocrática:</span>
+                <p className="text-zinc-800 dark:text-zinc-200 font-medium print:text-black">
                   Esperanza: <strong>{currentPublisher.hope === 'ungido' ? 'Ungido' : 'Otras ovejas'}</strong>
                 </p>
-                <p className="text-indigo-700 dark:text-indigo-400 font-bold capitalize print:text-indigo-900">
+                <p className="text-indigo-600 dark:text-indigo-400 font-bold capitalize print:text-indigo-900">
                   {currentPublisher.privilege
                     ? currentPublisher.privilege.replace('_', ' ')
                     : 'Publicador de las buenas noticias'}
@@ -839,8 +840,8 @@ export const TarjetasS21Tab: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Grupo de Servicio:</span>
-                <p className="font-bold text-zinc-800 dark:text-[#E4E4E7] print:text-black">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Grupo de Servicio:</span>
+                <p className="font-bold text-zinc-800 dark:text-zinc-200 print:text-black">
                   Grupo {currentPublisher.groupNumber || 'Sin grupo'}
                   {currentPublisher.groupNumber && preachingGroups.find(g => g.number === currentPublisher.groupNumber)
                     ? ` (${preachingGroups.find(g => g.number === currentPublisher.groupNumber)?.name})`
@@ -849,52 +850,52 @@ export const TarjetasS21Tab: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Dirección & Teléfono:</span>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] truncate print:text-black">{currentPublisher.address || 'Sin dirección guardada'}</p>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] font-mono tabular-nums print:text-black">{currentPublisher.phone || 'Sin teléfono'}</p>
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Dirección & Teléfono:</span>
+                <p className="text-zinc-800 dark:text-zinc-200 truncate print:text-black">{currentPublisher.address || 'Sin dirección guardada'}</p>
+                <p className="text-zinc-800 dark:text-zinc-200 font-mono tabular-nums print:text-black">{currentPublisher.phone || 'Sin teléfono'}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] block">Contacto de Emergencia:</span>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] print:text-black">{currentPublisher.emergencyContactName || 'No indicado'}</p>
-                <p className="text-zinc-800 dark:text-[#E4E4E7] font-mono tabular-nums text-[11px] print:text-black">{currentPublisher.emergencyContactPhone || '—'}</p>
+                <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-400 block tracking-wider">Contacto de Emergencia:</span>
+                <p className="text-zinc-800 dark:text-zinc-200 print:text-black">{currentPublisher.emergencyContactName || 'No indicado'}</p>
+                <p className="text-zinc-800 dark:text-zinc-200 font-mono tabular-nums text-[11px] print:text-black">{currentPublisher.emergencyContactPhone || '—'}</p>
               </div>
             </div>
 
             {/* Official 12-Month Service Table */}
-            <div className="border border-zinc-800 dark:border-[#27272A] rounded-xl overflow-x-auto print:border-zinc-800">
+            <div className="border border-zinc-200/80 dark:border-white/10 rounded-2xl overflow-x-auto shadow-sm print:border-zinc-800">
               <table className="w-full min-w-[540px] text-xs text-left border-collapse">
                 <thead>
-                  <tr className="bg-zinc-800 dark:bg-[#18181F] text-white dark:text-[#F4F4F5] uppercase text-[10px] tracking-wider border-b border-zinc-700 dark:border-[#27272A] print:bg-zinc-800 print:text-white">
-                    <th className="p-2.5 border-r border-zinc-700 dark:border-[#27272A] w-32 font-bold print:border-zinc-700">Mes</th>
-                    <th className="p-2.5 border-r border-zinc-700 dark:border-[#27272A] w-28 text-center font-bold print:border-zinc-700">
+                  <tr className="bg-zinc-100/90 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 uppercase text-[10px] tracking-wider border-b border-zinc-200/80 dark:border-white/10 print:bg-zinc-800 print:text-white">
+                    <th className="p-3 border-r border-zinc-200/60 dark:border-white/10 w-32 font-bold print:border-zinc-700">Mes</th>
+                    <th className="p-3 border-r border-zinc-200/60 dark:border-white/10 w-28 text-center font-bold print:border-zinc-700">
                       ¿Participó en el ministerio?
                     </th>
-                    <th className="p-2.5 border-r border-zinc-700 dark:border-[#27272A] w-28 text-center font-bold print:border-zinc-700">
+                    <th className="p-3 border-r border-zinc-200/60 dark:border-white/10 w-28 text-center font-bold print:border-zinc-700">
                       Cursos Bíblicos
                     </th>
-                    <th className="p-2.5 border-r border-zinc-700 dark:border-[#27272A] w-24 text-center font-bold print:border-zinc-700">
+                    <th className="p-3 border-r border-zinc-200/60 dark:border-white/10 w-24 text-center font-bold print:border-zinc-700">
                       Horas
                     </th>
-                    <th className="p-2.5 font-bold">Notas / Observaciones (Precursor auxiliar, etc.)</th>
-                    <th className="p-2.5 text-right w-16 no-print">Acción</th>
+                    <th className="p-3 font-bold">Notas / Observaciones (Precursor auxiliar, etc.)</th>
+                    <th className="p-3 text-right w-16 no-print">Acción</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-300 dark:divide-[#27272A] print:divide-zinc-300">
+                <tbody className="divide-y divide-zinc-200/60 dark:divide-white/10 print:divide-zinc-300">
                   {currentS21Card.months.map((m, index) => (
                     <tr
                       key={m.monthKey}
-                      className={`hover:bg-indigo-50/40 dark:hover:bg-[#18181F]/70 transition ${
-                        index % 2 === 0 ? 'bg-white dark:bg-[#121216]' : 'bg-zinc-50/50 dark:bg-[#18181F]/30'
+                      className={`hover:bg-indigo-50/40 dark:hover:bg-white/5 transition-colors ${
+                        index % 2 === 0 ? 'bg-transparent' : 'bg-zinc-50/50 dark:bg-white/[0.02]'
                       } print:bg-white`}
                     >
-                      <td className="p-2.5 border-r border-zinc-300 dark:border-[#27272A] font-bold text-zinc-800 dark:text-[#F4F4F5] print:border-zinc-300 print:text-black">
+                      <td className="p-3 border-r border-zinc-200/60 dark:border-white/10 font-bold text-zinc-900 dark:text-white print:border-zinc-300 print:text-black">
                         {m.monthName}
                       </td>
 
-                      <td className="p-2.5 border-r border-zinc-300 dark:border-[#27272A] text-center print:border-zinc-300">
+                      <td className="p-3 border-r border-zinc-200/60 dark:border-white/10 text-center print:border-zinc-300">
                         {m.participated ? (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold print:bg-emerald-100 print:text-emerald-800">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold print:bg-emerald-100 print:text-emerald-800">
                             ✓
                           </span>
                         ) : m.hasReport ? (
@@ -904,18 +905,18 @@ export const TarjetasS21Tab: React.FC = () => {
                         )}
                       </td>
 
-                      <td className="p-2.5 border-r border-zinc-300 dark:border-[#27272A] text-center font-bold text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums print:border-zinc-300 print:text-black">
+                      <td className="p-3 border-r border-zinc-200/60 dark:border-white/10 text-center font-bold text-zinc-800 dark:text-zinc-200 font-mono tabular-nums print:border-zinc-300 print:text-black">
                         {m.participated ? m.bibleStudies : '—'}
                       </td>
 
-                      <td className="p-2.5 border-r border-zinc-300 dark:border-[#27272A] text-center font-bold text-indigo-700 dark:text-indigo-400 font-mono tabular-nums print:border-zinc-300 print:text-indigo-800">
+                      <td className="p-3 border-r border-zinc-200/60 dark:border-white/10 text-center font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums print:border-zinc-300 print:text-indigo-800">
                         {m.hours !== undefined && m.hours !== null ? m.hours : '—'}
                       </td>
 
-                      <td className="p-2.5 border-r border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#A1A1AA] print:border-zinc-300 print:text-black">
+                      <td className="p-3 border-r border-zinc-200/60 dark:border-white/10 text-zinc-700 dark:text-zinc-300 print:border-zinc-300 print:text-black">
                         <div className="flex items-center gap-2">
                           {m.isAuxiliaryPioneer && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 dark:bg-indigo-500/20 text-indigo-800 dark:text-indigo-400 print:bg-indigo-100 print:text-indigo-800">
+                            <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20 print:bg-indigo-100 print:text-indigo-800">
                               Precursor Auxiliar
                             </span>
                           )}
@@ -923,7 +924,7 @@ export const TarjetasS21Tab: React.FC = () => {
                         </div>
                       </td>
 
-                      <td className="p-2.5 text-right no-print">
+                      <td className="p-3 text-right no-print">
                         <button
                           onClick={() => {
                             setEditingMonth({
@@ -937,7 +938,7 @@ export const TarjetasS21Tab: React.FC = () => {
                               notes: m.notes,
                             });
                           }}
-                          className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                          className="p-1.5 rounded-xl hover:bg-zinc-200/80 dark:hover:bg-white/10 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-90"
                           title={`Editar informe de ${m.monthName}`}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -949,22 +950,22 @@ export const TarjetasS21Tab: React.FC = () => {
 
                 {/* S-21 Totals / Averages Row */}
                 <tfoot>
-                  <tr className="bg-zinc-100 dark:bg-[#18181F] font-extrabold text-zinc-900 dark:text-[#F4F4F5] border-t-2 border-zinc-800 dark:border-[#27272A] print:bg-zinc-100 print:border-zinc-800 print:text-black">
-                    <td className="p-3 border-r border-zinc-300 dark:border-[#27272A] uppercase tracking-wider print:border-zinc-300">
+                  <tr className="bg-zinc-100/90 dark:bg-white/5 font-extrabold text-zinc-900 dark:text-white border-t-2 border-zinc-200/80 dark:border-white/10 print:bg-zinc-100 print:border-zinc-800 print:text-black">
+                    <td className="p-3.5 border-r border-zinc-200/60 dark:border-white/10 uppercase tracking-wider print:border-zinc-300">
                       TOTALES DEL AÑO
                     </td>
-                    <td className="p-3 border-r border-zinc-300 dark:border-[#27272A] text-center text-emerald-700 dark:text-emerald-400 font-mono tabular-nums print:border-zinc-300 print:text-emerald-800">
+                    <td className="p-3.5 border-r border-zinc-200/60 dark:border-white/10 text-center text-emerald-600 dark:text-emerald-400 font-mono tabular-nums print:border-zinc-300 print:text-emerald-800">
                       {currentS21Card.totalMonthsActive} / 12 meses
                     </td>
-                    <td className="p-3 border-r border-zinc-300 dark:border-[#27272A] text-center text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums print:border-zinc-300 print:text-black">
+                    <td className="p-3.5 border-r border-zinc-200/60 dark:border-white/10 text-center text-zinc-900 dark:text-white font-mono tabular-nums print:border-zinc-300 print:text-black">
                       {currentS21Card.totalBibleStudies} (Prom: {currentS21Card.avgStudiesPerMonth})
                     </td>
-                    <td className="p-3 border-r border-zinc-300 dark:border-[#27272A] text-center text-indigo-700 dark:text-indigo-400 text-sm font-mono tabular-nums print:border-zinc-300 print:text-indigo-800">
+                    <td className="p-3.5 border-r border-zinc-200/60 dark:border-white/10 text-center text-indigo-600 dark:text-indigo-400 text-sm font-mono tabular-nums print:border-zinc-300 print:text-indigo-800">
                       {currentS21Card.totalHours} hrs (Prom: {currentS21Card.avgHoursPerMonth})
                     </td>
-                    <td colSpan={2} className="p-3 text-zinc-600 dark:text-[#A1A1AA] text-[11px] font-normal italic print:text-zinc-600">
+                    <td colSpan={2} className="p-3.5 text-zinc-600 dark:text-zinc-400 text-[11px] font-normal italic print:text-zinc-600">
                       {currentPublisher.privilege === 'precursor_regular' || currentPublisher.pioneerStatus === 'regular' ? (
-                        <span className="font-semibold text-indigo-900 dark:text-indigo-400">
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                           Precursor regular: {currentS21Card.totalHours}/600 hrs anuales ({Math.round((currentS21Card.totalHours / 600) * 100)}%)
                         </span>
                       ) : (
@@ -977,14 +978,14 @@ export const TarjetasS21Tab: React.FC = () => {
             </div>
 
             {/* Bottom Official Signatures Block (For Circuit Overseer & Secretary) */}
-            <div className="pt-4 border-t border-zinc-300 dark:border-[#27272A] grid grid-cols-2 gap-8 text-center text-xs print:border-zinc-300">
-              <div className="border-t border-zinc-400 dark:border-[#27272A] pt-2 space-y-0.5 print:border-zinc-400">
-                <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block print:text-zinc-400">Firma del Secretario</span>
-                <p className="font-semibold text-zinc-700 dark:text-[#F4F4F5] print:text-black">Secretario de la Congregación</p>
+            <div className="pt-4 border-t border-zinc-200/60 dark:border-white/10 grid grid-cols-2 gap-8 text-center text-xs print:border-zinc-300">
+              <div className="border-t border-zinc-300 dark:border-white/20 pt-2 space-y-0.5 print:border-zinc-400">
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block print:text-zinc-400">Firma del Secretario</span>
+                <p className="font-semibold text-zinc-700 dark:text-zinc-300 print:text-black">Secretario de la Congregación</p>
               </div>
-              <div className="border-t border-zinc-400 dark:border-[#27272A] pt-2 space-y-0.5 print:border-zinc-400">
-                <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block print:text-zinc-400">Revisión Semestral</span>
-                <p className="font-semibold text-zinc-700 dark:text-[#F4F4F5] print:text-black">Superintendente de Circuito</p>
+              <div className="border-t border-zinc-300 dark:border-white/20 pt-2 space-y-0.5 print:border-zinc-400">
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block print:text-zinc-400">Revisión Semestral</span>
+                <p className="font-semibold text-zinc-700 dark:text-zinc-300 print:text-black">Superintendente de Circuito</p>
               </div>
             </div>
           </div>
@@ -997,46 +998,46 @@ export const TarjetasS21Tab: React.FC = () => {
       {/* ============================================================== */}
       {activeView === 'pastoral' && (
         <div className="space-y-6 no-print">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-2xl space-y-1 shadow-xs">
-            <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm flex items-center gap-2">
-              <AlertTriangle className="w-4.5 h-4.5 text-amber-500" />
+          <div className="kg-glass-surface kg-sheen-top border border-amber-500/30 dark:border-amber-500/20 bg-amber-500/10 dark:bg-amber-500/5 p-4 sm:p-5 rounded-3xl space-y-1.5 shadow-sm text-amber-900 dark:text-amber-200">
+            <h3 className="font-bold text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
               <span>Atención Pastoral de la Congregación (Pautas Oficiales)</span>
             </h3>
-            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] leading-relaxed">
+            <p className="text-xs text-amber-800/80 dark:text-amber-300/80 leading-relaxed">
               Según las pautas del libro <em>Organizados para hacer la voluntad de Jehová</em>, los ancianos y siervos ministeriales se interesan con cariño por los publicadores que no han informado para brindarles ayuda espiritual oportuna antes de que se vuelvan inactivos (6 meses consecutivos sin predicar).
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Irregular Section */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+            <div className="kg-card-bento kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span>Publicadores Irregulares <span className="font-mono tabular-nums">({metrics.irregularCount})</span></span>
+                <h3 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/30" />
+                  <span>Publicadores Irregulares <span className="font-mono tabular-nums text-zinc-400">({metrics.irregularCount})</span></span>
                 </h3>
-                <span className="text-xs bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] px-2.5 py-0.5 rounded-md font-semibold inline-flex items-center gap-1.5">
+                <span className="text-xs bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25 px-3 py-1 rounded-full font-bold inline-flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   1 a 5 meses pendientes
                 </span>
               </div>
 
               {metrics.irregularPublishers.length === 0 ? (
-                <div className="text-center py-6 text-zinc-400 dark:text-[#A1A1AA] text-xs">
+                <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                  <p>¡Excelente! No hay publicadores irregulares en este período.</p>
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">¡Excelente! No hay publicadores irregulares en este período.</p>
                 </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {metrics.irregularPublishers.map(({ publisher, missingMonths, lastMonth }) => (
                     <div
                       key={publisher.id}
-                      className="p-3 bg-zinc-50/80 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs shadow-2xs"
+                      className="p-3.5 bg-zinc-100/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs hover:border-amber-400/40 transition-colors"
                     >
                       <div>
-                        <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{publisher.name}</h4>
-                        <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px]">
-                          Grupo {publisher.groupNumber || 'Sin grupo'} • Faltan <span className="font-mono tabular-nums">{missingMonths}</span> meses por informar
+                        <h4 className="font-bold text-zinc-900 dark:text-white">{publisher.name}</h4>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
+                          Grupo {publisher.groupNumber || 'Sin grupo'} • Faltan <span className="font-mono tabular-nums font-bold text-amber-600 dark:text-amber-400">{missingMonths}</span> meses por informar
                           {lastMonth ? ` (Último: ${lastMonth})` : ''}
                         </p>
                       </div>
@@ -1044,7 +1045,7 @@ export const TarjetasS21Tab: React.FC = () => {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleSendPastoralWhatsApp(publisher, missingMonths)}
-                          className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
                           title="Enviar mensaje pastoral por WhatsApp"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
@@ -1052,7 +1053,7 @@ export const TarjetasS21Tab: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleSelectPublisher(publisher.id)}
-                          className="px-2.5 py-1.5 bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] rounded-lg font-bold text-xs transition cursor-pointer"
+                          className="px-3 py-1.5 bg-white dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 rounded-xl font-bold text-xs transition-all active:scale-95 cursor-pointer"
                         >
                           Ver S-21
                         </button>
@@ -1064,41 +1065,41 @@ export const TarjetasS21Tab: React.FC = () => {
             </div>
 
             {/* Inactive Section */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+            <div className="kg-card-bento kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span>Publicadores Inactivos <span className="font-mono tabular-nums">({metrics.inactiveCount})</span></span>
+                <h3 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/30" />
+                  <span>Publicadores Inactivos <span className="font-mono tabular-nums text-zinc-400">({metrics.inactiveCount})</span></span>
                 </h3>
-                <span className="text-xs bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] px-2.5 py-0.5 rounded-md font-semibold inline-flex items-center gap-1.5">
+                <span className="text-xs bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/25 px-3 py-1 rounded-full font-bold inline-flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                   6+ meses sin predicar
                 </span>
               </div>
 
               {metrics.inactivePublishers.length === 0 ? (
-                <div className="text-center py-6 text-zinc-400 dark:text-[#A1A1AA] text-xs">
+                <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                  <p>No hay publicadores clasificados como inactivos.</p>
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">No hay publicadores clasificados como inactivos.</p>
                 </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {metrics.inactivePublishers.map(({ publisher, missingMonths }) => (
                     <div
                       key={publisher.id}
-                      className="p-3 bg-zinc-50/80 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs shadow-2xs"
+                      className="p-3.5 bg-zinc-100/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs hover:border-rose-400/40 transition-colors"
                     >
                       <div>
-                        <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{publisher.name}</h4>
-                        <p className="text-zinc-500 dark:text-[#A1A1AA] text-[11px]">
-                          Grupo {publisher.groupNumber || 'Sin grupo'} • <span className="font-mono tabular-nums">{missingMonths}</span> meses sin actividad registrada
+                        <h4 className="font-bold text-zinc-900 dark:text-white">{publisher.name}</h4>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
+                          Grupo {publisher.groupNumber || 'Sin grupo'} • <span className="font-mono tabular-nums font-bold text-rose-600 dark:text-rose-400">{missingMonths}</span> meses sin actividad registrada
                         </p>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           onClick={() => handleSendPastoralWhatsApp(publisher, missingMonths)}
-                          className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
                           title="Enviar saludo pastoral por WhatsApp"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
@@ -1106,7 +1107,7 @@ export const TarjetasS21Tab: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleSelectPublisher(publisher.id)}
-                          className="px-2.5 py-1.5 bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] rounded-lg font-bold text-xs transition cursor-pointer"
+                          className="px-3 py-1.5 bg-white dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 rounded-xl font-bold text-xs transition-all active:scale-95 cursor-pointer"
                         >
                           Ver S-21
                         </button>
@@ -1351,61 +1352,61 @@ export const TarjetasS21Tab: React.FC = () => {
       {/* VIEW 3.5: AUDITORÍA DE PRECURSORES REGULARES (600H) Y AUX.     */}
       {/* ============================================================== */}
       {activeView === 'auditoria_precursores' && (
-        <div className="space-y-5 no-print">
+        <div className="space-y-6 no-print">
           {/* Summary Banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A]">
-              <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase block">Precursores Regulares</span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{pioneerAudit.summary.totalRegularPioneers}</span>
-              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">Meta: 600 h anuales (50 h/mes)</span>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Precursores Regulares</span>
+              <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono tabular-nums block mt-1">{pioneerAudit.summary.totalRegularPioneers}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-0.5">Meta: 600 h anuales (50 h/mes)</span>
             </div>
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
-              <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
                 <span>En Meta Pro-Rata</span>
               </span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{pioneerAudit.summary.onTrackCount}</span>
-              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">Ritmo saludable (≥ 50 h/mes)</span>
+              <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono tabular-nums block mt-1">{pioneerAudit.summary.onTrackCount}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-0.5">Ritmo saludable (≥ 50 h/mes)</span>
             </div>
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
-              <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500 ring-2 ring-amber-500/30" />
                 <span>En Observación / Déficit</span>
               </span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+              <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono tabular-nums block mt-1">
                 {pioneerAudit.summary.warningCount + pioneerAudit.summary.behindCount}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">
-                <span className="font-mono tabular-nums">{pioneerAudit.summary.warningCount}</span> observación • <span className="font-mono tabular-nums">{pioneerAudit.summary.behindCount}</span> rezagados
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-0.5">
+                <span className="font-mono tabular-nums font-bold text-amber-600 dark:text-amber-400">{pioneerAudit.summary.warningCount}</span> obs. • <span className="font-mono tabular-nums font-bold text-rose-600 dark:text-rose-400">{pioneerAudit.summary.behindCount}</span> rezagados
               </span>
             </div>
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
-              <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-indigo-500" />
+            <div className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 ring-2 ring-indigo-500/30" />
                 <span>Promedio Mensual</span>
               </span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{pioneerAudit.summary.avgRegularPioneerMonthlyHours} h</span>
-              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] block mt-0.5">
-                <span className="font-mono tabular-nums">{pioneerAudit.summary.combinedPioneerHours}</span> h acumuladas en <span className="font-mono tabular-nums">{selectedServiceYear}</span>
+              <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono tabular-nums block mt-1">{pioneerAudit.summary.avgRegularPioneerMonthlyHours} h</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-0.5">
+                <span className="font-mono tabular-nums font-bold text-indigo-600 dark:text-indigo-400">{pioneerAudit.summary.combinedPioneerHours}</span> h en <span className="font-mono tabular-nums">{selectedServiceYear}</span>
               </span>
             </div>
           </div>
 
           {/* Regular Pioneers Table */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
-            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 overflow-hidden shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm flex items-center gap-2">
+                <h3 className="font-bold text-zinc-900 dark:text-white text-sm flex items-center gap-2">
                   <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>Control Anual de Horas de Precursores Regulares y Especiales <span className="font-mono tabular-nums">({selectedServiceYear})</span></span>
+                  <span>Control Anual de Horas de Precursores Regulares y Especiales <span className="font-mono tabular-nums text-zinc-400">({selectedServiceYear})</span></span>
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Seguimiento del requisito anual de 600 horas (50 h mensuales promedio) más horas de crédito teocrático para la revisión del Comité de Servicio y visita del Superintendente de Circuito.
                 </p>
               </div>
               <button
                 onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 dark:hover:bg-[#27272A] text-white border border-transparent dark:border-[#27272A] rounded-xl text-xs font-bold shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold shrink-0 transition-all shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Imprimir Auditoría A4</span>
@@ -1414,7 +1415,7 @@ export const TarjetasS21Tab: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] uppercase text-[10px] font-bold border-b border-zinc-200 dark:border-[#27272A]">
+                <thead className="bg-zinc-100/90 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 uppercase text-[10px] font-bold border-b border-zinc-200/80 dark:border-white/10">
                   <tr>
                     <th className="py-3 px-4">Precursor</th>
                     <th className="py-3 px-3 text-center">Grupo</th>
@@ -1430,10 +1431,10 @@ export const TarjetasS21Tab: React.FC = () => {
                     <th className="py-3 px-4 text-right">Acción</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+                <tbody className="divide-y divide-zinc-200/60 dark:divide-white/10">
                   {pioneerAudit.regularPioneers.length === 0 ? (
                     <tr>
-                      <td colSpan={12} className="py-8 text-center text-zinc-400 dark:text-[#A1A1AA]">
+                      <td colSpan={12} className="py-12 text-center text-zinc-400 dark:text-zinc-500 font-medium">
                         No hay precursores regulares registrados en el fichero.
                       </td>
                     </tr>
@@ -1444,10 +1445,10 @@ export const TarjetasS21Tab: React.FC = () => {
                         Math.round((row.effectiveHours / row.annualGoalHours) * 100)
                       );
                       return (
-                        <tr key={row.publisher.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/50 transition">
+                        <tr key={row.publisher.id} className="hover:bg-indigo-50/40 dark:hover:bg-white/5 transition-colors">
                           <td className="py-3 px-4">
-                            <div className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{row.publisher.name}</div>
-                            <div className="w-32 bg-zinc-100 dark:bg-[#18181F] h-1.5 rounded-full overflow-hidden mt-1 border border-zinc-200/50 dark:border-[#27272A]">
+                            <div className="font-bold text-zinc-900 dark:text-white">{row.publisher.name}</div>
+                            <div className="w-32 bg-zinc-100 dark:bg-white/10 h-1.5 rounded-full overflow-hidden mt-1 border border-zinc-200/50 dark:border-white/10">
                               <div
                                 className={`h-full rounded-full ${
                                   row.paceStatus === 'en_meta'
@@ -1460,25 +1461,25 @@ export const TarjetasS21Tab: React.FC = () => {
                               />
                             </div>
                           </td>
-                          <td className="py-3 px-3 text-center font-semibold text-zinc-600 dark:text-[#A1A1AA]">
+                          <td className="py-3 px-3 text-center font-semibold text-zinc-600 dark:text-zinc-400">
                             G-{row.publisher.groupNumber || '-'}
                           </td>
-                          <td className="py-3 px-3 text-center font-semibold text-zinc-700 dark:text-[#E4E4E7] font-mono tabular-nums">
+                          <td className="py-3 px-3 text-center font-semibold text-zinc-700 dark:text-zinc-200 font-mono tabular-nums">
                             {row.monthsReported} / 12
                           </td>
-                          <td className="py-3 px-3 text-right font-semibold text-zinc-800 dark:text-[#E4E4E7] font-mono tabular-nums">
+                          <td className="py-3 px-3 text-right font-semibold text-zinc-800 dark:text-zinc-200 font-mono tabular-nums">
                             {row.totalHours} h
                           </td>
                           <td className="py-3 px-3 text-right text-indigo-600 dark:text-indigo-400 font-semibold font-mono tabular-nums">
                             {row.totalCreditHours > 0 ? `+${row.totalCreditHours} h` : '-'}
                           </td>
-                          <td className="py-3 px-3 text-right font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+                          <td className="py-3 px-3 text-right font-black text-zinc-900 dark:text-white font-mono tabular-nums">
                             {row.effectiveHours} h
                           </td>
-                          <td className="py-3 px-3 text-right font-bold text-zinc-800 dark:text-[#E4E4E7] font-mono tabular-nums">
+                          <td className="py-3 px-3 text-right font-bold text-zinc-800 dark:text-zinc-200 font-mono tabular-nums">
                             {row.avgMonthlyHours} h
                           </td>
-                          <td className="py-3 px-3 text-right text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
+                          <td className="py-3 px-3 text-right text-zinc-500 dark:text-zinc-400 font-mono tabular-nums">
                             {row.proRataTargetHours} h
                           </td>
                           <td
@@ -1492,20 +1493,20 @@ export const TarjetasS21Tab: React.FC = () => {
                           >
                             {row.hoursDelta >= 0 ? `+${row.hoursDelta} h` : `${row.hoursDelta} h`}
                           </td>
-                          <td className="py-3 px-3 text-right text-zinc-600 dark:text-[#A1A1AA] font-medium font-mono tabular-nums">
+                          <td className="py-3 px-3 text-right text-zinc-600 dark:text-zinc-400 font-medium font-mono tabular-nums">
                             {row.remainingToAnnualGoal} h
                           </td>
                           <td className="py-3 px-3 text-center">
                             {row.paceStatus === 'en_meta' ? (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                                 En Meta
                               </span>
                             ) : row.paceStatus === 'atencion' ? (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-400">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                                 Observación
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-500/15 text-rose-800 dark:text-rose-400">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/20">
                                 Déficit
                               </span>
                             )}
@@ -1513,7 +1514,7 @@ export const TarjetasS21Tab: React.FC = () => {
                           <td className="py-3 px-4 text-right">
                             <button
                               onClick={() => handleSelectPublisher(row.publisher.id)}
-                              className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-lg font-bold text-[11px] transition cursor-pointer"
+                              className="px-3 py-1.5 bg-indigo-50 dark:bg-white/10 hover:bg-indigo-100 dark:hover:bg-white/15 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-white/10 rounded-xl font-bold text-[11px] transition-all active:scale-95 cursor-pointer"
                             >
                               Abrir S-21
                             </button>
@@ -1529,38 +1530,38 @@ export const TarjetasS21Tab: React.FC = () => {
 
           {/* Auxiliary Pioneers Summary */}
           {pioneerAudit.auxPioneers.length > 0 && (
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 space-y-3">
+            <div className="kg-card-bento kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-6 space-y-4 shadow-sm">
               <div>
-                <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
-                  Precursores Auxiliares en el Año de Servicio <span className="font-mono tabular-nums">({pioneerAudit.auxPioneers.length})</span>
+                <h4 className="font-bold text-zinc-900 dark:text-white text-sm">
+                  Precursores Auxiliares en el Año de Servicio <span className="font-mono tabular-nums text-zinc-400">({pioneerAudit.auxPioneers.length})</span>
                 </h4>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Publicadores que han servido como precursores auxiliares (continuos o temporales de 15h / 30h).
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 {pioneerAudit.auxPioneers.map((aux) => (
                   <div
                     key={aux.publisher.id}
                     onClick={() => handleSelectPublisher(aux.publisher.id)}
-                    className="p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/50 bg-zinc-50/60 dark:bg-[#18181F]/60 cursor-pointer flex items-center justify-between gap-2 text-xs transition"
+                    className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 hover:shadow-md bg-zinc-100/70 dark:bg-white/5 cursor-pointer flex items-center justify-between gap-3 text-xs transition-all active:scale-[0.98]"
                   >
                     <div>
-                      <div className="font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                      <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
                         <span>{aux.publisher.name}</span>
                         {aux.isContinuous && (
-                          <span className="px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold border border-indigo-500/20">
                             Continuo
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
-                        <span className="font-mono tabular-nums">{aux.monthsServed}</span> mes(es): {aux.monthsLabels.join(', ') || 'Activo'}
+                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        <span className="font-mono tabular-nums font-bold">{aux.monthsServed}</span> mes(es): {aux.monthsLabels.join(', ') || 'Activo'}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-black text-indigo-700 dark:text-indigo-400 font-mono tabular-nums">{aux.totalHours} h</div>
-                      <div className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Prom: <span className="font-mono tabular-nums">{aux.avgHours}</span> h/m</div>
+                      <div className="font-black text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{aux.totalHours} h</div>
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400">Prom: <span className="font-mono tabular-nums font-bold">{aux.avgHours}</span> h/m</div>
                     </div>
                   </div>
                 ))}

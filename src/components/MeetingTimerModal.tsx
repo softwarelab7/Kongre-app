@@ -1039,7 +1039,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
   // Sub-componente reutilizable para Lista de Programa (usado en Desktop y en pestaña Móvil)
   const renderProgramListContent = () => (
     <div className="flex-1 flex flex-col justify-between overflow-hidden p-3 sm:p-4">
-      <div className="space-y-2 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+      <div className="space-y-2.5 overflow-y-auto flex-1 pr-1 custom-scrollbar">
         {parts.map((p, idx) => {
           const isSelected = selectedPartIndex === idx;
           const rec = partRecords[p.id];
@@ -1055,31 +1055,39 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 setSelectedPartIndex(idx);
                 setMobileSection('reloj');
               }}
-              className={`w-full text-left p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer active:scale-[0.99] ${
+              className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer active:scale-[0.99] relative overflow-hidden ${
                 isSelected
-                  ? 'border-indigo-500 bg-indigo-950/70 ring-1 ring-indigo-500/80'
+                  ? 'border-indigo-500/80 bg-indigo-950/60 ring-2 ring-indigo-500/50 shadow-lg shadow-indigo-950/60'
                   : rec?.completed
-                  ? 'border-zinc-800/80 bg-zinc-950/30 text-zinc-400 hover:bg-zinc-900/60'
-                  : 'border-zinc-800/90 bg-zinc-950/60 hover:bg-zinc-900 text-zinc-200'
+                  ? 'border-white/5 bg-white/[0.02] text-zinc-400 hover:bg-white/[0.05]'
+                  : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-zinc-200'
               }`}
             >
-              <div className="flex items-start justify-between gap-2.5">
+              {/* Left indicator accent strip matching theocratic section */}
+              <div
+                className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl"
+                style={{ backgroundColor: p.sectionColor || '#6366f1' }}
+              />
+
+              <div className="flex items-start justify-between gap-3 pl-1.5">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-400">
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
                     <span
-                      className="w-2 h-2 rounded-full shrink-0"
+                      className="w-2 h-2 rounded-full shrink-0 shadow-xs"
                       style={{ backgroundColor: p.sectionColor }}
                     />
                     {win && (
-                      <span>
+                      <span className="bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
                         {win.startStr} – {win.endStr}
                       </span>
                     )}
                     <span>·</span>
-                    <span className="uppercase tracking-wider truncate">{p.sectionLabel}</span>
+                    <span className="uppercase tracking-wider font-semibold truncate">
+                      {p.sectionLabel}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 mt-1">
+                  <div className="flex items-center gap-1.5 mt-1.5">
                     {rec?.completed && (
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     )}
@@ -1097,13 +1105,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 </div>
 
                 <div className="text-right shrink-0 flex flex-col items-end">
-                  <span className="text-xs font-mono font-bold text-zinc-200">
+                  <span className="text-xs font-mono font-bold text-zinc-200 bg-white/5 px-2 py-0.5 rounded-lg border border-white/10">
                     {p.defaultMinutes} min
                   </span>
                   {realSec > 0 && (
                     <span
-                      className={`text-[10px] font-mono mt-0.5 ${
-                        isOverPart ? 'text-rose-400 font-bold' : 'text-emerald-400'
+                      className={`text-[10px] font-mono font-bold mt-1.5 px-1.5 py-0.5 rounded ${
+                        isOverPart
+                          ? 'bg-rose-950/70 border border-rose-800/80 text-rose-300'
+                          : 'bg-emerald-950/70 border border-emerald-800/80 text-emerald-300'
                       }`}
                     >
                       Real: {formatDurationMMSS(realSec)}
@@ -1120,33 +1130,44 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
   // Sub-componente reutilizable para Notas de Presidencia
   const renderNotesContent = () => (
-    <div className="flex-1 flex flex-col p-4 space-y-3 overflow-y-auto">
-      <div>
-        <h4 className="text-xs sm:text-sm font-bold text-white">
-          Apuntes del Presidente y Anuncios a la Congregación
-        </h4>
-        <p className="text-[11px] text-zinc-400">
-          Guardado automático para la semana del {currentWeek.weekStartDate}.
-        </p>
+    <div className="flex-1 flex flex-col p-4 sm:p-5 space-y-4 overflow-y-auto">
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-amber-400" />
+            <span>Apuntes del Presidente y Anuncios</span>
+          </h4>
+          <p className="text-[11px] text-zinc-400 mt-0.5">
+            Guardado automático para la semana del {currentWeek.weekStartDate}.
+          </p>
+        </div>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-950/60 border border-emerald-800/60 text-emerald-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Autoguardado
+        </span>
       </div>
 
       <textarea
         value={chairmanNotes}
         onChange={(e) => handleSaveNotes(e.target.value)}
         placeholder="Escribe aquí tus notas de introducción, puntos para enlazar partes, anuncios locales, saludos o adelanto de la próxima semana..."
-        className="flex-1 min-h-[220px] w-full rounded-2xl bg-zinc-950 border border-zinc-800 p-3.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500 resize-none leading-relaxed"
+        className="flex-1 min-h-[220px] w-full rounded-2xl bg-black/40 border border-white/10 p-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none leading-relaxed backdrop-blur-sm"
       />
 
-      <div className="p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 text-xs text-zinc-400 space-y-1">
-        <div className="font-bold text-zinc-300">Recordatorios rápidos:</div>
-        <p>
+      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-zinc-400 space-y-2">
+        <div className="font-bold text-zinc-200 flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>Recordatorios de Presidencia:</span>
+        </div>
+        <p className="leading-relaxed">
           · Lectura semanal:{' '}
           <strong className="text-indigo-300">
             {activeClmPrograma?.lectura_semana || currentWeek.midweek.bibleReading}
           </strong>
         </p>
-        <p>
-          · Consejo estudiantil: <strong className="text-amber-300">Máximo 1 minuto</strong> centrado en el folleto{' '}
+        <p className="leading-relaxed">
+          · Consejo estudiantil:{' '}
+          <strong className="text-amber-300">Máximo 1 minuto</strong> centrado en el folleto{' '}
           <em>th / lmd</em>.
         </p>
       </div>
@@ -1155,12 +1176,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
   // Sub-componente reutilizable para Resumen de Tiempos
   const renderSummaryContent = () => (
-    <div className="flex-1 flex flex-col justify-between p-4 space-y-4 overflow-y-auto">
+    <div className="flex-1 flex flex-col justify-between p-4 sm:p-5 space-y-4 overflow-y-auto">
       <div className="space-y-3 flex-1 overflow-hidden flex flex-col">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs sm:text-sm font-bold text-white">Duración Real por Intervención</h4>
-            <p className="text-[11px] text-zinc-400">
+            <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-emerald-400" />
+              <span>Duración Real por Intervención</span>
+            </h4>
+            <p className="text-[11px] text-zinc-400 mt-0.5">
               Comparativa entre tiempo asignado y tiempo real empleado.
             </p>
           </div>
@@ -1174,13 +1198,13 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               } catch {}
               showToast('Registros de tiempo reiniciados');
             }}
-            className="text-xs text-rose-400 hover:underline cursor-pointer font-semibold px-2 py-1"
+            className="text-xs text-rose-400 hover:text-rose-300 hover:underline cursor-pointer font-semibold px-2 py-1 transition-colors"
           >
             Reiniciar todo
           </button>
         </div>
 
-        <div className="space-y-2 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+        <div className="space-y-2.5 overflow-y-auto flex-1 pr-1 custom-scrollbar">
           {parts.map((p, idx) => {
             const rec = partRecords[p.id];
             const realSec = rec?.elapsedSeconds || 0;
@@ -1190,28 +1214,28 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             return (
               <div
                 key={p.id}
-                className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800/80 flex items-center justify-between gap-2 text-xs"
+                className="p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 flex items-center justify-between gap-3 text-xs transition-colors"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-zinc-200 truncate">
+                  <p className="font-bold text-zinc-100 truncate">
                     {idx + 1}. {p.title}
                   </p>
-                  <p className="text-[11px] text-zinc-500 truncate">{p.speaker}</p>
+                  <p className="text-[11px] text-zinc-400 truncate mt-0.5">{p.speaker}</p>
                 </div>
 
                 <div className="text-right font-mono shrink-0">
-                  <div className="text-zinc-300">
+                  <div className="text-zinc-200 font-semibold">
                     {realSec > 0 ? formatDurationMMSS(realSec) : '--:--'}{' '}
-                    <span className="text-zinc-600">/ {p.defaultMinutes}:00</span>
+                    <span className="text-zinc-500 font-normal">/ {p.defaultMinutes}:00</span>
                   </div>
                   {realSec > 0 && (
                     <div
-                      className={`text-[10px] ${
+                      className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold mt-1 ${
                         diffSec > 15
-                          ? 'text-rose-400 font-bold'
+                          ? 'bg-rose-950/70 border border-rose-800/80 text-rose-300'
                           : diffSec < -30
-                          ? 'text-sky-400'
-                          : 'text-emerald-400'
+                          ? 'bg-sky-950/70 border border-sky-800/80 text-sky-300'
+                          : 'bg-emerald-950/70 border border-emerald-800/80 text-emerald-300'
                       }`}
                     >
                       {diffSec > 0
@@ -1229,7 +1253,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
       <button
         type="button"
         onClick={handleCopyTimingSummary}
-        className="w-full min-h-[46px] py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md active:scale-[0.99]"
+        className="w-full min-h-[46px] py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-lg shadow-emerald-600/25 active:scale-[0.98]"
       >
         {copiedSummary ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
         <span>{copiedSummary ? '¡Informe Copiado!' : 'Copiar Informe de Tiempos'}</span>
@@ -1243,46 +1267,49 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Consola de Presidencia y Cronómetro de Reunión"
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/95 backdrop-blur-md select-none ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl select-none ${
         isFullscreen || displayMode === 'atril' ? 'p-0' : 'p-0 sm:p-3 md:p-4'
       }`}
     >
       <div
-        className={`bg-zinc-950 text-white w-full flex flex-col shadow-2xl border-zinc-800/90 overflow-hidden transition-all ${
+        className={`kg-glass-surface bg-zinc-950/95 text-white w-full flex flex-col shadow-[0_25px_70px_rgba(0,0,0,0.85)] border-zinc-800/90 overflow-hidden transition-all duration-300 ${
           isFullscreen || displayMode === 'atril'
             ? 'h-dvh max-w-none rounded-none border-0'
-            : 'h-dvh sm:h-[94vh] max-w-7xl rounded-none sm:rounded-3xl sm:border'
+            : 'h-dvh sm:h-[94vh] max-w-7xl rounded-none sm:rounded-3xl sm:border border-white/10 ring-1 ring-white/5'
         }`}
       >
+        {/* Sheen top highlight on container */}
+        <div className="kg-sheen-top absolute inset-0 pointer-events-none" />
+
         {/* ── BARRA DE PROGRESO SUPERIOR DE ALTO CONTRASTE ── */}
-        <div className="w-full h-1.5 sm:h-2 bg-zinc-900 overflow-hidden shrink-0">
+        <div className="w-full h-1.5 sm:h-2 bg-white/5 overflow-hidden shrink-0 relative">
           <div
             className={`h-full transition-all duration-500 ${
               isOvertime
-                ? 'bg-rose-500'
+                ? 'bg-gradient-to-r from-rose-600 via-rose-500 to-red-400 shadow-[0_0_12px_rgba(244,63,94,0.8)]'
                 : isCriticalWarning
-                ? 'bg-amber-500'
+                ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-orange-400 shadow-[0_0_12px_rgba(245,158,11,0.8)]'
                 : isOneMinuteWarning
-                ? 'bg-yellow-400'
+                ? 'bg-gradient-to-r from-yellow-500 to-amber-400 shadow-[0_0_12px_rgba(234,179,8,0.7)]'
                 : isCounselMode
-                ? 'bg-sky-400'
-                : 'bg-emerald-500'
+                ? 'bg-gradient-to-r from-sky-500 to-cyan-400 shadow-[0_0_12px_rgba(56,189,248,0.8)]'
+                : 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 shadow-[0_0_12px_rgba(16,185,129,0.7)]'
             }`}
             style={{ width: `${isOvertime ? 100 : progressPercent}%` }}
           />
         </div>
 
-        {/* ── HEADER COMPACTO (ADAPTADO A MÓVIL EN 1 SOLA FILA) ── */}
-        <div className="px-3 sm:px-6 py-2.5 sm:py-3 bg-zinc-900/95 border-b border-zinc-800/80 flex items-center justify-between gap-2 shrink-0">
-          {/* Izquierda: Selector rápido de modo en móvil + Título en desktop */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex items-center bg-zinc-950 p-1 rounded-xl border border-zinc-800 shrink-0">
+        {/* ── HEADER COMPACTO CON SEGMENTED CONTROL APPLE ── */}
+        <div className="px-3 sm:px-6 py-2.5 sm:py-3.5 bg-zinc-950/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-between gap-2.5 shrink-0 relative z-10">
+          {/* Izquierda: Selector de modo (Presidencia / Atril) + Título en desktop */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center bg-black/50 p-1 rounded-2xl border border-white/10 backdrop-blur-md shrink-0">
               <button
                 type="button"
                 onClick={() => setDisplayMode('presidencia')}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   displayMode === 'presidencia'
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -1292,9 +1319,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDisplayMode('atril')}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   displayMode === 'atril'
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -1304,18 +1331,23 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             </div>
 
             <div className="hidden md:block min-w-0 pl-1">
-              <div className="text-xs font-bold text-zinc-200 truncate">
-                {activeMeetingType === 'midweek'
-                  ? `Vida y Ministerio · ${activeRoom === 'auxiliar' ? 'Sala Auxiliar' : 'Auditorio'}`
-                  : 'Reunión de Fin de Semana'}
+              <div className="text-xs font-bold text-zinc-100 truncate flex items-center gap-2">
+                <span>
+                  {activeMeetingType === 'midweek'
+                    ? `Vida y Ministerio · ${activeRoom === 'auxiliar' ? 'Sala Auxiliar' : 'Auditorio'}`
+                    : 'Reunión de Fin de Semana'}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-zinc-400">
+                  {currentWeek.weekStartDate}
+                </span>
               </div>
-              <div className="text-[11px] text-zinc-400 truncate">
-                Parte {selectedPartIndex + 1} de {parts.length} · Fin est. {scheduleTimeline.projectedEndStr}
+              <div className="text-[11px] text-zinc-400 truncate mt-0.5">
+                Parte {selectedPartIndex + 1} de {parts.length} · Fin estimado: {scheduleTimeline.projectedEndStr}
               </div>
             </div>
           </div>
 
-          {/* Derecha: Reloj, Sonido, Ajustes Móvil y Cerrar */}
+          {/* Derecha: Desfase, Reloj, Sonido, Ajustes y Cerrar */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desfase en Desktop */}
             <div
@@ -1327,6 +1359,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   : 'bg-emerald-950/50 border-emerald-800/70 text-emerald-300'
               }`}
             >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  scheduleTimeline.netVarianceSeconds > 60
+                    ? 'bg-rose-400 animate-pulse'
+                    : scheduleTimeline.netVarianceSeconds < -60
+                    ? 'bg-sky-400'
+                    : 'bg-emerald-400'
+                }`}
+              />
               <span>
                 {scheduleTimeline.netVarianceSeconds > 60
                   ? `Atraso: +${Math.round(scheduleTimeline.netVarianceSeconds / 60)}m`
@@ -1337,20 +1378,21 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             </div>
 
             {/* Reloj Digital */}
-            <div className="px-2.5 py-1.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-mono tabular-nums text-zinc-200 flex items-center gap-1.5">
+            <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl text-xs font-mono tabular-nums text-zinc-200 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
               <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
               <span className="font-bold">{liveClockShort}</span>
             </div>
 
-            {/* Botón de Ajustes de Reunión (Visible en móvil/tablet para no saturar la cabecera) */}
+            {/* Botón de Ajustes de Reunión (Visible en móvil/tablet) */}
             {displayMode === 'presidencia' && (
               <button
                 type="button"
                 onClick={() => setIsMobileSettingsOpen((prev) => !prev)}
-                className={`lg:hidden p-2.5 rounded-xl border transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                className={`lg:hidden p-2.5 rounded-xl border transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center active:scale-95 ${
                   isMobileSettingsOpen
-                    ? 'bg-indigo-600 border-indigo-500 text-white'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-300'
+                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-md'
+                    : 'bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10'
                 }`}
                 title="Ajustes de reunión y sala"
                 aria-label="Ajustes de reunión"
@@ -1364,24 +1406,24 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
               aria-label={soundEnabled ? 'Silenciar alertas de sonido' : 'Activar alertas de sonido'}
-              className={`p-2.5 rounded-xl border transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center ${
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center active:scale-95 ${
                 soundEnabled
-                  ? 'bg-zinc-800 border-zinc-700 text-emerald-400 hover:bg-zinc-700'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-emerald-950/60 border-emerald-700/70 text-emerald-300 hover:bg-emerald-900/70'
+                  : 'bg-white/5 border-white/10 text-zinc-500 hover:text-zinc-300 hover:bg-white/10'
               }`}
               title={soundEnabled ? 'Sonido activado' : 'Sonido silenciado'}
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
 
-            {/* Botón Pantalla completa (API Fullscreen del navegador) */}
+            {/* Botón Pantalla completa */}
             <button
               type="button"
               onClick={handleToggleFullscreen}
-              className={`px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer min-h-[40px] flex items-center justify-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer min-h-[40px] flex items-center justify-center gap-1.5 active:scale-95 ${
                 isFullscreen
-                  ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-500 text-white shadow-sm'
-                  : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-200 hover:text-white'
+                  ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-600/30'
+                  : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-200 hover:text-white'
               }`}
               title={isFullscreen ? 'Salir de pantalla completa (Atajo: F)' : 'Pantalla completa (Atajo: F)'}
               aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
@@ -1400,7 +1442,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2.5 rounded-xl bg-zinc-900 hover:bg-rose-950/80 border border-zinc-800 hover:border-rose-700 text-zinc-300 hover:text-rose-200 transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
+              className="p-2.5 rounded-xl bg-white/5 hover:bg-rose-950/80 border border-white/10 hover:border-rose-700 text-zinc-300 hover:text-rose-200 transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center active:scale-95"
               title="Cerrar"
               aria-label="Cerrar"
             >
@@ -1409,15 +1451,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
           </div>
         </div>
 
-        {/* ── SUB-BARRA DE CONFIGURACIÓN (SIEMPRE VISIBLE EN DESKTOP, DESPLEGABLE EN MÓVIL) ── */}
+        {/* ── SUB-BARRA DE CONFIGURACIÓN CON SUPERFICIES GLASS ── */}
         {displayMode === 'presidencia' && (
           <div
             className={`${
               isMobileSettingsOpen ? 'flex' : 'hidden lg:flex'
-            } px-3.5 sm:px-6 py-2.5 bg-zinc-950 border-b border-zinc-800/80 flex-wrap items-center justify-between gap-2.5 shrink-0`}
+            } px-4 sm:px-6 py-2.5 bg-black/40 backdrop-blur-md border-b border-white/10 flex-wrap items-center justify-between gap-3 shrink-0 relative z-10`}
           >
             <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-              <div className="flex items-center bg-zinc-900 p-1 rounded-xl border border-zinc-800 flex-1 sm:flex-initial">
+              <div className="flex items-center bg-black/50 p-1 rounded-xl border border-white/10 flex-1 sm:flex-initial">
                 <button
                   type="button"
                   onClick={() => {
@@ -1427,7 +1469,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   }}
                   className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     activeMeetingType === 'midweek'
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-indigo-600 text-white shadow-xs'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -1443,7 +1485,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   }}
                   className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     activeMeetingType === 'weekend'
-                      ? 'bg-emerald-600 text-white'
+                      ? 'bg-emerald-600 text-white shadow-xs'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -1452,14 +1494,14 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               </div>
 
               {activeMeetingType === 'midweek' && hasAuxRoomParts && (
-                <div className="flex items-center bg-zinc-900 p-1 rounded-xl border border-zinc-800 flex-1 sm:flex-initial">
+                <div className="flex items-center bg-black/50 p-1 rounded-xl border border-white/10 flex-1 sm:flex-initial">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveRoom('principal');
                       setSelectedPartIndex(0);
                     }}
-                    className={`flex-1 sm:flex-initial px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       activeRoom === 'principal'
                         ? 'bg-zinc-700 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -1473,7 +1515,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                       setActiveRoom('auxiliar');
                       setSelectedPartIndex(0);
                     }}
-                    className={`flex-1 sm:flex-initial px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       activeRoom === 'auxiliar'
                         ? 'bg-amber-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -1484,8 +1526,8 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 </div>
               )}
 
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
-                <span>Inicio:</span>
+              <div className="flex items-center gap-1.5 text-xs text-zinc-300 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+                <span className="text-zinc-400 font-medium">Inicio:</span>
                 <input
                   type="time"
                   value={meetingStartTime}
@@ -1500,7 +1542,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setCountDirection((d) => (d === 'down' ? 'up' : 'down'))}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 font-medium cursor-pointer transition-colors active:scale-95"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-indigo-400" />
                 <span>{countDirection === 'down' ? 'Cuenta regresiva' : 'Tiempo transcurrido'}</span>
@@ -1509,10 +1551,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setAutoStartNext((a) => !a)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-medium cursor-pointer transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-medium cursor-pointer transition-colors active:scale-95 ${
                   autoStartNext
                     ? 'bg-indigo-950/70 border-indigo-700 text-indigo-300'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    : 'bg-white/5 border-white/10 text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 <Radio className="w-3.5 h-3.5" />
@@ -1522,15 +1564,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
           </div>
         )}
 
-        {/* ── BANNER DE SEÑAL VISUAL EN ESCENARIO ── */}
+        {/* ── BANNER DE SEÑAL VISUAL EN ESCENARIO (TALLY LAMP) ── */}
         {stageFlashCue && (
           <div
-            className={`px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 animate-pulse shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 animate-pulse shrink-0 relative z-10 ${
               stageFlashCue === 'concluir'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white'
                 : stageFlashCue === 'ultimo_minuto'
-                ? 'bg-amber-500 text-zinc-950'
-                : 'bg-sky-500 text-zinc-950'
+                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-zinc-950'
+                : 'bg-gradient-to-r from-sky-500 to-cyan-500 text-zinc-950'
             }`}
           >
             <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wide uppercase mx-auto text-center">
@@ -1546,16 +1588,16 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             <button
               type="button"
               onClick={() => setStageFlashCue(null)}
-              className="px-2.5 py-1 rounded-lg bg-black/20 hover:bg-black/30 text-xs font-bold cursor-pointer shrink-0"
+              className="px-2.5 py-1 rounded-lg bg-black/20 hover:bg-black/30 text-xs font-bold cursor-pointer shrink-0 active:scale-95"
             >
               Ocultar
             </button>
           </div>
         )}
 
-        {/* ── MINI-CRONÓMETRO FLOTANTE EN MÓVIL CUANDO EL USUARIO MIRA PROGRAMA / NOTAS / TIEMPOS ── */}
+        {/* ── MINI-CRONÓMETRO FLOTANTE EN MÓVIL ── */}
         {displayMode === 'presidencia' && mobileSection !== 'reloj' && (
-          <div className="lg:hidden px-3.5 py-2.5 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between gap-2 shrink-0">
+          <div className="lg:hidden px-3.5 py-2.5 bg-black/50 border-b border-white/10 flex items-center justify-between gap-2.5 shrink-0">
             <div
               onClick={() => setMobileSection('reloj')}
               className="min-w-0 flex-1 flex items-center gap-2.5 cursor-pointer"
@@ -1566,7 +1608,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                     ? 'bg-rose-950 text-rose-400 border-rose-500'
                     : isCriticalWarning
                     ? 'bg-amber-950 text-amber-300 border-amber-500'
-                    : 'bg-zinc-950 text-emerald-400 border-zinc-800'
+                    : 'bg-black/60 text-emerald-400 border-white/10'
                 }`}
               >
                 {mainTimerFormatted}
@@ -1581,8 +1623,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setIsRunning(!isRunning)}
-                className={`p-2.5 rounded-xl font-bold text-xs flex items-center justify-center cursor-pointer min-w-[42px] min-h-[42px] ${
-                  isRunning ? 'bg-amber-500 text-zinc-950' : 'bg-emerald-500 text-zinc-950'
+                className={`p-2.5 rounded-xl font-bold text-xs flex items-center justify-center cursor-pointer min-w-[42px] min-h-[42px] active:scale-95 ${
+                  isRunning
+                    ? 'bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20'
+                    : 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
                 }`}
                 aria-label={isRunning ? 'Pausar' : 'Iniciar'}
               >
@@ -1591,7 +1635,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={handleCompleteAndNext}
-                className="p-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center cursor-pointer min-w-[42px] min-h-[42px]"
+                className="p-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs flex items-center justify-center cursor-pointer min-w-[42px] min-h-[42px] shadow-md shadow-indigo-600/20 active:scale-95"
                 aria-label="Siguiente parte"
               >
                 <SkipForward className="w-4 h-4" />
@@ -1605,17 +1649,35 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
           /* ============================================================================
              VISTA 1: MODO ATRIL PURO (MONITOR DE ESCENARIO OPTIMIZADO PARA MÓVIL Y TABLET)
              ============================================================================ */
-          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 md:p-10 bg-zinc-950 overflow-y-auto">
+          <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 md:p-10 bg-zinc-950 overflow-y-auto relative">
+            {/* Ambient backlight halo behind the atril clock */}
+            <div
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full opacity-25 blur-3xl pointer-events-none transition-all duration-700 ${
+                isOvertime
+                  ? 'bg-rose-600'
+                  : isCriticalWarning
+                  ? 'bg-amber-500'
+                  : isOneMinuteWarning
+                  ? 'bg-yellow-400'
+                  : isCounselMode
+                  ? 'bg-sky-500'
+                  : 'bg-emerald-500'
+              }`}
+            />
+
             {/* Cabecera de parte actual */}
-            <div className="text-center space-y-1.5 max-w-4xl mx-auto w-full">
+            <div className="text-center space-y-2 max-w-4xl mx-auto w-full relative z-10">
               <div className="flex items-center justify-center gap-2 text-[11px] sm:text-sm font-bold tracking-widest uppercase text-zinc-400 flex-wrap">
-                <span style={{ color: currentPart?.sectionColor || '#818cf8' }}>
+                <span
+                  className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10"
+                  style={{ color: currentPart?.sectionColor || '#818cf8' }}
+                >
                   {isCounselMode ? 'CONSEJO DE PRESIDENCIA (1 MIN)' : currentPart?.sectionLabel}
                 </span>
                 {currentWindow && (
                   <>
                     <span>·</span>
-                    <span className="font-mono text-zinc-400">
+                    <span className="font-mono text-zinc-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
                       {currentWindow.startStr} – {currentWindow.endStr}
                     </span>
                   </>
@@ -1627,7 +1689,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               </h1>
 
               <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-sm sm:text-xl text-zinc-300 font-semibold">
-                <span>{currentPart?.speaker}</span>
+                <span className="text-white font-bold">{currentPart?.speaker}</span>
                 {currentPart?.assistant && (
                   <>
                     <span className="text-zinc-600">·</span>
@@ -1637,7 +1699,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 {currentPart?.lessonNumber && (
                   <>
                     <span className="text-zinc-600">·</span>
-                    <span className="text-amber-300">
+                    <span className="text-amber-300 font-medium">
                       Lecc. #{currentPart.lessonNumber}: {currentPart.lessonTitle}
                     </span>
                   </>
@@ -1645,42 +1707,42 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               </div>
             </div>
 
-            {/* Pantalla Gigante del Cronómetro sin desbordamiento en móviles de 360px */}
-            <div className="my-auto py-3 sm:py-6 flex flex-col items-center justify-center w-full">
+            {/* Pantalla Gigante del Cronómetro en Atril */}
+            <div className="my-auto py-4 sm:py-8 flex flex-col items-center justify-center w-full relative z-10">
               <div
                 onClick={() => setIsRunning(!isRunning)}
                 title="Toca para Iniciar o Pausar"
-                className={`w-full max-w-2xl cursor-pointer font-mono tabular-nums font-black text-[4.25rem] xs:text-7xl sm:text-8xl md:text-[9.5rem] leading-none tracking-tight px-4 sm:px-14 py-6 sm:py-10 rounded-3xl border-2 text-center transition-all shadow-2xl active:scale-[0.99] ${
+                className={`w-full max-w-2xl cursor-pointer font-mono tabular-nums font-black text-[4.5rem] xs:text-7xl sm:text-8xl md:text-[9.5rem] leading-none tracking-tighter px-4 sm:px-14 py-8 sm:py-12 rounded-3xl border-2 text-center transition-all duration-300 shadow-2xl active:scale-[0.99] select-none ${
                   isOvertime
-                    ? 'bg-rose-950/80 text-rose-400 border-rose-500 animate-pulse'
+                    ? 'bg-rose-950/80 text-rose-400 border-rose-500 shadow-[0_0_100px_rgba(244,63,94,0.4)] animate-pulse'
                     : isCriticalWarning
-                    ? 'bg-amber-950/80 text-amber-300 border-amber-500'
+                    ? 'bg-amber-950/80 text-amber-300 border-amber-500 shadow-[0_0_80px_rgba(245,158,11,0.35)]'
                     : isOneMinuteWarning
-                    ? 'bg-yellow-950/60 text-yellow-300 border-yellow-600/80'
+                    ? 'bg-yellow-950/60 text-yellow-300 border-yellow-600/80 shadow-[0_0_60px_rgba(234,179,8,0.25)]'
                     : isCounselMode
-                    ? 'bg-sky-950/70 text-sky-300 border-sky-500/80'
-                    : 'bg-zinc-900/90 text-emerald-400 border-zinc-800'
+                    ? 'bg-sky-950/70 text-sky-300 border-sky-500/80 shadow-[0_0_80px_rgba(56,189,248,0.35)]'
+                    : 'bg-black/60 text-emerald-400 border-emerald-500/50 shadow-[0_0_80px_rgba(16,185,129,0.25)]'
                 }`}
               >
                 {mainTimerFormatted}
               </div>
 
-              <div className="mt-3 flex items-center justify-center gap-3 text-xs sm:text-base font-bold text-center">
+              <div className="mt-4 flex items-center justify-center gap-3 text-xs sm:text-base font-bold text-center">
                 {isOvertime ? (
-                  <span className="text-rose-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="text-rose-400 uppercase tracking-widest flex items-center gap-2 bg-rose-950/60 px-4 py-1.5 rounded-full border border-rose-500/60 shadow-md">
                     <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     Tiempo excedido ({formatDurationMMSS(Math.abs(secondsLeft))})
                   </span>
                 ) : isCriticalWarning ? (
-                  <span className="text-amber-300 uppercase tracking-widest">
+                  <span className="text-amber-300 uppercase tracking-widest bg-amber-950/60 px-4 py-1.5 rounded-full border border-amber-500/60 shadow-md">
                     Últimos 30 segundos — Concluyendo intervención
                   </span>
                 ) : isOneMinuteWarning ? (
-                  <span className="text-yellow-300 uppercase tracking-widest">
+                  <span className="text-yellow-300 uppercase tracking-widest bg-yellow-950/60 px-4 py-1.5 rounded-full border border-yellow-500/60 shadow-md">
                     Último minuto disponible
                   </span>
                 ) : (
-                  <span className="text-zinc-400">
+                  <span className="text-zinc-400 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
                     Asignado: {isCounselMode ? '1 min (Consejo)' : `${currentPart?.defaultMinutes} min`} ·{' '}
                     {isRunning ? 'En curso (Toca el reloj para pausar)' : 'En pausa (Toca el reloj para iniciar)'}
                   </span>
@@ -1689,15 +1751,15 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             </div>
 
             {/* Controles inferiores ergonómicos para pulgar en móvil y tablet */}
-            <div className="max-w-4xl mx-auto w-full space-y-3">
+            <div className="max-w-4xl mx-auto w-full space-y-3 relative z-10">
               <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsRunning(!isRunning)}
                   className={`col-span-2 sm:col-span-1 min-h-[52px] px-8 py-3.5 rounded-2xl text-base font-black shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 ${
                     isRunning
-                      ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950'
-                      : 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950'
+                      ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-amber-500/30'
+                      : 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-emerald-500/30'
                   }`}
                 >
                   {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
@@ -1708,7 +1770,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleStartCounselMinute}
-                    className="min-h-[48px] px-4 py-3 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md active:scale-95"
+                    className="min-h-[48px] px-5 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-400 hover:to-cyan-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md shadow-sky-500/20 active:scale-95"
                   >
                     <Timer className="w-4 h-4 shrink-0" />
                     <span>Consejo (1:00)</span>
@@ -1718,7 +1780,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 <button
                   type="button"
                   onClick={handleCompleteAndNext}
-                  className="min-h-[48px] px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md active:scale-95"
+                  className="min-h-[48px] px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md shadow-indigo-500/20 active:scale-95"
                 >
                   <span>Siguiente</span>
                   <SkipForward className="w-4 h-4 shrink-0" />
@@ -1728,7 +1790,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   type="button"
                   onClick={() => setSelectedPartIndex((i) => Math.max(0, i - 1))}
                   disabled={selectedPartIndex === 0}
-                  className="min-h-[48px] px-4 py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 border border-zinc-800 text-zinc-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  className="min-h-[48px] px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 disabled:opacity-30 border border-white/10 text-zinc-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
                 >
                   <SkipBack className="w-4 h-4 shrink-0" />
                   <span>Anterior</span>
@@ -1741,7 +1803,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                     setSecondsLeft(isCounselMode ? 60 : (currentPart?.defaultMinutes || 5) * 60);
                     setElapsedInCurrentRun(0);
                   }}
-                  className="min-h-[48px] px-4 py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  className="min-h-[48px] px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
                 >
                   <RotateCcw className="w-4 h-4 shrink-0" />
                   <span>Reiniciar</span>
@@ -1752,8 +1814,8 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   onClick={handleToggleFullscreen}
                   className={`col-span-2 sm:col-span-1 min-h-[48px] px-4 py-3 rounded-2xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 ${
                     isFullscreen
-                      ? 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-600 text-emerald-300'
-                      : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-200'
+                      ? 'bg-emerald-950/80 hover:bg-emerald-900 border-emerald-600 text-emerald-300 shadow-md'
+                      : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-200'
                   }`}
                   title={isFullscreen ? 'Salir de pantalla completa (Atajo: F)' : 'Maximizar área visual en Pantalla completa (Atajo: F)'}
                 >
@@ -1767,14 +1829,16 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               </div>
 
               {nextPart && (
-                <div className="px-4 py-2.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="font-bold text-zinc-500 uppercase">Siguiente:</span>
+                <div className="px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-xs text-zinc-400">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="font-bold text-zinc-400 uppercase tracking-wider text-[10px] bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                      Siguiente
+                    </span>
                     <span className="font-bold text-zinc-200 truncate">{nextPart.title}</span>
                     <span>·</span>
                     <span className="text-indigo-300 font-medium truncate">{nextPart.speaker}</span>
                   </div>
-                  <span className="font-mono text-zinc-400 shrink-0 ml-2">
+                  <span className="font-mono font-bold text-zinc-300 shrink-0 ml-2 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5">
                     {nextPart.defaultMinutes}m
                   </span>
                 </div>
@@ -1783,107 +1847,211 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
           </div>
         ) : (
           /* ============================================================================
-             VISTA 2: CONSOLA DE PRESIDENCIA (CON NAVEGACIÓN POR PESTAÑAS EN MÓVIL)
+             VISTA 2: CONSOLA DE PRESIDENCIA (DUAL-PANE COCKPIT ESTUDIO DE GRABACIÓN)
              ============================================================================ */
           <div className="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-12 lg:gap-6 lg:p-6">
-            {/* SECCIÓN IZQUIERDA (Reloj y Controles): Visible siempre en Desktop, o cuando mobileSection === 'reloj' */}
+            {/* SECCIÓN IZQUIERDA (Reloj y Controles) */}
             <div
               className={`${
                 mobileSection === 'reloj' ? 'flex' : 'hidden lg:flex'
-              } lg:col-span-7 flex-1 flex-col justify-between space-y-4 p-3.5 sm:p-6 lg:rounded-3xl bg-zinc-900/40 lg:bg-zinc-900/60 lg:border lg:border-zinc-800/90 overflow-y-auto`}
+              } lg:col-span-7 flex-1 flex-col justify-between space-y-4 p-4 sm:p-6 lg:rounded-3xl kg-card-bento bg-zinc-900/40 lg:bg-zinc-900/60 lg:border lg:border-white/10 shadow-2xl relative overflow-y-auto`}
             >
               {/* Encabezado de la intervención activa */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2 flex-wrap text-[11px] sm:text-xs">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <span
-                      className="font-extrabold uppercase tracking-wider"
+                      className="font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10"
                       style={{ color: isCounselMode ? '#38bdf8' : currentPart?.sectionColor || '#818cf8' }}
                     >
                       {isCounselMode ? 'CONSEJO Y ENCOMIO (1:00)' : currentPart?.sectionLabel}
                     </span>
                     {currentWindow && (
-                      <>
-                        <span className="text-zinc-600">·</span>
-                        <span className="font-mono text-zinc-400">
-                          {currentWindow.startStr} – {currentWindow.endStr}
-                        </span>
-                      </>
+                      <span className="font-mono text-zinc-300 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                        {currentWindow.startStr} – {currentWindow.endStr}
+                      </span>
                     )}
                   </div>
 
-                  <span className="text-zinc-400 font-mono">
+                  <span className="text-zinc-400 font-mono bg-white/5 px-2.5 py-1 rounded-xl border border-white/10">
                     Parte {selectedPartIndex + 1}/{parts.length} ·{' '}
-                    <strong>{isCounselMode ? '1:00' : `${currentPart?.defaultMinutes}:00`}m</strong>
+                    <strong className="text-white">{isCounselMode ? '1:00' : `${currentPart?.defaultMinutes}:00`}m</strong>
                   </span>
                 </div>
 
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-snug">
+                <h2 className="text-lg sm:text-2xl font-black text-white leading-snug tracking-tight">
                   {currentPart?.partNumber ? `${currentPart.partNumber}. ` : ''}
                   {currentPart?.title}
                 </h2>
 
                 <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm text-zinc-300">
-                  <span className="font-bold text-white">
-                    Asignado: <span className="text-indigo-300">{currentPart?.speaker}</span>
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="text-zinc-400 font-normal">Asignado:</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-200">
+                      {currentPart?.speaker}
+                    </span>
                   </span>
                   {currentPart?.assistant && (
                     <>
                       <span className="text-zinc-600">·</span>
-                      <span>
-                        Ayudante: <strong className="text-zinc-200">{currentPart.assistant}</strong>
+                      <span className="text-zinc-300">
+                        Ayudante: <strong className="text-white">{currentPart.assistant}</strong>
                       </span>
                     </>
                   )}
                 </div>
               </div>
 
-              {/* PANTALLA CENTRAL DEL CRONÓMETRO */}
-              <div className="flex flex-col items-center justify-center py-1 sm:py-2">
+              {/* PANTALLA CENTRAL DEL CRONÓMETRO - Dial Circular de Cabina */}
+              <div className="flex flex-col items-center justify-center py-2 sm:py-3 relative">
+                {/* Luminous reactive aura backdrop */}
+                <div
+                  className={`absolute inset-0 rounded-3xl opacity-25 blur-3xl pointer-events-none transition-all duration-700 ${
+                    isOvertime
+                      ? 'bg-rose-600'
+                      : isCriticalWarning
+                      ? 'bg-amber-500'
+                      : isOneMinuteWarning
+                      ? 'bg-yellow-400'
+                      : isCounselMode
+                      ? 'bg-sky-500'
+                      : isRunning
+                      ? 'bg-emerald-500'
+                      : 'bg-indigo-600/30'
+                  }`}
+                />
+
                 <div
                   onClick={() => setIsRunning(!isRunning)}
                   title="Toca para Iniciar o Pausar"
-                  className={`w-full max-w-lg cursor-pointer font-mono tabular-nums font-black text-6xl xs:text-7xl sm:text-8xl tracking-tight py-5 sm:py-6 px-4 sm:px-6 rounded-3xl border-2 text-center transition-all shadow-inner active:scale-[0.99] ${
+                  className={`w-full max-w-lg cursor-pointer rounded-3xl border-2 p-5 sm:p-7 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 active:scale-[0.99] select-none ${
                     isOvertime
-                      ? 'bg-rose-950/75 text-rose-400 border-rose-500 animate-pulse'
+                      ? 'bg-rose-950/60 border-rose-500 shadow-[0_0_60px_-10px_rgba(244,63,94,0.45)] ring-1 ring-rose-500/50'
                       : isCriticalWarning
-                      ? 'bg-amber-950/75 text-amber-300 border-amber-500'
+                      ? 'bg-amber-950/60 border-amber-500 shadow-[0_0_50px_-10px_rgba(245,158,11,0.4)] ring-1 ring-amber-500/50'
                       : isOneMinuteWarning
-                      ? 'bg-yellow-950/50 text-yellow-300 border-yellow-600/80'
+                      ? 'bg-yellow-950/50 border-yellow-500/70 shadow-[0_0_40px_-10px_rgba(234,179,8,0.35)]'
                       : isCounselMode
-                      ? 'bg-sky-950/60 text-sky-300 border-sky-500/70'
-                      : 'bg-zinc-950 text-emerald-400 border-zinc-800'
+                      ? 'bg-sky-950/50 border-sky-400/80 shadow-[0_0_50px_-10px_rgba(56,189,248,0.4)]'
+                      : isRunning
+                      ? 'bg-black/60 border-emerald-500/60 shadow-[0_0_50px_-15px_rgba(16,185,129,0.35)]'
+                      : 'bg-black/40 border-white/10 shadow-xl hover:border-white/20'
                   }`}
                 >
-                  {mainTimerFormatted}
-                </div>
+                  {/* Sheen top reflection */}
+                  <div className="kg-sheen-top absolute inset-0 pointer-events-none" />
 
-                <div className="mt-2.5 flex items-center justify-center gap-3 flex-wrap text-xs text-zinc-400 font-mono">
-                  <span>
-                    Transcurrido: <strong className="text-zinc-200">{formatDurationMMSS(elapsedInCurrentRun)}</strong>
-                  </span>
-                  <span>·</span>
-                  <span>
-                    Restante:{' '}
-                    <strong className={isOvertime ? 'text-rose-400' : 'text-emerald-400'}>
-                      {isOvertime
-                        ? `+${formatDurationMMSS(Math.abs(secondsLeft))}`
-                        : formatDurationMMSS(secondsLeft)}
-                    </strong>
-                  </span>
+                  {/* Circular Dial SVG Gauge */}
+                  <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex items-center justify-center my-1">
+                    <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 240 240">
+                      {/* Background track circle */}
+                      <circle
+                        cx="120"
+                        cy="120"
+                        r="100"
+                        stroke="rgba(255, 255, 255, 0.08)"
+                        strokeWidth="8"
+                        fill="none"
+                      />
+                      {/* Active progress arc */}
+                      <circle
+                        cx="120"
+                        cy="120"
+                        r="100"
+                        stroke={
+                          isOvertime
+                            ? '#f43f5e'
+                            : isCriticalWarning
+                            ? '#f59e0b'
+                            : isOneMinuteWarning
+                            ? '#eab308'
+                            : isCounselMode
+                            ? '#38bdf8'
+                            : '#10b981'
+                        }
+                        strokeWidth="10"
+                        strokeDasharray={628.32}
+                        strokeDashoffset={
+                          isOvertime
+                            ? 0
+                            : 628.32 - (progressPercent / 100) * 628.32
+                        }
+                        strokeLinecap="round"
+                        fill="none"
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+
+                    {/* Centered Monospace Time Readout */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <span className="font-mono tabular-nums font-black text-5xl sm:text-6xl tracking-tight text-white drop-shadow-lg">
+                        {mainTimerFormatted}
+                      </span>
+
+                      {/* Status indicator capsule */}
+                      <div className="mt-1.5">
+                        {isOvertime ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                            Excedido +{formatDurationMMSS(Math.abs(secondsLeft))}
+                          </span>
+                        ) : isCriticalWarning ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/50 animate-pulse">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                            Últimos 30s
+                          </span>
+                        ) : isOneMinuteWarning ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-yellow-500/20 text-yellow-300 border border-yellow-500/50">
+                            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                            Último minuto
+                          </span>
+                        ) : isCounselMode ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-400/50">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                            Consejo 1:00
+                          </span>
+                        ) : isRunning ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            En curso
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-white/10">
+                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                            En pausa
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Telemetry Chips under dial */}
+                  <div className="mt-3 flex items-center justify-center gap-2 flex-wrap text-xs font-mono">
+                    <span className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-zinc-300">
+                      Transcurrido: <strong className="text-white">{formatDurationMMSS(elapsedInCurrentRun)}</strong>
+                    </span>
+                    <span className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-zinc-300">
+                      Restante:{' '}
+                      <strong className={isOvertime ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+                        {isOvertime
+                          ? `+${formatDurationMMSS(Math.abs(secondsLeft))}`
+                          : formatDurationMMSS(secondsLeft)}
+                      </strong>
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* CONTROLES PRINCIPALES ADAPTADOS AL PULGAR EN MÓVIL */}
-              <div className="space-y-2.5">
+              {/* CONTROLES PRINCIPALES CON TACTO DE HARDWARE */}
+              <div className="space-y-3">
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsRunning(!isRunning)}
-                    className={`col-span-2 sm:col-span-1 min-h-[48px] px-7 py-3 rounded-2xl text-sm font-extrabold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+                    className={`col-span-2 sm:col-span-1 min-h-[48px] px-8 py-3 rounded-2xl text-sm font-extrabold shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 ${
                       isRunning
-                        ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950'
-                        : 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950'
+                        ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-amber-500/30'
+                        : 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-emerald-500/30'
                     }`}
                   >
                     {isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -1903,10 +2071,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                           handleStartCounselMinute();
                         }
                       }}
-                      className={`min-h-[46px] px-3.5 py-2.5 rounded-2xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer border active:scale-95 ${
+                      className={`min-h-[46px] px-4 py-2.5 rounded-2xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer border active:scale-95 ${
                         isCounselMode
-                          ? 'bg-sky-500 text-zinc-950 border-sky-400 shadow-md'
-                          : 'bg-sky-950/80 hover:bg-sky-900 text-sky-300 border-sky-700/80'
+                          ? 'bg-gradient-to-r from-sky-400 to-cyan-500 text-zinc-950 border-sky-300 shadow-md shadow-sky-500/30'
+                          : 'bg-sky-950/70 hover:bg-sky-900 text-sky-300 border-sky-700/80'
                       }`}
                     >
                       <Timer className="w-4 h-4 shrink-0" />
@@ -1917,7 +2085,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleCompleteAndNext}
-                    className="min-h-[46px] px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95"
+                    className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-600/30 active:scale-95"
                   >
                     <span>Siguiente</span>
                     <SkipForward className="w-4 h-4 shrink-0" />
@@ -1930,63 +2098,65 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                       setSecondsLeft(isCounselMode ? 60 : (currentPart?.defaultMinutes || 5) * 60);
                       setElapsedInCurrentRun(0);
                     }}
-                    className="min-h-[46px] px-3.5 py-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                    className="min-h-[46px] px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                   >
                     <RotateCcw className="w-4 h-4 shrink-0" />
                     <span>Reiniciar</span>
                   </button>
                 </div>
 
-                {/* Ajustes finos y Timbre en grilla compacta apta para móvil */}
-                <div className="grid grid-cols-4 sm:flex sm:flex-wrap items-center justify-center gap-1.5 pt-1">
+                {/* Ajustes finos y Timbre en grilla compacta */}
+                <div className="grid grid-cols-4 sm:flex sm:flex-wrap items-center justify-center gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setSecondsLeft((s) => s - 60)}
-                    className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-mono font-bold cursor-pointer active:scale-95"
+                    className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 text-xs font-mono font-bold cursor-pointer active:scale-90 transition-colors"
                   >
                     -1m
                   </button>
                   <button
                     type="button"
                     onClick={() => setSecondsLeft((s) => s - 30)}
-                    className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-mono font-bold cursor-pointer active:scale-95"
+                    className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 text-xs font-mono font-bold cursor-pointer active:scale-90 transition-colors"
                   >
                     -30s
                   </button>
                   <button
                     type="button"
                     onClick={() => setSecondsLeft((s) => s + 30)}
-                    className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-mono font-bold cursor-pointer active:scale-95"
+                    className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 text-xs font-mono font-bold cursor-pointer active:scale-90 transition-colors"
                   >
                     +30s
                   </button>
                   <button
                     type="button"
                     onClick={() => setSecondsLeft((s) => s + 60)}
-                    className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-mono font-bold cursor-pointer active:scale-95"
+                    className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 text-xs font-mono font-bold cursor-pointer active:scale-90 transition-colors"
                   >
                     +1m
                   </button>
 
+                  {/* Timbre físico acústico */}
                   <button
                     type="button"
                     onClick={() => {
                       playTheocraticChime('manual');
                       showToast('🔔 Timbre acústico reproducido');
                     }}
-                    className="col-span-2 sm:col-span-1 min-h-[38px] px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/70 border border-amber-800/70 text-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                    className="col-span-2 sm:col-span-1 min-h-[38px] px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/10 hover:from-amber-500/30 hover:to-yellow-500/20 border border-amber-400/40 hover:border-amber-400 text-amber-300 text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-md shadow-amber-950/40 transition-all"
                   >
                     <Bell className="w-3.5 h-3.5 shrink-0" />
                     <span>Timbre</span>
                   </button>
 
+                  {/* Aviso Concluir (Tally lamp) */}
                   <button
                     type="button"
                     onClick={() => setStageFlashCue((c) => (c === 'concluir' ? null : 'concluir'))}
-                    className={`col-span-2 sm:col-span-1 min-h-[38px] px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors active:scale-95 ${
+                    className={`col-span-2 sm:col-span-1 min-h-[38px] px-3.5 py-1.5 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
                       stageFlashCue === 'concluir'
-                        ? 'bg-rose-600 border-rose-500 text-white'
-                        : 'bg-rose-950/50 hover:bg-rose-900/60 border-rose-800/70 text-rose-300'
+                        ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-rose-500 shadow-md shadow-rose-600/40 animate-pulse'
+                        : 'bg-rose-950/40 hover:bg-rose-900/60 border-rose-700/50 text-rose-300'
                     }`}
                   >
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -1997,16 +2167,16 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
               {/* TARJETA INTEGRADA DE EVALUACIÓN ESTUDIANTIL S-38 */}
               {currentPart?.isStudentPart && (
-                <div className="p-3.5 rounded-2xl bg-zinc-950/90 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold">
-                      <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/5 to-transparent border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative overflow-hidden">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-xs text-amber-300 font-bold">
+                      <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
                       <span>
                         Lección #{currentPart.lessonNumber}: {currentPart.lessonTitle}
                       </span>
                     </div>
                     <p className="text-[11px] text-zinc-400">
-                      Evaluar estudiante en registro S-38:
+                      Registrar evaluación estudiantil en ficha S-38 del publicador:
                     </p>
                   </div>
 
@@ -2014,10 +2184,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleEvaluateStudentLesson('completada')}
-                      className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
+                      className={`min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
                         currentPart.lessonStatus === 'completada'
-                          ? 'bg-emerald-500 text-zinc-950 shadow-sm'
-                          : 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border border-emerald-700/70'
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/30'
+                          : 'bg-emerald-950/70 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/70'
                       }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
@@ -2027,10 +2197,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleEvaluateStudentLesson('continuar')}
-                      className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
+                      className={`min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
                         currentPart.lessonStatus === 'continuar'
-                          ? 'bg-amber-500 text-zinc-950 shadow-sm'
-                          : 'bg-amber-950/80 hover:bg-amber-800 text-amber-300 border border-amber-700/70'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 shadow-md shadow-amber-500/30'
+                          : 'bg-amber-950/70 hover:bg-amber-900 text-amber-300 border border-amber-700/70'
                       }`}
                     >
                       <RotateCcw className="w-3.5 h-3.5 shrink-0" />
@@ -2045,14 +2215,16 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setMobileSection('programa')}
-                  className="lg:hidden w-full p-3 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex items-center justify-between gap-2 text-left text-xs text-zinc-400 active:scale-[0.99]"
+                  className="lg:hidden w-full p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-2 text-left text-xs text-zinc-400 active:scale-[0.99] transition-colors"
                 >
                   <div className="truncate">
-                    <span className="font-bold text-zinc-500 uppercase mr-1.5">Sigue:</span>
+                    <span className="font-bold text-zinc-400 uppercase mr-1.5 text-[10px] bg-white/5 px-1.5 py-0.5 rounded">
+                      Sigue:
+                    </span>
                     <span className="font-bold text-zinc-200">{nextPart.title}</span>
                     <span className="text-indigo-300 ml-1.5">({nextPart.speaker})</span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-zinc-500 shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-zinc-400 shrink-0" />
                 </button>
               )}
             </div>
@@ -2075,14 +2247,14 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             )}
 
             {/* COLUMNA DERECHA EN DESKTOP (lg:col-span-5) */}
-            <div className="hidden lg:flex lg:col-span-5 flex-col rounded-3xl bg-zinc-900/50 border border-zinc-800/90 overflow-hidden">
-              <div className="p-2 bg-zinc-950 border-b border-zinc-800 flex items-center gap-1">
+            <div className="hidden lg:flex lg:col-span-5 flex-col rounded-3xl kg-card-bento bg-zinc-900/50 border border-white/10 overflow-hidden shadow-2xl">
+              <div className="p-2 bg-black/50 border-b border-white/10 flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setRightPanelTab('programa')}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     rightPanelTab === 'programa'
-                      ? 'bg-zinc-800 text-white shadow-xs'
+                      ? 'bg-white/10 text-white shadow-xs'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -2094,7 +2266,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   onClick={() => setRightPanelTab('notas')}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     rightPanelTab === 'notas'
-                      ? 'bg-zinc-800 text-white shadow-xs'
+                      ? 'bg-white/10 text-white shadow-xs'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -2106,7 +2278,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   onClick={() => setRightPanelTab('resumen')}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     rightPanelTab === 'resumen'
-                      ? 'bg-zinc-800 text-white shadow-xs'
+                      ? 'bg-white/10 text-white shadow-xs'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -2121,13 +2293,13 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             </div>
 
             {/* ── BARRA DE NAVEGACIÓN INFERIOR EN MÓVIL (< lg) PARA MODO PRESIDENCIA ── */}
-            <div className="lg:hidden bg-zinc-900 border-t border-zinc-800 px-2 py-1.5 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] grid grid-cols-4 gap-1 shrink-0">
+            <div className="lg:hidden bg-zinc-950/90 backdrop-blur-xl border-t border-white/10 px-2 py-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] grid grid-cols-4 gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileSection('reloj')}
-                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer min-h-[46px] ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer min-h-[46px] active:scale-95 ${
                   mobileSection === 'reloj'
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -2138,9 +2310,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileSection('programa')}
-                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer min-h-[46px] ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer min-h-[46px] active:scale-95 ${
                   mobileSection === 'programa'
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -2151,9 +2323,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileSection('notas')}
-                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer min-h-[46px] ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer min-h-[46px] active:scale-95 ${
                   mobileSection === 'notas'
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -2164,9 +2336,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileSection('resumen')}
-                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer min-h-[46px] ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer min-h-[46px] active:scale-95 ${
                   mobileSection === 'resumen'
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -2179,7 +2351,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
         {/* Notificación flotante interna */}
         {toastMsg && (
-          <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 px-4 py-2.5 rounded-2xl bg-zinc-900 border border-indigo-500/50 text-white text-xs font-bold shadow-2xl flex items-center gap-2 animate-in fade-in duration-200">
+          <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl bg-zinc-900/95 backdrop-blur-xl border border-indigo-500/40 text-white text-xs font-bold shadow-2xl flex items-center gap-2.5 animate-in fade-in duration-200">
             <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{toastMsg}</span>
           </div>

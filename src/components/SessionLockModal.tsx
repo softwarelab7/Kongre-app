@@ -120,7 +120,7 @@ export const SessionLockModal: React.FC = () => {
     >
       <div
         className={`w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
-          shake ? 'animate-bounce' : ''
+          shake ? 'animate-shake' : ''
         }`}
       >
         {/* Theocratic Lock Icon */}

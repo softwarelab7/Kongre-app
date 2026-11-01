@@ -114,7 +114,7 @@ export default function ThemeToggle({
         height: size,
         ["--tt-bg" as string]: currentConfig.biteBg,
         transform: isActive ? "scale(0.92)" : isHovered ? "scale(1.08)" : "scale(1)",
-        transition: "transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), color 200ms ease, background-color 200ms ease",
+        transition: "transform 200ms cubic-bezier(0.16, 1, 0.3, 1), color 200ms ease, background-color 200ms ease",
         ...style,
       }}
     >

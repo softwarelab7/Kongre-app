@@ -60,3 +60,6 @@ public/assets/temp/
 # Developer internal changelog (private, not public)
 CHANGELOG_DEV.md
 *.dev.md
+
+# Impeccable platform binaries (auto-downloaded/cached on demand)
+**/impeccable/scripts/bin/

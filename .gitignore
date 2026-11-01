@@ -63,3 +63,6 @@ CHANGELOG_DEV.md
 
 # Impeccable platform binaries (auto-downloaded/cached on demand)
 **/impeccable/scripts/bin/
+
+# Taste Skill working files, screenshots and inspection reports
+.taste-skill/

@@ -2469,21 +2469,25 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
          ========================================================================= */}
       {activeSubTab === 'revisitas' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-500" />
-                <span>Agenda de Revisitas y Personas Interesadas</span>
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
-                Anota direcciones, preguntas pendientes, publicaciones dejadas y convierte revisitas en cursos bíblicos
-              </p>
+          <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-2xs">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <span>Agenda de Revisitas y Personas Interesadas</span>
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Anota direcciones, preguntas pendientes, publicaciones dejadas y convierte revisitas en cursos bíblicos
+                </p>
+              </div>
             </div>
 
             <button
               type="button"
               onClick={handleOpenNewRv}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shrink-0 shadow-lg shadow-emerald-500/20 border border-white/20 transition-all active:scale-95 kg-sheen-top"
             >
               <Plus className="w-4 h-4" />
               <span>Nueva Revisita</span>
@@ -2499,11 +2503,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 value={rvSearch}
                 onChange={(e) => setRvSearch(e.target.value)}
                 placeholder="Buscar por nombre, calle, territorio o tema conversado..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-xs font-medium text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-2xs"
               />
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
               {[
                 { id: 'todas', label: `Todas (${returnVisits.length})` },
                 { id: 'hoy', label: 'Para visitar hoy' },
@@ -2513,10 +2517,10 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   key={f.id}
                   type="button"
                   onClick={() => setRvFilter(f.id as any)}
-                  className={`px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 border ${
                     rvFilter === f.id
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-white/20 shadow-md shadow-emerald-500/20'
+                      : 'bg-white/70 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border-zinc-200/70 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10'
                   }`}
                 >
                   {f.label}
@@ -2530,34 +2534,34 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
             {filteredReturnVisits.map((rv) => (
               <div
                 key={rv.id}
-                className="bg-white dark:bg-[#18181F] rounded-2xl p-5 border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between gap-4"
+                className="kg-card-bento kg-sheen-top rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between gap-4 border border-zinc-200/80 dark:border-white/10 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                        <h4 className="text-base font-extrabold text-zinc-900 dark:text-white">
                           {rv.name}
                         </h4>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${
                             rv.interestLevel === 'alto'
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                               : rv.interestLevel === 'medio'
-                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300'
-                              : 'bg-zinc-100 text-zinc-700 dark:bg-[#18181F] dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A]'
+                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                              : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20'
                           }`}
                         >
                           Interés {rv.interestLevel}
                         </span>
                         {rv.territoryNumber && (
-                          <span className="text-[10px] font-bold font-mono tabular-nums px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300">
+                          <span className="text-[10px] font-bold font-mono tabular-nums px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                             Territorio #{rv.territoryNumber}
                           </span>
                         )}
                       </div>
 
-                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5 mt-1">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 mt-1">
                         <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                         <span>{rv.address}</span>
                       </p>
@@ -2567,7 +2571,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       <button
                         type="button"
                         onClick={() => handleOpenEditRv(rv)}
-                        className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer"
+                        className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer"
                         title="Editar revisita"
                       >
                         <Edit3 className="w-4 h-4" />
@@ -2575,7 +2579,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       <button
                         type="button"
                         onClick={() => handleDeleteRv(rv.id)}
-                        className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                        className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition-all cursor-pointer"
                         title="Eliminar revisita"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -2583,24 +2587,24 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#121216] border border-zinc-100 dark:border-[#27272A] space-y-1.5 text-xs">
-                    <p className="text-zinc-700 dark:text-[#F4F4F5]">
+                  <div className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.02] border border-zinc-100/80 dark:border-white/5 space-y-1.5 text-xs">
+                    <p className="text-zinc-700 dark:text-zinc-200">
                       <strong className="text-emerald-600 dark:text-emerald-400">Tema conversado:</strong>{' '}
                       {rv.topic}
                     </p>
                     {rv.pendingQuestion && (
-                      <p className="text-zinc-700 dark:text-[#F4F4F5]">
+                      <p className="text-zinc-700 dark:text-zinc-200">
                         <strong className="text-indigo-600 dark:text-indigo-400">Pregunta pendiente:</strong>{' '}
                         {rv.pendingQuestion}
                       </p>
                     )}
                     {rv.publicationLeft && (
-                      <p className="text-zinc-500 dark:text-[#A1A1AA]">
+                      <p className="text-zinc-500 dark:text-zinc-400">
                         <strong>Publicación / Video:</strong> {rv.publicationLeft}
                       </p>
                     )}
                     {rv.bestTime && (
-                      <p className="text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1">
+                      <p className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-amber-500" />
                         <span>Horario: {rv.bestTime}</span>
                       </p>
@@ -2609,8 +2613,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
                   {/* Última nota del historial */}
                   {rv.visitsHistory.length > 0 && (
-                    <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] px-1">
-                      <span className="font-bold text-zinc-700 dark:text-[#F4F4F5]">
+                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 px-1">
+                      <span className="font-bold text-zinc-700 dark:text-zinc-200">
                         Visitas (<span className="font-mono tabular-nums">{rv.visitsHistory.length}</span>):
                       </span>{' '}
                       Última el <span className="font-mono tabular-nums">{rv.visitsHistory[0].date}</span> — &ldquo;{rv.visitsHistory[0].note}&rdquo;
@@ -2619,12 +2623,12 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 </div>
 
                 {/* Acciones de la tarjeta de Revisita */}
-                <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2 flex-wrap">
+                <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleLogQuickVisitToday(rv.id)}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md shadow-emerald-500/15 border border-white/10 transition-all active:scale-95 kg-sheen-top"
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>Registrar visita hoy</span>
@@ -2633,7 +2637,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     <button
                       type="button"
                       onClick={() => handleConvertRvToStudy(rv)}
-                      className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-zinc-100/80 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
                       title="Convertir esta revisita en un Estudio Bíblico activo"
                     >
                       <GraduationCap className="w-3.5 h-3.5" />
@@ -2641,13 +2645,13 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     {rv.address && (
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rv.address)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#121216] border border-zinc-200/70 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]"
+                        className="p-2.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/70 dark:border-white/10 text-zinc-600 dark:text-zinc-300 transition-all active:scale-95"
                         title="Abrir dirección en Google Maps"
                       >
                         <MapPin className="w-3.5 h-3.5" />
@@ -2658,7 +2662,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                         href={`https://wa.me/${rv.phone.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+                        className="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:scale-95"
                         title="Enviar WhatsApp"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
@@ -2677,21 +2681,25 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
          ========================================================================= */}
       {activeSubTab === 'estudios' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-amber-500" />
-                <span>Mis Estudios Bíblicos (Cursos Bíblicos)</span>
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
-                Lleva el avance por lección de ¡Disfrute de la vida para siempre!, sesiones del mes y metas espirituales
-              </p>
+          <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 shadow-2xs">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <span>Mis Estudios Bíblicos (Cursos Bíblicos)</span>
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Lleva el avance por lección de ¡Disfrute de la vida para siempre!, sesiones del mes y metas espirituales
+                </p>
+              </div>
             </div>
 
             <button
               type="button"
               onClick={handleOpenNewStudy}
-              className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shrink-0 transition-colors shadow-xs"
+              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shrink-0 shadow-lg shadow-amber-500/20 border border-white/20 transition-all active:scale-95 kg-sheen-top"
             >
               <Plus className="w-4 h-4" />
               <span>Nuevo Estudio Bíblico</span>
@@ -2708,18 +2716,18 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               return (
                 <div
                   key={st.id}
-                  className="bg-white dark:bg-[#18181F] rounded-2xl p-5 border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between gap-4"
+                  className="kg-card-bento kg-sheen-top rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between gap-4 border border-zinc-200/80 dark:border-white/10 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/5"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 font-mono tabular-nums">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono tabular-nums">
                           {st.scheduleDay} • {st.scheduleTime}
                         </span>
-                        <h4 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-[#F4F4F5] mt-1">
+                        <h4 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white mt-1.5">
                           {st.studentName}
                         </h4>
-                        <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1 mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 mt-0.5">
                           <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                           <span>{st.address || 'Dirección registrada'}</span>
                         </p>
@@ -2729,14 +2737,14 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                         <button
                           type="button"
                           onClick={() => handleOpenEditStudy(st)}
-                          className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-[#121216] cursor-pointer"
+                          className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteStudy(st.id)}
-                          className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                          className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition-all cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -2744,62 +2752,62 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     </div>
 
                     {/* Progreso de Lección */}
-                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#121216] border border-zinc-100 dark:border-[#27272A] space-y-2">
+                    <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 space-y-2.5 shadow-2xs">
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] block">
+                          <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 block">
                             {st.publication}
                           </span>
-                          <span className="text-sm font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+                          <span className="text-sm font-black text-zinc-900 dark:text-white font-mono tabular-nums">
                             Lección {st.currentLesson} de {st.totalLessons} ({pct}%)
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => handleUpdateStudyLesson(st.id, -1)}
-                            className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-[#F4F4F5] text-xs font-bold cursor-pointer font-mono tabular-nums"
+                            className="px-3 py-1 rounded-xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 border border-zinc-200/80 dark:border-white/10 text-zinc-900 dark:text-white text-xs font-bold cursor-pointer font-mono tabular-nums transition-all active:scale-95"
                           >
                             -1
                           </button>
                           <button
                             type="button"
                             onClick={() => handleUpdateStudyLesson(st.id, 1)}
-                            className="px-2.5 py-1 rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-bold cursor-pointer font-mono tabular-nums shadow-xs"
+                            className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold cursor-pointer font-mono tabular-nums shadow-xs border border-white/20 transition-all active:scale-95 kg-sheen-top"
                           >
                             +1 Lección
                           </button>
                         </div>
                       </div>
 
-                      <div className="w-full h-2 rounded-full bg-zinc-200 dark:bg-[#27272A] overflow-hidden">
+                      <div className="w-full h-2.5 rounded-full bg-zinc-200/70 dark:bg-white/10 overflow-hidden p-0.5 shadow-inner">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all"
+                          className="h-full rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-500 transition-all duration-300 shadow-xs"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
                     </div>
 
                     {st.spiritualGoal && (
-                      <p className="text-xs text-zinc-700 dark:text-[#F4F4F5] bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+                      <p className="text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50/80 dark:bg-white/[0.02] p-3 rounded-2xl border border-zinc-100/80 dark:border-white/5">
                         <strong className="text-zinc-900 dark:text-white">Meta espiritual:</strong>{' '}
                         {st.spiritualGoal}
                       </p>
                     )}
 
                     {st.notes && (
-                      <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] px-1">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 px-1">
                         <strong>Notas:</strong> {st.notes}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2 flex-wrap">
+                  <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between gap-2 flex-wrap">
                     <button
                       type="button"
                       onClick={() => handleMarkStudySessionToday(st.id)}
-                      className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                      className="px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Marcar estudio realizado hoy</span>
@@ -2823,14 +2831,14 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       {activeSubTab === 'informe' && (
         <div className="w-full space-y-4 sm:space-y-5">
           {/* 1. CABECERA Y TARJETA DE META ANUAL DEL AÑO DE SERVICIO (SEPTIEMBRE - AGOSTO) */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-4 sm:p-6 border border-zinc-200 dark:border-[#27272A] shadow-2xs space-y-4">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-zinc-100 dark:border-[#27272A]">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl p-5 sm:p-7 space-y-5 shadow-sm">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-white/10">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
-                    <Target className="w-3 h-3" /> Año de Servicio (Septiembre – Agosto)
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                    <Target className="w-3.5 h-3.5" /> Año de Servicio (Septiembre – Agosto)
                   </span>
-                  <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
+                  <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                     {serviceYearSummary.isRegularPioneer
                       ? 'Precursor Regular (Meta oficial: 600 h/año)'
                       : serviceYearSummary.isSpecialPioneer
@@ -2838,23 +2846,23 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       : `Meta personal: ${hourGoal} h al mes (${serviceYearSummary.annualGoalHours} h al año)`}
                   </span>
                 </div>
-                <h3 className="text-base sm:text-xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1">
+                <h3 className="text-lg sm:text-2xl font-extrabold text-zinc-900 dark:text-white mt-1.5 tracking-tight">
                   Mi Historial Mensual y Meta Anual de Horas
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Consulta tu avance mes a mes, ajusta tu meta de horas y toca cualquier mes para editarlo o enviarlo por WhatsApp.
                 </p>
               </div>
 
               {/* Selectores rápidos: Meta Mensual/Anual y Año de Servicio */}
-              <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
-                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
-                  <Target className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <span className="text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA]">Mi Meta:</span>
+              <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-auto">
+                <div className="flex items-center gap-2 bg-white/70 dark:bg-white/[0.04] px-3.5 py-2 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-2xs">
+                  <Target className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Mi Meta:</span>
                   <select
                     value={hourGoal}
                     onChange={(e) => handleUpdateGoal(Number(e.target.value))}
-                    className="bg-transparent text-xs font-extrabold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none cursor-pointer"
+                    className="bg-transparent text-xs font-extrabold text-zinc-900 dark:text-white focus:outline-none cursor-pointer"
                   >
                     <option value={10}>10 h/mes (120 h/año)</option>
                     <option value={15}>15 h/mes (Auxiliar)</option>
@@ -2864,9 +2872,9 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
-                  <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <span className="text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA]">Periodo:</span>
+                <div className="flex items-center gap-2 bg-white/70 dark:bg-white/[0.04] px-3.5 py-2 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-2xs">
+                  <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Periodo:</span>
                   <select
                     value={selectedServiceYear}
                     onChange={(e) => {
@@ -2890,78 +2898,78 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               </div>
             </div>
 
-            {/* Resumen Visual de la Meta Anual (4 tarjetas limpias + Barra de Progreso) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-              <div className="p-3.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+            {/* Resumen Visual de la Meta Anual (4 tarjetas Bento limpias + Barra de Progreso) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <div className="kg-card-bento p-4 sm:p-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 transition-all">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
                   Horas en el Año
                 </span>
-                <div className="flex items-baseline gap-1.5 mt-1 font-mono tabular-nums">
-                  <span className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5]">
-                    {serviceYearSummary.totalHoursYear} h
+                <div className="flex items-baseline gap-1.5 mt-1.5 font-mono tabular-nums">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                    {serviceYearSummary.totalHoursYear} <span className="text-lg font-bold text-zinc-500 dark:text-zinc-400">h</span>
                   </span>
-                  <span className="text-xs font-bold text-zinc-500 dark:text-[#A1A1AA]">
+                  <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     / {serviceYearSummary.annualGoalHours} h
                   </span>
                 </div>
-                <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5 block font-mono tabular-nums">
+                <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 mt-1 block font-mono tabular-nums">
                   {serviceYearSummary.annualProgressPct}% de tu meta anual
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
+              <div className="kg-card-bento p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
                   Promedio por Mes
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1 font-mono tabular-nums">
-                  {serviceYearSummary.avgMonthlyHours} h
+                <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1.5 font-mono tabular-nums tracking-tight">
+                  {serviceYearSummary.avgMonthlyHours} <span className="text-lg font-bold text-zinc-500 dark:text-zinc-400">h</span>
                 </div>
-                <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block font-mono tabular-nums">
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 block font-mono tabular-nums">
                   Meta mensual: {hourGoal} h/mes
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
+              <div className="kg-card-bento p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
                   Meses Informados
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 font-mono tabular-nums">
+                <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1.5 font-mono tabular-nums tracking-tight">
                   {serviceYearSummary.monthsParticipated}{' '}
-                  <span className="text-xs font-bold text-zinc-400">de 12</span>
+                  <span className="text-sm font-bold text-zinc-400">de 12</span>
                 </div>
-                <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block">
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 block">
                   Septiembre a Agosto
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
+              <div className="kg-card-bento p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
                   Faltan para la Meta
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1 font-mono tabular-nums">
+                <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1.5 font-mono tabular-nums tracking-tight">
                   {serviceYearSummary.remainingAnnualHours === 0
                     ? '¡Lograda! 🎉'
                     : `${serviceYearSummary.remainingAnnualHours} h`}
                 </div>
-                <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5 block font-mono tabular-nums">
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 block font-mono tabular-nums">
                   {serviceYearSummary.totalStudiesYear} estudios en el año
                 </span>
               </div>
             </div>
 
             {/* Barra de progreso anual */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-bold">
-                <span className="text-zinc-600 dark:text-[#A1A1AA]">
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-zinc-600 dark:text-zinc-300">
                   Avance acumulado del año de servicio {selectedServiceYear}
                 </span>
                 <span className="text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                   {serviceYearSummary.totalHoursYear} h completadas ({serviceYearSummary.annualProgressPct}%)
                 </span>
               </div>
-              <div className="w-full h-3 rounded-full bg-zinc-100 dark:bg-[#18181F] overflow-hidden p-0.5 border border-zinc-200/60 dark:border-[#27272A]">
+              <div className="w-full h-3 rounded-full bg-zinc-200/70 dark:bg-white/10 overflow-hidden p-0.5 shadow-inner">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 transition-all duration-500"
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 transition-all duration-500 shadow-sm"
                   style={{ width: `${serviceYearSummary.annualProgressPct}%` }}
                 />
               </div>
@@ -2971,13 +2979,13 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           {/* 2. PANEL DIVIDIDO: MIS 12 MESES DEL AÑO (IZQUIERDA) + DETALLE Y ENVÍO DEL MES SELECCIONADO (DERECHA) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
             {/* IZQUIERDA (7 cols): LISTA VISUAL INTERACTIVA DE LOS 12 MESES */}
-            <div className="lg:col-span-7 bg-white dark:bg-[#121216] rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-[#27272A] shadow-2xs space-y-3.5">
-              <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-[#27272A]">
+            <div className="lg:col-span-7 kg-glass-surface kg-sheen-top rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-200/60 dark:border-white/10">
                 <div>
-                  <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                  <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
                     Mis 12 Meses ({selectedServiceYear})
                   </h4>
-                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                     Toca cualquier mes de la lista para ver o editar tus horas, estudios y notas.
                   </p>
                 </div>
@@ -2988,14 +2996,14 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       setSelectedServiceYear('2025-2026');
                       setSelectedHistoryMonthKey(currentMonthKey);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 text-[11px] font-bold hover:bg-indigo-100 transition cursor-pointer shrink-0"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[11px] font-bold hover:bg-indigo-500/20 transition-all cursor-pointer shrink-0 active:scale-95"
                   >
                     Ir al mes actual
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {serviceYearSummary.rows.map((row) => {
                   const isSelected = row.monthKey === selectedHistoryRow?.monthKey;
                   const rowHours = row.hours ?? 0;
@@ -3007,30 +3015,30 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       key={row.monthKey}
                       type="button"
                       onClick={() => setSelectedHistoryMonthKey(row.monthKey)}
-                      className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                      className={`text-left p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between gap-2.5 active:scale-[0.99] ${
                         isSelected
-                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 dark:border-indigo-500 ring-2 ring-indigo-500/20 shadow-2xs'
+                          ? 'bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/80 ring-2 ring-indigo-500/30 shadow-md shadow-indigo-500/10'
                           : row.isCurrentMonth
-                          ? 'bg-zinc-50/90 dark:bg-[#18181F]/90 border-indigo-200 dark:border-indigo-800/70 hover:border-indigo-400'
-                          : 'bg-white dark:bg-[#18181F] border-zinc-200/80 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#18181F]/80'
+                          ? 'bg-white/90 dark:bg-white/[0.04] border-indigo-300 dark:border-indigo-500/40 hover:border-indigo-400 shadow-2xs'
+                          : 'bg-white/60 dark:bg-white/[0.02] border-zinc-200/80 dark:border-white/10 hover:bg-white/80 dark:hover:bg-white/[0.05]'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2 w-full">
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                            <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white">
                               {row.monthName}
                             </span>
                             <span className="text-[11px] font-semibold text-zinc-400 font-mono tabular-nums">
                               {row.year}
                             </span>
                             {row.isCurrentMonth && (
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-indigo-600 text-white">
+                              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-600 text-white shadow-2xs">
                                 Actual
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 mt-1">
+                          <div className="flex items-center gap-1.5 mt-1.5">
                             {row.participated ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                                 <CheckCircle2 className="w-3 h-3" /> Participó
@@ -3045,7 +3053,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                               </span>
                             )}
                             {row.isAuxiliaryPioneer && (
-                              <span className="px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 text-[9px] font-bold">
+                              <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-[9px] font-bold">
                                 Auxiliar
                               </span>
                             )}
@@ -3053,7 +3061,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                         </div>
 
                         <div className="text-right font-mono tabular-nums shrink-0">
-                          <div className="text-sm sm:text-base font-black text-indigo-600 dark:text-indigo-400">
+                          <div className="text-sm sm:text-base font-extrabold text-indigo-600 dark:text-indigo-400">
                             {row.hours !== undefined ? `${row.hours} h` : '0 h'}
                             {row.minutes > 0 && (
                               <span className="text-[10px] font-bold text-zinc-400 ml-0.5">
@@ -3061,7 +3069,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] font-semibold text-zinc-500 dark:text-[#A1A1AA] block font-mono tabular-nums">
+                          <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 block font-mono tabular-nums">
                             {row.bibleStudies > 0 ? `${row.bibleStudies} est.` : '0 est.'}
                           </span>
                         </div>
@@ -3069,11 +3077,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
                       {/* Mini barra de progreso frente a la meta mensual */}
                       <div className="w-full space-y-1">
-                        <div className="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-[#27272A] overflow-hidden">
+                        <div className="w-full h-1.5 rounded-full bg-zinc-200/70 dark:bg-white/10 overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all ${
+                            className={`h-full rounded-full transition-all duration-300 ${
                               monthGoalPct >= 100
-                                ? 'bg-emerald-500'
+                                ? 'bg-emerald-500 shadow-xs'
                                 : row.participated
                                 ? 'bg-indigo-500'
                                 : 'bg-zinc-300 dark:bg-zinc-700'
@@ -3082,7 +3090,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                           />
                         </div>
                         {row.notes && (
-                          <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate">
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
                             {row.notes}
                           </p>
                         )}
@@ -3095,26 +3103,26 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
             {/* DERECHA (5 cols): EDITOR SIMPLE Y ENVÍO DEL MES SELECCIONADO */}
             {selectedHistoryRow && (
-              <div className="lg:col-span-5 bg-white dark:bg-[#121216] rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-[#27272A] shadow-2xs space-y-4 lg:sticky lg:top-20">
-                <div className="flex items-start justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+              <div className="lg:col-span-5 kg-glass-surface kg-sheen-top rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm lg:sticky lg:top-20">
+                <div className="flex items-start justify-between gap-2 pb-3 border-b border-zinc-200/60 dark:border-white/10">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                         {selectedHistoryRow.isCurrentMonth
                           ? 'Mes en Curso (Sincronizado con Cronómetro)'
                           : 'Edición de Mes del Historial'}
                       </span>
                     </div>
-                    <h4 className="text-base sm:text-lg font-black text-zinc-900 dark:text-[#F4F4F5] mt-0.5">
+                    <h4 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white mt-0.5 tracking-tight">
                       {selectedHistoryRow.monthName} <span className="font-mono tabular-nums">{selectedHistoryRow.year}</span>
                     </h4>
                   </div>
 
                   <span
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase ${
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                       selectedHistoryRow.participated
-                        ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/60 dark:border-[#27272A]'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                        : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20'
                     }`}
                   >
                     {selectedHistoryRow.participated ? 'Mes Activo' : 'Pendiente'}
@@ -3122,12 +3130,12 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 </div>
 
                 {/* Paso 1: ¿Participaste en el ministerio este mes? */}
-                <label className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 cursor-pointer shadow-2xs">
                   <div className="pr-3">
-                    <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] block">
+                    <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white block">
                       Participé en la predicación este mes
                     </span>
-                    <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
                       Marca esta casilla si predicaste en {selectedHistoryRow.monthName}
                     </span>
                   </div>
@@ -3135,19 +3143,19 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     type="checkbox"
                     checked={historyFormParticipated}
                     onChange={(e) => setHistoryFormParticipated(e.target.checked)}
-                    className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                    className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
                   />
                 </label>
 
                 {/* Paso 2: Horas y Estudios del Mes */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Control de Horas */}
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 space-y-2 shadow-2xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">
+                      <span className="text-xs font-bold text-zinc-700 dark:text-zinc-200">
                         Horas del Mes
                       </span>
-                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                         Meta: {hourGoal}h
                       </span>
                     </div>
@@ -3155,7 +3163,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       <button
                         type="button"
                         onClick={() => setHistoryFormHours((h) => Math.max(0, h - 1))}
-                        className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-black hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 font-black hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         -
                       </button>
@@ -3168,32 +3176,32 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                           onChange={(e) =>
                             setHistoryFormHours(Math.max(0, parseInt(e.target.value, 10) || 0))
                           }
-                          className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums"
+                          className="w-14 text-center text-lg font-black py-0.5 rounded-xl bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                         />
                         <span className="text-xs font-bold text-zinc-400">h</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setHistoryFormHours((h) => h + 1)}
-                        className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-black hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 font-black hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         +
                       </button>
                     </div>
                     {historyFormMinutes > 0 && (
-                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold block text-center font-mono tabular-nums">
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold block text-center font-mono tabular-nums">
                         + {historyFormMinutes} min acumulados
                       </span>
                     )}
                   </div>
 
                   {/* Control de Cursos Bíblicos */}
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 space-y-2 shadow-2xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">
+                      <span className="text-xs font-bold text-zinc-700 dark:text-zinc-200">
                         Cursos Bíblicos
                       </span>
-                      <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
                         Diferentes
                       </span>
                     </div>
@@ -3201,7 +3209,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       <button
                         type="button"
                         onClick={() => setHistoryFormStudies((s) => Math.max(0, s - 1))}
-                        className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-black hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 font-black hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         -
                       </button>
@@ -3214,13 +3222,13 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                           onChange={(e) =>
                             setHistoryFormStudies(Math.max(0, parseInt(e.target.value, 10) || 0))
                           }
-                          className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums"
+                          className="w-14 text-center text-lg font-black py-0.5 rounded-xl bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => setHistoryFormStudies((s) => s + 1)}
-                        className="w-8 h-8 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-black hover:bg-zinc-100 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 font-black hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         +
                       </button>
@@ -3232,7 +3240,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 </div>
 
                 {/* Paso 3: Precursor Auxiliar en este mes */}
-                <label className="flex items-center justify-between p-3 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-800/50 cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-2xl bg-purple-500/10 dark:bg-purple-500/15 border border-purple-500/20 cursor-pointer">
                   <div>
                     <span className="text-xs font-bold text-purple-900 dark:text-purple-200 block">
                       Hice el Precursorado Auxiliar este mes
@@ -3251,7 +3259,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
                 {/* Paso 4: Notas del mes */}
                 <div>
-                  <label className="block text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-200 mb-1">
                     Notas o comentarios del mes (opcional)
                   </label>
                   <textarea
@@ -3259,16 +3267,16 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                     value={historyFormNotes}
                     onChange={(e) => setHistoryFormNotes(e.target.value)}
                     placeholder="Ej. Precursor auxiliar de 15h, horas en campaña especial..."
-                    className="w-full p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-xs text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    className="w-full p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
                   />
                 </div>
 
                 {/* Botones de Acción del Mes */}
-                <div className="space-y-2 pt-1">
+                <div className="space-y-2.5 pt-1">
                   <button
                     type="button"
                     onClick={handleSaveSelectedHistoryMonth}
-                    className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-colors"
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 border border-white/20 cursor-pointer transition-all active:scale-95 kg-sheen-top"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Guardar {selectedHistoryRow.monthName} en mi Historial</span>
@@ -3277,7 +3285,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   <button
                     type="button"
                     onClick={handleShareSelectedMonthWhatsApp}
-                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs cursor-pointer transition-colors"
+                    className="w-full py-3 px-4 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 border border-emerald-500/30 cursor-pointer transition-all active:scale-95 backdrop-blur-xs"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>Enviar {selectedHistoryRow.monthName} por WhatsApp</span>

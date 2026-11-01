@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
@@ -54,6 +55,7 @@ import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
 import { RolesManagerTab } from './components/RolesManagerTab';
 import { MobileMenuTab } from './components/MobileMenuTab';
 import { CategoryHubTab } from './components/CategoryHubTab';
+import { GlobalSectionQuickBar } from './components/GlobalSectionQuickBar';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
 import { SessionLockModal } from './components/SessionLockModal';
@@ -74,6 +76,7 @@ import { DesktopUpdateModal } from './components/DesktopUpdateModal';
 import { checkForDesktopUpdate, DesktopUpdateInfo } from './services/desktopUpdateService';
 import { isDesktopApp } from './utils/platform';
 import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
+import { OfflineDashboard } from './components/OfflineDashboard';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
@@ -449,6 +452,39 @@ const AppContent: React.FC = () => {
 
   const [previousTab, setPreviousTab] = useState<ActiveTab>('menu');
 
+  const getMobileMainTabOrder = useCallback((tab: ActiveTab): number | null => {
+    if (
+      tab === 'inicio' ||
+      tab === 'cronometro_ministerio' ||
+      tab === 'revisitas' ||
+      tab === 'estudios_biblicos'
+    ) {
+      return 0;
+    }
+    if (tab === 'panorama_general') return 1;
+    if (
+      tab === 'programacion' ||
+      tab === 'clm_vmc' ||
+      tab === 's89' ||
+      tab === 'discursos' ||
+      tab === 'hospitalidad'
+    ) {
+      return 2;
+    }
+    if (tab === 'calendario') return 3;
+    if (tab === 'menu') return 4;
+    return null;
+  }, []);
+
+  const tabTransitionDirection = useMemo(() => {
+    const prevOrder = getMobileMainTabOrder(previousTab);
+    const nextOrder = getMobileMainTabOrder(activeTab);
+    if (prevOrder !== null && nextOrder !== null && prevOrder !== nextOrder) {
+      return nextOrder > prevOrder ? 1 : -1;
+    }
+    return 0;
+  }, [previousTab, activeTab, getMobileMainTabOrder]);
+
   // Navigation with browser History (Back / Forward button support)
   const setActiveTab = useCallback(
     (
@@ -459,6 +495,9 @@ const AppContent: React.FC = () => {
         const nextTab = typeof targetTabOrFn === 'function' ? targetTabOrFn(prevTab) : targetTabOrFn;
         if (nextTab !== prevTab) {
           setPreviousTab(prevTab);
+          if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
         }
         const currentModal = options?.modal !== undefined ? options.modal : null;
         const currentWeekId = options?.weekId || null;
@@ -1587,24 +1626,12 @@ const AppContent: React.FC = () => {
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} ${isInspectorOpen ? 'lg:pr-[380px]' : ''} transition-all duration-200 flex flex-col justify-between overflow-x-clip`}>
         <div className="relative flex-1 w-full px-2.5 sm:px-4 md:px-6 lg:px-7 xl:px-8 py-2.5 sm:py-5 pb-6">
-          {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
-            <div className="md:hidden sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 -mx-2.5 px-3 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2.5 mb-3.5 bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3 min-w-0">
-                <button
-                  type="button"
-                  data-mobile-back-btn="true"
-                  aria-label="Atrás"
-                  onClick={() => setActiveTab(previousTab || 'menu')}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] transition-all active:scale-95 cursor-pointer shrink-0"
-                >
-                  <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                </button>
-                <span className="text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5] truncate">
-                  {mobileTabTitles[activeTab] || ''}
-                </span>
-              </div>
-            </div>
-          )}
+          <GlobalSectionQuickBar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            selectedCategoryHub={selectedCategoryHub}
+            onSelectCategoryHub={setSelectedCategoryHub}
+          />
           <LoadingSpinner
             isVisible={!isDemoMode && (isSupabaseSyncing || syncStatus === 'saving')}
             activeTab={activeTab}
@@ -1659,98 +1686,127 @@ const AppContent: React.FC = () => {
               </div>
             )}
 
-            {(activeTab === 'inicio' ||
-              activeTab === 'cronometro_ministerio' ||
-              activeTab === 'revisitas' ||
-              activeTab === 'estudios_biblicos') && (
-              <MinisterioPublicadorTab
-                setActiveTab={setActiveTab}
-                initialSubTab={
-                  activeTab === 'cronometro_ministerio'
-                    ? 'cronometro'
-                    : activeTab === 'revisitas'
-                    ? 'revisitas'
-                    : activeTab === 'estudios_biblicos'
-                    ? 'estudios'
-                    : 'resumen'
-                }
-                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-              />
-            )}
-            {activeTab === 'panorama_general' && (
-              <PanoramaGeneralTab setActiveTab={setActiveTab} />
-            )}
-            {activeTab === 'estadisticas_secretaria' && (
-              <ResumenInicioTab
-                setActiveTab={setActiveTab}
-                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-                onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-                onOpenConflictsModal={openConflictsView}
-                onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
-              />
-            )}
-            {activeTab === 'calendario' && (
-              <CongregationCalendar onNavigateToWeek={handleNavigateToWeek} />
-            )}
-            {activeTab === 'programacion' && <ScheduleTab />}
-            {activeTab === 'clm_vmc' && (
-              <ClmScheduleView
-                publishers={publishers}
-                congregationId={settings.congregationName}
-              />
-            )}
-            {activeTab === 's89' && <S89SlipsTab />}
-            {activeTab === 'publicadores' && <PublishersTab />}
-            {activeTab === 'precursores_auxiliares' && <PrecursoresAuxiliaresTab />}
-            {activeTab === 'grupos_servicio' && <GruposServicioTab />}
-            {activeTab === 'territorios' && <TerritoriosTab />}
-            {activeTab === 'visita_sc' && <VisitaSuperintendenteTab />}
-            {activeTab === 'memorial_asambleas' && <MemorialAsambleasTab />}
-            {activeTab === 'discursos' && <DiscursosPublicosTab />}
-            {activeTab === 'hospitalidad' && <HospitalidadTab />}
-            {activeTab === 'carritos' && <CarritosTab />}
-            {activeTab === 'asistencia' && <AsistenciaTab />}
-            {activeTab === 'informe_s1' && <InformeSucursalS1Tab />}
-            {activeTab === 'informes_servicio' && <InformesServicioTab />}
-            {activeTab === 'tarjetas_s21' && <TarjetasS21Tab />}
-            {activeTab === 'cuentas' && <CuentasTab />}
-            {activeTab === 'literatura' && <LiteraturaTab />}
-            {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
-            {activeTab === 'panel_electrico' && <PanelElectricoTab />}
-            {activeTab === 'mantenimiento' && <MantenimientoTab />}
-            {activeTab === 'tablero_anuncios' && <TableroAnunciosTab />}
-            {activeTab === 'conflictos' && (
-              <ConflictCenterTab onNavigateToWeek={handleNavigateToWeek} />
-            )}
-            {activeTab === 'equidad' && <EquidadDashboardTab />}
-            {activeTab === 'exportar_pdf' && <ExportPdfTab />}
-            {activeTab === 'mi_vista' && <PersonalViewTab />}
-            {activeTab === 'perfil' && <UserProfileSettingsView />}
-            {activeTab === 'roles' && (
-              <RolesManagerTab setActiveTab={setActiveTab} />
-            )}
-            {activeTab === 'ajustes' && (
-              <SettingsTab
-                onNavigateToProfile={() => setActiveTab('perfil')}
-                onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
-                onNavigateToRoles={() => setActiveTab('roles')}
-              />
-            )}
-            {activeTab === 'menu' && (
-              <CategoryHubTab
-                setActiveTab={setActiveTab}
-                selectedCategory={selectedCategoryHub}
-                onSelectCategory={setSelectedCategoryHub}
-                onOpenConflictsModal={openConflictsView}
-                onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
-                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-                onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-                onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
-                onOpenRoleModal={() => setActiveTab('roles')}
-                onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
-                onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
-              />
-            )}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab === 'menu' ? `menu-${selectedCategoryHub}` : activeTab}
+                initial={{
+                  opacity: 0,
+                  x: tabTransitionDirection * 18,
+                  y: tabTransitionDirection === 0 ? 10 : 3,
+                  scale: 0.994,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  x: tabTransitionDirection * -12,
+                  y: tabTransitionDirection === 0 ? -6 : 0,
+                  scale: 0.996,
+                }}
+                transition={{
+                  duration: 0.22,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="w-full will-change-[transform,opacity]"
+              >
+                {(activeTab === 'inicio' ||
+                  activeTab === 'cronometro_ministerio' ||
+                  activeTab === 'revisitas' ||
+                  activeTab === 'estudios_biblicos') && (
+                  <MinisterioPublicadorTab
+                    setActiveTab={setActiveTab}
+                    initialSubTab={
+                      activeTab === 'cronometro_ministerio'
+                        ? 'cronometro'
+                        : activeTab === 'revisitas'
+                        ? 'revisitas'
+                        : activeTab === 'estudios_biblicos'
+                        ? 'estudios'
+                        : 'resumen'
+                    }
+                    onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                  />
+                )}
+                {activeTab === 'panorama_general' && (
+                  <PanoramaGeneralTab setActiveTab={setActiveTab} />
+                )}
+                {activeTab === 'estadisticas_secretaria' && (
+                  <ResumenInicioTab
+                    setActiveTab={setActiveTab}
+                    onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                    onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                    onOpenConflictsModal={openConflictsView}
+                    onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+                  />
+                )}
+                {activeTab === 'calendario' && (
+                  <CongregationCalendar onNavigateToWeek={handleNavigateToWeek} />
+                )}
+                {activeTab === 'programacion' && <ScheduleTab />}
+                {activeTab === 'clm_vmc' && (
+                  <ClmScheduleView
+                    publishers={publishers}
+                    congregationId={settings.congregationName}
+                  />
+                )}
+                {activeTab === 's89' && <S89SlipsTab />}
+                {activeTab === 'publicadores' && <PublishersTab />}
+                {activeTab === 'precursores_auxiliares' && <PrecursoresAuxiliaresTab />}
+                {activeTab === 'grupos_servicio' && <GruposServicioTab />}
+                {activeTab === 'territorios' && <TerritoriosTab />}
+                {activeTab === 'visita_sc' && <VisitaSuperintendenteTab />}
+                {activeTab === 'memorial_asambleas' && <MemorialAsambleasTab />}
+                {activeTab === 'discursos' && <DiscursosPublicosTab />}
+                {activeTab === 'hospitalidad' && <HospitalidadTab />}
+                {activeTab === 'carritos' && <CarritosTab />}
+                {activeTab === 'asistencia' && <AsistenciaTab />}
+                {activeTab === 'informe_s1' && <InformeSucursalS1Tab />}
+                {activeTab === 'informes_servicio' && <InformesServicioTab />}
+                {activeTab === 'tarjetas_s21' && <TarjetasS21Tab />}
+                {activeTab === 'cuentas' && <CuentasTab />}
+                {activeTab === 'literatura' && <LiteraturaTab />}
+                {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
+                {activeTab === 'panel_electrico' && <PanelElectricoTab />}
+                {activeTab === 'mantenimiento' && <MantenimientoTab />}
+                {activeTab === 'tablero_anuncios' && <TableroAnunciosTab />}
+                {activeTab === 'conflictos' && (
+                  <ConflictCenterTab onNavigateToWeek={handleNavigateToWeek} />
+                )}
+                {activeTab === 'equidad' && <EquidadDashboardTab />}
+                {activeTab === 'exportar_pdf' && <ExportPdfTab />}
+                {activeTab === 'mi_vista' && <PersonalViewTab />}
+                {activeTab === 'perfil' && <UserProfileSettingsView />}
+                {activeTab === 'roles' && (
+                  <RolesManagerTab setActiveTab={setActiveTab} />
+                )}
+                {activeTab === 'ajustes' && (
+                  <SettingsTab
+                    onNavigateToProfile={() => setActiveTab('perfil')}
+                    onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                    onNavigateToRoles={() => setActiveTab('roles')}
+                  />
+                )}
+                {activeTab === 'menu' && (
+                  <CategoryHubTab
+                    setActiveTab={setActiveTab}
+                    selectedCategory={selectedCategoryHub}
+                    onSelectCategory={setSelectedCategoryHub}
+                    onOpenConflictsModal={openConflictsView}
+                    onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+                    onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                    onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                    onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+                    onOpenRoleModal={() => setActiveTab('roles')}
+                    onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                    onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
           </>
         )}
         </div>
@@ -1904,12 +1960,10 @@ const AppContent: React.FC = () => {
         onClose={() => setIsDesktopUpdateOpen(false)}
       />
 
-      {/* Modal de Cola de Sincronización Offline (IndexedDB / Supabase) */}
-      <OfflineSyncQueueModal
+      {/* Panel de Datos Locales y Cola de Sincronización Offline (OfflineDashboard) */}
+      <OfflineDashboard
         isOpen={isQueueModalOpen}
         onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
-        isOnline={isOnline}
-        onSyncNow={syncOfflineQueueNow}
       />
 
       {/* Demo Notice Modal (Organized-style Welcome to Demo Notice) */}

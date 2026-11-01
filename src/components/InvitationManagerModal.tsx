@@ -304,20 +304,6 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('sesiones')}
-            className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-              activeTab === 'sesiones'
-                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
-            }`}
-          >
-            <span>Dispositivos Autorizados</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-              {activeSessions.filter((s) => s.status === 'active').length}
-            </span>
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveTab('clave_maestra')}
             className={`py-3 px-3 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'clave_maestra'
@@ -596,76 +582,6 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                   ))}
                 </div>
               )}
-            </div>
-          )}
-
-          {/* TAB 3: ACTIVE DEVICE SESSIONS */}
-          {activeTab === 'sesiones' && (
-            <div className="space-y-4">
-              <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F]/80 border border-zinc-200 dark:border-[#27272A]">
-                <span className="font-bold text-zinc-900 dark:text-white block mb-0.5">
-                  Control de Dispositivos y Cuentas Conectadas
-                </span>
-                <p className="text-zinc-500 dark:text-[#A1A1AA]">
-                  Si un hermano se muda de congregación o deja de servir como anciano o siervo ministerial, puedes revocar inmediatamente su sesión desde este panel.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {activeSessions.map((sess) => {
-                  const isRevoked = sess.status === 'revoked';
-                  return (
-                    <div
-                      key={sess.id}
-                      className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                        isRevoked
-                          ? 'border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#121216]/50 opacity-60'
-                          : 'border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                          {sess.deviceInfo.includes('Móvil') ? (
-                            <Smartphone className="w-4 h-4" />
-                          ) : (
-                            <Laptop className="w-4 h-4" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-zinc-900 dark:text-white text-xs">{sess.name}</span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                              {THEOCRATIC_ROLES[sess.role as TheocraticRole]?.shortName || sess.role}
-                            </span>
-                            {isRevoked ? (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                                Acceso Revocado
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                                Conectado
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-zinc-500 mt-0.5">
-                            {sess.email} • {sess.deviceInfo} • Activo: {sess.lastActive}
-                          </p>
-                        </div>
-                      </div>
-
-                      {!isRevoked && (
-                        <button
-                          type="button"
-                          onClick={() => revokeSession(sess.id)}
-                          className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold self-end sm:self-auto cursor-pointer"
-                        >
-                          Revocar Acceso
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           )}
 

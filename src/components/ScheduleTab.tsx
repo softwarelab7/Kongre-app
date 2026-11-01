@@ -23,6 +23,7 @@ import { SplashCheckbox } from './SplashCheckbox';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { createDefaultPrograma } from '../utils/clmDefaultProgram';
+import { autoAsignarLocal } from '../utils/clmAutoAssignLocal';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
 import {
   getLocalOfficialFormBytes,
@@ -77,6 +78,8 @@ import {
   MoreHorizontal,
   ChevronDown,
   ArrowLeft,
+  ArrowRightLeft,
+  RefreshCw,
   X,
 } from 'lucide-react';
 
@@ -290,6 +293,189 @@ export const ScheduleTab: React.FC = () => {
     setToastNotification(msg);
     setTimeout(() => setToastNotification(null), 3500);
   };
+
+  // Autoasignación integral para Entre Semana (VMC) + Fin de Semana
+  const handleAutoAssignAllMeetings = () => {
+    if (!currentWeek) return;
+    // 1. Autoasignar semana en CongregationContext (incluye Fin de Semana y estructura base)
+    autoAssignCurrentWeek();
+
+    // 2. Autoasignar también el programa detallado de Entre Semana (VMC)
+    const existingClm =
+      getClmPrograma(currentWeek.weekStartDate) ||
+      createDefaultPrograma(
+        currentWeek.weekStartDate,
+        settings.congregationName || currentWeek.id,
+        currentWeek,
+        publishers
+      );
+    const assignedClm = autoAsignarLocal(existingClm, publishers, clmProgramas);
+    updateClmPrograma(assignedClm);
+    try {
+      localStorage.setItem(`clm_programa_${currentWeek.weekStartDate}`, JSON.stringify(assignedClm));
+    } catch {}
+
+    setToastNotification('✨ Reunión Entre Semana y Fin de Semana autoasignadas inteligentemente.');
+    setTimeout(() => setToastNotification(null), 3500);
+  };
+
+  // Autoasignación específica para la Reunión del Fin de Semana
+  const handleAutoAssignWeekendOnly = () => {
+    if (!currentWeek) return;
+    const updated = JSON.parse(JSON.stringify(currentWeek)) as WeekSchedule;
+    const activeMalePublishers = publishers.filter(
+      (p) => p.isActive !== false && p.gender === 'hermano'
+    );
+    const usedIds = new Set<string>();
+
+    const pickBestCandidate = (roleCheck: (p: Publisher) => boolean): Publisher | undefined => {
+      const pool = activeMalePublishers.filter(
+        (p) => roleCheck(p) && !usedIds.has(p.id)
+      );
+      const fallbackPool =
+        pool.length > 0
+          ? pool
+          : activeMalePublishers.filter((p) => !usedIds.has(p.id));
+      if (fallbackPool.length === 0) return undefined;
+      return fallbackPool[0];
+    };
+
+    if (!updated.weekend.presidentId) {
+      const candidate = pickBestCandidate(
+        (p) => Boolean(p.roles.fds_presidente || p.spiritualStatus === 'anciano')
+      );
+      if (candidate) {
+        updated.weekend.presidentId = candidate.id;
+        usedIds.add(candidate.id);
+      }
+    } else {
+      usedIds.add(updated.weekend.presidentId);
+    }
+
+    if (!updated.weekend.atalayaConductorId) {
+      const candidate = pickBestCandidate(
+        (p) => Boolean(p.roles.fds_atalaya_conductor || p.spiritualStatus === 'anciano')
+      );
+      if (candidate) {
+        updated.weekend.atalayaConductorId = candidate.id;
+        usedIds.add(candidate.id);
+      }
+    } else {
+      usedIds.add(updated.weekend.atalayaConductorId);
+    }
+
+    if (!updated.weekend.atalayaLectorId) {
+      const candidate = pickBestCandidate(
+        (p) => Boolean(p.roles.fds_atalaya_lector || p.roles.vym_vida_lector)
+      );
+      if (candidate) {
+        updated.weekend.atalayaLectorId = candidate.id;
+        usedIds.add(candidate.id);
+      }
+    } else {
+      usedIds.add(updated.weekend.atalayaLectorId);
+    }
+
+    if (!updated.weekend.initialPrayerId) {
+      const candidate = pickBestCandidate(
+        (p) => Boolean(p.roles.vym_oracion || p.spiritualStatus === 'anciano' || p.spiritualStatus === 'siervo_ministerial')
+      );
+      if (candidate) {
+        updated.weekend.initialPrayerId = candidate.id;
+        usedIds.add(candidate.id);
+      }
+    } else {
+      usedIds.add(updated.weekend.initialPrayerId);
+    }
+
+    if (!updated.weekend.finalPrayerId) {
+      const candidate = pickBestCandidate(
+        (p) => Boolean(p.roles.vym_oracion || p.spiritualStatus === 'anciano' || p.spiritualStatus === 'siervo_ministerial')
+      );
+      if (candidate) {
+        updated.weekend.finalPrayerId = candidate.id;
+        usedIds.add(candidate.id);
+      }
+    } else {
+      usedIds.add(updated.weekend.finalPrayerId);
+    }
+
+    if (!updated.weekend.publicTalkSpeaker) {
+      const speakerCandidate = pickBestCandidate(
+        (p) => Boolean(p.roles.fds_orador || p.spiritualStatus === 'anciano')
+      );
+      if (speakerCandidate) {
+        updated.weekend.publicTalkSpeaker = speakerCandidate.name;
+        usedIds.add(speakerCandidate.id);
+      }
+    }
+
+    updateWeek(updated);
+    setToastNotification('✨ Reunión del Fin de Semana autoasignada sin cruces.');
+    setTimeout(() => setToastNotification(null), 3500);
+  };
+
+  // Progreso en vivo de asignaciones de Entre Semana y Fin de Semana
+  const meetingProgress = useMemo(() => {
+    if (!currentWeek) {
+      return {
+        midweekAssigned: 0,
+        midweekTotal: 0,
+        weekendAssigned: 0,
+        weekendTotal: 6,
+      };
+    }
+
+    const clmProg =
+      getClmPrograma(currentWeek.weekStartDate) ||
+      createDefaultPrograma(
+        currentWeek.weekStartDate,
+        settings.congregationName || currentWeek.id,
+        currentWeek,
+        publishers
+      );
+    const assignableClmParts = clmProg.partes.filter((p) => p.tipo !== 'cancion');
+    const midweekTotal = 3 + assignableClmParts.length;
+    const midweekAssigned =
+      (clmProg.presidente_nid ? 1 : 0) +
+      (clmProg.oracion_inicial_nid ? 1 : 0) +
+      (clmProg.oracion_final_nid ? 1 : 0) +
+      assignableClmParts.filter((p) => Boolean(p.asignado_nid)).length;
+
+    const w = currentWeek.weekend;
+    const weekendTotal = 6;
+    const weekendAssigned =
+      (w.presidentId ? 1 : 0) +
+      (w.initialPrayerId ? 1 : 0) +
+      (w.publicTalkSpeaker ? 1 : 0) +
+      (w.atalayaConductorId ? 1 : 0) +
+      (w.atalayaLectorId ? 1 : 0) +
+      (w.finalPrayerId ? 1 : 0);
+
+    return {
+      midweekAssigned,
+      midweekTotal,
+      weekendAssigned,
+      weekendTotal,
+    };
+  }, [currentWeek, clmProgramas, getClmPrograma, settings.congregationName, publishers]);
+
+  // Detección de cruces internos en la Reunión del Fin de Semana
+  const weekendDuplicateIds = useMemo(() => {
+    if (!currentWeek) return new Set<string>();
+    const counts = new Map<string, number>();
+    const w = currentWeek.weekend;
+    [w.presidentId, w.initialPrayerId, w.atalayaConductorId, w.atalayaLectorId, w.finalPrayerId]
+      .filter(Boolean)
+      .forEach((id) => {
+        if (id) counts.set(id, (counts.get(id) || 0) + 1);
+      });
+    const dupes = new Set<string>();
+    counts.forEach((count, id) => {
+      if (count > 1) dupes.add(id);
+    });
+    return dupes;
+  }, [currentWeek]);
 
   if (!currentWeek) {
     return (
@@ -758,41 +944,63 @@ export const ScheduleTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Bloque 1B: Selector de tipo de reunión (3 columnas simétricas en móvil, en línea en desktop) */}
+          {/* Bloque 1B: Selector de tipo de reunión con indicadores de progreso */}
           <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A] gap-1">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'all'
                     ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                Todo
+                <span>Todo</span>
+                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                  {meetingProgress.midweekAssigned + meetingProgress.weekendAssigned}/
+                  {meetingProgress.midweekTotal + meetingProgress.weekendTotal}
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('midweek')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'midweek'
                     ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                Entre Semana
+                <span className="truncate">Entre Semana</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
+                    meetingProgress.midweekAssigned >= meetingProgress.midweekTotal && meetingProgress.midweekTotal > 0
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                      : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
+                  }`}
+                >
+                  {meetingProgress.midweekAssigned}/{meetingProgress.midweekTotal}
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('weekend')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'weekend'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    ? 'bg-white dark:bg-[#121216] text-emerald-600 dark:text-emerald-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                Fin de Semana
+                <span className="truncate">Fin de Semana</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
+                    meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                      : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
+                  }`}
+                >
+                  {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal}
+                </span>
               </button>
             </div>
 
@@ -813,7 +1021,11 @@ export const ScheduleTab: React.FC = () => {
           <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             {!isReadOnly ? (
               <button
-                onClick={autoAssignCurrentWeek}
+                onClick={
+                  viewMode === 'weekend'
+                    ? handleAutoAssignWeekendOnly
+                    : handleAutoAssignAllMeetings
+                }
                 className="min-h-[34px] sm:min-h-0 flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                 title="Autoasignar toda esta semana respetando rotación y sin cruces"
               >
@@ -1127,43 +1339,216 @@ export const ScheduleTab: React.FC = () => {
               currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
             }`}
           >
-            {/* ── ENCABEZADO FDS SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */}
-            <div className="px-3.5 sm:px-5 py-3 bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs sm:text-sm">
-                  Reunión del Fin de Semana
-                </span>
-                <span className="hidden sm:inline text-zinc-300 dark:text-zinc-600">•</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] sm:text-xs font-mono tabular-nums">
-                  {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
-                </span>
+            {/* ── ENCABEZADO FDS REDISEÑADO CON IDENTIDAD VISUAL, PROGRESO Y SALTO RÁPIDO ── */}
+            <div className="border-t-4 border-t-emerald-600 dark:border-t-emerald-500 px-3.5 sm:px-5 py-3.5 sm:py-4 bg-gradient-to-b from-emerald-50/50 via-zinc-50/70 to-white dark:from-emerald-950/25 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200 dark:border-[#27272A] flex flex-col gap-3 text-xs">
+              {/* Fila 1: Identidad visual, Fecha/Hora completa y Barra de Progreso */}
+              <div className="flex items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight">
+                        Reunión del Fin de Semana
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                        Pública y La Atalaya
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px] sm:text-xs">
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      <span className="capitalize">
+                        {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)}
+                        {settings.weekendMeetingTime ? ` • ${settings.weekendMeetingTime}` : ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Indicador de progreso de 6 segmentos */}
+                <div
+                  className={`flex flex-col items-end px-2.5 py-1.5 rounded-xl border shrink-0 ${
+                    meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
+                      ? 'bg-emerald-50/90 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300'
+                      : 'bg-white border-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:border-[#27272A] dark:text-[#F4F4F5]'
+                  }`}
+                  title="Progreso de asignaciones de Fin de Semana"
+                >
+                  <div className="flex items-center gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
+                    <CheckCircle2
+                      size={12}
+                      className={
+                        meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-emerald-500'
+                      }
+                    />
+                    <span>
+                      {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal} asignados
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-6 gap-0.5 w-20 h-1.5 mt-1">
+                    {[1, 2, 3, 4, 5, 6].map((step) => (
+                      <span
+                        key={step}
+                        className={`h-full rounded-xs transition-colors ${
+                          meetingProgress.weekendAssigned >= step
+                            ? 'bg-emerald-500 dark:bg-emerald-400'
+                            : 'bg-zinc-200 dark:bg-zinc-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-200 dark:border-[#27272A]">
-                {!isReadOnly && (
+              {/* Fila 2: Resumen de Bosquejo y Cánticos + Botones de Acción Rápida */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-200/70 dark:border-[#27272A]">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
                   <button
                     type="button"
-                    onClick={() => handleQuickSyncOrganized('weekend')}
-                    className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
-                    title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
+                    onClick={() => {
+                      setWeekendEditTab('discurso');
+                      setIsWeekendEditModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#204d74]/10 hover:bg-[#204d74]/20 dark:bg-[#204d74]/30 text-[#204d74] dark:text-sky-300 border border-[#204d74]/20 text-[11px] font-bold transition cursor-pointer"
+                    title="Clic para editar bosquejo u orador"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span>Sincronizar Bosquejo</span>
+                    <Mic size={11} className="shrink-0" />
+                    <span>
+                      {currentWeek.weekend.publicTalkOutlineNumber
+                        ? `Bosquejo #${currentWeek.weekend.publicTalkOutlineNumber}`
+                        : 'Definir Bosquejo'}
+                    </span>
                   </button>
-                )}
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrganizedModalTab('bosquejos');
-                    setIsOrganizedModalOpen(true);
-                  }}
-                  className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
-                  title="Ver catálogo oficial de 194 bosquejos"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <span>Catálogo (#1-194)</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWeekendEditTab('canciones');
+                      setIsWeekendEditModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A] text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums transition cursor-pointer"
+                    title="Clic para editar los cánticos del fin de semana"
+                  >
+                    <Music size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>
+                      Cánticos {currentWeek.weekend.openingSong || 12}, {currentWeek.weekend.middleSong || 68},{' '}
+                      {currentWeek.weekend.closingSong || 138}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={handleAutoAssignWeekendOnly}
+                      className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                      title="Autoasignar presidente, oraciones, conductor y lector del fin de semana"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                      <span>Autoasignar FDS</span>
+                    </button>
+                  )}
+
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleQuickSyncOrganized('weekend')}
+                      className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                      title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>Sincronizar Bosquejo</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrganizedModalTab('bosquejos');
+                      setIsOrganizedModalOpen(true);
+                    }}
+                    className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    title="Ver catálogo oficial de 194 bosquejos"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                    <span>Catálogo (#1-194)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsTimerModalOpen(true)}
+                    className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    title="Abrir cronómetro de atril para Discurso Público y Estudio de La Atalaya"
+                  >
+                    <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Atril</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Fila 3: Barra de salto rápido a secciones de Fin de Semana */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2 border-t border-zinc-200/60 dark:border-[#27272A]">
+                {[
+                  {
+                    id: 'fds-sec-apertura',
+                    label: 'Apertura',
+                    assigned:
+                      (currentWeek.weekend.presidentId ? 1 : 0) + (currentWeek.weekend.initialPrayerId ? 1 : 0),
+                    total: 2,
+                    pillClass:
+                      'bg-zinc-200/70 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300/60 dark:border-zinc-700',
+                    dotClass: 'bg-emerald-500',
+                  },
+                  {
+                    id: 'fds-sec-discurso',
+                    label: 'Discurso Público',
+                    assigned: currentWeek.weekend.publicTalkSpeaker ? 1 : 0,
+                    total: 1,
+                    pillClass:
+                      'bg-[#204d74]/10 hover:bg-[#204d74]/20 dark:bg-[#204d74]/25 dark:hover:bg-[#204d74]/35 text-[#204d74] dark:text-sky-300 border-[#204d74]/25',
+                    dotClass: 'bg-[#204d74] dark:bg-sky-400',
+                  },
+                  {
+                    id: 'fds-sec-atalaya',
+                    label: 'La Atalaya',
+                    assigned:
+                      (currentWeek.weekend.atalayaConductorId ? 1 : 0) +
+                      (currentWeek.weekend.atalayaLectorId ? 1 : 0),
+                    total: 2,
+                    pillClass:
+                      'bg-[#1d6349]/10 hover:bg-[#1d6349]/20 dark:bg-[#1d6349]/25 dark:hover:bg-[#1d6349]/35 text-[#1d6349] dark:text-emerald-300 border-[#1d6349]/25',
+                    dotClass: 'bg-[#1d6349] dark:bg-emerald-400',
+                  },
+                  {
+                    id: 'fds-sec-conclusion',
+                    label: 'Conclusión',
+                    assigned: currentWeek.weekend.finalPrayerId ? 1 : 0,
+                    total: 1,
+                    pillClass:
+                      'bg-zinc-200/70 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300/60 dark:border-zinc-700',
+                    dotClass: 'bg-teal-500',
+                  },
+                ].map((sec) => (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById(sec.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition cursor-pointer shrink-0 shadow-2xs ${sec.pillClass}`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${sec.dotClass}`} />
+                    <span>{sec.label}</span>
+                    <span className="font-mono text-[10px] opacity-80">
+                      ({sec.assigned}/{sec.total})
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -1171,17 +1556,20 @@ export const ScheduleTab: React.FC = () => {
             <div className="flex-1 overflow-y-auto">
               {/* 1. MARCO INICIAL: Presidente, Cántico 1, Oración Inicial */}
               {/* FILA: Presidente */}
-              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+              <div id="fds-sec-apertura" className="border-b border-zinc-100 dark:border-[#27272A]/70 scroll-mt-24">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2.5 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
                       P.
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                           Presidente de la reunión
                         </h4>
+                        <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] inline-flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> (5 min)
+                        </span>
                       </div>
                       <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-0.5 tracking-tight leading-relaxed">
                         Preside la reunión, presenta al orador visitante/local y da los anuncios finales
@@ -1189,7 +1577,19 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+                    {currentWeek.weekend.presidentId &&
+                      weekendDuplicateIds.has(currentWeek.weekend.presidentId) && (
+                        <button
+                          type="button"
+                          onClick={() => setIsConflictsModalOpen(true)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 cursor-pointer"
+                          title="Este hermano tiene más de una asignación en esta reunión"
+                        >
+                          <AlertTriangle size={12} />
+                          <span>Cruce</span>
+                        </button>
+                      )}
                     {currentWeek.weekend.presidentId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1220,6 +1620,29 @@ export const ScheduleTab: React.FC = () => {
                           <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.presidentId)?.name || 'Hno. Asignado'}</span>
                         </button>
+
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReplacementState({
+                                isOpen: true,
+                                weekId: currentWeek.id,
+                                meetingType: 'weekend',
+                                meetingDate: currentWeek.weekend.date,
+                                assignmentTitle: 'Presidente de la Reunión',
+                                assignmentPath: 'weekend.presidentId',
+                                currentPublisherId: currentWeek.weekend.presidentId,
+                                roleKey: 'fds_presidente',
+                                targetGender: 'hermano',
+                              })
+                            }
+                            className="p-1.5 rounded-full text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                            title="Sustitución rápida de presidente"
+                          >
+                            <ArrowRightLeft size={13} />
+                          </button>
+                        )}
 
                         <button
                           type="button"
@@ -1339,7 +1762,19 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+                    {currentWeek.weekend.initialPrayerId &&
+                      weekendDuplicateIds.has(currentWeek.weekend.initialPrayerId) && (
+                        <button
+                          type="button"
+                          onClick={() => setIsConflictsModalOpen(true)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 cursor-pointer"
+                          title="Este hermano tiene más de una asignación en esta reunión"
+                        >
+                          <AlertTriangle size={12} />
+                          <span>Cruce</span>
+                        </button>
+                      )}
                     {currentWeek.weekend.initialPrayerId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1370,6 +1805,29 @@ export const ScheduleTab: React.FC = () => {
                           <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.initialPrayerId)?.name || 'Hno. Asignado'}</span>
                         </button>
+
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReplacementState({
+                                isOpen: true,
+                                weekId: currentWeek.id,
+                                meetingType: 'weekend',
+                                meetingDate: currentWeek.weekend.date,
+                                assignmentTitle: 'Oración Inicial (Fin de Semana)',
+                                assignmentPath: 'weekend.initialPrayerId',
+                                currentPublisherId: currentWeek.weekend.initialPrayerId,
+                                roleKey: 'vym_oracion',
+                                targetGender: 'hermano',
+                              })
+                            }
+                            className="p-1.5 rounded-full text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                            title="Sustitución rápida"
+                          >
+                            <ArrowRightLeft size={13} />
+                          </button>
+                        )}
 
                         <button
                           type="button"
@@ -1431,12 +1889,15 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* 2. SECCIÓN: DISCURSO PÚBLICO (30 MIN) */}
-              <div className="mt-2">
-                <div
-                  style={{ backgroundColor: '#204d74' }}
-                  className="w-full text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
-                >
-                  DISCURSO PÚBLICO (30 MIN)
+              <div id="fds-sec-discurso" className="mt-2 scroll-mt-24">
+                <div className="w-full bg-[#204d74] text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none">
+                  <div className="flex items-center gap-2">
+                    <Mic className="w-4 h-4 text-sky-200 shrink-0" />
+                    <span>DISCURSO PÚBLICO (30 MIN)</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/15 text-white/95">
+                    {currentWeek.weekend.publicTalkSpeaker ? '1/1 asignado' : '0/1 asignado'}
+                  </span>
                 </div>
 
                 <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
@@ -1577,12 +2038,15 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* 4. SECCIÓN: ESTUDIO DE LA ATALAYA (60 MIN) */}
-              <div className="mt-2">
-                <div
-                  style={{ backgroundColor: '#1d6349' }}
-                  className="w-full text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
-                >
-                  ESTUDIO DE LA ATALAYA (60 MIN)
+              <div id="fds-sec-atalaya" className="mt-2 scroll-mt-24">
+                <div className="w-full bg-[#1d6349] text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-emerald-200 shrink-0" />
+                    <span>ESTUDIO DE LA ATALAYA (60 MIN)</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/15 text-white/95">
+                    {(currentWeek.weekend.atalayaConductorId ? 1 : 0) + (currentWeek.weekend.atalayaLectorId ? 1 : 0)}/2 asignados
+                  </span>
                 </div>
 
                 {/* Sub-fila: Tema del artículo de La Atalaya */}
@@ -1648,7 +2112,19 @@ export const ScheduleTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+                      {currentWeek.weekend.atalayaConductorId &&
+                        weekendDuplicateIds.has(currentWeek.weekend.atalayaConductorId) && (
+                          <button
+                            type="button"
+                            onClick={() => setIsConflictsModalOpen(true)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 cursor-pointer"
+                            title="Este hermano tiene más de una asignación en esta reunión"
+                          >
+                            <AlertTriangle size={12} />
+                            <span>Cruce</span>
+                          </button>
+                        )}
                       {currentWeek.weekend.atalayaConductorId ? (
                         <div className="flex items-center gap-1.5">
                           <button
@@ -1679,6 +2155,29 @@ export const ScheduleTab: React.FC = () => {
                             <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>{publishersMap.get(currentWeek.weekend.atalayaConductorId)?.name || 'Hno. Asignado'}</span>
                           </button>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setReplacementState({
+                                  isOpen: true,
+                                  weekId: currentWeek.id,
+                                  meetingType: 'weekend',
+                                  meetingDate: currentWeek.weekend.date,
+                                  assignmentTitle: 'Conductor de La Atalaya',
+                                  assignmentPath: 'weekend.atalayaConductorId',
+                                  currentPublisherId: currentWeek.weekend.atalayaConductorId,
+                                  roleKey: 'fds_atalaya_conductor',
+                                  targetGender: 'hermano',
+                                })
+                              }
+                              className="p-1.5 rounded-full text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                              title="Sustitución rápida"
+                            >
+                              <ArrowRightLeft size={13} />
+                            </button>
+                          )}
 
                           <button
                             type="button"
@@ -1758,7 +2257,19 @@ export const ScheduleTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+                      {currentWeek.weekend.atalayaLectorId &&
+                        weekendDuplicateIds.has(currentWeek.weekend.atalayaLectorId) && (
+                          <button
+                            type="button"
+                            onClick={() => setIsConflictsModalOpen(true)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 cursor-pointer"
+                            title="Este hermano tiene más de una asignación en esta reunión"
+                          >
+                            <AlertTriangle size={12} />
+                            <span>Cruce</span>
+                          </button>
+                        )}
                       {currentWeek.weekend.atalayaLectorId ? (
                         <div className="flex items-center gap-1.5">
                           <button
@@ -1789,6 +2300,29 @@ export const ScheduleTab: React.FC = () => {
                             <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>{publishersMap.get(currentWeek.weekend.atalayaLectorId)?.name || 'Hno. Asignado'}</span>
                           </button>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setReplacementState({
+                                  isOpen: true,
+                                  weekId: currentWeek.id,
+                                  meetingType: 'weekend',
+                                  meetingDate: currentWeek.weekend.date,
+                                  assignmentTitle: 'Lector de La Atalaya',
+                                  assignmentPath: 'weekend.atalayaLectorId',
+                                  currentPublisherId: currentWeek.weekend.atalayaLectorId,
+                                  roleKey: 'fds_atalaya_lector',
+                                  targetGender: 'hermano',
+                                })
+                              }
+                              className="p-1.5 rounded-full text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                              title="Sustitución rápida"
+                            >
+                              <ArrowRightLeft size={13} />
+                            </button>
+                          )}
 
                           <button
                             type="button"
@@ -1852,7 +2386,7 @@ export const ScheduleTab: React.FC = () => {
 
               {/* 5. MARCO FINAL: Cántico Final, Oración Final */}
               {/* FILA: Cántico Final */}
-              <div className="border-b border-zinc-100 dark:border-[#27272A]/70">
+              <div id="fds-sec-conclusion" className="border-b border-zinc-100 dark:border-[#27272A]/70 scroll-mt-24">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-zinc-50/70 dark:hover:bg-[#18181F]/40 transition-colors gap-2 sm:gap-4">
                   <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -1910,7 +2444,19 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+                    {currentWeek.weekend.finalPrayerId &&
+                      weekendDuplicateIds.has(currentWeek.weekend.finalPrayerId) && (
+                        <button
+                          type="button"
+                          onClick={() => setIsConflictsModalOpen(true)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800 cursor-pointer"
+                          title="Este hermano tiene más de una asignación en esta reunión"
+                        >
+                          <AlertTriangle size={12} />
+                          <span>Cruce</span>
+                        </button>
+                      )}
                     {currentWeek.weekend.finalPrayerId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1941,6 +2487,29 @@ export const ScheduleTab: React.FC = () => {
                           <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.finalPrayerId)?.name || 'Hno. Asignado'}</span>
                         </button>
+
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReplacementState({
+                                isOpen: true,
+                                weekId: currentWeek.id,
+                                meetingType: 'weekend',
+                                meetingDate: currentWeek.weekend.date,
+                                assignmentTitle: 'Oración Final (Fin de Semana)',
+                                assignmentPath: 'weekend.finalPrayerId',
+                                currentPublisherId: currentWeek.weekend.finalPrayerId,
+                                roleKey: 'vym_oracion',
+                                targetGender: 'hermano',
+                              })
+                            }
+                            className="p-1.5 rounded-full text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                            title="Sustitución rápida"
+                          >
+                            <ArrowRightLeft size={13} />
+                          </button>
+                        )}
 
                         <button
                           type="button"

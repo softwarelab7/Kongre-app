@@ -806,6 +806,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIdentifiedPublisher(foundPublisher.publisherId, brotherName);
       }
 
+      try {
+        window.dispatchEvent(
+          new CustomEvent('kongre_pin_redeemed', {
+            detail: {
+              publisherId: foundPublisher.publisherId || `pub_${primaryRole}`,
+              publisherName: brotherName,
+              role: primaryRole,
+              pin: cleanPin,
+            },
+          })
+        );
+      } catch {}
+
       await insertAuditLog({
         accion: 'login',
         hermano_nid: foundPublisher.publisherId || 'personal',

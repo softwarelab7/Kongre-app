@@ -1,5 +1,6 @@
 // src/components/ExportPdfTab.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
 import { useCongregation } from '../context/CongregationContext';
 import {
   generateProgramPdf,
@@ -35,6 +36,9 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  RotateCw,
+  ChevronLeft,
+  ChevronRight,
   Maximize2,
   X,
   Sparkles,
@@ -44,8 +48,290 @@ import {
   Search,
   Scissors,
   Check,
+  Layers,
 } from 'lucide-react';
 import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
+
+// Configure PDF.js worker for react-pdf with local bundler + CDN fallback
+try {
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url
+  ).toString();
+} catch {
+  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+}
+
+export interface ReactPdfInteractivePreviewProps {
+  fileUrl: string | null;
+  title: string;
+  subtitle?: string;
+  docType: 's89' | 's21' | 'programa';
+  pageSize: 'letter' | 'a4';
+  pageOrientation: 'portrait' | 'landscape';
+  onDownload: () => void;
+  onPrint: () => void;
+  onExpandModal?: () => void;
+  minHeightClass?: string;
+}
+
+export const ReactPdfInteractivePreview: React.FC<ReactPdfInteractivePreviewProps> = ({
+  fileUrl,
+  title,
+  subtitle,
+  docType,
+  pageSize,
+  pageOrientation,
+  onDownload,
+  onPrint,
+  onExpandModal,
+  minHeightClass = 'min-h-[640px]',
+}) => {
+  const [numPages, setNumPages] = useState<number>(1);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1.05);
+  const [rotation, setRotation] = useState<number>(0);
+  const [renderAllPages, setRenderAllPages] = useState<boolean>(false);
+  const [useNativeFallback, setUseNativeFallback] = useState<boolean>(false);
+  const [isLoadingDoc, setIsLoadingDoc] = useState<boolean>(false);
+
+  useEffect(() => {
+    setPageNumber(1);
+    setUseNativeFallback(false);
+  }, [fileUrl, docType]);
+
+  const handleDocumentLoadSuccess = ({ numPages: loadedPages }: { numPages: number }) => {
+    setNumPages(loadedPages || 1);
+    setPageNumber(1);
+    setIsLoadingDoc(false);
+  };
+
+  const handleDocumentLoadError = () => {
+    setIsLoadingDoc(false);
+    setUseNativeFallback(true);
+  };
+
+  const baseWidth = pageOrientation === 'landscape' ? 680 : 520;
+
+  return (
+    <div
+      className={`rounded-3xl bg-zinc-900 border border-zinc-300 dark:border-[#27272A] shadow-xl overflow-hidden flex flex-col ${minHeightClass} no-print`}
+    >
+      {/* Interactive React-PDF Toolbar */}
+      <div className="px-3.5 py-2.5 sm:px-4 bg-zinc-950 text-zinc-200 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 shrink-0">
+            <Sparkles className="w-3.5 h-3.5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-bold text-zinc-100 truncate">{title}</p>
+            {subtitle && (
+              <p className="text-[10.5px] text-zinc-400 truncate">{subtitle}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Interactive Controls: Pagination, Zoom, Rotation, Print & Download */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {/* Page Navigation */}
+          {!useNativeFallback && numPages > 1 && (
+            <div className="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-xl border border-zinc-800">
+              <button
+                type="button"
+                disabled={pageNumber <= 1 || renderAllPages}
+                onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
+                className="p-0.5 text-zinc-300 hover:text-white disabled:opacity-40 cursor-pointer"
+                title="Página anterior"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-[11px] font-mono font-bold text-zinc-200 px-1">
+                {renderAllPages ? `${numPages} págs.` : `${pageNumber} / ${numPages}`}
+              </span>
+              <button
+                type="button"
+                disabled={pageNumber >= numPages || renderAllPages}
+                onClick={() => setPageNumber((p) => Math.min(numPages, p + 1))}
+                className="p-0.5 text-zinc-300 hover:text-white disabled:opacity-40 cursor-pointer"
+                title="Página siguiente"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setRenderAllPages((prev) => !prev)}
+                className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold transition-colors cursor-pointer ${
+                  renderAllPages
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-zinc-800 text-zinc-300 hover:text-white'
+                }`}
+                title="Alternar entre página única o todas las páginas"
+              >
+                <Layers className="w-3 h-3 inline mr-0.5" />
+                {renderAllPages ? 'Todas' : '1 Pág'}
+              </button>
+            </div>
+          )}
+
+          {/* Zoom & Rotation Controls */}
+          {!useNativeFallback && (
+            <div className="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-xl border border-zinc-800">
+              <button
+                type="button"
+                onClick={() => setScale((s) => Math.max(0.65, Number((s - 0.15).toFixed(2))))}
+                className="p-0.5 text-zinc-300 hover:text-indigo-400 cursor-pointer"
+                title="Reducir zoom"
+              >
+                <ZoomOut className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-[11px] font-mono font-bold text-zinc-200 min-w-[40px] text-center">
+                {Math.round(scale * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={() => setScale((s) => Math.min(1.75, Number((s + 0.15).toFixed(2))))}
+                className="p-0.5 text-zinc-300 hover:text-indigo-400 cursor-pointer"
+                title="Aumentar zoom"
+              >
+                <ZoomIn className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setRotation((r) => (r + 90) % 360)}
+                className="p-0.5 text-zinc-300 hover:text-indigo-400 cursor-pointer ml-0.5"
+                title="Rotar página 90°"
+              >
+                <RotateCw className="w-3.5 h-3.5" />
+              </button>
+              {(scale !== 1.05 || rotation !== 0) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScale(1.05);
+                    setRotation(0);
+                  }}
+                  className="p-0.5 text-zinc-400 hover:text-white cursor-pointer"
+                  title="Restablecer vista"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Toggle React-PDF Canvas vs Native PDF Engine */}
+          <button
+            type="button"
+            onClick={() => setUseNativeFallback((prev) => !prev)}
+            className="px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-[11px] font-semibold transition-colors cursor-pointer"
+            title="Cambiar modo de visor PDF"
+          >
+            {useNativeFallback ? 'Lienzo React-PDF' : 'Visor Nativo'}
+          </button>
+
+          {onExpandModal && (
+            <button
+              type="button"
+              onClick={onExpandModal}
+              className="px-2.5 py-1 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+              title="Ampliar vista previa en pantalla completa"
+            >
+              <Maximize2 className="w-3 h-3" />
+              <span className="hidden sm:inline">Ampliar</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onPrint}
+            className="px-2.5 py-1 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Enviar formato directamente a imprimir"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Imprimir</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onDownload}
+            className="px-3 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            title="Descargar archivo PDF oficial"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Descargar PDF</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Interactive PDF Canvas Body */}
+      <div className="flex-1 bg-zinc-800/90 overflow-auto flex flex-col items-center justify-start p-4 sm:p-6 relative">
+        {!fileUrl ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-zinc-300 text-sm gap-2 py-16">
+            <div className="w-8 h-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+            <span>Generando vista previa del formato {docType.toUpperCase()}...</span>
+          </div>
+        ) : useNativeFallback ? (
+          <iframe
+            src={fileUrl}
+            title={title}
+            className="w-full flex-1 min-h-[580px] rounded-xl bg-zinc-700 border border-zinc-700"
+          />
+        ) : (
+          <Document
+            file={fileUrl}
+            onLoadSuccess={handleDocumentLoadSuccess}
+            onLoadError={handleDocumentLoadError}
+            loading={
+              <div className="flex flex-col items-center justify-center text-zinc-300 text-sm gap-2 py-16">
+                <div className="w-8 h-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+                <span>Renderizando documento con react-pdf...</span>
+              </div>
+            }
+            className="flex flex-col items-center gap-5 max-w-full"
+          >
+            {renderAllPages ? (
+              Array.from(new Array(numPages), (_, idx) => (
+                <div
+                  key={`page_${idx + 1}`}
+                  className="bg-white rounded-xl shadow-2xl overflow-hidden border border-zinc-700/60 transition-all"
+                >
+                  <Page
+                    pageNumber={idx + 1}
+                    width={baseWidth}
+                    scale={scale}
+                    rotate={rotation}
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-zinc-700/60 transition-all">
+                <Page
+                  pageNumber={pageNumber}
+                  width={baseWidth}
+                  scale={scale}
+                  rotate={rotation}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
+              </div>
+            )}
+          </Document>
+        )}
+
+        {/* Bottom Metadata Pill */}
+        <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950/80 border border-zinc-800 text-[11px] text-zinc-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span>
+            Vista previa interactiva ({docType.toUpperCase()}) • {pageSize.toUpperCase()} •{' '}
+            {pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const ExportPdfTab: React.FC = () => {
   const {
@@ -96,15 +382,16 @@ export const ExportPdfTab: React.FC = () => {
   const [previewMode, setPreviewMode] = useState<'sheet' | 'pdf'>('sheet');
   const [previewZoom, setPreviewZoom] = useState<number>(100);
 
-  // Preview state for S-89 Slips
+  // Preview state for S-89 Slips (default to 'pdf' so react-pdf interactive preview is immediately visible)
   const [selectedS89WeekId, setSelectedS89WeekId] = useState<string>(
     () => currentWeekId || currentWeek?.id || weeks[0]?.id || ''
   );
-  const [s89PreviewMode, setS89PreviewMode] = useState<'sheet' | 'pdf'>('sheet');
+  const [s89PreviewMode, setS89PreviewMode] = useState<'sheet' | 'pdf'>('pdf');
   const [s89Zoom, setS89Zoom] = useState<number>(100);
   const [s89RoomFilter, setS89RoomFilter] = useState<'todos' | 'principal' | 'auxiliar'>('todos');
+  const [showS89OfficialTemplateCenter, setShowS89OfficialTemplateCenter] = useState<boolean>(false);
 
-  // Preview state for S-21 Cards
+  // Preview state for S-21 Cards (default to 'pdf' so react-pdf interactive preview is immediately visible)
   const availableServiceYears = useMemo(() => getAvailableServiceYears(), []);
   const [selectedS21ServiceYear, setSelectedS21ServiceYear] = useState<string>(() =>
     getCurrentServiceYear()
@@ -120,8 +407,9 @@ export const ExportPdfTab: React.FC = () => {
     () => activePublishers[0]?.id || ''
   );
   const [s21SearchQuery, setS21SearchQuery] = useState<string>('');
-  const [s21PreviewMode, setS21PreviewMode] = useState<'sheet' | 'pdf'>('sheet');
+  const [s21PreviewMode, setS21PreviewMode] = useState<'sheet' | 'pdf'>('pdf');
   const [s21Zoom, setS21Zoom] = useState<number>(100);
+  const [showS21OfficialTemplateCenter, setShowS21OfficialTemplateCenter] = useState<boolean>(false);
 
   // Common Preview Modal & Blob URL state
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
@@ -192,8 +480,8 @@ export const ExportPdfTab: React.FC = () => {
   useEffect(() => {
     const isPdfActiveInTab =
       (activeTab === 'programa' && previewMode === 'pdf') ||
-      (activeTab === 's89' && s89PreviewMode === 'pdf') ||
-      (activeTab === 's21' && s21PreviewMode === 'pdf');
+      activeTab === 's89' ||
+      activeTab === 's21';
 
     if (!isPdfActiveInTab && !isPreviewModalOpen) return;
 
@@ -312,6 +600,35 @@ export const ExportPdfTab: React.FC = () => {
   };
 
   const handlePrint = () => {
+    if (pdfBlobUrl && (activeTab === 's89' || activeTab === 's21' || previewMode === 'pdf' || isPreviewModalOpen)) {
+      try {
+        const printIframe = document.createElement('iframe');
+        printIframe.style.position = 'fixed';
+        printIframe.style.right = '0';
+        printIframe.style.bottom = '0';
+        printIframe.style.width = '0';
+        printIframe.style.height = '0';
+        printIframe.style.border = '0';
+        printIframe.src = pdfBlobUrl;
+        printIframe.onload = () => {
+          try {
+            printIframe.contentWindow?.focus();
+            printIframe.contentWindow?.print();
+          } catch {
+            window.print();
+          }
+          window.setTimeout(() => {
+            if (document.body.contains(printIframe)) {
+              document.body.removeChild(printIframe);
+            }
+          }, 60000);
+        };
+        document.body.appendChild(printIframe);
+        return;
+      } catch {
+        // Fallback to standard print
+      }
+    }
     window.print();
   };
 
@@ -809,38 +1126,21 @@ export const ExportPdfTab: React.FC = () => {
               </div>
             </div>
 
-            {/* MODE A: EMBEDDED GENERATED PDF VIEWER */}
+            {/* MODE A: EMBEDDED GENERATED PDF VIEWER (REACT-PDF) */}
             {previewMode === 'pdf' ? (
-              <div className="rounded-3xl bg-zinc-800 border border-zinc-300 dark:border-[#27272A] shadow-lg overflow-hidden flex flex-col min-h-[680px] no-print">
-                <div className="px-4 py-2.5 bg-zinc-900 text-zinc-200 text-xs flex items-center justify-between border-b border-zinc-700">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                    <span className="font-semibold">
-                      Previsualización del archivo PDF generado ({pageSize.toUpperCase()} •{' '}
-                      {pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'})
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleDownloadPdf}
-                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Descargar este PDF</span>
-                  </button>
-                </div>
-                {pdfBlobUrl ? (
-                  <iframe
-                    src={pdfBlobUrl}
-                    title="Vista previa del PDF del Programa"
-                    className="w-full flex-1 min-h-[640px] bg-zinc-700"
-                  />
-                ) : (
-                  <div className="flex-1 flex items-center justify-center text-zinc-300 text-sm p-8">
-                    Generando documento PDF...
-                  </div>
-                )}
-              </div>
+              <ReactPdfInteractivePreview
+                fileUrl={pdfBlobUrl}
+                title={`Vista Previa del Programa (${pageSize.toUpperCase()} • ${
+                  pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'
+                })`}
+                subtitle={pdfCongregationName.trim() || settings.congregationName || 'Congregación'}
+                docType="programa"
+                pageSize={pageSize}
+                pageOrientation={pageOrientation}
+                onDownload={handleDownloadPdf}
+                onPrint={handlePrint}
+                onExpandModal={() => handleOpenPreviewBeforeDownload('programa')}
+              />
             ) : (
               /* MODE B: PROPORTIONAL PAPER SHEET PREVIEW (PORTRAIT vs LANDSCAPE) */
               <div className="bg-zinc-200/70 dark:bg-zinc-950/80 p-3 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] overflow-x-auto flex justify-center">
@@ -1080,23 +1380,338 @@ export const ExportPdfTab: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: HOJAS DE ASIGNACIÓN S-89 (CARGAR Y RELLENAR PDF OFICIAL) */}
+      {/* TAB 2: HOJAS DE ASIGNACIÓN S-89 (VISTA PREVIA INTERACTIVA REACT-PDF + PLANTILLA OFICIAL) */}
       {activeTab === 's89' && (
-        <LocalOfficialFormsCenter
-          initialFormCode="S-89"
-          initialWeekId={selectedS89WeekId}
-          compactHeader={true}
-        />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* S-89 Controls & Selection Column */}
+            <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Formato S-89 (Papeletas)</span>
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  4 por hoja
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
+                  1. Seleccionar Semana de Reunión
+                </label>
+                <select
+                  value={s89Week?.id || ''}
+                  onChange={(e) => setSelectedS89WeekId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-900 dark:text-white"
+                >
+                  {weeks.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      Semana del {w.weekStartDate} al {w.weekEndDate} ({w.midweek.date})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Page Size & Orientation for S-89 */}
+              <div className="space-y-2.5 pt-3 border-t border-zinc-100 dark:border-[#27272A]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
+                  2. Formato de Hoja e Impresión
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageSize('letter');
+                      updateSettings({ pdfPageSize: 'letter' });
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      pageSize === 'letter'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]'
+                    }`}
+                  >
+                    Carta (Letter)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageSize('a4');
+                      updateSettings({ pdfPageSize: 'a4' });
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      pageSize === 'a4'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8]'
+                    }`}
+                  >
+                    A4 (ISO)
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('portrait');
+                      updateSettings({ pdfOrientation: 'portrait' });
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      pageOrientation === 'portrait'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300'
+                        : 'border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
+                    }`}
+                  >
+                    <RectangleVertical className="w-3.5 h-3.5" />
+                    <span>Vertical</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('landscape');
+                      updateSettings({ pdfOrientation: 'landscape' });
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      pageOrientation === 'landscape'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300'
+                        : 'border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA]'
+                    }`}
+                  >
+                    <RectangleHorizontal className="w-3.5 h-3.5" />
+                    <span>Horizontal</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Actions: Fullscreen Preview, Print, Download */}
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleOpenPreviewBeforeDownload('s89')}
+                  className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Ampliar Vista Previa S-89</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadS89}
+                  className="w-full py-2.5 px-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold border border-indigo-200 dark:border-indigo-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Descargar Hojas S-89 (PDF)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="w-full py-2.5 px-4 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Imprimir Hojas S-89</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowS89OfficialTemplateCenter((prev) => !prev)}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>
+                    {showS89OfficialTemplateCenter
+                      ? 'Ocultar Rellenador de PDF Oficial'
+                      : 'Cargar / Rellenar PDF Oficial S-89'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive React-PDF Preview Column for S-89 */}
+            <div className="lg:col-span-2">
+              <ReactPdfInteractivePreview
+                fileUrl={pdfBlobUrl}
+                title={`Vista Previa Interactiva S-89 — Semana ${s89Week?.weekStartDate || ''}`}
+                subtitle={`${
+                  pdfCongregationName.trim() || settings.congregationName || 'Congregación'
+                } • ${pageSize.toUpperCase()} (${
+                  pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'
+                })`}
+                docType="s89"
+                pageSize={pageSize}
+                pageOrientation={pageOrientation}
+                onDownload={handleDownloadS89}
+                onPrint={handlePrint}
+                onExpandModal={() => handleOpenPreviewBeforeDownload('s89')}
+              />
+            </div>
+          </div>
+
+          {showS89OfficialTemplateCenter && (
+            <LocalOfficialFormsCenter
+              initialFormCode="S-89"
+              initialWeekId={selectedS89WeekId}
+              compactHeader={true}
+            />
+          )}
+        </div>
       )}
 
-      {/* TAB 3: TARJETAS DE PUBLICADOR S-21 (CARGAR Y RELLENAR PDF OFICIAL) */}
+      {/* TAB 3: TARJETAS DE PUBLICADOR S-21 (VISTA PREVIA INTERACTIVA REACT-PDF + PLANTILLA OFICIAL) */}
       {activeTab === 's21' && (
-        <LocalOfficialFormsCenter
-          initialFormCode="S-21"
-          initialPublisherId={selectedS21PublisherId}
-          initialServiceYear={selectedS21ServiceYear}
-          compactHeader={true}
-        />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* S-21 Controls & Publisher Selector Column */}
+            <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Tarjeta de Publicador S-21</span>
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  {selectedS21ServiceYear}
+                </span>
+              </div>
+
+              {/* Search & Select Publisher */}
+              <div className="space-y-2.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
+                  1. Seleccionar Publicador y Año
+                </label>
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={s21SearchQuery}
+                    onChange={(e) => setS21SearchQuery(e.target.value)}
+                    placeholder="Buscar hermano o hermana..."
+                    className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-white"
+                  />
+                </div>
+
+                <select
+                  value={selectedS21Publisher?.id || ''}
+                  onChange={(e) => setSelectedS21PublisherId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-900 dark:text-white"
+                >
+                  {activePublishers
+                    .filter((p) =>
+                      !s21SearchQuery.trim()
+                        ? true
+                        : (p.name || '')
+                            .toLowerCase()
+                            .includes(s21SearchQuery.trim().toLowerCase())
+                    )
+                    .map((pub) => (
+                      <option key={pub.id} value={pub.id}>
+                        {pub.name} (Grupo {pub.groupId || 1})
+                      </option>
+                    ))}
+                </select>
+
+                <select
+                  value={selectedS21ServiceYear}
+                  onChange={(e) => setSelectedS21ServiceYear(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-900 dark:text-white"
+                >
+                  {availableServiceYears.map((sy) => (
+                    <option key={sy} value={sy}>
+                      Año de Servicio {sy}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Summary Stats of Selected S-21 Card */}
+              {s21CardData && (
+                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-[10px] text-zinc-400 block">Meses activos</span>
+                    <span className="font-extrabold text-zinc-900 dark:text-white">
+                      {s21CardData.totals.monthsActive} / 12
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-zinc-400 block">Horas totales</span>
+                    <span className="font-extrabold text-indigo-600 dark:text-indigo-400">
+                      {s21CardData.totals.totalHours} h
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions: Fullscreen Preview, Print, Download */}
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleOpenPreviewBeforeDownload('s21')}
+                  className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Ampliar Vista Previa S-21</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadS21}
+                  className="w-full py-2.5 px-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold border border-indigo-200 dark:border-indigo-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Descargar Tarjeta S-21 (PDF)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="w-full py-2.5 px-4 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Imprimir Tarjeta S-21</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowS21OfficialTemplateCenter((prev) => !prev)}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>
+                    {showS21OfficialTemplateCenter
+                      ? 'Ocultar Rellenador de PDF Oficial'
+                      : 'Cargar / Rellenar PDF Oficial S-21'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive React-PDF Preview Column for S-21 */}
+            <div className="lg:col-span-2">
+              <ReactPdfInteractivePreview
+                fileUrl={pdfBlobUrl}
+                title={`Vista Previa Interactiva S-21 — ${
+                  selectedS21Publisher?.name || 'Publicador'
+                }`}
+                subtitle={`Año de Servicio ${selectedS21ServiceYear} • ${pageSize.toUpperCase()} (${
+                  pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'
+                })`}
+                docType="s21"
+                pageSize={pageSize}
+                pageOrientation={pageOrientation}
+                onDownload={handleDownloadS21}
+                onPrint={handlePrint}
+                onExpandModal={() => handleOpenPreviewBeforeDownload('s21')}
+              />
+            </div>
+          </div>
+
+          {showS21OfficialTemplateCenter && (
+            <LocalOfficialFormsCenter
+              initialFormCode="S-21"
+              initialPublisherId={selectedS21PublisherId}
+              initialServiceYear={selectedS21ServiceYear}
+              compactHeader={true}
+            />
+          )}
+        </div>
       )}
 
       {/* TAB 3: CENTRO WHATSAPP */}
@@ -1500,19 +2115,31 @@ export const ExportPdfTab: React.FC = () => {
               </div>
             </div>
 
-            {/* Embedded PDF Preview Body */}
-            <div className="flex-1 bg-zinc-800 relative flex flex-col overflow-hidden">
-              {pdfBlobUrl ? (
-                <iframe
-                  src={pdfBlobUrl}
-                  title="Vista Previa del Documento PDF"
-                  className="w-full h-full border-0"
-                />
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-zinc-300 text-sm">
-                  Generando vista previa del PDF...
-                </div>
-              )}
+            {/* Embedded React-PDF Interactive Preview Body inside Modal */}
+            <div className="flex-1 bg-zinc-900 relative flex flex-col overflow-hidden p-2 sm:p-4">
+              <ReactPdfInteractivePreview
+                fileUrl={pdfBlobUrl}
+                title={
+                  previewModalDocType === 's89'
+                    ? `Papeletas S-89 (Semana ${s89Week?.weekStartDate || ''})`
+                    : previewModalDocType === 's21'
+                    ? `Tarjeta S-21 (${selectedS21Publisher?.name || 'Publicador'} • ${selectedS21ServiceYear})`
+                    : `Programa de Reuniones (${activeTemplate.toUpperCase()})`
+                }
+                subtitle={`${pageSize.toUpperCase()} • ${
+                  pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'
+                }`}
+                docType={previewModalDocType}
+                pageSize={pageSize}
+                pageOrientation={pageOrientation}
+                onDownload={() => {
+                  if (previewModalDocType === 's89') handleDownloadS89();
+                  else if (previewModalDocType === 's21') handleDownloadS21();
+                  else handleDownloadPdf();
+                }}
+                onPrint={handlePrint}
+                minHeightClass="flex-1 h-full"
+              />
             </div>
 
             {/* Modal Footer with Confirm & Download CTA */}

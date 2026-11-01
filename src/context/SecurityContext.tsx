@@ -16,8 +16,179 @@ import {
   isSafeDemoMode,
 } from '../utils/theocraticSecurity';
 import { TheocraticRole } from '../utils/rbac';
-import { CongregationInvitation, ActiveDeviceSession } from '../types';
+import {
+  CongregationInvitation,
+  ActiveDeviceSession,
+  CredentialRedemptionRecord,
+  CredentialRevocationHistoryItem,
+  CredentialRevocationReasonId,
+} from '../types';
 import { insertAuditLog } from '../services/auditLogService';
+
+export const REVOCATION_REASON_OPTIONS: {
+  id: CredentialRevocationReasonId;
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: 'olvido',
+    label: 'Lo olvidó',
+    description: 'El hermano olvidó su código o PIN personal y solicita uno nuevo.',
+  },
+  {
+    id: 'perdida_telefono',
+    label: 'Perdió o le robaron el teléfono',
+    description: 'Extravío, pérdida o robo del dispositivo donde tenía la sesión abierta.',
+  },
+  {
+    id: 'alguien_mas_lo_sabe',
+    label: 'Alguien más conoce el código',
+    description: 'Sospecha de que otra persona vio o conoce el código de acceso.',
+  },
+  {
+    id: 'cambio_dispositivo',
+    label: 'Cambio o renovación de dispositivo',
+    description: 'El hermano cambió de teléfono, tableta o computadora.',
+  },
+  {
+    id: 'otro_motivo',
+    label: 'Otro motivo de seguridad / Reasignación',
+    description: 'Mantenimiento preventivo de seguridad o actualización de privilegios.',
+  },
+];
+
+export function detectBrowserDeviceDetails(): {
+  deviceInfo: string;
+  deviceType: 'mobile' | 'tablet' | 'desktop';
+  osName: string;
+  browserName: string;
+} {
+  if (typeof navigator === 'undefined') {
+    return {
+      deviceInfo: 'Navegador Web · Escritorio',
+      deviceType: 'desktop',
+      osName: 'Sistema Operativo',
+      browserName: 'Navegador',
+    };
+  }
+  const ua = navigator.userAgent || '';
+  let osName = 'Escritorio';
+  let deviceType: 'mobile' | 'tablet' | 'desktop' = 'desktop';
+
+  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) {
+    osName = 'iPadOS (iPad)';
+    deviceType = 'tablet';
+  } else if (/iPhone|iPod/i.test(ua)) {
+    osName = 'iOS (iPhone)';
+    deviceType = 'mobile';
+  } else if (/Android/i.test(ua)) {
+    const isTablet = !/Mobile/i.test(ua);
+    osName = isTablet ? 'Android Tablet' : 'Android Smartphone';
+    deviceType = isTablet ? 'tablet' : 'mobile';
+  } else if (/Windows/i.test(ua)) {
+    osName = 'Windows PC';
+    deviceType = 'desktop';
+  } else if (/Mac OS X|Macintosh/i.test(ua)) {
+    osName = 'macOS (Mac)';
+    deviceType = 'desktop';
+  } else if (/Linux/i.test(ua)) {
+    osName = 'Linux PC';
+    deviceType = 'desktop';
+  }
+
+  let browserName = 'Navegador Web';
+  if (/Edg\//i.test(ua)) browserName = 'Microsoft Edge';
+  else if (/OPR\/|Opera/i.test(ua)) browserName = 'Opera';
+  else if (/Brave/i.test(ua)) browserName = 'Brave';
+  else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) browserName = 'Google Chrome';
+  else if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) browserName = 'Safari';
+  else if (/Firefox\//i.test(ua)) browserName = 'Mozilla Firefox';
+
+  return {
+    deviceInfo: `${osName} · ${browserName}`,
+    deviceType,
+    osName,
+    browserName,
+  };
+}
+
+export function formatDeviceHardwareId(rawId?: string): string {
+  const source = (rawId || 'dev_local_default').trim();
+  if (/^DEV-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(source)) {
+    return source;
+  }
+  let hash = 2166136261;
+  for (let i = 0; i < source.length; i++) {
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  const hex = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+  const suffix = source
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase()
+    .slice(-4)
+    .padStart(4, '0');
+  return `DEV-${hex.slice(0, 4)}-${suffix}`;
+}
+
+const TIMEZONE_LOCATION_MAP: Record<string, string> = {
+  'America/Mexico_City': 'Ciudad de México, México',
+  'America/Monterrey': 'Monterrey, Nuevo León, México',
+  'America/Cancun': 'Cancún, Quintana Roo, México',
+  'America/Tijuana': 'Tijuana, Baja California, México',
+  'America/Hermosillo': 'Hermosillo, Sonora, México',
+  'America/Chihuahua': 'Chihuahua, México',
+  'America/Mazatlan': 'Mazatlán, Sinaloa, México',
+  'America/Merida': 'Mérida, Yucatán, México',
+  'America/Bogota': 'Bogotá, Colombia',
+  'America/Lima': 'Lima, Perú',
+  'America/Santiago': 'Santiago, Chile',
+  'America/Argentina/Buenos_Aires': 'Buenos Aires, Argentina',
+  'America/Buenos_Aires': 'Buenos Aires, Argentina',
+  'America/Caracas': 'Caracas, Venezuela',
+  'America/Guayaquil': 'Guayaquil, Ecuador',
+  'America/La_Paz': 'La Paz, Bolivia',
+  'America/Asuncion': 'Asunción, Paraguay',
+  'America/Montevideo': 'Montevideo, Uruguay',
+  'America/Panama': 'Ciudad de Panamá, Panamá',
+  'America/Costa_Rica': 'San José, Costa Rica',
+  'America/Guatemala': 'Ciudad de Guatemala, Guatemala',
+  'America/El_Salvador': 'San Salvador, El Salvador',
+  'America/Tegucigalpa': 'Tegucigalpa, Honduras',
+  'America/Managua': 'Managua, Nicaragua',
+  'America/Santo_Domingo': 'Santo Domingo, República Dominicana',
+  'America/Puerto_Rico': 'San Juan, Puerto Rico',
+  'America/Havana': 'La Habana, Cuba',
+  'America/New_York': 'Nueva York, EE. UU. (Este)',
+  'America/Chicago': 'Chicago / Texas, EE. UU. (Centro)',
+  'America/Denver': 'Denver, EE. UU. (Montaña)',
+  'America/Los_Angeles': 'Los Ángeles, California, EE. UU.',
+  'America/Phoenix': 'Phoenix, Arizona, EE. UU.',
+  'Europe/Madrid': 'Madrid, España',
+  'Atlantic/Canary': 'Islas Canarias, España',
+};
+
+export function detectApproximateLocation(): string {
+  try {
+    if (typeof window !== 'undefined') {
+      const savedLoc = localStorage.getItem('kongre_approx_location_v1');
+      if (savedLoc && savedLoc.trim().length > 0) {
+        return savedLoc.trim();
+      }
+    }
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) {
+      if (TIMEZONE_LOCATION_MAP[tz]) {
+        return `${TIMEZONE_LOCATION_MAP[tz]} (${tz.split('/').pop()?.replace(/_/g, ' ')})`;
+      }
+      const parts = tz.split('/');
+      const city = parts[parts.length - 1]?.replace(/_/g, ' ') || tz;
+      const region = parts[0]?.replace(/_/g, ' ') || '';
+      return region ? `${city}, ${region}` : city;
+    }
+  } catch {}
+  return 'Ciudad de México, México (Región local)';
+}
 
 interface SecurityContextType {
   isLocked: boolean;
@@ -30,6 +201,9 @@ interface SecurityContextType {
   isCongregationPinSet: boolean;
   invitations: CongregationInvitation[];
   activeSessions: ActiveDeviceSession[];
+  credentialRedemptions: CredentialRedemptionRecord[];
+  revocationHistory: CredentialRevocationHistoryItem[];
+  currentDeviceId: string;
   lockSession: () => void;
   unlockSession: (pin: string) => Promise<boolean>;
   setPasscodePin: (newPin: string | null) => Promise<void>;
@@ -45,7 +219,26 @@ interface SecurityContextType {
   createInvitation: (role: TheocraticRole, targetName?: string, expiresInDays?: number) => Promise<CongregationInvitation>;
   revokeInvitation: (id: string) => void;
   redeemInvitationCode: (code: string, userEmail?: string, userName?: string, externalInvitations?: CongregationInvitation[]) => Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }>;
-  revokeSession: (sessionId: string) => void;
+  revokeSession: (sessionId: string, reasonLabel?: string, revokedBy?: string) => void;
+  revokeAllOtherSessions: (revokedBy?: string) => void;
+  updateCurrentDeviceLocation: (locationLabel: string) => void;
+  recordCredentialRedemption: (params: {
+    publisherId: string;
+    publisherName: string;
+    role: string;
+    codeOrPin: string;
+    deviceInfo?: string;
+  }) => void;
+  revokeAndReplacePublisherCredential: (params: {
+    publisherId: string;
+    publisherName: string;
+    role: string;
+    oldPinOrCode?: string;
+    newPinOrCode: string;
+    reasonId: CredentialRevocationReasonId;
+    reasonDetails?: string;
+    revokedBy: string;
+  }) => void;
   // Reloj de Bloqueo Automático por Inactividad
   remainingSeconds: number;
   totalSeconds: number;
@@ -62,15 +255,263 @@ const AUTOLOCK_STORAGE_KEY = 'kongre_security_autolock_minutes';
 const PRIVACY_STORAGE_KEY = 'kongre_security_privacy_mode';
 const MASTER_KEY_STORAGE = 'kongre_security_master_key_hash';
 const INVITATIONS_STORAGE_KEY = 'kongre_theocratic_invitations_v1';
-const SESSIONS_STORAGE_KEY = 'kongre_device_sessions_v1';
+const SESSIONS_STORAGE_KEY = 'kongre_device_sessions_v3';
+const REDEMPTIONS_STORAGE_KEY = 'kongre_credential_redemptions_v1';
+const REVOCATIONS_STORAGE_KEY = 'kongre_credential_revocations_v1';
+const CURRENT_DEVICE_ID_KEY = 'kongre_current_device_id_v1';
+
+function maskCredentialCode(raw?: string): string {
+  if (!raw) return '••••';
+  const clean = raw.trim();
+  if (clean.length <= 2) return '••••';
+  if (clean.length <= 4) return `••${clean.slice(-2)}`;
+  return `••••${clean.slice(-3)}`;
+}
 
 // Initial invitations and sessions for fresh congregation
 const DEFAULT_INITIAL_INVITATIONS: CongregationInvitation[] = [];
-const DEFAULT_INITIAL_SESSIONS: ActiveDeviceSession[] = [];
+
+function buildInitialSessions(currentDevId: string): ActiveDeviceSession[] {
+  const dev = detectBrowserDeviceDetails();
+  const approxLoc = detectApproximateLocation();
+  const nowIso = new Date().toISOString();
+  const twoHoursAgoIso = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
+  const yesterdayIso = new Date(Date.now() - 26 * 3600 * 1000).toISOString();
+  const twoDaysAgoIso = new Date(Date.now() - 50 * 3600 * 1000).toISOString();
+  const fiveDaysAgoIso = new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString();
+  const twelveDaysAgoIso = new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString();
+  const twentyDaysAgoIso = new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString();
+
+  return [
+    {
+      id: currentDevId,
+      deviceId: formatDeviceHardwareId(currentDevId),
+      publisherId: 'pub-1',
+      email: 'carlos.mendoza@kongre.org',
+      name: 'Carlos Mendoza',
+      role: 'coordinador',
+      deviceInfo: dev.deviceInfo,
+      deviceType: dev.deviceType,
+      osName: dev.osName,
+      browserName: dev.browserName,
+      startedAt: twoHoursAgoIso,
+      lastActive: nowIso,
+      approxLocation: approxLoc,
+      ipPlaceholder: 'Este dispositivo · Sesión actual',
+      isCurrentDevice: true,
+      codeMasked: '••84',
+      status: 'active',
+    },
+    {
+      id: 'sess_other_tablet_01',
+      deviceId: 'DEV-4B8E-21A9',
+      publisherId: 'pub-1',
+      email: 'carlos.mendoza@kongre.org',
+      name: 'Carlos Mendoza',
+      role: 'coordinador',
+      deviceInfo: 'iPadOS (iPad Air) · Safari',
+      deviceType: 'tablet',
+      osName: 'iPadOS 17.4',
+      browserName: 'Safari',
+      startedAt: yesterdayIso,
+      lastActive: yesterdayIso,
+      approxLocation: 'Ciudad de México, México (Zona Centro)',
+      ipPlaceholder: 'Tableta personal · Salón del Reino',
+      isCurrentDevice: false,
+      codeMasked: '••84',
+      status: 'active',
+    },
+    {
+      id: 'sess_other_pc_02',
+      deviceId: 'DEV-9C2D-64F0',
+      publisherId: 'pub-1',
+      email: 'carlos.mendoza@kongre.org',
+      name: 'Carlos Mendoza',
+      role: 'coordinador',
+      deviceInfo: 'Windows PC · Google Chrome',
+      deviceType: 'desktop',
+      osName: 'Windows 11',
+      browserName: 'Google Chrome',
+      startedAt: twoDaysAgoIso,
+      lastActive: twoHoursAgoIso,
+      approxLocation: 'Ciudad de México, México (Zona Sur)',
+      ipPlaceholder: 'Computadora de casa',
+      isCurrentDevice: false,
+      codeMasked: '••84',
+      status: 'active',
+    },
+    {
+      id: 'sess_hist_revoked_01',
+      deviceId: 'DEV-3E1F-78B4',
+      publisherId: 'pub-1',
+      email: 'carlos.mendoza@kongre.org',
+      name: 'Carlos Mendoza',
+      role: 'coordinador',
+      deviceInfo: 'Android Smartphone (Galaxy S21) · Chrome',
+      deviceType: 'mobile',
+      osName: 'Android 13',
+      browserName: 'Google Chrome',
+      startedAt: twelveDaysAgoIso,
+      lastActive: fiveDaysAgoIso,
+      approxLocation: 'Guadalajara, Jalisco, México',
+      ipPlaceholder: 'Teléfono móvil anterior',
+      isCurrentDevice: false,
+      codeMasked: '••19',
+      status: 'revoked',
+      revokedAt: fiveDaysAgoIso,
+      revokedReasonId: 'cambio_dispositivo',
+      revokedReasonLabel: 'Cambio o renovación de dispositivo',
+      revokedReasonDetails: 'Renovación de equipo móvil personal.',
+      revokedBy: 'Carlos Mendoza',
+    },
+    {
+      id: 'sess_hist_revoked_02',
+      deviceId: 'DEV-6A9C-10D5',
+      publisherId: 'pub-1',
+      email: 'carlos.mendoza@kongre.org',
+      name: 'Carlos Mendoza',
+      role: 'coordinador',
+      deviceInfo: 'macOS (MacBook Air) · Safari',
+      deviceType: 'desktop',
+      osName: 'macOS Sonoma',
+      browserName: 'Safari',
+      startedAt: twentyDaysAgoIso,
+      lastActive: twelveDaysAgoIso,
+      approxLocation: 'Monterrey, Nuevo León, México',
+      ipPlaceholder: 'Equipo portátil de viaje',
+      isCurrentDevice: false,
+      codeMasked: '••19',
+      status: 'revoked',
+      revokedAt: twelveDaysAgoIso,
+      revokedReasonLabel: 'Sesión finalizada tras viaje de asamblea',
+      revokedBy: 'Carlos Mendoza',
+    },
+  ];
+}
+
+function buildInitialRedemptions(): CredentialRedemptionRecord[] {
+  const dev = detectBrowserDeviceDetails();
+  const d1 = new Date(Date.now() - 3 * 3600 * 1000).toISOString();
+  const d2 = new Date(Date.now() - 28 * 3600 * 1000).toISOString();
+  const d3 = new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
+  const d4 = new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString();
+  const d5 = new Date(Date.now() - 9 * 24 * 3600 * 1000).toISOString();
+
+  return [
+    {
+      id: 'red_01',
+      publisherId: 'pub-1',
+      publisherName: 'Carlos Mendoza',
+      role: 'coordinador',
+      codeMasked: '••84',
+      deviceInfo: dev.deviceInfo,
+      deviceType: dev.deviceType,
+      osName: dev.osName,
+      browserName: dev.browserName,
+      redeemedAt: d1,
+      lastActiveAt: new Date().toISOString(),
+      status: 'active',
+    },
+    {
+      id: 'red_02',
+      publisherId: 'pub-2',
+      publisherName: 'Roberto Gómez',
+      role: 'secretario',
+      codeMasked: '••21',
+      deviceInfo: 'Windows PC · Google Chrome',
+      deviceType: 'desktop',
+      osName: 'Windows 11',
+      browserName: 'Google Chrome',
+      redeemedAt: d2,
+      lastActiveAt: d1,
+      status: 'active',
+    },
+    {
+      id: 'red_03',
+      publisherId: 'pub-3',
+      publisherName: 'Miguel Ángel Torres',
+      role: 'superintendente_servicio',
+      codeMasked: '••56',
+      deviceInfo: 'iOS (iPhone 15) · Safari',
+      deviceType: 'mobile',
+      osName: 'iOS 17.5',
+      browserName: 'Safari',
+      redeemedAt: d3,
+      lastActiveAt: d2,
+      status: 'active',
+    },
+    {
+      id: 'red_04',
+      publisherId: 'pub-4',
+      publisherName: 'David Herrera',
+      role: 'siervo_territorios',
+      codeMasked: '••73',
+      deviceInfo: 'Android Smartphone (Xiaomi Redmi) · Chrome',
+      deviceType: 'mobile',
+      osName: 'Android 14',
+      browserName: 'Google Chrome',
+      redeemedAt: d4,
+      lastActiveAt: d3,
+      status: 'active',
+    },
+    {
+      id: 'red_05_rev',
+      publisherId: 'pub-4',
+      publisherName: 'David Herrera',
+      role: 'siervo_territorios',
+      codeMasked: '••40',
+      deviceInfo: 'Android Smartphone (Moto G) · Chrome',
+      deviceType: 'mobile',
+      osName: 'Android 12',
+      browserName: 'Google Chrome',
+      redeemedAt: d5,
+      lastActiveAt: d4,
+      status: 'revoked',
+      revokedAt: d4,
+      revokedBy: 'Carlos Mendoza (Coordinador)',
+      revokedReasonId: 'perdida_telefono',
+      revokedReasonLabel: 'Perdió o le robaron el teléfono',
+      revokedReasonDetails: 'Extravió el teléfono anterior en el transporte público; se revocó de inmediato.',
+    },
+  ];
+}
+
+function buildInitialRevocationHistory(): CredentialRevocationHistoryItem[] {
+  const d4 = new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString();
+  const d5 = new Date(Date.now() - 9 * 24 * 3600 * 1000).toISOString();
+  return [
+    {
+      id: 'rev_hist_01',
+      publisherId: 'pub-4',
+      publisherName: 'David Herrera',
+      previousCodeMasked: '••40',
+      previousDeviceInfo: 'Android Smartphone (Moto G) · Chrome',
+      previousRedeemedAt: d5,
+      revokedAt: d4,
+      revokedBy: 'Carlos Mendoza (Coordinador)',
+      reasonId: 'perdida_telefono',
+      reasonLabel: 'Perdió o le robaron el teléfono',
+      reasonDetails: 'Extravió el teléfono anterior en el transporte público; se revocó de inmediato.',
+      newCodeMasked: '••73',
+    },
+  ];
+}
 
 const SecurityContext = createContext<SecurityContextType | null>(null);
 
 export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentDeviceId] = useState<string>(() => {
+    try {
+      const existing = localStorage.getItem(CURRENT_DEVICE_ID_KEY);
+      if (existing) return existing;
+      const created = `dev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      localStorage.setItem(CURRENT_DEVICE_ID_KEY, created);
+      return created;
+    } catch {
+      return 'dev_current_local';
+    }
+  });
+
   const [pinHash, setPinHash] = useState<string | null>(() => {
     return localStorage.getItem(PIN_STORAGE_KEY);
   });
@@ -122,7 +563,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (saved) {
         const rawJson = isEncryptedPinAtRest(saved) ? decryptPinAtRest(saved) : saved;
         const parsed = JSON.parse(rawJson || '[]');
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           if (!isEncryptedPinAtRest(saved)) {
             localStorage.setItem(SESSIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(parsed)));
           }
@@ -132,7 +573,35 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch {
       // fallback
     }
-    return DEFAULT_INITIAL_SESSIONS;
+    return buildInitialSessions(currentDeviceId);
+  });
+
+  const [credentialRedemptions, setCredentialRedemptions] = useState<CredentialRedemptionRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem(REDEMPTIONS_STORAGE_KEY);
+      if (saved) {
+        const rawJson = isEncryptedPinAtRest(saved) ? decryptPinAtRest(saved) : saved;
+        const parsed = JSON.parse(rawJson || '[]');
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return buildInitialRedemptions();
+  });
+
+  const [revocationHistory, setRevocationHistory] = useState<CredentialRevocationHistoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(REVOCATIONS_STORAGE_KEY);
+      if (saved) {
+        const rawJson = isEncryptedPinAtRest(saved) ? decryptPinAtRest(saved) : saved;
+        const parsed = JSON.parse(rawJson || '[]');
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return buildInitialRevocationHistory();
   });
 
   // Sync invitations to localStorage (encrypted at rest) and listen for cloud updates
@@ -173,12 +642,95 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => window.removeEventListener('kongre_invitations_updated', handleInvitationsSynced);
   }, []);
 
-  // Sync sessions to localStorage (encrypted at rest)
+  // Sync sessions, redemptions and revocations to localStorage (encrypted at rest)
   useEffect(() => {
     try {
       localStorage.setItem(SESSIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(activeSessions)));
     } catch {}
   }, [activeSessions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(REDEMPTIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(credentialRedemptions)));
+    } catch {}
+  }, [credentialRedemptions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(REVOCATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(revocationHistory)));
+    } catch {}
+  }, [revocationHistory]);
+
+  // Ensure current browser device session is registered and kept up to date
+  useEffect(() => {
+    const dev = detectBrowserDeviceDetails();
+    const activeBrother =
+      (typeof window !== 'undefined' &&
+        (localStorage.getItem('kongre_current_brother_name') ||
+          localStorage.getItem('kongre_user_confirmed_name') ||
+          localStorage.getItem('kongre_google_display_name'))) ||
+      'Carlos Mendoza';
+    const activeEmail =
+      (typeof window !== 'undefined' &&
+        (localStorage.getItem('kongre_user_email') ||
+          localStorage.getItem('kongre_coordinator_email'))) ||
+      'sesion.local@kongre.org';
+    const activeRole =
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_active_role_v1')) ||
+      'coordinador';
+    const activePubId =
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_current_publisher_id_v2')) ||
+      'pub-1';
+
+    setActiveSessions((prev) => {
+      const approxLoc = detectApproximateLocation();
+      const formattedDevId = formatDeviceHardwareId(currentDeviceId);
+      const hasCurrent = prev.some((s) => s.id === currentDeviceId || s.isCurrentDevice);
+      if (hasCurrent) {
+        return prev.map((s) =>
+          s.id === currentDeviceId || s.isCurrentDevice
+            ? {
+                ...s,
+                id: currentDeviceId,
+                deviceId: s.deviceId || formattedDevId,
+                isCurrentDevice: true,
+                deviceInfo: dev.deviceInfo,
+                deviceType: dev.deviceType,
+                osName: dev.osName,
+                browserName: dev.browserName,
+                startedAt: s.startedAt || new Date().toISOString(),
+                lastActive: new Date().toISOString(),
+                approxLocation: s.approxLocation || approxLoc,
+                status: 'active',
+              }
+            : {
+                ...s,
+                deviceId: s.deviceId || formatDeviceHardwareId(s.id),
+                approxLocation: s.approxLocation || approxLoc,
+              }
+        );
+      }
+      const currentSession: ActiveDeviceSession = {
+        id: currentDeviceId,
+        deviceId: formattedDevId,
+        publisherId: activePubId,
+        email: activeEmail,
+        name: activeBrother,
+        role: activeRole,
+        deviceInfo: dev.deviceInfo,
+        deviceType: dev.deviceType,
+        osName: dev.osName,
+        browserName: dev.browserName,
+        startedAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        approxLocation: approxLoc,
+        ipPlaceholder: 'Este dispositivo · Sesión actual',
+        isCurrentDevice: true,
+        status: 'active',
+      };
+      return [currentSession, ...prev];
+    });
+  }, [currentDeviceId]);
 
   // Helper to check if demo mode is active and safe
   const isDemoSession = (): boolean => {
@@ -540,26 +1092,56 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return next;
       });
 
-      // Register new active device session
+      // Register new active device session with full device details
+      const dev = detectBrowserDeviceDetails();
+      const approxLoc = detectApproximateLocation();
+      const nowIso = new Date().toISOString();
+      const effectiveName = userName || found.targetName || 'Hermano Autorizado';
+      const newSessId = `sess_${Date.now()}`;
       const newSession: ActiveDeviceSession = {
-        id: `sess_${Date.now()}`,
+        id: newSessId,
+        deviceId: formatDeviceHardwareId(currentDeviceId || newSessId),
         email: userEmail || `${found.id.toLowerCase()}@kongre.org`,
-        name: userName || found.targetName || 'Hermano Autorizado',
+        name: effectiveName,
         role: found.role,
-        deviceInfo: navigator.userAgent.includes('Mobile') ? 'Dispositivo Móvil' : 'Navegador Web / PC',
-        lastActive: 'Hace un momento',
+        deviceInfo: dev.deviceInfo,
+        deviceType: dev.deviceType,
+        osName: dev.osName,
+        browserName: dev.browserName,
+        startedAt: nowIso,
+        lastActive: nowIso,
+        approxLocation: approxLoc,
         ipPlaceholder: 'Salón del Reino',
+        isCurrentDevice: true,
+        codeMasked: maskCredentialCode(cleanCode),
         status: 'active',
       };
 
       setActiveSessions((prev) => [newSession, ...prev]);
+
+      // Also record in credentialRedemptions
+      const newRedemption: CredentialRedemptionRecord = {
+        id: `red_${Date.now()}`,
+        publisherId: found.id,
+        publisherName: effectiveName,
+        role: found.role,
+        codeMasked: maskCredentialCode(cleanCode),
+        deviceInfo: dev.deviceInfo,
+        deviceType: dev.deviceType,
+        osName: dev.osName,
+        browserName: dev.browserName,
+        redeemedAt: nowIso,
+        lastActiveAt: nowIso,
+        status: 'active',
+      };
+      setCredentialRedemptions((prev) => [newRedemption, ...prev]);
 
       insertAuditLog({
         accion: 'CANJEAR_INVITACION_EXITOSO',
         hermano_nid: userEmail || newSession.name,
         hermano_nombre: newSession.name,
         modulo: 'auth',
-        detalles: `Invitación canjeada con éxito para el rol: ${found.role}.`,
+        detalles: `Invitación (${maskCredentialCode(cleanCode)}) canjeada en ${dev.deviceInfo} para el rol: ${found.role}.`,
       }).catch(() => {});
 
       return {
@@ -572,22 +1154,305 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [invitations]
   );
 
-  // Revoke device session
-  const revokeSession = useCallback((sessionId: string) => {
-    setActiveSessions((prev) => {
-      const target = prev.find((s) => s.id === sessionId);
-      if (target) {
-        insertAuditLog({
-          accion: 'REVOCAR_SESION_DISPOSITIVO',
-          hermano_nid: target.email || target.id,
-          hermano_nombre: target.name,
-          modulo: 'auth',
-          detalles: `Sesión revocada para dispositivo (${target.deviceInfo}) con rol ${target.role}.`,
-        }).catch(() => {});
-      }
-      return prev.map((s) => (s.id === sessionId ? { ...s, status: 'revoked' as const } : s));
-    });
-  }, []);
+  // Revoke single device session
+  const revokeSession = useCallback(
+    (sessionId: string, reasonLabel?: string, revokedBy?: string) => {
+      const nowIso = new Date().toISOString();
+      setActiveSessions((prev) => {
+        const target = prev.find((s) => s.id === sessionId);
+        if (target) {
+          insertAuditLog({
+            accion: 'REVOCAR_SESION_DISPOSITIVO',
+            hermano_nid: target.email || target.id,
+            hermano_nombre: target.name,
+            modulo: 'auth',
+            detalles: `Sesión cerrada/revocada en dispositivo (${target.deviceInfo}) con rol ${target.role}${reasonLabel ? `. Motivo: ${reasonLabel}` : ''}.`,
+          }).catch(() => {});
+        }
+        return prev.map((s) =>
+          s.id === sessionId
+            ? {
+                ...s,
+                status: 'revoked' as const,
+                revokedAt: nowIso,
+                revokedReasonLabel: reasonLabel || 'Sesión cerrada manualmente desde Mi Perfil',
+                revokedBy: revokedBy || target?.name || 'Usuario',
+              }
+            : s
+        );
+      });
+    },
+    []
+  );
+
+  // Revoke all other active device sessions except current device
+  const revokeAllOtherSessions = useCallback(
+    (revokedBy?: string) => {
+      const nowIso = new Date().toISOString();
+      setActiveSessions((prev) => {
+        const othersCount = prev.filter(
+          (s) => s.status === 'active' && s.id !== currentDeviceId && !s.isCurrentDevice
+        ).length;
+        if (othersCount > 0) {
+          insertAuditLog({
+            accion: 'CERRAR_OTRAS_SESIONES_DISPOSITIVOS',
+            hermano_nid: revokedBy || 'usuario',
+            hermano_nombre: revokedBy || 'Usuario',
+            modulo: 'auth',
+            detalles: `Se cerraron ${othersCount} sesiones activas en otros dispositivos.`,
+          }).catch(() => {});
+        }
+        return prev.map((s) =>
+          s.status === 'active' && s.id !== currentDeviceId && !s.isCurrentDevice
+            ? {
+                ...s,
+                status: 'revoked' as const,
+                revokedAt: nowIso,
+                revokedReasonLabel: 'Cierre de todas las demás sesiones abiertas',
+                revokedBy: revokedBy || s.name || 'Usuario',
+              }
+            : s
+        );
+      });
+    },
+    [currentDeviceId]
+  );
+
+  const updateCurrentDeviceLocation = useCallback(
+    (locationLabel: string) => {
+      const clean = locationLabel.trim();
+      if (!clean) return;
+      try {
+        localStorage.setItem('kongre_approx_location_v1', clean);
+      } catch {}
+      setActiveSessions((prev) =>
+        prev.map((s) =>
+          s.id === currentDeviceId || s.isCurrentDevice
+            ? { ...s, approxLocation: clean, lastActive: new Date().toISOString() }
+            : s
+        )
+      );
+    },
+    [currentDeviceId]
+  );
+
+  // Record a PIN or code redemption on current device
+  const recordCredentialRedemption = useCallback(
+    (params: {
+      publisherId: string;
+      publisherName: string;
+      role: string;
+      codeOrPin: string;
+      deviceInfo?: string;
+    }) => {
+      const dev = detectBrowserDeviceDetails();
+      const approxLoc = detectApproximateLocation();
+      const nowIso = new Date().toISOString();
+      const masked = maskCredentialCode(params.codeOrPin);
+
+      // Update or register the current device connection in activeSessions with deviceId, login date, and approxLocation
+      setActiveSessions((prev) => {
+        const formattedDevId = formatDeviceHardwareId(currentDeviceId);
+        const hasCurrent = prev.some((s) => s.id === currentDeviceId || s.isCurrentDevice);
+        if (hasCurrent) {
+          return prev.map((s) =>
+            s.id === currentDeviceId || s.isCurrentDevice
+              ? {
+                  ...s,
+                  id: currentDeviceId,
+                  deviceId: s.deviceId || formattedDevId,
+                  publisherId: params.publisherId,
+                  name: params.publisherName,
+                  role: params.role,
+                  deviceInfo: params.deviceInfo || dev.deviceInfo,
+                  deviceType: dev.deviceType,
+                  osName: dev.osName,
+                  browserName: dev.browserName,
+                  startedAt: nowIso,
+                  lastActive: nowIso,
+                  approxLocation: s.approxLocation || approxLoc,
+                  codeMasked: masked,
+                  isCurrentDevice: true,
+                  status: 'active',
+                }
+              : s
+          );
+        }
+        const newCurrentSession: ActiveDeviceSession = {
+          id: currentDeviceId,
+          deviceId: formattedDevId,
+          publisherId: params.publisherId,
+          email: `${params.publisherId}@kongre.org`,
+          name: params.publisherName,
+          role: params.role,
+          deviceInfo: params.deviceInfo || dev.deviceInfo,
+          deviceType: dev.deviceType,
+          osName: dev.osName,
+          browserName: dev.browserName,
+          startedAt: nowIso,
+          lastActive: nowIso,
+          approxLocation: approxLoc,
+          ipPlaceholder: 'Este dispositivo · Sesión actual',
+          isCurrentDevice: true,
+          codeMasked: masked,
+          status: 'active',
+        };
+        return [newCurrentSession, ...prev];
+      });
+
+      setCredentialRedemptions((prev) => {
+        const existingIdx = prev.findIndex(
+          (r) =>
+            r.status === 'active' &&
+            (r.publisherId === params.publisherId ||
+              r.publisherName.toLowerCase().trim() === params.publisherName.toLowerCase().trim())
+        );
+        const updatedRecord: CredentialRedemptionRecord = {
+          id: existingIdx >= 0 ? prev[existingIdx].id : `red_${Date.now()}`,
+          publisherId: params.publisherId,
+          publisherName: params.publisherName,
+          role: params.role,
+          codeMasked: masked,
+          deviceInfo: params.deviceInfo || dev.deviceInfo,
+          deviceType: dev.deviceType,
+          osName: dev.osName,
+          browserName: dev.browserName,
+          redeemedAt: existingIdx >= 0 ? prev[existingIdx].redeemedAt : nowIso,
+          lastActiveAt: nowIso,
+          status: 'active',
+        };
+        if (existingIdx >= 0) {
+          const copy = [...prev];
+          copy[existingIdx] = updatedRecord;
+          return copy;
+        }
+        return [updatedRecord, ...prev];
+      });
+    },
+    [currentDeviceId]
+  );
+
+  // Listen for custom 'kongre_pin_redeemed' events dispatched from AuthContext
+  useEffect(() => {
+    const handlePinRedeemed = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent)?.detail;
+        if (detail && detail.publisherName) {
+          recordCredentialRedemption({
+            publisherId: detail.publisherId || `pub_${Date.now()}`,
+            publisherName: detail.publisherName,
+            role: detail.role || 'publico',
+            codeOrPin: detail.pin || '••••',
+          });
+        }
+      } catch {}
+    };
+    window.addEventListener('kongre_pin_redeemed', handlePinRedeemed);
+    return () => window.removeEventListener('kongre_pin_redeemed', handlePinRedeemed);
+  }, [recordCredentialRedemption]);
+
+  // Mandatory elder workflow: revoke previous code/PIN + device sessions with reason and issue new credential
+  const revokeAndReplacePublisherCredential = useCallback(
+    (params: {
+      publisherId: string;
+      publisherName: string;
+      role: string;
+      oldPinOrCode?: string;
+      newPinOrCode: string;
+      reasonId: CredentialRevocationReasonId;
+      reasonDetails?: string;
+      revokedBy: string;
+    }) => {
+      const nowIso = new Date().toISOString();
+      const reasonObj = REVOCATION_REASON_OPTIONS.find((r) => r.id === params.reasonId);
+      const reasonLabel = reasonObj ? reasonObj.label : 'Cambio de código por seguridad';
+      const oldMasked = maskCredentialCode(params.oldPinOrCode);
+      const newMasked = maskCredentialCode(params.newPinOrCode);
+
+      let prevDeviceUsed = 'Dispositivo no registrado (Sin canje previo)';
+      let prevRedeemedAt: string | undefined = undefined;
+
+      // 1. Mark previous active credentialRedemptions for this person as 'revoked'
+      setCredentialRedemptions((prev) => {
+        const activeExisting = prev.find(
+          (r) =>
+            r.status === 'active' &&
+            (r.publisherId === params.publisherId ||
+              r.publisherName.toLowerCase().trim() === params.publisherName.toLowerCase().trim())
+        );
+        if (activeExisting) {
+          prevDeviceUsed = activeExisting.deviceInfo;
+          prevRedeemedAt = activeExisting.redeemedAt;
+        }
+
+        return prev.map((r) => {
+          const isTarget =
+            r.status === 'active' &&
+            (r.publisherId === params.publisherId ||
+              r.publisherName.toLowerCase().trim() === params.publisherName.toLowerCase().trim());
+          if (!isTarget) return r;
+          return {
+            ...r,
+            status: 'revoked' as const,
+            revokedAt: nowIso,
+            revokedBy: params.revokedBy,
+            revokedReasonId: params.reasonId,
+            revokedReasonLabel: reasonLabel,
+            revokedReasonDetails: params.reasonDetails?.trim() || undefined,
+          };
+        });
+      });
+
+      // 2. Mark any active device sessions belonging to this brother (except current elder device if different) as 'revoked'
+      setActiveSessions((prev) =>
+        prev.map((s) => {
+          const isTarget =
+            s.status === 'active' &&
+            !s.isCurrentDevice &&
+            (s.publisherId === params.publisherId ||
+              s.name.toLowerCase().trim() === params.publisherName.toLowerCase().trim());
+          if (!isTarget) return s;
+          return {
+            ...s,
+            status: 'revoked' as const,
+            revokedAt: nowIso,
+            revokedBy: params.revokedBy,
+            revokedReasonId: params.reasonId,
+            revokedReasonLabel: `${reasonLabel}${params.reasonDetails ? ` — ${params.reasonDetails.trim()}` : ''}`,
+            revokedReasonDetails: params.reasonDetails?.trim() || undefined,
+          };
+        })
+      );
+
+      // 3. Append to revocationHistory
+      const historyItem: CredentialRevocationHistoryItem = {
+        id: `rev_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        publisherId: params.publisherId,
+        publisherName: params.publisherName,
+        previousCodeMasked: oldMasked,
+        previousDeviceInfo: prevDeviceUsed,
+        previousRedeemedAt: prevRedeemedAt,
+        revokedAt: nowIso,
+        revokedBy: params.revokedBy,
+        reasonId: params.reasonId,
+        reasonLabel,
+        reasonDetails: params.reasonDetails?.trim() || undefined,
+        newCodeMasked: newMasked,
+      };
+
+      setRevocationHistory((prev) => [historyItem, ...prev]);
+
+      // 4. Audit Log
+      insertAuditLog({
+        accion: 'REVOCAR_Y_CAMBIAR_CODIGO_PERSONA',
+        hermano_nid: params.revokedBy,
+        hermano_nombre: params.revokedBy,
+        modulo: 'auth',
+        detalles: `Código anterior (${oldMasked}) de ${params.publisherName} REVOCADO y reemplazado por (${newMasked}). Motivo: ${reasonLabel}${params.reasonDetails ? ` (${params.reasonDetails.trim()})` : ''}.`,
+      }).catch(() => {});
+    },
+    []
+  );
 
   // Inactivity countdown & automatic session locking
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
@@ -691,6 +1556,9 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         isCongregationPinSet: !!congregationPinHash,
         invitations,
         activeSessions,
+        credentialRedemptions,
+        revocationHistory,
+        currentDeviceId,
         lockSession,
         unlockSession,
         setPasscodePin,
@@ -707,6 +1575,10 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         revokeInvitation,
         redeemInvitationCode,
         revokeSession,
+        revokeAllOtherSessions,
+        updateCurrentDeviceLocation,
+        recordCredentialRedemption,
+        revokeAndReplacePublisherCredential,
         remainingSeconds,
         totalSeconds,
         autoLockFraction,

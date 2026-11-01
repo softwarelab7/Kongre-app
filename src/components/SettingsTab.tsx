@@ -656,21 +656,52 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       {/* 3. VISTAS EXCLUSIVAS: CADA CATEGORÍA DENTRO DE SU PROPIO CONTENEDOR */}
       {activeTab !== 'all' && (
         <div className="space-y-4 animate-in fade-in duration-300">
-          {/* Navegación sutil y directa al Panel de Tarjetas */}
-          <div className="flex items-center justify-between gap-3 pb-1">
-            <div className="flex items-center gap-2">
+          {/* Barra de navegación rápida a Todas las tarjetas + Selector rápido superior */}
+          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
-                className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer active:scale-95 shrink-0"
-                title="Volver al Panel de Tarjetas"
-                aria-label="Volver al Panel de Tarjetas"
+                className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                title="Volver a todas las tarjetas de Ajustes"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Todas las tarjetas</span>
               </button>
-              <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-semibold">
-                Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
-              </span>
+              <div className="min-w-0">
+                <h2 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate">
+                  {SETTINGS_TABS_CONFIG[activeTab]?.label}
+                </h2>
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate hidden sm:block">
+                  Ajustes de la Congregación
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+              {tabKeys
+                .filter((k) => k !== 'all')
+                .map((tabKey) => {
+                  const cfg = SETTINGS_TABS_CONFIG[tabKey];
+                  const ScIcon = cfg.icon;
+                  const isCurr = tabKey === activeTab;
+                  return (
+                    <button
+                      key={tabKey}
+                      type="button"
+                      onClick={() => setActiveTab(tabKey)}
+                      className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                        isCurr
+                          ? 'bg-indigo-600 text-white shadow-2xs'
+                          : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                      }`}
+                      title={cfg.label}
+                    >
+                      <ScIcon size={14} />
+                      <span className="hidden xl:inline">{cfg.label.split(' ')[0]}</span>
+                    </button>
+                  );
+                })}
             </div>
           </div>
 

@@ -41,12 +41,14 @@ import {
   History,
   PlusCircle,
   MinusCircle,
+  ArrowLeft,
 } from 'lucide-react';
 import { MinistryStopwatchDial } from './MinistryStopwatchDial';
 import { getAvailableServiceYears, getServiceYearMonths } from '../utils/s21Helper';
 import { getVaultValue, setVaultValue } from '../utils/atRestVault';
 
 export type MinistrySubTab =
+  | 'tarjetas'
   | 'resumen'
   | 'cronometro'
   | 'revisitas'
@@ -1716,87 +1718,194 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         </div>
       )}
 
-      {/* Barra de Funciones y Subpestañas de Mi Ministerio (Cuadrícula simétrica 2x2 en móvil, 4 columnas en escritorio) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A]">
-        <button
-          type="button"
-          onClick={() => {
-            setActiveSubTab('resumen');
-            setActiveTab('inicio');
-          }}
-          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'resumen' || activeSubTab === 'cronometro'
-              ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-          }`}
-        >
-          <Timer className={`w-3.5 h-3.5 shrink-0 ${timerState.isRunning ? 'text-emerald-500 animate-spin' : ''}`} />
-          <span className="truncate">Cronómetro y Mes</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono tabular-nums bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 shrink-0">
-            {monthSummary.fullHours > 0
-              ? monthSummary.remainingMinutes > 0
-                ? `${monthSummary.fullHours}h ${monthSummary.remainingMinutes}m`
-                : `${monthSummary.fullHours}h`
-              : monthSummary.remainingMinutes > 0
-                ? `${monthSummary.remainingMinutes}m`
-                : '0h'}
-          </span>
-        </button>
+      {/* Tarjetas de Mi Ministerio o Barra de Sección Activa con «← Todas las tarjetas» */}
+      {(() => {
+        const timeSummaryStr =
+          monthSummary.fullHours > 0
+            ? monthSummary.remainingMinutes > 0
+              ? `${monthSummary.fullHours}h ${monthSummary.remainingMinutes}m`
+              : `${monthSummary.fullHours}h`
+            : monthSummary.remainingMinutes > 0
+            ? `${monthSummary.remainingMinutes}m`
+            : '0h';
 
-        <button
-          type="button"
-          onClick={() => {
-            setActiveSubTab('revisitas');
-            setActiveTab('revisitas');
-          }}
-          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'revisitas'
-              ? 'bg-white dark:bg-[#18181F] text-emerald-600 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-          }`}
-        >
-          <MapPin className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Revisitas</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono tabular-nums bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 shrink-0">
-            {returnVisits.length}
-          </span>
-        </button>
+        const ministryCards: {
+          id: Exclude<MinistrySubTab, 'tarjetas' | 'cronometro'>;
+          title: string;
+          shortLabel: string;
+          subtitle: string;
+          summary: string;
+          statusText: string;
+          icon: React.ElementType;
+          iconBg: string;
+          iconColor: string;
+          onSelect: () => void;
+        }[] = [
+          {
+            id: 'resumen',
+            title: 'Cronómetro y Mes Actual',
+            shortLabel: 'Cronómetro',
+            subtitle: 'Cronómetro de predicación en vivo, registro de sesiones diarias y progreso hacia tu meta mensual.',
+            summary: `Tiempo este mes: ${timeSummaryStr} · Meta: ${hourGoal}h`,
+            statusText: timerState.isRunning ? 'En curso' : 'Abrir cronómetro',
+            icon: Timer,
+            iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
+            iconColor: 'text-indigo-600 dark:text-indigo-400',
+            onSelect: () => {
+              setActiveSubTab('resumen');
+              setActiveTab('inicio');
+            },
+          },
+          {
+            id: 'revisitas',
+            title: 'Agenda de Revisitas',
+            shortLabel: 'Revisitas',
+            subtitle: 'Personas interesadas, direcciones, temas conversados, preguntas pendientes y fechas de visita.',
+            summary: `${returnVisits.length} revisita(s) registrada(s)`,
+            statusText: 'Ver revisitas',
+            icon: MapPin,
+            iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
+            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            onSelect: () => {
+              setActiveSubTab('revisitas');
+              setActiveTab('revisitas');
+            },
+          },
+          {
+            id: 'estudios',
+            title: 'Cursos Bíblicos (Estudios)',
+            shortLabel: 'Estudios',
+            subtitle: 'Seguimiento de estudiantes de la Biblia, publicación, lección actual y metas espirituales.',
+            summary: `${bibleStudies.length} curso(s) bíblico(s) activo(s)`,
+            statusText: 'Ver estudios',
+            icon: BookOpen,
+            iconBg: 'bg-amber-50 dark:bg-amber-950/60',
+            iconColor: 'text-amber-600 dark:text-amber-400',
+            onSelect: () => {
+              setActiveSubTab('estudios');
+              setActiveTab('estudios_biblicos');
+            },
+          },
+          {
+            id: 'informe',
+            title: 'Historial Mensual e Informe S-4',
+            shortLabel: 'Historial S-4',
+            subtitle: 'Resumen anual por año de servicio, envío de informe S-4 a la congregación y respaldo por WhatsApp.',
+            summary: `${serviceYearSummary.totalHoursYear}h acumuladas en el año de servicio`,
+            statusText: 'Ver historial',
+            icon: History,
+            iconBg: 'bg-purple-50 dark:bg-purple-950/60',
+            iconColor: 'text-purple-600 dark:text-purple-400',
+            onSelect: () => {
+              setActiveSubTab('informe');
+            },
+          },
+        ];
 
-        <button
-          type="button"
-          onClick={() => {
-            setActiveSubTab('estudios');
-            setActiveTab('estudios_biblicos');
-          }}
-          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'estudios'
-              ? 'bg-white dark:bg-[#18181F] text-amber-600 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-          }`}
-        >
-          <BookOpen className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Estudios</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono tabular-nums bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#3E3E42] shrink-0">
-            {bibleStudies.length}
-          </span>
-        </button>
+        const normalizedActiveId = activeSubTab === 'cronometro' ? 'resumen' : activeSubTab;
+        const activeCardMeta = ministryCards.find((c) => c.id === normalizedActiveId);
 
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('informe')}
-          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'informe'
-              ? 'bg-white dark:bg-[#18181F] text-purple-600 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-          }`}
-        >
-          <History className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Historial Mensual</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono tabular-nums bg-purple-50 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 shrink-0">
-            {serviceYearSummary.totalHoursYear}h
-          </span>
-        </button>
-      </div>
+        if (activeSubTab === 'tarjetas') {
+          return (
+            <div className="space-y-3 animate-in fade-in duration-200">
+              <div className="px-1">
+                <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
+                  Secciones de Mi Ministerio Personal
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                  Selecciona una tarjeta para entrar en la herramienta de predicación correspondiente.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ministryCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      onClick={card.onSelect}
+                      className="group text-left bg-white dark:bg-[#121216] hover:bg-zinc-50/80 dark:hover:bg-[#18181F] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className={`w-11 h-11 rounded-2xl ${card.iconBg} ${card.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-105`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">
+                            <span>{card.statusText}</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {card.title}
+                          </h4>
+                          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] leading-relaxed">
+                            {card.subtitle}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] text-[11px] font-medium text-zinc-600 dark:text-[#D4D4D8] truncate">
+                        {card.summary}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setActiveSubTab('tarjetas')}
+                className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Todas las tarjetas</span>
+              </button>
+
+              {activeCardMeta && (
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate">
+                    {activeCardMeta.title}
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate hidden sm:block">
+                    {activeCardMeta.summary}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+              {ministryCards.map((sc) => {
+                const ScIcon = sc.icon;
+                const isCurr = sc.id === normalizedActiveId;
+                return (
+                  <button
+                    key={sc.id}
+                    type="button"
+                    onClick={sc.onSelect}
+                    className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                      isCurr
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                    }`}
+                    title={sc.title}
+                  >
+                    <ScIcon className={`w-3.5 h-3.5 shrink-0 ${sc.id === 'resumen' && timerState.isRunning ? 'animate-spin' : ''}`} />
+                    <span>{sc.shortLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* =========================================================================
           3. CONTENIDO: PANEL PRINCIPAL (RESUMEN + CRONÓMETRO EN VIVO + ACCESOS)

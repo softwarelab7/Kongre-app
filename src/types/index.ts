@@ -1177,15 +1177,95 @@ export interface CongregationInvitation {
   usedByEmail?: string;
 }
 
+export type CredentialRevocationReasonId =
+  | 'olvido'
+  | 'perdida_telefono'
+  | 'alguien_mas_lo_sabe'
+  | 'cambio_dispositivo'
+  | 'otro_motivo';
+
 export interface ActiveDeviceSession {
   id: string;
+  deviceId?: string;
+  publisherId?: string;
   email: string;
   name: string;
   role: string;
   deviceInfo: string;
+  deviceType?: 'mobile' | 'tablet' | 'desktop';
+  osName?: string;
+  browserName?: string;
+  startedAt?: string;
   lastActive: string;
+  approxLocation?: string;
   ipPlaceholder?: string;
+  isCurrentDevice?: boolean;
+  codeMasked?: string;
   status: 'active' | 'revoked';
+  revokedAt?: string;
+  revokedReasonId?: CredentialRevocationReasonId;
+  revokedReasonLabel?: string;
+  revokedReasonDetails?: string;
+  revokedBy?: string;
+}
+
+export interface CredentialRevocationHistoryItem {
+  id: string;
+  publisherId: string;
+  publisherName: string;
+  previousCodeMasked: string;
+  previousDeviceInfo: string;
+  previousRedeemedAt?: string;
+  revokedAt: string;
+  revokedBy: string;
+  reasonId: CredentialRevocationReasonId;
+  reasonLabel: string;
+  reasonDetails?: string;
+  newCodeMasked: string;
+}
+
+export interface CredentialRedemptionRecord {
+  id: string;
+  publisherId: string;
+  publisherName: string;
+  role: string;
+  codeMasked: string;
+  deviceInfo: string;
+  deviceType: 'mobile' | 'tablet' | 'desktop';
+  osName: string;
+  browserName: string;
+  redeemedAt: string; // ISO string with day and hour
+  lastActiveAt: string;
+  status: 'active' | 'revoked';
+  revokedAt?: string;
+  revokedBy?: string;
+  revokedReasonId?: CredentialRevocationReasonId;
+  revokedReasonLabel?: string;
+  revokedReasonDetails?: string;
+}
+
+export type PinChangeRequestReasonId =
+  | 'perdida_dispositivo'
+  | 'olvido'
+  | 'sospecha_acceso_no_autorizado'
+  | 'cambio_equipo'
+  | 'otro';
+
+export interface SolicitudCambioPin {
+  id: string;
+  congregation_id: string;
+  publisher_id: string;
+  publisher_name: string;
+  publisher_email?: string;
+  role: string;
+  reason_id: PinChangeRequestReasonId;
+  reason_label: string;
+  details?: string;
+  status: 'pendiente' | 'atendida' | 'rechazada';
+  created_at: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  new_pin_masked?: string;
 }
 
 export interface AccountLinkRequest {

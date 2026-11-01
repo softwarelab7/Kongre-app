@@ -66,15 +66,15 @@ import type { DrillDownLevel, HighlightColor, UserAnnotation, ReferenceItem } fr
 const SECTION_BANNERS = {
   tesoros: {
     label: 'TESOROS DE LA BIBLIA',
-    bgColor: '#5A6B7C', // Gris acero / Slate semántico JW
+    bgClass: 'bg-[#5A6B7C]',
   },
   maestros: {
     label: 'SEAMOS MEJORES MAESTROS',
-    bgColor: '#C67D0A', // Ámbar dorado / Ocre semántico JW
+    bgClass: 'bg-[#C67D0A]',
   },
   vida_cristiana: {
     label: 'NUESTRA VIDA CRISTIANA',
-    bgColor: '#962828', // Carmesí / Granate semántico JW
+    bgClass: 'bg-[#962828]',
   },
 };
 
@@ -1092,7 +1092,11 @@ export default function ClmScheduleView({
 
     const asignado = autoAsignarLocal(programa, publishers, historial);
     setPrograma(asignado);
-    showToast('Asignaciones completadas con rotación inteligente.');
+    try {
+      localStorage.setItem(`clm_programa_${programa.semana_fecha}`, JSON.stringify(asignado));
+    } catch {}
+    updateClmPrograma(asignado);
+    showToast('Asignaciones de Entre Semana completadas con rotación inteligente.');
   };
 
   // Quitar rápidamente a todos los publicadores asignados de esta reunión
@@ -2223,29 +2227,127 @@ export default function ClmScheduleView({
           </div>
         </>
       ) : (
-        /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="px-3.5 sm:px-5 py-2.5 sm:py-3 bg-zinc-50/80 dark:bg-[#121216] border-b border-zinc-200/70 dark:border-[#27272A] flex flex-col gap-2 text-xs">
-          {/* Fila principal: Título + Lectura a la izquierda, Checkbox Sala Auxiliar + Cronómetro a la derecha */}
-          <div className="flex items-start sm:items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs sm:text-sm whitespace-nowrap">
-                  Reunión Entre Semana (VMC)
-                </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 border border-indigo-200/70 dark:border-indigo-500/30 font-bold font-mono tabular-nums text-[10px] sm:text-[11px] uppercase tracking-wide whitespace-nowrap">
-                  {effectivePrograma?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48'}
-                </span>
+        /* ── ENCABEZADO VMC REDISEÑADO (MODO EMBEBIDO / UNIFICADO) ── */
+        <div className="border-t-4 border-t-indigo-600 dark:border-t-indigo-500 px-3.5 sm:px-5 py-3.5 sm:py-4 bg-gradient-to-b from-indigo-50/50 via-zinc-50/70 to-white dark:from-indigo-950/25 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-[#27272A] flex flex-col gap-3 text-xs">
+          {/* Fila 1: Identidad visual, Fecha/Hora completa y Barra de Progreso */}
+          <div className="flex items-start sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              {currentWeek?.midweek?.date && (
-                <p className="font-semibold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums text-[11px] sm:text-xs mt-0.5 truncate">
-                  {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
-                  {settings?.midweekMeetingTime ? ` (${settings.midweekMeetingTime})` : ''}
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight">
+                    Reunión Entre Semana
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60">
+                    Vida y Ministerio (VMC)
+                  </span>
+                </div>
+                {currentWeek?.midweek?.date && (
+                  <div className="flex items-center gap-1.5 mt-0.5 text-indigo-700 dark:text-indigo-400 font-semibold text-[11px] sm:text-xs">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span className="capitalize">
+                      {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
+                      {settings?.midweekMeetingTime ? ` • ${settings.midweekMeetingTime}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Indicador de progreso con barra visual */}
+            {(() => {
+              const assignable = visiblePartes.filter((p) => p.tipo !== 'canto');
+              const assigned = assignable.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length;
+              const total = assignable.length || 1;
+              const pct = Math.min(100, Math.round((assigned / total) * 100));
+              const isComplete = assigned >= total;
+              return (
+                <div
+                  className={`flex flex-col items-end px-2.5 py-1.5 rounded-xl border shrink-0 ${
+                    isComplete
+                      ? 'bg-emerald-50/90 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300'
+                      : 'bg-white border-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:border-[#27272A] dark:text-[#F4F4F5]'
+                  }`}
+                  title="Progreso de asignaciones de Entre Semana"
+                >
+                  <div className="flex items-center gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
+                    <CheckCircle2
+                      size={12}
+                      className={isComplete ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-500'}
+                    />
+                    <span>
+                      {assigned}/{total} asignados
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-0.5 w-20 h-1.5 mt-1">
+                    {[20, 40, 60, 80, 100].map((step) => (
+                      <span
+                        key={step}
+                        className={`h-full rounded-xs transition-colors ${
+                          pct >= step - 10
+                            ? isComplete
+                              ? 'bg-emerald-500'
+                              : 'bg-indigo-600 dark:bg-indigo-400'
+                            : 'bg-zinc-200 dark:bg-zinc-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Fila 2: Lectura Bíblica Semanal + Cánticos + Botones de Acción Rápida */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-200/70 dark:border-[#27272A]">
+            <div className="flex items-center gap-2 flex-wrap min-w-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
+                Lectura:
+              </span>
+              <InlineReferenceToken
+                reference={{
+                  id: `reading-${semanaFechaStr}`,
+                  code: (effectivePrograma?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48').toUpperCase(),
+                  title: `Lectura Semanal: ${effectivePrograma?.lectura_semana || currentWeek?.midweek?.bibleReading || 'Biblia'}`,
+                  extract: `Lectura y examen del texto bíblico programado para la semana del ${effectivePrograma?.rango_semana || semanaFechaStr}.`,
+                }}
+                onSelectReference={(ref) => openReference(ref)}
+              />
+              {effectivePrograma && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
+                  <Music size={11} className="text-indigo-500 shrink-0" />
+                  <span>
+                    Cánticos {effectivePrograma.canto_inicial || 4}, {effectivePrograma.canto_medio || 89},{' '}
+                    {effectivePrograma.canto_final || 120}
+                  </span>
+                </span>
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
-              {/* Checkbox compacto integrado en la esquina superior derecha */}
+            {/* Acciones rápidas de Entre Semana + Sala Auxiliar + Cronómetro */}
+            <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+              <button
+                type="button"
+                onClick={handleAutoAssign}
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer active:scale-95 shadow-2xs"
+                title="Autoasignar partes de Entre Semana (VMC) respetando rotación"
+              >
+                <Sparkles size={12} className="text-amber-300 shrink-0" />
+                <span>Autoasignar VMC</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSyncOrganized}
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition-all cursor-pointer active:scale-95 shadow-2xs"
+                title="Sincronizar bosquejos y tiempos de la Guía de Actividades"
+              >
+                <RefreshCw size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Sincronizar Guía</span>
+              </button>
+
               <div
                 className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] shadow-2xs select-none"
                 title="Activar o desactivar Sala Auxiliar para esta semana"
@@ -2254,70 +2356,124 @@ export default function ClmScheduleView({
                   size="sm"
                   checked={showAuxRoom}
                   onChange={(e) => handleToggleAuxRoom(e.target.checked)}
-                  label={showAuxRoom ? 'Aux.' : 'Sala Auxiliar'}
+                  label="Sala Auxiliar"
                 />
               </div>
 
-              {/* Acceso directo a Modo Atril / Cronómetro (solo escritorio) */}
               <button
                 type="button"
                 onClick={() => {
                   setTimerInitialPartId(undefined);
                   setIsTimerModalOpen(true);
                 }}
-                className="hidden sm:flex min-h-[32px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] transition-all cursor-pointer shadow-2xs shrink-0"
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95"
                 title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
               >
-                <Clock size={12} className="shrink-0 text-amber-400 dark:text-amber-400" />
-                <span>Cronómetro / Atril</span>
+                <Clock size={12} className="shrink-0 text-amber-400" />
+                <span>Atril</span>
               </button>
             </div>
           </div>
 
-          {/* Sub-barra compacta SOLO cuando Sala Auxiliar está activa */}
-          {showAuxRoom && (
-            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-zinc-200/60 dark:border-[#27272A]">
-              <div className="inline-flex items-center gap-0.5 bg-white dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setActiveRoom('principal')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                    activeRoom === 'principal'
-                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-                  }`}
-                >
-                  <span>Auditorio</span>
-                </button>
+          {/* Fila 3: Navegación Rápida por Secciones de VMC + Selector de Sala */}
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-[#27272A] flex-wrap">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {[
+                {
+                  id: 'section-tesoros',
+                  label: 'Tesoros de la Biblia',
+                  shortLabel: 'Tesoros',
+                  items: groupedSections.tesoros,
+                  pillClass:
+                    'bg-[#5A6B7C]/10 hover:bg-[#5A6B7C]/20 text-[#475664] dark:bg-[#5A6B7C]/25 dark:hover:bg-[#5A6B7C]/35 dark:text-slate-200 border-[#5A6B7C]/25',
+                  dotClass: 'bg-[#5A6B7C] dark:bg-slate-300',
+                },
+                {
+                  id: 'section-maestros',
+                  label: 'Mejores Maestros',
+                  shortLabel: 'Maestros',
+                  items: groupedSections.maestros,
+                  pillClass:
+                    'bg-[#C67D0A]/10 hover:bg-[#C67D0A]/20 text-[#9c6106] dark:bg-[#C67D0A]/25 dark:hover:bg-[#C67D0A]/35 dark:text-amber-200 border-[#C67D0A]/25',
+                  dotClass: 'bg-[#C67D0A] dark:bg-amber-400',
+                },
+                {
+                  id: 'section-vida_cristiana',
+                  label: 'Vida Cristiana',
+                  shortLabel: 'Vida Cristiana',
+                  items: groupedSections.vidaCristiana,
+                  pillClass:
+                    'bg-[#962828]/10 hover:bg-[#962828]/20 text-[#7d2020] dark:bg-[#962828]/25 dark:hover:bg-[#962828]/35 dark:text-rose-200 border-[#962828]/25',
+                  dotClass: 'bg-[#962828] dark:bg-rose-400',
+                },
+              ].map((sec) => {
+                const secAssigned = sec.items.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length;
+                const secTotal = sec.items.length;
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById(sec.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap shadow-2xs ${sec.pillClass}`}
+                  >
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${sec.dotClass}`} />
+                    <span className="sm:hidden">{sec.shortLabel}</span>
+                    <span className="hidden sm:inline">{sec.label}</span>
+                    <span className="font-mono tabular-nums text-[10px] opacity-80">
+                      ({secAssigned}/{secTotal})
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {showAuxRoom && (
+              <div className="flex items-center gap-1.5 ml-auto">
+                <div className="inline-flex items-center gap-0.5 bg-white dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveRoom('principal')}
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                      activeRoom === 'principal'
+                        ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                    }`}
+                  >
+                    <span>Auditorio</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveRoom('auxiliar')}
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                      activeRoom === 'auxiliar'
+                        ? 'bg-amber-500 text-white font-bold shadow-xs'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                    }`}
+                  >
+                    <span>Sala Auxiliar</span>
+                  </button>
+                </div>
 
                 <button
                   type="button"
-                  onClick={() => setActiveRoom('auxiliar')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                    activeRoom === 'auxiliar'
-                      ? 'bg-amber-500 text-white font-bold shadow-xs'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-                  }`}
+                  onClick={() => setIsAuxCounselorModalOpen(true)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer shadow-2xs"
+                  title="Consejero de la Sala Auxiliar"
                 >
-                  <span>Sala Auxiliar</span>
+                  <UserCheck size={12} className="shrink-0" />
+                  <span>
+                    {auxCounselorPart?.asignado_nombre
+                      ? auxCounselorPart.asignado_nombre.split(' ')[0]
+                      : 'Consejero'}
+                  </span>
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setIsAuxCounselorModalOpen(true)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer shadow-2xs"
-                title="Consejero de la Sala Auxiliar"
-              >
-                <UserCheck size={12} className="shrink-0" />
-                <span>
-                  {auxCounselorPart?.asignado_nombre
-                    ? auxCounselorPart.asignado_nombre.split(' ')[0]
-                    : 'Consejero'}
-                </span>
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
@@ -2418,10 +2574,16 @@ export default function ClmScheduleView({
         {groupedSections.tesoros.length > 0 && (
           <div id="section-tesoros" className="mt-2 scroll-mt-24">
             <div
-              style={{ backgroundColor: SECTION_BANNERS.tesoros.bgColor }}
-              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+              className={`w-full ${SECTION_BANNERS.tesoros.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
             >
-              {SECTION_BANNERS.tesoros.label}
+              <span className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 opacity-90 shrink-0" />
+                <span>{SECTION_BANNERS.tesoros.label}</span>
+              </span>
+              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+                {groupedSections.tesoros.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
+                {groupedSections.tesoros.length} asignados
+              </span>
             </div>
             {groupedSections.tesoros.map((part) => renderPartRow(part))}
           </div>
@@ -2431,10 +2593,16 @@ export default function ClmScheduleView({
         {groupedSections.maestros.length > 0 && (
           <div id="section-maestros" className="mt-2 scroll-mt-24">
             <div
-              style={{ backgroundColor: SECTION_BANNERS.maestros.bgColor }}
-              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+              className={`w-full ${SECTION_BANNERS.maestros.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
             >
-              {SECTION_BANNERS.maestros.label}
+              <span className="flex items-center gap-2">
+                <Award className="w-4 h-4 opacity-90 shrink-0" />
+                <span>{SECTION_BANNERS.maestros.label}</span>
+              </span>
+              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+                {groupedSections.maestros.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
+                {groupedSections.maestros.length} asignados
+              </span>
             </div>
             {groupedSections.maestros.map((part) => renderPartRow(part))}
           </div>
@@ -2447,10 +2615,16 @@ export default function ClmScheduleView({
         {groupedSections.vidaCristiana.length > 0 && (
           <div id="section-vida_cristiana" className="mt-2 scroll-mt-24">
             <div
-              style={{ backgroundColor: SECTION_BANNERS.vida_cristiana.bgColor }}
-              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+              className={`w-full ${SECTION_BANNERS.vida_cristiana.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
             >
-              {SECTION_BANNERS.vida_cristiana.label}
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 opacity-90 shrink-0" />
+                <span>{SECTION_BANNERS.vida_cristiana.label}</span>
+              </span>
+              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+                {groupedSections.vidaCristiana.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
+                {groupedSections.vidaCristiana.length} asignados
+              </span>
             </div>
             {groupedSections.vidaCristiana.map((part) => renderPartRow(part))}
           </div>

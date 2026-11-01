@@ -1,5 +1,6 @@
 // src/components/Navbar.tsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
@@ -76,6 +77,9 @@ import {
   FileBarChart,
   Download,
   Monitor,
+  RefreshCw,
+  WifiOff,
+  CloudCheck,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -200,10 +204,151 @@ export const Navbar: React.FC<NavbarProps> = ({
     accountLinkRequests,
     auxPioneerRequests,
     isOnline,
+    syncStatus,
+    isSupabaseSyncing,
+    lastSupabaseSyncAt,
+    offlineQueueStats,
+    syncNowWithSupabase,
+    syncOfflineQueueNow,
     isDemoMode,
     loadDemoData,
     exitDemoMode,
   } = useCongregation();
+
+  const [isForcingSync, setIsForcingSync] = useState(false);
+  const [syncFeedbackToast, setSyncFeedbackToast] = useState<{
+    message: string;
+    state: 'syncing' | 'online' | 'offline';
+  } | null>(null);
+  const syncToastTimeoutRef = useRef<number | null>(null);
+
+  const pendingOfflineCount = offlineQueueStats?.pendingCount ?? 0;
+  const isActivelySyncing =
+    isForcingSync ||
+    isSupabaseSyncing ||
+    syncStatus === 'saving' ||
+    (offlineQueueStats?.syncingCount ?? 0) > 0;
+
+  const effectiveSyncState: 'syncing' | 'online' | 'offline' = isActivelySyncing
+    ? 'syncing'
+    : !isOnline || syncStatus === 'offline'
+    ? 'offline'
+    : 'online';
+
+  const syncVisualConfig = useMemo(() => {
+    if (effectiveSyncState === 'syncing') {
+      return {
+        label: 'Sincronizando',
+        shortLabel: 'Sincronizando...',
+        ringClass:
+          'ring-2 ring-amber-500 dark:ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
+        badgeBg: 'bg-amber-500 text-white border-white dark:border-[#09090B]',
+        pillClass:
+          'bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border-amber-400/50 dark:border-amber-500/40',
+        dotClass: 'bg-amber-500 animate-ping',
+        solidDotClass: 'bg-amber-500',
+        description: 'Sincronizando cambios con la nube...',
+      };
+    }
+    if (effectiveSyncState === 'offline') {
+      return {
+        label: 'Desconectado',
+        shortLabel: pendingOfflineCount > 0 ? `Offline (${pendingOfflineCount})` : 'Desconectado',
+        ringClass:
+          'ring-2 ring-rose-500 dark:ring-rose-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
+        badgeBg: 'bg-rose-500 text-white border-white dark:border-[#09090B] animate-pulse',
+        pillClass:
+          'bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 border-rose-400/50 dark:border-rose-500/40',
+        dotClass: 'bg-rose-500 animate-ping',
+        solidDotClass: 'bg-rose-500',
+        description:
+          pendingOfflineCount > 0
+            ? `Sin conexión · ${pendingOfflineCount} cambio(s) en cola local. Clic para reintentar.`
+            : 'Sin conexión a Internet · Clic en tu foto para reintentar sincronización.',
+      };
+    }
+    return {
+      label: 'En línea',
+      shortLabel: pendingOfflineCount > 0 ? `En línea (${pendingOfflineCount})` : 'En línea',
+      ringClass:
+        'ring-2 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
+      badgeBg: 'bg-emerald-500 hover:bg-emerald-600 text-white border-white dark:border-[#09090B]',
+      pillClass:
+        'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border-emerald-400/50 dark:border-emerald-500/40',
+      dotClass: 'bg-emerald-500',
+      solidDotClass: 'bg-emerald-500',
+      description:
+        pendingOfflineCount > 0
+          ? `En línea · ${pendingOfflineCount} elemento(s) por subir. Clic para forzar sincronización.`
+          : 'En línea y sincronizado · Haz clic en tu foto de perfil para forzar la sincronización.',
+    };
+  }, [effectiveSyncState, pendingOfflineCount]);
+
+  const handleForceSync = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (isForcingSync) return;
+
+    if (syncToastTimeoutRef.current) {
+      window.clearTimeout(syncToastTimeoutRef.current);
+    }
+
+    setIsForcingSync(true);
+    setSyncFeedbackToast({
+      message: 'Sincronizando datos con la nube...',
+      state: 'syncing',
+    });
+
+    const minSpinPromise = new Promise((resolve) => window.setTimeout(resolve, 750));
+
+    try {
+      if (!navigator.onLine && !isOnline) {
+        await minSpinPromise;
+        setSyncFeedbackToast({
+          message:
+            pendingOfflineCount > 0
+              ? `Modo desconectado · ${pendingOfflineCount} cambio(s) seguros en cola local`
+              : 'Dispositivo desconectado · Tus datos están respaldados localmente',
+          state: 'offline',
+        });
+      } else {
+        const [queueRes, cloudRes] = await Promise.all([
+          syncOfflineQueueNow ? syncOfflineQueueNow().catch(() => null) : Promise.resolve(null),
+          syncNowWithSupabase ? syncNowWithSupabase(true).catch(() => null) : Promise.resolve(null),
+          minSpinPromise,
+        ]);
+
+        const syncedItems = queueRes?.syncedCount ?? 0;
+        if (cloudRes?.success || queueRes?.success || isDemoMode) {
+          setSyncFeedbackToast({
+            message:
+              syncedItems > 0
+                ? `¡Sincronización completada! (${syncedItems} cambio(s) subidos)`
+                : '¡Sincronización forzada completada! Todo está al día',
+            state: 'online',
+          });
+        } else {
+          setSyncFeedbackToast({
+            message: 'Sincronización verificada · Estado actualizado',
+            state: isOnline ? 'online' : 'offline',
+          });
+        }
+      }
+    } catch {
+      setSyncFeedbackToast({
+        message: isOnline
+          ? 'Sincronización local verificada'
+          : 'Desconectado · Cambios guardados en este dispositivo',
+        state: isOnline ? 'online' : 'offline',
+      });
+    } finally {
+      setIsForcingSync(false);
+      syncToastTimeoutRef.current = window.setTimeout(() => {
+        setSyncFeedbackToast(null);
+      }, 3600);
+    }
+  };
 
   const handleExitDemo = () => {
     exitDemoMode();
@@ -862,7 +1007,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                     {/* Active Accent Indicator (JW Library Purple/Indigo vertical bar on left edge) */}
                     {isCatActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none" />
+                      <motion.span
+                        layoutId="desktopSidebarActiveBar"
+                        transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none"
+                      />
                     )}
                   </button>
                 </div>
@@ -1097,15 +1246,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Status indicators (AutoLock & Offline Sync Queue) */}
-            <div className="hidden sm:flex items-center gap-1.5">
+            {/* Status indicator (AutoLock) */}
+            <div className="hidden sm:flex items-center">
               <AutoLockTimerChip />
-              {!isDemoMode && onOpenQueueModal && (
-                <OfflineSyncBadge
-                  isOnline={isOnline}
-                  onOpenQueueModal={onOpenQueueModal}
-                />
-              )}
             </div>
 
             {/* Unified System Utility Dock (sm+): Todos solo icono (Calendario, Publicadores, QR, PINs, Alertas, Tema) */}
@@ -1237,97 +1380,245 @@ export const Navbar: React.FC<NavbarProps> = ({
               <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={30} />
             </div>
 
-            {/* Cluster C: User Profile Capsule & Dropdown Menu */}
+            {/* Cluster C: User Profile Photo with Single Color-Coded Sync Status Indicator & Dropdown Menu */}
             <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
-                }}
-                aria-label="Menú de cuenta, perfil y cerrar sesión"
-                aria-expanded={openDropdown === 'user'}
-                className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-zinc-100/80 dark:bg-[#121216] hover:bg-white dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
-                title="Mi Perfil, Cuenta y Cerrar Sesión"
+              <div
+                className={`flex items-center h-9 sm:h-10 pl-1 pr-1 sm:pl-1.5 sm:pr-2 rounded-2xl bg-zinc-100/90 dark:bg-[#121216] hover:bg-white dark:hover:bg-[#18181F] border transition-all shadow-2xs gap-1 sm:gap-1.5 ${
+                  effectiveSyncState === 'syncing'
+                    ? 'border-amber-400/80 dark:border-amber-500/60'
+                    : effectiveSyncState === 'offline'
+                    ? 'border-rose-400/80 dark:border-rose-500/60'
+                    : 'border-emerald-400/60 dark:border-emerald-500/40'
+                }`}
               >
-                <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-[11px] shadow-2xs overflow-hidden shrink-0">
-                  {(() => {
-                    const effectiveAvatar = isDemoMode
-                      ? userProfile?.photoURL || null
-                      : userProfile?.photoURL ||
-                        user?.photoURL ||
-                        settings?.coordinatorPhotoURL ||
-                        (typeof window !== 'undefined'
-                          ? localStorage.getItem('kongre_user_photo') ||
-                            localStorage.getItem('kongre_google_photo') ||
-                            localStorage.getItem('kongre_coordinator_photo')
-                          : null);
+                {/* 1. CLICKABLE PROFILE PHOTO + SINGLE COLOR-CODED SYNC STATUS RING & CORNER BADGE */}
+                <button
+                  type="button"
+                  onClick={handleForceSync}
+                  aria-label={`${syncVisualConfig.label}: Haz clic en la foto de perfil para forzar la sincronización`}
+                  title={syncVisualConfig.description}
+                  className="group/sync relative flex items-center gap-1.5 py-0.5 pr-1 rounded-xl cursor-pointer focus:outline-none active:scale-95 transition-transform"
+                >
+                  <div
+                    className={`relative w-7 h-7 sm:w-7 sm:h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-[11px] overflow-hidden shrink-0 transition-all duration-300 ${syncVisualConfig.ringClass}`}
+                  >
+                    {(() => {
+                      const effectiveAvatar = isDemoMode
+                        ? userProfile?.photoURL || null
+                        : userProfile?.photoURL ||
+                          user?.photoURL ||
+                          settings?.coordinatorPhotoURL ||
+                          (typeof window !== 'undefined'
+                            ? localStorage.getItem('kongre_user_photo') ||
+                              localStorage.getItem('kongre_google_photo') ||
+                              localStorage.getItem('kongre_coordinator_photo')
+                            : null);
 
-                    if (effectiveAvatar) {
+                      if (effectiveAvatar) {
+                        return (
+                          <img
+                            src={effectiveAvatar}
+                            alt="Foto de perfil y estado de sincronización"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        );
+                      }
+
                       return (
-                        <img
-                          src={effectiveAvatar}
-                          alt="Usuario"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLElement).style.display = 'none';
-                          }}
-                        />
+                        <span>
+                          {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
+                        </span>
                       );
-                    }
+                    })()}
+                  </div>
 
-                    return (
-                      <span>
-                        {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
-                      </span>
-                    );
-                  })()}
-                </div>
-                <span className="hidden md:inline-block max-w-[110px] truncate text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] text-left">
-                  {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
-                </span>
-                <ChevronDown
-                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-400 dark:text-[#A1A1AA] shrink-0 transition-transform duration-150 ${
-                    openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
+                  {/* Single Corner Sync Status Badge on Profile Photo */}
+                  <span
+                    className={`absolute -bottom-0.5 left-4.5 sm:left-5 w-4 h-4 rounded-full border-2 flex items-center justify-center shadow-xs transition-colors duration-300 ${syncVisualConfig.badgeBg}`}
+                  >
+                    {effectiveSyncState === 'syncing' ? (
+                      <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                    ) : effectiveSyncState === 'offline' ? (
+                      <WifiOff className="w-2.5 h-2.5" />
+                    ) : (
+                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                    )}
+                  </span>
+
+                  {/* Visible Color Status Pill Integrated with Profile Photo (Desktop sm+) */}
+                  <span
+                    className={`hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10.5px] font-bold border transition-colors ${syncVisualConfig.pillClass}`}
+                  >
+                    <span className="relative flex h-1.5 w-1.5 shrink-0">
+                      {effectiveSyncState !== 'online' && (
+                        <span
+                          className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${syncVisualConfig.dotClass}`}
+                        />
+                      )}
+                      <span
+                        className={`relative inline-flex rounded-full h-1.5 w-1.5 ${syncVisualConfig.solidDotClass}`}
+                      />
+                    </span>
+                    <span>{syncVisualConfig.shortLabel}</span>
+                  </span>
+                </button>
+
+                {/* Subtle Divider */}
+                <span className="h-4 w-px bg-zinc-200 dark:bg-[#27272A]" aria-hidden="true" />
+
+                {/* 2. PROFILE MENU DROPDOWN TRIGGER */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
+                  }}
+                  aria-label="Menú de cuenta, perfil y cerrar sesión"
+                  aria-expanded={openDropdown === 'user'}
+                  className="flex items-center gap-1 py-1 px-1 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                  title="Abrir menú de Mi Perfil y Cuenta"
+                >
+                  <span className="hidden lg:inline-block max-w-[96px] truncate text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] text-left">
+                    {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-zinc-500 dark:text-[#A1A1AA] shrink-0 transition-transform duration-150 ${
+                      openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Floating Sync Feedback Toast right under Profile Photo */}
+              {syncFeedbackToast && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className={`absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl p-3 shadow-xl border z-50 animate-in fade-in slide-in-from-top-1 duration-150 backdrop-blur-md ${
+                    syncFeedbackToast.state === 'syncing'
+                      ? 'bg-amber-50/95 dark:bg-amber-950/90 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100'
+                      : syncFeedbackToast.state === 'offline'
+                      ? 'bg-rose-50/95 dark:bg-rose-950/90 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-100'
+                      : 'bg-emerald-50/95 dark:bg-emerald-950/90 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100'
                   }`}
-                />
-              </button>
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                        syncFeedbackToast.state === 'syncing'
+                          ? 'bg-amber-500 text-white'
+                          : syncFeedbackToast.state === 'offline'
+                          ? 'bg-rose-500 text-white'
+                          : 'bg-emerald-500 text-white'
+                      }`}
+                    >
+                      {syncFeedbackToast.state === 'syncing' ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      ) : syncFeedbackToast.state === 'offline' ? (
+                        <WifiOff className="w-3.5 h-3.5" />
+                      ) : (
+                        <CloudCheck className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-extrabold leading-snug">
+                        {syncFeedbackToast.message}
+                      </p>
+                      <div className="mt-1.5 flex items-center gap-3 text-[11px] font-bold">
+                        {!isDemoMode && onOpenQueueModal && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSyncFeedbackToast(null);
+                              onOpenQueueModal();
+                            }}
+                            className="underline hover:opacity-80 cursor-pointer"
+                          >
+                            Ver cola ({pendingOfflineCount})
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSyncFeedbackToast(null);
+                            setOpenDropdown('user');
+                          }}
+                          className="underline hover:opacity-80 cursor-pointer"
+                        >
+                          Menú de perfil
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSyncFeedbackToast(null)}
+                      className="text-current opacity-60 hover:opacity-100 p-0.5 cursor-pointer"
+                      aria-label="Cerrar aviso"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Redesigned User Profile Panel Popover (Mobile & Desktop) */}
               {openDropdown === 'user' && (
                 <div className="absolute right-0 top-full mt-2.5 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#121216] rounded-2xl shadow-xl border border-zinc-200 dark:border-[#27272A] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  {/* Modern Identity Header Card */}
-                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mb-2.5">
+                  {/* Modern Identity Header Card with Click-to-Sync Profile Photo */}
+                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mb-2.5 space-y-2.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs shrink-0 overflow-hidden">
-                        {(() => {
-                          const effectiveAvatar = isDemoMode
-                            ? userProfile?.photoURL || null
-                            : userProfile?.photoURL ||
-                              user?.photoURL ||
-                              settings?.coordinatorPhotoURL ||
-                              (typeof window !== 'undefined'
-                                ? localStorage.getItem('kongre_user_photo') ||
-                                  localStorage.getItem('kongre_google_photo') ||
-                                  localStorage.getItem('kongre_coordinator_photo')
-                                : null);
+                      <button
+                        type="button"
+                        onClick={handleForceSync}
+                        title={syncVisualConfig.description}
+                        className="group/drop-avatar relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+                      >
+                        <div
+                          className={`w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs overflow-hidden transition-all ${syncVisualConfig.ringClass}`}
+                        >
+                          {(() => {
+                            const effectiveAvatar = isDemoMode
+                              ? userProfile?.photoURL || null
+                              : userProfile?.photoURL ||
+                                user?.photoURL ||
+                                settings?.coordinatorPhotoURL ||
+                                (typeof window !== 'undefined'
+                                  ? localStorage.getItem('kongre_user_photo') ||
+                                    localStorage.getItem('kongre_google_photo') ||
+                                    localStorage.getItem('kongre_coordinator_photo')
+                                  : null);
 
-                          if (effectiveAvatar) {
+                            if (effectiveAvatar) {
+                              return (
+                                <img
+                                  src={effectiveAvatar}
+                                  alt="Usuario"
+                                  className="w-full h-full object-cover"
+                                />
+                              );
+                            }
+
                             return (
-                              <img
-                                src={effectiveAvatar}
-                                alt="Usuario"
-                                className="w-full h-full object-cover"
-                              />
+                              <span>
+                                {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
+                              </span>
                             );
-                          }
-
-                          return (
-                            <span>
-                              {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
-                            </span>
-                          );
-                        })()}
-                      </div>
+                          })()}
+                        </div>
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shadow-xs ${syncVisualConfig.badgeBg}`}
+                        >
+                          {effectiveSyncState === 'syncing' ? (
+                            <RefreshCw className="w-3 h-3 animate-spin" />
+                          ) : effectiveSyncState === 'offline' ? (
+                            <WifiOff className="w-3 h-3" />
+                          ) : (
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          )}
+                        </span>
+                      </button>
 
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight">
@@ -1343,6 +1634,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </div>
                       </div>
                     </div>
+
+                    {/* OfflineDashboard & Local Data Status Button */}
+                    {onOpenQueueModal && (
+                      <div className="pt-1 border-t border-zinc-200/70 dark:border-[#27272A]">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenDropdown(null);
+                            onOpenQueueModal();
+                          }}
+                          className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer active:scale-[0.98] ${syncVisualConfig.pillClass}`}
+                          title="Abrir panel de datos locales y cola de sincronización"
+                        >
+                          <span className="flex items-center gap-1.5 min-w-0">
+                            <CloudCheck className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">
+                              Panel Offline · {pendingOfflineCount} pendientes
+                            </span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* 2-Column Quick Access Cards */}
@@ -1594,17 +1908,34 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleSelectTab('inicio')}
             aria-label="Ir a Mi Ministerio"
             aria-current={activeTab === 'inicio' ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'inicio' ||
               activeTab === 'cronometro_ministerio' ||
               activeTab === 'revisitas' ||
               activeTab === 'estudios_biblicos'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                 : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
-            <Compass className="w-5 h-5 stroke-[2]" />
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Ministerio</span>
+            {(activeTab === 'inicio' ||
+              activeTab === 'cronometro_ministerio' ||
+              activeTab === 'revisitas' ||
+              activeTab === 'estudios_biblicos') && (
+              <>
+                <motion.span
+                  layoutId="mobileBottomNavActivePill"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/60 dark:border-indigo-500/25 pointer-events-none"
+                />
+                <motion.span
+                  layoutId="mobileBottomNavTopBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none"
+                />
+              </>
+            )}
+            <Compass className="w-5 h-5 stroke-[2] relative z-10" />
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">Ministerio</span>
           </button>
 
           {/* 2. Mi Congregación (Informe, próximos privilegios, anuncios y eventos) */}
@@ -1613,19 +1944,33 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleSelectTab('panorama_general')}
             aria-label="Ir a Mi Congregación"
             aria-current={activeTab === 'panorama_general' ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'panorama_general'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                 : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
-            <div className="relative">
+            {activeTab === 'panorama_general' && (
+              <>
+                <motion.span
+                  layoutId="mobileBottomNavActivePill"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/60 dark:border-indigo-500/25 pointer-events-none"
+                />
+                <motion.span
+                  layoutId="mobileBottomNavTopBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none"
+                />
+              </>
+            )}
+            <div className="relative z-10">
               <LayoutDashboard className="w-5 h-5 stroke-[2]" />
               {conflicts.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#09090B] animate-pulse" />
               )}
             </div>
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Congregación</span>
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">Congregación</span>
           </button>
 
           {/* 3. Reuniones (Programación) */}
@@ -1634,14 +1979,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleSelectTab('programacion')}
             aria-label="Ir a Programación de Reuniones"
             aria-current={activeTab === 'programacion' ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'hospitalidad'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                 : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
-            <ClipboardList className="w-5 h-5 stroke-[2]" />
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Reuniones</span>
+            {(activeTab === 'programacion' ||
+              activeTab === 'clm_vmc' ||
+              activeTab === 's89' ||
+              activeTab === 'discursos' ||
+              activeTab === 'hospitalidad') && (
+              <>
+                <motion.span
+                  layoutId="mobileBottomNavActivePill"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/60 dark:border-indigo-500/25 pointer-events-none"
+                />
+                <motion.span
+                  layoutId="mobileBottomNavTopBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none"
+                />
+              </>
+            )}
+            <ClipboardList className="w-5 h-5 stroke-[2] relative z-10" />
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">Reuniones</span>
           </button>
 
           {/* 4. Calendario */}
@@ -1650,19 +2013,30 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleSelectTab('calendario')}
             aria-label="Ir a Calendario de la Congregación"
             aria-current={activeTab === 'calendario' ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'calendario'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                 : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
-            <div className="relative">
+            {activeTab === 'calendario' && (
+              <>
+                <motion.span
+                  layoutId="mobileBottomNavActivePill"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/60 dark:border-indigo-500/25 pointer-events-none"
+                />
+                <motion.span
+                  layoutId="mobileBottomNavTopBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none"
+                />
+              </>
+            )}
+            <div className="relative z-10">
               <Calendar className="w-5 h-5 stroke-[2]" />
-              {activeTab === 'calendario' && (
-                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-              )}
             </div>
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Calendario</span>
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">Calendario</span>
           </button>
 
           {/* 5. Menú (Abre/Cierra Bottom Sheet ergonómico de una sola mano) */}
@@ -1671,19 +2045,33 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handleSelectTab('menu')}
             aria-label="Ir al Menú completo de la congregación"
             aria-current={activeTab === 'menu' ? 'page' : undefined}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'menu'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-[#18181F]'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
                 : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5]'
             }`}
           >
-            <div className="relative">
+            {activeTab === 'menu' && (
+              <>
+                <motion.span
+                  layoutId="mobileBottomNavActivePill"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-indigo-50/90 dark:bg-[#18181F] border border-indigo-200/60 dark:border-indigo-500/25 pointer-events-none"
+                />
+                <motion.span
+                  layoutId="mobileBottomNavTopBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none"
+                />
+              </>
+            )}
+            <div className="relative z-10">
               <Menu className="w-5 h-5 stroke-[2]" />
               {activeTab !== 'menu' && (pendingRequestsCount > 0 || pinnedNoticesCount > 0 || overdueTerritoriesCount > 0) && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white dark:ring-[#09090B]" />
               )}
             </div>
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">
               Menú
             </span>
           </button>

@@ -63,6 +63,8 @@ import {
   Download,
   Printer,
   Layers,
+  ArrowLeft,
+  LayoutGrid,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -78,9 +80,18 @@ import {
 import { PushSubscriptionModal } from './PushSubscriptionModal';
 import { TwoFactorSetupModal } from './TwoFactorSetupModal';
 import { TwoFactorPromptModal } from './TwoFactorPromptModal';
+import { ProfileDevicesAndCodesSection } from './ProfileDevicesAndCodesSection';
+import { PinManagementModal } from './PinManagementModal';
 import { setSecureLocalPin, getPinLockoutRemainingSeconds } from '../utils/theocraticSecurity';
 
-export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos' | 'seguridad_2fa';
+export type PublisherPortalTab =
+  | 'tarjetas'
+  | 'asignaciones'
+  | 'informe'
+  | 'ausencias'
+  | 'grupo'
+  | 'avisos'
+  | 'seguridad_2fa';
 export type NWPublisherTab = PublisherPortalTab;
 
 export const PersonalViewTab: React.FC = () => {
@@ -134,9 +145,10 @@ export const PersonalViewTab: React.FC = () => {
     return publishers[0]?.id || '';
   });
 
-  // 2FA state
+  // 2FA & PIN Request state
   const [show2FASetupModal, setShow2FASetupModal] = useState(false);
   const [show2FAPromptModal, setShow2FAPromptModal] = useState(false);
+  const [isPinRequestModalOpen, setIsPinRequestModalOpen] = useState(false);
   const [pending2FAPublisher, setPending2FAPublisher] = useState<{ id: string; name: string } | null>(null);
   const [is2FADisabling, setIs2FADisabling] = useState(false);
 
@@ -963,13 +975,29 @@ export const PersonalViewTab: React.FC = () => {
             </button>
           </form>
 
-          {/* Ayuda */}
-          <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] text-xs text-zinc-500 space-y-2 text-center">
+          {/* Ayuda y Solicitud de Cambio de PIN */}
+          <div className="pt-4 border-t border-zinc-100 dark:border-[#27272A] text-xs text-zinc-500 space-y-3 text-center">
             <p className="italic">
-              ¿No tienes tu PIN o lo extraviaste? Solicita a los ancianos tu <strong>papeleta de credenciales</strong> o nuevo enlace de acceso.
+              ¿Olvidaste tu PIN, perdiste tu dispositivo o sospechas de un acceso no autorizado?
             </p>
+            <button
+              type="button"
+              onClick={() => setIsPinRequestModalOpen(true)}
+              className="mx-auto py-2.5 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Solicitar Cambio de PIN a los Ancianos</span>
+            </button>
           </div>
         </div>
+
+        <PinManagementModal
+          isOpen={isPinRequestModalOpen}
+          onClose={() => setIsPinRequestModalOpen(false)}
+          publisherId={selectedPublisherId || currentPublisherId || 'publicador'}
+          publisherName={selectedPublisher?.name || currentBrotherName || 'Publicador'}
+          role={effectiveRoleInfo?.id}
+        />
       </div>
     );
   }
@@ -1149,111 +1177,190 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
-        <button
-          type="button"
-          onClick={() => setActiveModule('asignaciones')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'asignaciones'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <Calendar size={14} className="shrink-0" />
-          <span className="truncate">Asignaciones</span>
-          {myAssignments.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 shrink-0">
-              {myAssignments.length}
-            </span>
-          )}
-        </button>
+      {/* 2.2 TARJETAS INTERACTIVAS DE SECCIONES DEL PORTAL O BARRA DE SECCIÓN ACTIVA */}
+      {(() => {
+        const portalCards: {
+          id: Exclude<PublisherPortalTab, 'tarjetas'>;
+          title: string;
+          shortLabel: string;
+          subtitle: string;
+          summary: string;
+          statusText: string;
+          icon: React.ElementType;
+          iconBg: string;
+          iconColor: string;
+        }[] = [
+          {
+            id: 'asignaciones',
+            title: 'Mis Asignaciones y Partes',
+            shortLabel: 'Asignaciones',
+            subtitle: 'Consulta tus partes estudiantiles, discursos, turnos de audio/aseo y confirma asistencia.',
+            summary: `${myAssignments.length} asignación(es) programada(s)`,
+            statusText: 'Ver partes',
+            icon: Calendar,
+            iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
+            iconColor: 'text-indigo-600 dark:text-indigo-400',
+          },
+          {
+            id: 'informe',
+            title: 'Informe Mensual e Historial S-4',
+            shortLabel: 'Informe S-4',
+            subtitle: 'Envía tu informe mensual de predicación y consulta tu registro del año de servicio.',
+            summary: existingReport ? 'Informe del mes registrado' : 'Pendiente de enviar este mes',
+            statusText: 'Abrir informe',
+            icon: CalendarDays,
+            iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
+            iconColor: 'text-emerald-600 dark:text-emerald-400',
+          },
+          {
+            id: 'ausencias',
+            title: 'Mis Ausencias Programadas',
+            shortLabel: 'Ausencias',
+            subtitle: 'Informa con anticipación las semanas en que no podrás recibir asignaciones.',
+            summary: `${(selectedPublisher?.ausencias || []).length} ausencia(s) registrada(s)`,
+            statusText: 'Gestionar fechas',
+            icon: Plane,
+            iconBg: 'bg-amber-50 dark:bg-amber-950/60',
+            iconColor: 'text-amber-600 dark:text-amber-400',
+          },
+          {
+            id: 'grupo',
+            title: 'Mi Grupo de Servicio',
+            shortLabel: 'Mi Grupo',
+            subtitle: 'Compañeros de grupo, superintendente, auxiliar y puntos de reunión para predicar.',
+            summary: myPreachingGroup ? `Grupo ${myPreachingGroup.number} · ${myPreachingGroup.name}` : 'Grupo de servicio local',
+            statusText: 'Ver mi grupo',
+            icon: Users,
+            iconBg: 'bg-blue-50 dark:bg-blue-950/60',
+            iconColor: 'text-blue-600 dark:text-blue-400',
+          },
+          {
+            id: 'avisos',
+            title: 'Tablero de Avisos y Cartas',
+            shortLabel: 'Avisos',
+            subtitle: 'Comunicados recientes, anuncios de la congregación y eventos especiales.',
+            summary: `${notices.length} aviso(s) disponible(s)`,
+            statusText: 'Leer avisos',
+            icon: Bell,
+            iconBg: 'bg-purple-50 dark:bg-purple-950/60',
+            iconColor: 'text-purple-600 dark:text-purple-400',
+          },
+          {
+            id: 'seguridad_2fa',
+            title: 'Seguridad 2FA y Mis Dispositivos',
+            shortLabel: 'Seguridad 2FA',
+            subtitle: 'Configura Microsoft Authenticator (2FA), solicita cambio de PIN y revisa tus dispositivos.',
+            summary: isCurrentPublisher2FAEnabled ? '2FA Activo · Historial privado' : 'Configurar 2FA · Historial privado',
+            statusText: 'Abrir seguridad',
+            icon: ShieldCheck,
+            iconBg: 'bg-teal-50 dark:bg-teal-950/60',
+            iconColor: 'text-teal-600 dark:text-teal-400',
+          },
+        ];
 
-        <button
-          type="button"
-          onClick={() => setActiveModule('informe')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'informe'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <CalendarDays size={14} className="shrink-0" />
-          <span className="truncate">Historial Mensual</span>
-          {existingReport && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Mes registrado" />
-          )}
-        </button>
+        const activeCardMeta = portalCards.find((c) => c.id === activeModule);
 
-        <button
-          type="button"
-          onClick={() => setActiveModule('ausencias')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'ausencias'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <Plane size={14} className="shrink-0" />
-          <span className="truncate">Ausencias</span>
-          {(selectedPublisher?.ausencias || []).length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 shrink-0">
-              {(selectedPublisher?.ausencias || []).length}
-            </span>
-          )}
-        </button>
+        if (activeModule === 'tarjetas') {
+          return (
+            <div className="space-y-3 animate-in fade-in duration-200">
+              <div className="px-1">
+                <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
+                  Secciones de Mi Portal Teocrático
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                  Selecciona una tarjeta para abrir directamente esa sección.
+                </p>
+              </div>
 
-        <button
-          type="button"
-          onClick={() => setActiveModule('grupo')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'grupo'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <Users size={14} className="shrink-0" />
-          <span className="truncate">Mi Grupo</span>
-        </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {portalCards.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      onClick={() => setActiveModule(card.id)}
+                      className="group text-left bg-white dark:bg-[#121216] hover:bg-zinc-50/80 dark:hover:bg-[#18181F] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className={`w-11 h-11 rounded-2xl ${card.iconBg} ${card.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-105`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">
+                            <span>{card.statusText}</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {card.title}
+                          </h4>
+                          <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] leading-relaxed">
+                            {card.subtitle}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] text-[11px] font-medium text-zinc-600 dark:text-[#D4D4D8] truncate">
+                        {card.summary}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
 
-        <button
-          type="button"
-          onClick={() => setActiveModule('avisos')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'avisos'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <Bell size={14} className="shrink-0" />
-          <span className="truncate">Avisos</span>
-          {notices.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300 shrink-0">
-              {notices.length}
-            </span>
-          )}
-        </button>
+        return (
+          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setActiveModule('tarjetas')}
+                className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Todas las tarjetas</span>
+              </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModule('seguridad_2fa')}
-          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeModule === 'seguridad_2fa'
-              ? 'bg-white dark:bg-[#121216] text-purple-700 dark:text-purple-400 shadow-sm'
-              : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-          }`}
-        >
-          <ShieldCheck size={14} className="shrink-0" />
-          <span className="truncate">Seguridad 2FA</span>
-          {isCurrentPublisher2FAEnabled ? (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="2FA Activado" />
-          ) : (
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-[#D4D4D8] font-semibold shrink-0">
-              Opcional
-            </span>
-          )}
-        </button>
-      </div>
+              {activeCardMeta && (
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate">
+                    {activeCardMeta.title}
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate hidden sm:block">
+                    {activeCardMeta.subtitle}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+              {portalCards.map((sc) => {
+                const ScIcon = sc.icon;
+                const isCurr = sc.id === activeModule;
+                return (
+                  <button
+                    key={sc.id}
+                    type="button"
+                    onClick={() => setActiveModule(sc.id)}
+                    className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                      isCurr
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                    }`}
+                    title={sc.title}
+                  >
+                    <ScIcon className="w-3.5 h-3.5 shrink-0" />
+                    <span className="hidden xl:inline">{sc.shortLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 2.3 CONTENIDO DEL MÓDULO SELECCIONADO */}
 
@@ -2425,6 +2532,18 @@ export const PersonalViewTab: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* HISTORIAL PRIVADO DE DISPOSITIVOS DEL PUBLICADOR */}
+          <ProfileDevicesAndCodesSection
+            targetPublisherId={selectedPublisherId}
+            targetPublisherName={selectedPublisher?.name}
+            isSupervisorPreviewingOther={Boolean(
+              canSupervise &&
+                showSupervisorSelect &&
+                currentPublisherId &&
+                selectedPublisherId !== currentPublisherId
+            )}
+          />
         </div>
       )}
 
@@ -2641,6 +2760,15 @@ export const PersonalViewTab: React.FC = () => {
           setEnteredPin('');
           setLockoutSeconds(0);
         }}
+      />
+
+      {/* MODAL EXCLUSIVO: SOLICITUD DE CAMBIO DE PIN A LOS ANCIANOS */}
+      <PinManagementModal
+        isOpen={isPinRequestModalOpen}
+        onClose={() => setIsPinRequestModalOpen(false)}
+        publisherId={selectedPublisher?.id || currentPublisherId || 'publicador'}
+        publisherName={selectedPublisher?.name || currentBrotherName || 'Publicador'}
+        role={effectiveRoleInfo?.id}
       />
     </div>
   );

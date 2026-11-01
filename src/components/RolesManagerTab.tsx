@@ -11,6 +11,12 @@ import {
   encodeSecureShareToken,
 } from '../utils/theocraticSecurity';
 import { insertAuditLog } from '../services/auditLogService';
+import {
+  loadLocalPinChangeRequests,
+  fetchSolicitudesCambioPinFromSupabase,
+  updateSolicitudCambioPinStatusInSupabase,
+} from '../services/pinChangeRequestsService';
+import { SolicitudCambioPin } from '../types';
 import { ActiveTab } from './Navbar';
 import {
   ShieldCheck,
@@ -92,7 +98,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   // - 'mi_sesion': Mi perfil actual, cambiar con PIN y simulación de roles
   // - 'nube_qr': Vinculación Google y Códigos QR
   // - 'matriz': Matriz de Permisos Teocráticos por Roles
-  const [activeTabMode, setActiveTabMode] = useState<'directorio' | 'mi_sesion' | 'nube_qr' | 'matriz'>('directorio');
+  const [activeTabMode, setActiveTabMode] = useState<'tarjetas' | 'directorio' | 'mi_sesion' | 'nube_qr' | 'matriz'>('directorio');
 
   useEffect(() => {
     if (!isAllowedAccess && activeTabMode === 'directorio') {
@@ -138,6 +144,83 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   // Quick invitation state
   const [invRole, setInvRole] = useState<TheocraticRole>('anciano');
   const [invBrotherName, setInvBrotherName] = useState('');
+
+  // SolicitudesCambioPin (Supabase + Local sync for Elders)
+  const [pinChangeRequests, setPinChangeRequests] = useState<SolicitudCambioPin[]>(() =>
+    loadLocalPinChangeRequests()
+  );
+  const [resolvingRequestId, setResolvingRequestId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const syncPinRequests = async () => {
+      const list = await fetchSolicitudesCambioPinFromSupabase(settings.congregationNumber || settings.congregationId);
+      if (mounted) setPinChangeRequests(list);
+    };
+    syncPinRequests();
+
+    const handleUpdated = () => {
+      if (mounted) setPinChangeRequests(loadLocalPinChangeRequests());
+    };
+    window.addEventListener('kongre:solicitudes-cambio-pin-updated', handleUpdated);
+    return () => {
+      mounted = false;
+      window.removeEventListener('kongre:solicitudes-cambio-pin-updated', handleUpdated);
+    };
+  }, [settings.congregationNumber, settings.congregationId]);
+
+  const pendingPinChangeRequests = useMemo(
+    () => pinChangeRequests.filter((r) => r.estado === 'pendiente'),
+    [pinChangeRequests]
+  );
+
+  const handleResolvePinChangeRequest = async (req: SolicitudCambioPin) => {
+    setResolvingRequestId(req.id);
+    try {
+      const takenPins = publisherPinsList.map((p) => p.pin.trim()).filter(Boolean);
+      const newGeneratedPin = generateSecurePublisherPin(takenPins);
+      const targetPub = publishers.find(
+        (p) =>
+          p.id === req.publisher_id ||
+          p.name.toLowerCase().trim() === req.publisher_nombre.toLowerCase().trim()
+      );
+      const targetId = targetPub?.id || req.publisher_id;
+      const targetRole: TheocraticRole =
+        targetPub?.theocraticRole || (req.rol as TheocraticRole) || 'publico';
+
+      assignPersonalPinToPublisher(
+        targetId,
+        newGeneratedPin,
+        targetRole,
+        req.publisher_nombre,
+        req.publisher_email,
+        targetPub?.privilege
+      );
+
+      if (targetPub) {
+        updatePublisher({
+          ...targetPub,
+          personalPin: newGeneratedPin,
+          theocraticRole: targetRole,
+        });
+      }
+
+      await updateSolicitudCambioPinStatusInSupabase(
+        req.id,
+        'atendida',
+        currentBrotherName || effectiveRoleInfo.shortName || 'Anciano',
+        newGeneratedPin
+      );
+
+      setPinChangeRequests(loadLocalPinChangeRequests());
+      setFeedback(
+        `PIN anterior revocado para ${req.publisher_nombre}. Nuevo PIN asignado: ${newGeneratedPin} (registrado en SolicitudesCambioPin).`
+      );
+      setTimeout(() => setFeedback(null), 5000);
+    } finally {
+      setResolvingRequestId(null);
+    }
+  };
 
   // Complete official list of 16 theocratic roles
   const allTheocraticRoles: TheocraticRole[] = [
@@ -831,6 +914,94 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
         </div>
       )}
 
+      {/* AVISO AUTOMÁTICO A ANCIANOS: SOLICITUDES DE CAMBIO DE PIN (SUPABASE SolicitudesCambioPin) */}
+      {isAllowedAccess && pendingPinChangeRequests.length > 0 && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-300/80 dark:border-amber-800/70 space-y-3 shadow-xs">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-2">
+                  <span>Solicitudes de Cambio de PIN Recibidas ({pendingPinChangeRequests.length})</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-mono">
+                    SolicitudesCambioPin
+                  </span>
+                </h4>
+                <p className="text-[11px] text-amber-800 dark:text-amber-300/90">
+                  Los siguientes publicadores han solicitado un cambio de PIN desde su perfil indicando el motivo.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {pendingPinChangeRequests.map((req) => (
+              <div
+                key={req.id}
+                className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-amber-200/90 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white">
+                      {req.publisher_nombre}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300">
+                      Motivo: {req.razon_etiqueta}
+                    </span>
+                    <span className="text-[10px] text-zinc-400">
+                      {new Date(req.fecha_solicitud).toLocaleString('es-MX', {
+                        day: '2-digit',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  {req.detalles && (
+                    <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
+                      Nota del publicador: “{req.detalles}”
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={resolvingRequestId === req.id}
+                    onClick={() => handleResolvePinChangeRequest(req)}
+                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>
+                      {resolvingRequestId === req.id
+                        ? 'Asignando...'
+                        : 'Revocar PIN Anterior y Asignar Nuevo'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await updateSolicitudCambioPinStatusInSupabase(
+                        req.id,
+                        'rechazada',
+                        currentBrotherName || 'Anciano'
+                      );
+                      setPinChangeRequests(loadLocalPinChangeRequests());
+                    }}
+                    className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
+                    title="Descartar solicitud"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* 2. STATS KPI CARDS (ACTING AS INSTANT FILTERS) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {/* Total Hermanos */}
@@ -978,98 +1149,243 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
         </div>
       </div>
 
-      {/* 3. MAIN SECTION TABS NAVIGATION */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 dark:border-[#27272A] pb-2">
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] w-full sm:w-auto">
+      {/* 3. MAIN SECTION TABS NAVIGATION + «← Todas las tarjetas» */}
+      {activeTabMode !== 'tarjetas' && (
+        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-3 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <button
+              type="button"
+              onClick={() => setActiveTabMode('tarjetas')}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-extrabold transition-all cursor-pointer shrink-0 shadow-xs bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#1C1C24] dark:hover:bg-[#272732] border-zinc-200/80 dark:border-[#2E2E3A] text-zinc-800 dark:text-[#F4F4F5]"
+            >
+              <span>← Todas las tarjetas</span>
+            </button>
+
+            <div className="hidden sm:block h-5 w-px bg-zinc-200 dark:bg-[#27272A]" />
+
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] w-full sm:w-auto">
+              {isAllowedAccess && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTabMode('directorio')}
+                  className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                    activeTabMode === 'directorio'
+                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300 shrink-0" />
+                  <span className="truncate">Directorio ({stats.total})</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setActiveTabMode('mi_sesion')}
+                className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  activeTabMode === 'mi_sesion'
+                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                }`}
+              >
+                <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span className="truncate">Mi Sesión</span>
+              </button>
+
+              {isAllowedAccess && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTabMode('nube_qr')}
+                  className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                    activeTabMode === 'nube_qr'
+                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Globe className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <span className="truncate">Cuentas Nube</span>
+                  {pendingRequestsCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-extrabold animate-pulse shrink-0 font-mono tabular-nums">
+                      {pendingRequestsCount}
+                    </span>
+                  )}
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setActiveTabMode('matriz')}
+                className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  activeTabMode === 'matriz'
+                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate">Permisos</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Action Header Button */}
+          {activeTabMode === 'directorio' && isAllowedAccess && (
+            <div className="flex items-center gap-2">
+              {stats.withoutPin > 0 && (
+                <button
+                  type="button"
+                  onClick={handleAutoAssignAllMissingPins}
+                  className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all font-mono tabular-nums"
+                  title="Generar PIN personal a todos los hermanos que no tienen"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">Auto-asignar ({stats.withoutPin} faltantes)</span>
+                  <span className="sm:hidden">Auto ({stats.withoutPin})</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowAddModal(true)}
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 cursor-pointer transition-all"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>+ Asignar Hermano</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SECTION 0: VISTA DE TODAS LAS TARJETAS (HUB INTERACTIVO) */}
+      {/* ========================================================================= */}
+      {activeTabMode === 'tarjetas' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {isAllowedAccess && (
             <button
               type="button"
               onClick={() => setActiveTabMode('directorio')}
-              className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
-                activeTabMode === 'directorio'
-                  ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-              }`}
+              className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
             >
-              <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300 shrink-0" />
-              <span className="truncate">Directorio ({stats.total})</span>
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/50">
+                    {stats.total} hermanos · {stats.withPin} con PIN
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    Directorio de Responsabilidades y PINs
+                  </h4>
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                    Administra los privilegios teocráticos, códigos de acceso personal y solicitudes de cambio de PIN de cada hermano.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
+                <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                  Entrar a esta sección →
+                </span>
+              </div>
             </button>
           )}
 
           <button
             type="button"
             onClick={() => setActiveTabMode('mi_sesion')}
-            className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
-              activeTabMode === 'mi_sesion'
-                ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-            }`}
+            className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-amber-400 dark:hover:border-amber-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
           >
-            <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span className="truncate">Mi Sesión</span>
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center shrink-0">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
+                  {effectiveRoleInfo.shortName}
+                </span>
+              </div>
+              <div>
+                <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Mi Sesión y Simulador de Vistas
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                  Verifica tu perfil activo, solicita cambio de PIN o simula cómo ve la aplicación otro rol teocrático.
+                </p>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
+              <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                Entrar a esta sección →
+              </span>
+            </div>
           </button>
 
           {isAllowedAccess && (
             <button
               type="button"
               onClick={() => setActiveTabMode('nube_qr')}
-              className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
-                activeTabMode === 'nube_qr'
-                  ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-              }`}
+              className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-sky-400 dark:hover:border-sky-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
             >
-              <Globe className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
-              <span className="truncate">Cuentas Nube</span>
-              {pendingRequestsCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-extrabold animate-pulse shrink-0 font-mono tabular-nums">
-                  {pendingRequestsCount}
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-900/50 flex items-center justify-center shrink-0">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                    {pendingRequestsCount > 0 ? `${pendingRequestsCount} pendientes` : 'Sincronizado'}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                    Cuentas en la Nube y Códigos QR
+                  </h4>
+                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                    Aprueba vinculaciones de cuentas y genera invitaciones QR rápidas para conectar dispositivos.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
+                <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400">
+                  Entrar a esta sección →
                 </span>
-              )}
+              </div>
             </button>
           )}
 
           <button
             type="button"
             onClick={() => setActiveTabMode('matriz')}
-            className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
-              activeTabMode === 'matriz'
-                ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-            }`}
+            className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-emerald-400 dark:hover:border-emerald-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="truncate">Permisos</span>
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+                  16 Roles Oficiales
+                </span>
+              </div>
+              <div>
+                <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  Matriz de Permisos Teocráticos
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                  Consulta los permisos detallados de lectura, edición y administración asignados a cada responsabilidad.
+                </p>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
+              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                Entrar a esta sección →
+              </span>
+            </div>
           </button>
         </div>
-
-        {/* Action Header Button */}
-        {activeTabMode === 'directorio' && isAllowedAccess && (
-          <div className="flex items-center gap-2">
-            {stats.withoutPin > 0 && (
-              <button
-                type="button"
-                onClick={handleAutoAssignAllMissingPins}
-                className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all font-mono tabular-nums"
-                title="Generar PIN personal a todos los hermanos que no tienen"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Auto-asignar ({stats.withoutPin} faltantes)</span>
-                <span className="sm:hidden">Auto ({stats.withoutPin})</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setShowAddModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 cursor-pointer transition-all"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>+ Asignar Hermano</span>
-            </button>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* ========================================================================= */}
       {/* SECTION 1: DIRECTORIO DE RESPONSABILIDADES Y PINS */}

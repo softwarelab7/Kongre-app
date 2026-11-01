@@ -25,7 +25,14 @@ import {
   X,
   Lock,
   Save,
+  Smartphone,
+  Calendar,
+  Clock,
+  ShieldAlert,
 } from 'lucide-react';
+import { useSecurity } from '../../../context/SecurityContext';
+import { CredentialRevocationModal, CredentialRevocationTarget } from '../../CredentialRevocationModal';
+import { CredentialRevocationReasonId } from '../../../types';
 
 interface AccessCredentialsSectionProps {
   formData: any;
@@ -45,15 +52,19 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     assignPersonalPinToPublisher,
     generateUniquePublisherPin,
     removePublisherPin,
+    currentBrotherName,
+    effectiveRoleInfo,
   } = useAuth();
 
   const { settings, updatePublisher, publishers } = useCongregation();
+  const { credentialRedemptions, revocationHistory, revokeAndReplacePublisherCredential } = useSecurity();
 
   const [showPin, setShowPin] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
   const [isSavingLocal, setIsSavingLocal] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [revocationTarget, setRevocationTarget] = useState<CredentialRevocationTarget | null>(null);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const publisherId = formData.id || formData.nid || 'nuevo_publicador';
@@ -125,7 +136,38 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     return evaluatePinStrength(currentPin);
   }, [currentPin]);
 
+  const activeRedemption = useMemo(() => {
+    return credentialRedemptions.find(
+      (red) =>
+        red.status === 'active' &&
+        (red.publisherId === publisherId ||
+          red.publisherName.toLowerCase().trim() === publisherName.toLowerCase().trim())
+    );
+  }, [credentialRedemptions, publisherId, publisherName]);
+
+  const personRevocations = useMemo(() => {
+    return revocationHistory.filter(
+      (rev) =>
+        rev.publisherId === publisherId ||
+        rev.publisherName.toLowerCase().trim() === publisherName.toLowerCase().trim()
+    );
+  }, [revocationHistory, publisherId, publisherName]);
+
   const handleGenerateNewPin = () => {
+    // If publisher already has a PIN, require mandatory reason form to revoke the previous one
+    if (currentPin && currentPin.trim().length >= 4) {
+      setRevocationTarget({
+        publisherId,
+        publisherName,
+        role: currentRole,
+        currentPinOrCode: currentPin,
+        redeemedDeviceInfo: activeRedemption?.deviceInfo,
+        redeemedDeviceType: activeRedemption?.deviceType,
+        redeemedAt: activeRedemption?.redeemedAt,
+      });
+      return;
+    }
+
     const newUniquePin = generateUniquePublisherPin();
     handleChange('personalPin', newUniquePin);
 
@@ -412,6 +454,32 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
                 Genera o escribe un código numérico único para que {publisherName} pueda ingresar a su portal personal.
               </p>
             )}
+            {activeRedemption && (
+              <div className="p-3 rounded-xl bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-white/[0.06] space-y-1 text-xs">
+                <div className="flex items-center gap-1.5 font-bold text-zinc-700 dark:text-zinc-300">
+                  <Lock size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>Historial de dispositivos y ubicación protegidos por privacidad</span>
+                </div>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  Por privacidad, solo el publicador puede consultar sus propios dispositivos conectados y ubicaciones desde su perfil personal.
+                </p>
+              </div>
+            )}
+
+            {personRevocations.length > 0 && (
+              <div className="p-2.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 space-y-1 text-[11px]">
+                <div className="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1">
+                  <ShieldAlert size={12} />
+                  <span>Códigos anteriores revocados ({personRevocations.length}):</span>
+                </div>
+                {personRevocations.slice(0, 2).map((rev) => (
+                  <div key={rev.id} className="text-slate-600 dark:text-slate-400">
+                    <span className="line-through font-mono text-rose-600">{rev.previousCodeMasked}</span> →{' '}
+                    <strong className="font-mono">{rev.newCodeMasked}</strong> · {rev.reasonLabel}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-zinc-200/60 dark:border-white/[0.05] flex items-center gap-2 flex-wrap">
@@ -421,7 +489,7 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/50 text-xs font-bold transition-all cursor-pointer"
             >
               <RefreshCw size={13} />
-              <span>Generar PIN Único</span>
+              <span>{currentPin ? 'Cambiar / Revocar PIN' : 'Generar PIN Único'}</span>
             </button>
 
             {currentPin && (
@@ -610,6 +678,61 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
           </div>
         </div>
       )}
+
+      <CredentialRevocationModal
+        isOpen={Boolean(revocationTarget)}
+        onClose={() => setRevocationTarget(null)}
+        target={revocationTarget}
+        onGenerateRandomPin={generateUniquePublisherPin}
+        onConfirmRevokeAndReplace={(params: {
+          publisherId: string;
+          publisherName: string;
+          role: string;
+          oldPinOrCode?: string;
+          newPinOrCode: string;
+          reasonId: CredentialRevocationReasonId;
+          reasonDetails: string;
+        }) => {
+          revokeAndReplacePublisherCredential({
+            publisherId: params.publisherId,
+            publisherName: params.publisherName,
+            role: params.role,
+            oldPinOrCode: params.oldPinOrCode,
+            newPinOrCode: params.newPinOrCode,
+            reasonId: params.reasonId,
+            reasonDetails: params.reasonDetails,
+            revokedBy: currentBrotherName || effectiveRoleInfo.shortName || 'Anciano',
+          });
+
+          handleChange('personalPin', params.newPinOrCode);
+          assignPersonalPinToPublisher(
+            params.publisherId,
+            params.newPinOrCode,
+            currentRole,
+            params.publisherName,
+            formData.email,
+            formData.privilege || formData.role
+          );
+
+          const existingPub = publishers.find(
+            (p) => p.id === params.publisherId || (p as any).nid === params.publisherId
+          );
+          if (existingPub) {
+            updatePublisher({
+              ...existingPub,
+              personalPin: params.newPinOrCode,
+              theocraticRole: currentRole,
+            });
+          }
+
+          if (showToast) {
+            showToast(
+              `PIN anterior revocado y nuevo PIN (${params.newPinOrCode}) asignado a ${params.publisherName}`,
+              'success'
+            );
+          }
+        }}
+      />
     </section>
   );
 };

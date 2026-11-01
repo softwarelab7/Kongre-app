@@ -124,7 +124,7 @@ export default defineConfig(({ mode }) => {
             /^\/workbox-.*\.js$/,
             /\.js$/,
           ],
-          maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB para plantillas PDF S-89 y bundles
+          maximumFileSizeToCacheInBytes: 12 * 1024 * 1024, // 12MB para plantillas PDF S-89 y bundles sin minificar
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,pdf,json,webmanifest}'],
           runtimeCaching: [
             // Estrategia dedicada para Formularios y Datos S-89 respaldados por IndexedDB

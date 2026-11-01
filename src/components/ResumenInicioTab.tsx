@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { ActiveTab } from './Navbar';
+import { TheocraticRole } from '../utils/rbac';
 import { ResponsiveServiceChart } from './charts/ResponsiveServiceChart';
 import { ResponsiveAttendanceChart } from './charts/ResponsiveAttendanceChart';
 import { PublisherPinsModal } from './PublisherPinsModal';
@@ -36,7 +37,540 @@ import {
   MapPin,
   Check,
   KeyRound,
+  CreditCard,
+  Package,
+  Wrench,
+  ClipboardList,
+  Compass,
+  ShoppingBag,
 } from 'lucide-react';
+
+export interface QuickAccessTool {
+  id: string;
+  title: string;
+  subtitle: string;
+  badge?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accentClass: string;
+  iconBgClass: string;
+  onClick: () => void;
+}
+
+export interface QuickAccessGridProps {
+  roleId: TheocraticRole;
+  roleName: string;
+  setActiveTab: (tab: ActiveTab) => void;
+  onOpenTimerModal?: () => void;
+  onOpenKioskModal?: () => void;
+  onOpenPinsModal?: () => void;
+  publisherPinsCount?: number;
+}
+
+export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
+  roleId,
+  roleName,
+  setActiveTab,
+  onOpenTimerModal,
+  onOpenKioskModal,
+  onOpenPinsModal,
+  publisherPinsCount = 0,
+}) => {
+  const tools = useMemo<QuickAccessTool[]>(() => {
+    switch (roleId) {
+      case 'secretario':
+        return [
+          {
+            id: 'informes_s4',
+            title: 'Informes S-4',
+            subtitle: 'Recopilación mensual',
+            badge: 'Prioritario',
+            icon: FileText,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('informes_servicio'),
+          },
+          {
+            id: 'tarjetas_s21',
+            title: 'Tarjetas S-21',
+            subtitle: 'Registro de publicador',
+            badge: 'S-21',
+            icon: ClipboardList,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('tarjetas_s21'),
+          },
+          {
+            id: 'asistencia_s88',
+            title: 'Asistencia S-88',
+            subtitle: 'Conteo de reuniones',
+            badge: 'Semanal',
+            icon: TrendingUp,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('asistencia'),
+          },
+          {
+            id: 'directorio_pub',
+            title: 'Publicadores',
+            subtitle: 'Censo y privilegios',
+            badge: `${publisherPinsCount} PINs`,
+            icon: Users,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('publicadores'),
+          },
+        ];
+
+      case 'superintendente_servicio':
+      case 'superintendente_grupo':
+        return [
+          {
+            id: 'grupos_predicacion',
+            title: 'Grupos de Servicio',
+            subtitle: 'Organización y salidas',
+            badge: 'Campo',
+            icon: Users,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('grupos_servicio'),
+          },
+          {
+            id: 'territorios_mapa',
+            title: 'Territorios S-13',
+            subtitle: 'Asignación y cobertura',
+            badge: 'Mapas',
+            icon: MapPin,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('territorios'),
+          },
+          {
+            id: 'informes_campo',
+            title: 'Informes S-4',
+            subtitle: 'Seguimiento del grupo',
+            badge: 'Mensual',
+            icon: FileText,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('informes_servicio'),
+          },
+          {
+            id: 'carritos_publico',
+            title: 'Carritos Públicos',
+            subtitle: 'Turnos y ubicaciones',
+            badge: 'Turnos',
+            icon: ShoppingBag,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('carritos'),
+          },
+        ];
+
+      case 'superintendente_vym':
+        return [
+          {
+            id: 'programa_vym',
+            title: 'Programa VyM',
+            subtitle: 'Asignaciones semanales',
+            badge: 'S-140',
+            icon: Calendar,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('programacion'),
+          },
+          {
+            id: 'hojas_s89',
+            title: 'Hojas S-89',
+            subtitle: 'Vista previa y envío',
+            badge: 'PDF',
+            icon: Award,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('s89'),
+          },
+          {
+            id: 'clm_estudiantes',
+            title: 'Escuela VyM',
+            subtitle: 'Historial y estudiantes',
+            badge: 'CLM',
+            icon: BookOpen,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('clm_vmc'),
+          },
+          {
+            id: 'modo_atril_vym',
+            title: 'Cronómetro Atril',
+            subtitle: 'Control de tiempos',
+            badge: 'En vivo',
+            icon: Timer,
+            accentClass: 'hover:border-sky-500/40 dark:hover:border-sky-400/40',
+            iconBgClass: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+            onClick: () => (onOpenTimerModal ? onOpenTimerModal() : setActiveTab('programacion')),
+          },
+        ];
+
+      case 'siervo_territorios':
+        return [
+          {
+            id: 'mapa_territorios',
+            title: 'Territorios S-13',
+            subtitle: 'Control de tarjetas',
+            badge: 'Principal',
+            icon: MapPin,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('territorios'),
+          },
+          {
+            id: 'grupos_salida',
+            title: 'Grupos de Servicio',
+            subtitle: 'Salidas de predicación',
+            badge: 'Campo',
+            icon: Users,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('grupos_servicio'),
+          },
+          {
+            id: 'carritos_turnos',
+            title: 'Predicación Pública',
+            subtitle: 'Puntos de exhibidores',
+            badge: 'Carritos',
+            icon: ShoppingBag,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('carritos'),
+          },
+          {
+            id: 'mi_ministerio_terr',
+            title: 'Mi Ministerio',
+            subtitle: 'Cronómetro y revisitas',
+            badge: 'Personal',
+            icon: Compass,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('inicio'),
+          },
+        ];
+
+      case 'siervo_cuentas':
+        return [
+          {
+            id: 'contabilidad_mensual',
+            title: 'Cuentas S-26',
+            subtitle: 'Ingresos y gastos',
+            badge: 'Contable',
+            icon: CreditCard,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('cuentas'),
+          },
+          {
+            id: 'tablero_anuncios_cta',
+            title: 'Tablero Anuncios',
+            subtitle: 'Informes financieros',
+            badge: 'Cartelera',
+            icon: FileText,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('tablero_anuncios'),
+          },
+          {
+            id: 'programa_cta',
+            title: 'Programa Reunión',
+            subtitle: 'Consultar semana',
+            badge: 'Semana',
+            icon: Calendar,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('programacion'),
+          },
+          {
+            id: 'mi_ministerio_cta',
+            title: 'Mi Ministerio',
+            subtitle: 'Registro personal',
+            badge: 'S-4',
+            icon: Compass,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('inicio'),
+          },
+        ];
+
+      case 'siervo_literatura':
+        return [
+          {
+            id: 'inventario_lit',
+            title: 'Literatura S-28',
+            subtitle: 'Inventario y pedidos',
+            badge: 'Stock',
+            icon: Package,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('literatura'),
+          },
+          {
+            id: 'carritos_lit',
+            title: 'Exhibidores',
+            subtitle: 'Publicaciones en carritos',
+            badge: 'Público',
+            icon: ShoppingBag,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('carritos'),
+          },
+          {
+            id: 'grupos_lit',
+            title: 'Grupos de Servicio',
+            subtitle: 'Distribución por grupo',
+            badge: 'Grupos',
+            icon: Users,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('grupos_servicio'),
+          },
+          {
+            id: 'mi_ministerio_lit',
+            title: 'Mi Ministerio',
+            subtitle: 'Cronómetro y cursos',
+            badge: 'Personal',
+            icon: Compass,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('inicio'),
+          },
+        ];
+
+      case 'encargado_mantenimiento':
+      case 'encargado_audiovideo':
+      case 'encargado_acomodadores':
+        return [
+          {
+            id: 'limpieza_deberes_op',
+            title: 'Aseo y Deberes',
+            subtitle: 'Acomodadores y audio',
+            badge: 'Turnos',
+            icon: Brush,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('limpieza_deberes'),
+          },
+          {
+            id: 'mantenimiento_salon',
+            title: 'Mantenimiento',
+            subtitle: 'Seguridad del Salón',
+            badge: 'Salón',
+            icon: Wrench,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('mantenimiento'),
+          },
+          {
+            id: 'asistencia_conteo',
+            title: 'Asistencia S-88',
+            subtitle: 'Registrar concurrentes',
+            badge: 'Conteo',
+            icon: TrendingUp,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('asistencia'),
+          },
+          {
+            id: 'modo_atril_av',
+            title: 'Modo Atril / TV',
+            subtitle: 'Cronómetro de plataforma',
+            badge: 'Cabina',
+            icon: Tv,
+            accentClass: 'hover:border-sky-500/40 dark:hover:border-sky-400/40',
+            iconBgClass: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+            onClick: () => (onOpenKioskModal ? onOpenKioskModal() : setActiveTab('programacion')),
+          },
+        ];
+
+      case 'publico':
+        return [
+          {
+            id: 'pub_cronometro',
+            title: 'Cronómetro S-4',
+            subtitle: 'Registrar predicación',
+            badge: 'Ministerio',
+            icon: Timer,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('inicio'),
+          },
+          {
+            id: 'pub_revisitas',
+            title: 'Mis Revisitas',
+            subtitle: 'Seguimiento de personas',
+            badge: 'Notas',
+            icon: MapPin,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => setActiveTab('revisitas'),
+          },
+          {
+            id: 'pub_estudios',
+            title: 'Cursos Bíblicos',
+            subtitle: 'Progreso de estudiantes',
+            badge: 'Cursos',
+            icon: BookOpen,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('estudios_biblicos'),
+          },
+          {
+            id: 'pub_programa',
+            title: 'Cartelera y Reunión',
+            subtitle: 'Asignaciones de la semana',
+            badge: 'Semana',
+            icon: Calendar,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('programacion'),
+          },
+        ];
+
+      case 'coordinador':
+      case 'anciano':
+      default:
+        return [
+          {
+            id: 'coord_programa',
+            title: 'Programa Semanal',
+            subtitle: 'Reunión entre semana y fin',
+            badge: 'S-140',
+            icon: Calendar,
+            accentClass: 'hover:border-indigo-500/40 dark:hover:border-indigo-400/40',
+            iconBgClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+            onClick: () => setActiveTab('programacion'),
+          },
+          {
+            id: 'coord_asistencia',
+            title: 'Asistencia S-88',
+            subtitle: 'Estadísticas de reuniones',
+            badge: 'S-88',
+            icon: TrendingUp,
+            accentClass: 'hover:border-teal-500/40 dark:hover:border-teal-400/40',
+            iconBgClass: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            onClick: () => setActiveTab('asistencia'),
+          },
+          {
+            id: 'coord_s89',
+            title: 'Hojas S-89',
+            subtitle: 'Asignaciones estudiantiles',
+            badge: 'PDF',
+            icon: Award,
+            accentClass: 'hover:border-amber-500/40 dark:hover:border-amber-400/40',
+            iconBgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            onClick: () => setActiveTab('s89'),
+          },
+          {
+            id: 'coord_pins',
+            title: 'Directorio y PINs',
+            subtitle: 'Accesos de publicadores',
+            badge: `${publisherPinsCount} PINs`,
+            icon: KeyRound,
+            accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
+            iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            onClick: () => (onOpenPinsModal ? onOpenPinsModal() : setActiveTab('publicadores')),
+          },
+        ];
+    }
+  }, [roleId, setActiveTab, onOpenTimerModal, onOpenKioskModal, onOpenPinsModal, publisherPinsCount]);
+
+  return (
+    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs">
+      <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0">
+            <Zap className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                Acceso Rápido Táctil
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                <ShieldCheck className="w-3 h-3" />
+                {roleName}
+              </span>
+            </div>
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+              Las 4 herramientas principales más usadas según tu rol activo
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          {onOpenTimerModal && (
+            <button
+              type="button"
+              onClick={onOpenTimerModal}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
+              title="Abrir Cronómetro de Atril"
+            >
+              <Timer className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="hidden sm:inline">Modo Atril</span>
+            </button>
+          )}
+          {onOpenKioskModal && (
+            <button
+              type="button"
+              onClick={onOpenKioskModal}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
+              title="Abrir Modo Pantalla del Salón"
+            >
+              <Tv className="w-3.5 h-3.5 text-sky-500" />
+              <span className="hidden sm:inline">Pantalla Salón</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+        {tools.map((tool) => {
+          const IconComponent = tool.icon;
+          return (
+            <button
+              key={tool.id}
+              type="button"
+              onClick={tool.onClick}
+              className={`group relative flex flex-col justify-between text-left p-3.5 sm:p-4 min-h-[96px] rounded-xl bg-zinc-50/80 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#1F1F28] border border-zinc-200/90 dark:border-[#27272A] ${tool.accentClass} shadow-2xs hover:shadow-md transition-all duration-150 cursor-pointer active:scale-[0.97] touch-manipulation`}
+            >
+              <div className="flex items-start justify-between gap-2 w-full">
+                <div
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-150 group-hover:scale-105 ${tool.iconBgClass}`}
+                >
+                  <IconComponent className="w-5 h-5" />
+                </div>
+
+                {tool.badge && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">
+                    {tool.badge}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-3 w-full">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                    {tool.title}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+                </div>
+                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
+                  {tool.subtitle}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 interface ResumenInicioTabProps {
   setActiveTab: (tab: ActiveTab) => void;
@@ -66,14 +600,11 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
     weeks,
     currentWeek,
     publishers,
-    publishersMap,
     territories,
-    conflicts,
-    settings,
     monthlyReports,
   } = useCongregation();
 
-  const { publisherPinsList } = useAuth();
+  const { publisherPinsList, effectiveRoleInfo } = useAuth();
   const publisherPinsCount = useMemo(() => {
     return publishers.filter(
       (p) =>
@@ -148,9 +679,6 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
     return { total, assigned, overdue };
   }, [territories]);
 
-  // Time range filter for activity chart
-  const [chartRange, setChartRange] = useState<'6 meses' | '12 meses'>('6 meses');
-
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in select-none">
       {/* =========================================================================
@@ -186,6 +714,19 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           </button>
         </div>
       </div>
+
+      {/* =========================================================================
+          1B. QUICK ACCESS GRID (4 MAIN TOOLS BY USER ROLE)
+         ========================================================================= */}
+      <QuickAccessGrid
+        roleId={effectiveRoleInfo.id}
+        roleName={effectiveRoleInfo.name}
+        setActiveTab={setActiveTab}
+        onOpenTimerModal={onOpenTimerModal}
+        onOpenKioskModal={onOpenKioskModal}
+        onOpenPinsModal={handleOpenPins}
+        publisherPinsCount={publisherPinsCount}
+      />
 
       {/* =========================================================================
           2. TOP 5 KPI SUMMARY CARDS (EXACT REFERENCE DESIGN)
@@ -289,7 +830,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
-            0
+            {monthlyReports.length}
           </div>
           <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             S-4 del Mes
@@ -318,7 +859,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
       </div>
 
       {/* =========================================================================
-          4. BOTTOM ROW (Resumen de Publicadores & Acciones Rápidas)
+          4. BOTTOM ROW (Resumen de Publicadores & Cobertura de Territorios)
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Card 1: Resumen de Publicadores */}
@@ -387,97 +928,80 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
                 {publisherStats.total}
               </span>
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono tabular-nums">
-                100% actividad
+                {publisherStats.activityPct}% actividad
               </span>
             </div>
           </div>
         </div>
 
-        {/* Card 2: Acciones Rápidas */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
-              <Zap className="w-4 h-4" />
+        {/* Card 2: Estado de Territorios y Accesos Complementarios */}
+        <div className="lg:col-span-4 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                    Territorios S-13
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                    Estado de predicación
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab('territorios')}
+                className="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <span>Abrir</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
-                Acciones Rápidas
-              </h3>
-              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Accesos directos teocráticos</p>
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+                <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] block">
+                  Total
+                </span>
+                <span className="text-base font-mono font-black text-zinc-900 dark:text-[#F4F4F5]">
+                  {territoriesStats.total}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+                <span className="text-[10px] font-bold uppercase text-teal-600 dark:text-teal-400 block">
+                  Asignados
+                </span>
+                <span className="text-base font-mono font-black text-teal-600 dark:text-teal-400">
+                  {territoriesStats.assigned}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+                <span className="text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400 block">
+                  Vencidos
+                </span>
+                <span className="text-base font-mono font-black text-amber-600 dark:text-amber-400">
+                  {territoriesStats.overdue}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              onClick={() => setActiveTab('programacion')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-            >
-              <Calendar className="w-4 h-4 text-indigo-500 shrink-0" />
-              <span className="truncate">Programa</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('asistencia')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-            >
-              <TrendingUp className="w-4 h-4 text-teal-500 shrink-0" />
-              <span className="truncate">Asistencia</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('s89')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-            >
-              <Award className="w-4 h-4 text-amber-500 shrink-0" />
-              <span className="truncate">Hojas S-89</span>
-            </button>
-
-            {onOpenTimerModal && (
-              <button
-                type="button"
-                onClick={onOpenTimerModal}
-                className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-              >
-                <Timer className="w-4 h-4 text-indigo-500 shrink-0" />
-                <span className="truncate">Modo Atril</span>
-              </button>
-            )}
-
-            {onOpenKioskModal && (
-              <button
-                type="button"
-                onClick={onOpenKioskModal}
-                className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-              >
-                <Tv className="w-4 h-4 text-sky-500 shrink-0" />
-                <span className="truncate">Pantalla Salón</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('territorios')}
-              className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-teal-500 shrink-0" />
-              <span className="truncate">Territorios</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleOpenPins}
-              className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 dark:bg-amber-950/30 hover:bg-amber-500/15 dark:hover:bg-amber-900/40 border border-amber-500/25 text-xs font-bold text-amber-800 dark:text-amber-300 transition-all cursor-pointer shadow-xs"
-            >
+          <button
+            type="button"
+            onClick={handleOpenPins}
+            className="mt-3 w-full flex items-center justify-between gap-2 p-2.5 rounded-lg bg-amber-500/10 dark:bg-amber-950/30 hover:bg-amber-500/15 dark:hover:bg-amber-900/40 border border-amber-500/25 text-xs font-bold text-amber-800 dark:text-amber-300 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+          >
+            <span className="flex items-center gap-2 truncate">
               <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="truncate">Ver PINs</span>
-              <span className="ml-auto text-[10px] bg-amber-500/20 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-1.5 py-0.5 rounded-full font-mono tabular-nums">
-                {publisherPinsCount}
-              </span>
-            </button>
-          </div>
+              <span>Directorio de PINs de Publicadores</span>
+            </span>
+            <span className="text-[10px] bg-amber-500/20 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-2 py-0.5 rounded-full font-mono tabular-nums">
+              {publisherPinsCount}
+            </span>
+          </button>
         </div>
       </div>
 
@@ -489,3 +1013,4 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
     </div>
   );
 };
+

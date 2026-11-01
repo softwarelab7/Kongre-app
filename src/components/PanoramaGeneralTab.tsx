@@ -1027,6 +1027,16 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         accent: 'text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 dark:bg-cyan-500/20',
       },
       {
+        id: 'sec-asistencia',
+        title: 'Asistencia S-88',
+        meta: currentWeek?.attendance?.midweek?.present || currentWeek?.attendance?.weekend?.present
+          ? `Último: ${(currentWeek?.attendance?.weekend?.present || currentWeek?.attendance?.midweek?.present || 0)} presencial`
+          : 'Reuniones y conteo',
+        icon: UserCheck,
+        targetTab: 'asistencia' as ActiveTab,
+        accent: 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-500/20',
+      },
+      {
         id: 'sec-mi-vista',
         title: 'Mis Asignaciones',
         meta:
@@ -1059,6 +1069,40 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
 
   return (
     <div className="w-full space-y-4 sm:space-y-5 animate-fade-in select-none">
+      {/* =========================================================================
+          ACCESO RÁPIDO: REGISTRO DE ASISTENCIA A REUNIONES (S-88)
+         ========================================================================= */}
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-white to-blue-50/80 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-indigo-600/30">
+            <UserCheck className="w-5 h-5 stroke-[2.2]" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                Registro de Asistencia S-88
+              </h3>
+              <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                Oficial S-88
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+              Conteo de asistencia en vivo (presencial y Zoom) para Vida y Ministerio y Reunión Pública.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('asistencia')}
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-xs shadow-xs shadow-indigo-600/25 transition-all cursor-pointer shrink-0 self-stretch sm:self-auto"
+        >
+          <UserCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+          <span>Registrar Asistencia</span>
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       {/* =========================================================================
           1. FILA SUPERIOR: INFORME & PRÓXIMOS (2 TARJETAS LADO A LADO)
          ========================================================================= */}
@@ -1471,7 +1515,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {congregationQuickSections.map((sec) => {
             const IconComponent = sec.icon;
             return (
@@ -1501,6 +1545,27 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             );
           })}
         </div>
+      </div>
+
+      {/* =========================================================================
+          BOTÓN DE ACCIÓN FLOTANTE (FAB): REGISTRO DE ASISTENCIA S-88
+         ========================================================================= */}
+      <div className="fixed bottom-5 sm:bottom-6 right-4 sm:right-6 z-40 animate-fade-in pointer-events-auto">
+        <button
+          type="button"
+          onClick={() => setActiveTab('asistencia')}
+          className="group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-xl shadow-indigo-600/35 hover:shadow-indigo-600/50 border border-indigo-400/30 transition-all cursor-pointer select-none"
+          title="Registro de Asistencia S-88 (Reuniones y conteo en vivo)"
+          aria-label="Abrir Registro de Asistencia S-88"
+        >
+          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <UserCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+          </div>
+          <span className="tracking-wide">Asistencia S-88</span>
+          <span className="hidden sm:inline-flex items-center text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/20 text-white/95">
+            Rápido
+          </span>
+        </button>
       </div>
 
       {/* =========================================================================

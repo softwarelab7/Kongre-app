@@ -687,28 +687,28 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Top Card & Filter Controls (Light/Dark Theme Consistent) */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216] text-zinc-900 dark:text-white shadow-2xs border border-zinc-200 dark:border-[#27272A]">
+      <div className="kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl text-zinc-900 dark:text-white shadow-xl border border-zinc-200/80 dark:border-white/10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 shadow-xs">
                 <BarChart3 className="w-3.5 h-3.5" />
                 Año Teocrático (1 Sep - 31 Ago)
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
               Tendencia Histórica de Asistencia
             </h2>
-            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Análisis de asistencia entre semana y fin de semana •{' '}
-              <strong className="text-zinc-800 dark:text-[#E4E4E7]">{settings.congregationName}</strong>
+              <strong className="text-zinc-800 dark:text-zinc-200">{settings.congregationName}</strong>
             </p>
           </div>
 
           {/* Right Selector & Action Pills */}
           <div className="grid grid-cols-2 sm:flex items-center gap-2">
             {/* Service Year Selector */}
-            <div className="flex items-center justify-center gap-2 bg-zinc-50 dark:bg-[#18181F] px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+            <div className="flex items-center justify-center gap-2 bg-zinc-100/80 dark:bg-white/5 px-3.5 py-2.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-inner">
               <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <select
                 value={selectedServiceYear}
@@ -727,7 +727,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             <button
               type="button"
               onClick={handleCopyAnnualSummary}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-bold text-xs border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200/80 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 font-bold text-xs border border-zinc-200/80 dark:border-white/10 transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-xs"
               title="Copiar resumen del año de servicio al portapapeles"
             >
               {copiedSummary ? (
@@ -746,68 +746,68 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         </div>
 
         {/* Quick Annual KPI Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mt-4 pt-4 border-t border-zinc-100 dark:border-[#27272A]">
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
-            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider block">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-5 pt-5 border-t border-zinc-200/70 dark:border-white/10">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/30 transition-all">
+            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400 tracking-wider block">
               Promedio Anual
             </span>
-            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5 font-mono tabular-nums">
               {annualMetrics.annualAvgOverall}
             </div>
-            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">Congregación total</span>
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">Congregación total</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/30 transition-all">
             <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 tracking-wider block">
               Entre Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5 font-mono tabular-nums">
               {annualMetrics.annualAvgMidweek}
             </div>
-            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate block font-medium">
               {settings.midweekMeetingDay || 'Miércoles'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-sky-500/30 transition-all">
             <span className="text-[10px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-wider block">
               Fin de Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-0.5 font-mono tabular-nums">
               {annualMetrics.annualAvgWeekend}
             </div>
-            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate block font-medium">
               {settings.weekendMeetingDay || 'Domingo'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-amber-500/30 transition-all">
             <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 tracking-wider block">
               Pico Máximo
             </span>
-            <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5 font-mono tabular-nums">
               {annualMetrics.absolutePeak}
             </div>
-            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate block font-medium">
               {annualMetrics.peakMonth || '—'}
             </span>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-emerald-500/30 transition-all">
             <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider block">
               Presencial / Zoom
             </span>
-            <div className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5">
+            <div className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5 font-mono tabular-nums">
               {annualMetrics.annualInPersonPct}% / {annualMetrics.annualZoomPct}%
             </div>
-            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Distribución anual</span>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Distribución anual</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-200/70 dark:border-[#27272A]/70">
-            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider block">
+          <div className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 hover:border-zinc-400/30 transition-all">
+            <span className="text-[10px] uppercase font-bold text-zinc-500 dark:text-zinc-400 tracking-wider block">
               Tendencia Anual
             </span>
-            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5">
+            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-0.5 font-mono tabular-nums">
               {annualMetrics.trendDelta >= 0 ? (
                 <>
                   <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -820,7 +820,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 </>
               )}
             </div>
-            <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate block">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate block font-medium">
               {annualMetrics.monthsWithData} de 12 meses
             </span>
           </div>
@@ -828,15 +828,15 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       </div>
 
       {/* Navigation Pills & Visual Mode Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121216] p-2 sm:p-2.5 rounded-2xl border border-zinc-200/90 dark:border-[#27272A]/90 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 kg-glass-surface kg-sheen-top p-2.5 sm:p-3 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xl">
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setChartView('last4weeks')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               chartView === 'last4weeks'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20'
+                : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -846,10 +846,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
           <button
             type="button"
             onClick={() => setChartView('trends')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               chartView === 'trends'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -859,10 +859,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
           <button
             type="button"
             onClick={() => setChartView('channels')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               chartView === 'channels'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -872,10 +872,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
           <button
             type="button"
             onClick={() => setChartView('weekly')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
               chartView === 'weekly'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#D4D4D8] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -899,14 +899,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         {/* Chart View Secondary Filters */}
         <div className="flex items-center gap-2 self-end sm:self-center">
           {chartView === 'last4weeks' && (
-            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl text-xs">
+            <div className="flex items-center gap-1 bg-zinc-200/60 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 p-1 rounded-2xl text-xs">
               <button
                 type="button"
                 onClick={() => setFourWeeksLineMode('meetings')}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   fourWeeksLineMode === 'meetings'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-white dark:bg-white/15 text-zinc-900 dark:text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Por Reunión
@@ -914,10 +914,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               <button
                 type="button"
                 onClick={() => setFourWeeksLineMode('channels')}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   fourWeeksLineMode === 'channels'
-                    ? 'bg-emerald-600 text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Presencial vs Zoom
@@ -925,10 +925,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               <button
                 type="button"
                 onClick={() => setFourWeeksLineMode('all')}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   fourWeeksLineMode === 'all'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Todas las Series
@@ -937,14 +937,14 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
           )}
 
           {chartView === 'trends' && (
-            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl text-xs">
+            <div className="flex items-center gap-1 bg-zinc-200/60 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 p-1 rounded-2xl text-xs">
               <button
                 type="button"
                 onClick={() => setMeetingFilter('both')}
-                className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   meetingFilter === 'both'
-                    ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-white dark:bg-white/15 text-zinc-900 dark:text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Todas
@@ -952,10 +952,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               <button
                 type="button"
                 onClick={() => setMeetingFilter('midweek')}
-                className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   meetingFilter === 'midweek'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Entre Semana
@@ -963,10 +963,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
               <button
                 type="button"
                 onClick={() => setMeetingFilter('weekend')}
-                className={`px-2 py-0.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                   meetingFilter === 'weekend'
-                    ? 'bg-sky-600 text-white shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Fin de Semana
@@ -978,10 +978,10 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             <button
               type="button"
               onClick={() => setShowAverageLine(!showAverageLine)}
-              className={`p-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+              className={`px-3 py-1.5 rounded-2xl border text-xs font-bold cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-xs ${
                 showAverageLine
-                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                  : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-500 border-transparent'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                  : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border-zinc-200/80 dark:border-white/10'
               }`}
               title="Alternar línea de promedio"
             >
@@ -993,7 +993,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             <button
               type="button"
               onClick={handleSeedDemoData}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer transition-all active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95"
               title="Cargar datos de asistencia estimados para visualizar las gráficas"
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -1004,17 +1004,17 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       </div>
 
       {/* Main Chart Canvas Area */}
-      <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/90 dark:border-[#27272A]/90 p-4 sm:p-6 shadow-xs">
+      <div className="kg-card-bento kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-7 shadow-2xl transition-all">
         {/* VIEW 0: COMPARATIVA DE LAS ÚLTIMAS 4 SEMANAS (RECHARTS LINECHART) */}
         {chartView === 'last4weeks' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 dark:border-[#27272A] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-white/10 pb-4">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base sm:text-lg">
+                  <h3 className="font-bold text-zinc-900 dark:text-white text-base sm:text-lg">
                     Tendencia Histórica: Comparativa de las Últimas 4 Semanas
                   </h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     Recharts LineChart
                   </span>
                   {lastFourWeeksComparison.isUsingSamplePreview && (

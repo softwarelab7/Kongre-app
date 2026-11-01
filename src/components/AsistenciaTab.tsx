@@ -292,16 +292,16 @@ export const AsistenciaTab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Barra Unificada de Vistas y Acciones de Asistencia */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl transition-all">
         {/* View Switcher Pills */}
-        <div className="grid grid-cols-2 sm:flex items-center p-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] rounded-xl text-xs font-bold gap-1">
+        <div className="grid grid-cols-2 sm:flex items-center p-1.5 bg-zinc-200/60 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl text-xs font-bold gap-1">
           <button
             type="button"
             onClick={() => setMainView('dashboard')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl transition-all cursor-pointer ${
               mainView === 'dashboard'
-                ? 'bg-indigo-600 text-white font-bold'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5 shrink-0" />
@@ -310,10 +310,10 @@ export const AsistenciaTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setMainView('registro')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl transition-all cursor-pointer ${
               mainView === 'registro'
-                ? 'bg-indigo-600 text-white font-bold'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
             <Calendar className="w-3.5 h-3.5 shrink-0" />
@@ -325,7 +325,7 @@ export const AsistenciaTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsS88ModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A] font-bold text-xs transition-all active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200/80 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/10 font-bold text-xs hover:scale-105 active:scale-95 transition-all shadow-xs cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
             <span className="truncate">Cargar S-88 PDF</span>
@@ -338,7 +338,7 @@ export const AsistenciaTab: React.FC = () => {
               }
               setIsCounterOpen(true);
             }}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs hover:scale-105 active:scale-95 transition-all shadow-md shadow-indigo-500/25 cursor-pointer"
           >
             <Smartphone className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Contador en Vivo</span>
@@ -363,18 +363,18 @@ export const AsistenciaTab: React.FC = () => {
       {mainView === 'registro' && (
         <div className="space-y-6 animate-fade-in">
           {/* Month selector & Secretary action bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] transition-colors">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">Mes seleccionado:</span>
-              <div className="flex items-center gap-2 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] px-3 py-1.5 rounded-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-3xl kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 shadow-xl transition-all">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold text-zinc-600 dark:text-zinc-300">Mes seleccionado:</span>
+              <div className="flex items-center gap-2 bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 px-3.5 py-2 rounded-2xl shadow-inner">
                 <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="bg-transparent text-zinc-800 dark:text-[#F4F4F5] font-semibold text-xs sm:text-sm outline-hidden cursor-pointer font-mono tabular-nums"
+                  className="bg-transparent text-zinc-900 dark:text-white font-bold text-xs sm:text-sm outline-hidden cursor-pointer font-mono tabular-nums"
                 >
                   {availableMonths.map((m) => (
-                    <option key={m} value={m} className="text-zinc-900 bg-white dark:bg-[#18181F] dark:text-[#F4F4F5]">
+                    <option key={m} value={m} className="text-zinc-900 bg-white dark:bg-[#18181F] dark:text-white">
                       Mes: {m}
                     </option>
                   ))}
@@ -382,11 +382,11 @@ export const AsistenciaTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setMainView('dashboard')}
-                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <span>Ver gráficos anuales</span>
                 <span>↗</span>
@@ -394,7 +394,7 @@ export const AsistenciaTab: React.FC = () => {
 
               <button
                 onClick={handleCopySecretaryReport}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 {copiedSuccess ? (
                   <>
@@ -412,57 +412,59 @@ export const AsistenciaTab: React.FC = () => {
           </div>
 
           {/* KPI Cards Ribbon */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 transition-colors">
-              <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] mb-1">
-                <span className="text-xs font-semibold uppercase tracking-wider">Promedio Entre Semana</span>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="kg-card-bento kg-sheen-top rounded-3xl p-5 border border-zinc-200/80 dark:border-white/10 transition-all hover:border-indigo-500/40 hover:shadow-xl shadow-md">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider">Promedio Entre Semana</span>
                 <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.avgMidweek}</div>
-              <p className="text-2xs text-zinc-400 dark:text-[#A1A1AA] mt-1">
-                {settings.midweekMeetingDay} • <span className="font-mono tabular-nums">{metrics.midweekCount}</span> reuniones
+              <div className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">{metrics.avgMidweek}</div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                <span>{settings.midweekMeetingDay} • <span className="font-mono tabular-nums font-semibold">{metrics.midweekCount}</span> reuniones</span>
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 transition-colors">
-              <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] mb-1">
-                <span className="text-xs font-semibold uppercase tracking-wider">Promedio Fin de Semana</span>
+            <div className="kg-card-bento kg-sheen-top rounded-3xl p-5 border border-zinc-200/80 dark:border-white/10 transition-all hover:border-blue-500/40 hover:shadow-xl shadow-md">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider">Promedio Fin de Semana</span>
                 <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.avgWeekend}</div>
-              <p className="text-2xs text-zinc-400 dark:text-[#A1A1AA] mt-1">
-                {settings.weekendMeetingDay} • <span className="font-mono tabular-nums">{metrics.weekendCount}</span> reuniones
+              <div className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">{metrics.avgWeekend}</div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>{settings.weekendMeetingDay} • <span className="font-mono tabular-nums font-semibold">{metrics.weekendCount}</span> reuniones</span>
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 transition-colors">
-              <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] mb-1">
-                <span className="text-xs font-semibold uppercase tracking-wider">Promedio General</span>
+            <div className="kg-card-bento kg-sheen-top rounded-3xl p-5 border border-zinc-200/80 dark:border-white/10 transition-all hover:border-emerald-500/40 hover:shadow-xl shadow-md">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider">Promedio General</span>
                 <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.avgOverall}</div>
-              <p className="text-2xs text-zinc-400 dark:text-[#A1A1AA] mt-1">
-                Máxima del mes: <strong className="text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">{metrics.maxAttendance}</strong>
+              <div className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">{metrics.avgOverall}</div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                Máxima del mes: <strong className="text-zinc-900 dark:text-white font-mono tabular-nums">{metrics.maxAttendance}</strong>
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 transition-colors">
-              <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] mb-1">
-                <span className="text-xs font-semibold uppercase tracking-wider">Presencial vs Zoom</span>
+            <div className="kg-card-bento kg-sheen-top rounded-3xl p-5 border border-zinc-200/80 dark:border-white/10 transition-all hover:border-purple-500/40 hover:shadow-xl shadow-md">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider">Presencial vs Zoom</span>
                 <Video className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+              <div className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
                 {metrics.inPersonPct}% / {metrics.zoomPct}%
               </div>
               {/* Progress bar */}
-              <div className="w-full bg-zinc-100 dark:bg-[#18181F] h-2 rounded-full mt-2 overflow-hidden flex border border-zinc-200/60 dark:border-[#27272A]">
+              <div className="w-full bg-zinc-200/70 dark:bg-white/10 h-2.5 rounded-full mt-2.5 overflow-hidden flex border border-zinc-300/40 dark:border-white/10">
                 <div
-                  className="bg-indigo-600 h-full transition-all"
+                  className="bg-gradient-to-r from-indigo-600 to-indigo-500 h-full transition-all"
                   style={{ width: `${metrics.inPersonPct}%` }}
                   title={`Presencial: ${metrics.inPersonPct}%`}
                 />
                 <div
-                  className="bg-purple-500 h-full transition-all"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all"
                   style={{ width: `${metrics.zoomPct}%` }}
                   title={`Zoom: ${metrics.zoomPct}%`}
                 />
@@ -471,25 +473,25 @@ export const AsistenciaTab: React.FC = () => {
           </div>
 
       {/* Gráfico de Líneas Comparativo de las Últimas 4 Semanas (Recharts) */}
-      <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 transition-colors space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
+      <div className="kg-card-bento kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-6 shadow-xl transition-all space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-200/60 dark:border-white/10 pb-3">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base flex items-center gap-2">
+              <h3 className="font-bold text-zinc-900 dark:text-white text-base flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Tendencia Histórica: Comparativa de las Últimas 4 Semanas</span>
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800 font-mono tabular-nums">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800 font-mono tabular-nums">
                 Promedio General: {lastFourWeeksTrend.avgGeneral}
               </span>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
               Comparación directa de asistencia en las últimas 4 semanas entre Entre Semana ({settings.midweekMeetingDay}), Fin de Semana ({settings.weekendMeetingDay}) y Promedio Semanal.
             </p>
           </div>
 
           <div className="flex items-center gap-3 text-xs">
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200/60 dark:border-emerald-800/50 font-mono tabular-nums">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/20 font-mono tabular-nums">
               {lastFourWeeksTrend.delta >= 0 ? (
                 <ArrowUpRight className="w-3.5 h-3.5" />
               ) : (
@@ -566,43 +568,43 @@ export const AsistenciaTab: React.FC = () => {
       </div>
 
       {/* Week by Week Inputs Section: Cards View (Default on mobile) or Table View */}
-      <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden transition-colors">
-        <div className="p-4 border-b border-zinc-100 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/70 dark:bg-[#18181F]">
+      <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 overflow-hidden shadow-xl transition-all">
+        <div className="p-4 sm:p-5 border-b border-zinc-200/70 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-100/50 dark:bg-white/[0.02]">
           <div>
-            <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
+            <h3 className="font-bold text-zinc-900 dark:text-white text-base">
               Registro Semanal de Asistencia • <span className="font-mono tabular-nums">{selectedMonth}</span>
             </h3>
-            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Ingrese los números de cada reunión; el total se calcula automáticamente.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {/* View layout toggle */}
-            <div className="flex items-center p-1 bg-zinc-200/80 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] rounded-xl text-xs font-semibold">
+            <div className="flex items-center p-1 bg-zinc-200/60 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl text-xs font-bold gap-1">
               <button
                 onClick={() => setLayoutMode('cards')}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                   layoutMode === 'cards'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A] shadow-xs font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                    ? 'bg-white dark:bg-white/15 text-indigo-700 dark:text-white shadow-xs font-bold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Vista Tarjetas Móvil
               </button>
               <button
                 onClick={() => setLayoutMode('table')}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                   layoutMode === 'table'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A] shadow-xs font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                    ? 'bg-white dark:bg-white/15 text-indigo-700 dark:text-white shadow-xs font-bold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Tabla Completa
               </button>
             </div>
 
-            <span className="hidden sm:inline-block text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA] bg-white dark:bg-[#18181F] px-3 py-1 rounded-xl border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
+            <span className="hidden sm:inline-block text-xs font-bold text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-white/10 px-3 py-1.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 font-mono tabular-nums">
               {monthWeeks.length} semanas
             </span>
           </div>
@@ -610,7 +612,7 @@ export const AsistenciaTab: React.FC = () => {
 
         {/* 1. MOBILE-FIRST CARDS VIEW */}
         {layoutMode === 'cards' && (
-          <div className="p-4 space-y-4">
+          <div className="p-4 sm:p-5 space-y-4">
             {monthWeeks.map((week, idx) => {
               const att = week.attendance || {
                 weekId: week.id,
@@ -622,43 +624,48 @@ export const AsistenciaTab: React.FC = () => {
               return (
                 <div
                   key={week.id}
-                  className="rounded-2xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F] p-4 space-y-4"
+                  className="kg-card-bento kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 space-y-4 hover:border-indigo-500/30 transition-all shadow-md"
                 >
                   {/* Card Header */}
-                  <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-[#27272A] pb-2.5">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
-                        Semana #{idx + 1}
-                      </span>
-                      <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base font-mono tabular-nums">
-                        Del {week.weekStartDate} al {week.weekEndDate}
-                      </h4>
+                  <div className="flex items-center justify-between border-b border-zinc-200/70 dark:border-white/10 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400 font-mono font-black text-sm flex items-center justify-center border border-indigo-500/30 shadow-inner">
+                        #{idx + 1}
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-mono tabular-nums block">
+                          Semana del mes
+                        </span>
+                        <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base font-mono tabular-nums">
+                          Del {week.weekStartDate} al {week.weekEndDate}
+                        </h4>
+                      </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-semibold block">Total Semana</span>
-                      <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{weekCombinedTotal}</span>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-400 uppercase font-bold block">Total Semana</span>
+                      <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{weekCombinedTotal}</span>
                     </div>
                   </div>
 
                   {/* Two columns: Midweek & Weekend */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {/* Entre Semana Panel */}
-                    <div className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-indigo-100 dark:border-[#27272A] space-y-3">
-                      <div className="flex items-center justify-between border-b border-indigo-50 dark:border-[#27272A] pb-2">
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-white/[0.03] border border-zinc-200/70 dark:border-white/5 space-y-3">
+                      <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-white/5 pb-2">
                         <span className="font-bold text-xs text-indigo-900 dark:text-indigo-300 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                           <span>Entre Semana ({settings.midweekMeetingDay})</span>
                         </span>
-                        <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs font-mono tabular-nums border border-indigo-200/60 dark:border-indigo-900/40">
+                        <span className="px-2.5 py-0.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-black text-xs font-mono tabular-nums border border-indigo-500/25">
                           Total: {att.midweek.total}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2.5">
                         {/* Presencial */}
                         <div>
-                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1">
+                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">
                             Presencial
                           </label>
                           <div className="flex items-center gap-1">
@@ -671,7 +678,7 @@ export const AsistenciaTab: React.FC = () => {
                                   Math.max(0, (att.midweek.inPerson || 0) - 1)
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               -
                             </button>
@@ -688,7 +695,7 @@ export const AsistenciaTab: React.FC = () => {
                                 )
                               }
                               placeholder="0"
-                              className="w-full text-center py-1.5 font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] bg-indigo-50/30 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                              className="w-full text-center py-2 font-black font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 border border-zinc-200/80 dark:border-white/10 rounded-xl text-base focus:ring-2 focus:ring-indigo-500/50 focus:outline-none transition-all shadow-inner"
                             />
                             <button
                               onClick={() =>
@@ -699,7 +706,7 @@ export const AsistenciaTab: React.FC = () => {
                                   (att.midweek.inPerson || 0) + 1
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               +
                             </button>
@@ -708,7 +715,7 @@ export const AsistenciaTab: React.FC = () => {
 
                         {/* Zoom */}
                         <div>
-                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1">
+                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">
                             Zoom
                           </label>
                           <div className="flex items-center gap-1">
@@ -721,7 +728,7 @@ export const AsistenciaTab: React.FC = () => {
                                   Math.max(0, (att.midweek.zoom || 0) - 1)
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               -
                             </button>
@@ -738,7 +745,7 @@ export const AsistenciaTab: React.FC = () => {
                                 )
                               }
                               placeholder="0"
-                              className="w-full text-center py-1.5 font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] bg-indigo-50/30 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                              className="w-full text-center py-2 font-black font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 border border-zinc-200/80 dark:border-white/10 rounded-xl text-base focus:ring-2 focus:ring-indigo-500/50 focus:outline-none transition-all shadow-inner"
                             />
                             <button
                               onClick={() =>
@@ -749,7 +756,7 @@ export const AsistenciaTab: React.FC = () => {
                                   (att.midweek.zoom || 0) + 1
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               +
                             </button>
@@ -759,21 +766,21 @@ export const AsistenciaTab: React.FC = () => {
                     </div>
 
                     {/* Fin de Semana Panel */}
-                    <div className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-blue-100 dark:border-[#27272A] space-y-3">
-                      <div className="flex items-center justify-between border-b border-blue-50 dark:border-[#27272A] pb-2">
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-white/[0.03] border border-zinc-200/70 dark:border-white/5 space-y-3">
+                      <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-white/5 pb-2">
                         <span className="font-bold text-xs text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                           <span>Fin de Semana ({settings.weekendMeetingDay})</span>
                         </span>
-                        <span className="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-extrabold text-xs font-mono tabular-nums border border-blue-200/60 dark:border-blue-900/40">
+                        <span className="px-2.5 py-0.5 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-black text-xs font-mono tabular-nums border border-blue-500/25">
                           Total: {att.weekend.total}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2.5">
                         {/* Presencial */}
                         <div>
-                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1">
+                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">
                             Presencial
                           </label>
                           <div className="flex items-center gap-1">
@@ -786,7 +793,7 @@ export const AsistenciaTab: React.FC = () => {
                                   Math.max(0, (att.weekend.inPerson || 0) - 1)
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               -
                             </button>
@@ -803,7 +810,7 @@ export const AsistenciaTab: React.FC = () => {
                                 )
                               }
                               placeholder="0"
-                              className="w-full text-center py-1.5 font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] bg-blue-50/30 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                              className="w-full text-center py-2 font-black font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 border border-zinc-200/80 dark:border-white/10 rounded-xl text-base focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all shadow-inner"
                             />
                             <button
                               onClick={() =>
@@ -814,7 +821,7 @@ export const AsistenciaTab: React.FC = () => {
                                   (att.weekend.inPerson || 0) + 1
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               +
                             </button>
@@ -823,7 +830,7 @@ export const AsistenciaTab: React.FC = () => {
 
                         {/* Zoom */}
                         <div>
-                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-[#A1A1AA] mb-1">
+                          <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">
                             Zoom
                           </label>
                           <div className="flex items-center gap-1">
@@ -836,7 +843,7 @@ export const AsistenciaTab: React.FC = () => {
                                   Math.max(0, (att.weekend.zoom || 0) - 1)
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               -
                             </button>
@@ -853,7 +860,7 @@ export const AsistenciaTab: React.FC = () => {
                                 )
                               }
                               placeholder="0"
-                              className="w-full text-center py-1.5 font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] bg-blue-50/30 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                              className="w-full text-center py-2 font-black font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 border border-zinc-200/80 dark:border-white/10 rounded-xl text-base focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all shadow-inner"
                             />
                             <button
                               onClick={() =>
@@ -864,7 +871,7 @@ export const AsistenciaTab: React.FC = () => {
                                   (att.weekend.zoom || 0) + 1
                                 )
                               }
-                              className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-sm flex items-center justify-center shrink-0 active:scale-95 transition-all border border-zinc-200/80 dark:border-[#27272A]"
+                              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-black text-base flex items-center justify-center shrink-0 hover:scale-110 active:scale-90 transition-all border border-zinc-200/80 dark:border-white/10 shadow-xs cursor-pointer"
                             >
                               +
                             </button>
@@ -883,33 +890,33 @@ export const AsistenciaTab: React.FC = () => {
         {layoutMode === 'table' && (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] font-bold border-b border-zinc-200 dark:border-[#27272A]">
+            <thead className="bg-zinc-100/80 dark:bg-white/[0.03] backdrop-blur-md text-zinc-700 dark:text-white font-bold border-b border-zinc-200/80 dark:border-white/10">
               <tr>
-                <th className="px-4 py-3">Semana</th>
-                <th className="px-4 py-3 bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-300 text-center border-x border-zinc-200 dark:border-[#27272A]" colSpan={3}>
+                <th className="px-4 py-3.5">Semana</th>
+                <th className="px-4 py-3.5 bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-900 dark:text-indigo-300 text-center border-x border-zinc-200/80 dark:border-white/10 font-bold" colSpan={3}>
                   Reunión Entre Semana ({settings.midweekMeetingDay})
                 </th>
-                <th className="px-4 py-3 bg-blue-50/70 dark:bg-blue-950/30 text-blue-900 dark:text-blue-300 text-center border-r border-zinc-200 dark:border-[#27272A]" colSpan={3}>
+                <th className="px-4 py-3.5 bg-blue-500/10 dark:bg-blue-500/15 text-blue-900 dark:text-blue-300 text-center border-r border-zinc-200/80 dark:border-white/10 font-bold" colSpan={3}>
                   Reunión Fin de Semana ({settings.weekendMeetingDay})
                 </th>
-                <th className="px-4 py-3 text-center">Total Semana</th>
+                <th className="px-4 py-3.5 text-center font-bold">Total Semana</th>
               </tr>
-              <tr className="bg-zinc-50 dark:bg-[#121216] text-2xs text-zinc-500 dark:text-[#A1A1AA] uppercase border-b border-zinc-200 dark:border-[#27272A]">
-                <th className="px-4 py-2">Fecha Inicio</th>
-                <th className="px-2 py-2 text-center bg-indigo-50/30 dark:bg-indigo-950/20">Presencial</th>
-                <th className="px-2 py-2 text-center bg-indigo-50/30 dark:bg-indigo-950/20">Zoom</th>
-                <th className="px-2 py-2 text-center bg-indigo-100/50 dark:bg-indigo-900/40 font-bold text-indigo-900 dark:text-indigo-300">
+              <tr className="bg-zinc-100/40 dark:bg-white/[0.02] text-2xs text-zinc-500 dark:text-zinc-400 uppercase tracking-wider border-b border-zinc-200/80 dark:border-white/10">
+                <th className="px-4 py-2 font-bold">Fecha Inicio</th>
+                <th className="px-2 py-2 text-center bg-indigo-500/5 dark:bg-indigo-500/10 font-bold">Presencial</th>
+                <th className="px-2 py-2 text-center bg-indigo-500/5 dark:bg-indigo-500/10 font-bold">Zoom</th>
+                <th className="px-2 py-2 text-center bg-indigo-500/15 dark:bg-indigo-500/20 font-black text-indigo-900 dark:text-indigo-300">
                   Total
                 </th>
-                <th className="px-2 py-2 text-center bg-blue-50/30 dark:bg-blue-950/20">Presencial</th>
-                <th className="px-2 py-2 text-center bg-blue-50/30 dark:bg-blue-950/20">Zoom</th>
-                <th className="px-2 py-2 text-center bg-blue-100/50 dark:bg-blue-900/40 font-bold text-blue-900 dark:text-blue-300">
+                <th className="px-2 py-2 text-center bg-blue-500/5 dark:bg-blue-500/10 font-bold">Presencial</th>
+                <th className="px-2 py-2 text-center bg-blue-500/5 dark:bg-blue-500/10 font-bold">Zoom</th>
+                <th className="px-2 py-2 text-center bg-blue-500/15 dark:bg-blue-500/20 font-black text-blue-900 dark:text-blue-300">
                   Total
                 </th>
-                <th className="px-4 py-2 text-center font-bold">Combinado</th>
+                <th className="px-4 py-2 text-center font-black">Combinado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+            <tbody className="divide-y divide-zinc-200/50 dark:divide-white/[0.05]">
               {monthWeeks.map((week) => {
                 const att = week.attendance || {
                   weekId: week.id,
@@ -920,14 +927,14 @@ export const AsistenciaTab: React.FC = () => {
                 const weekCombinedTotal = att.midweek.total + att.weekend.total;
 
                 return (
-                  <tr key={week.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/40 transition-colors">
-                    <td className="px-4 py-3 font-bold text-zinc-900 dark:text-[#F4F4F5] whitespace-nowrap font-mono tabular-nums">
+                  <tr key={week.id} className="hover:bg-zinc-100/60 dark:hover:bg-white/[0.04] transition-colors">
+                    <td className="px-4 py-3.5 font-bold text-zinc-900 dark:text-white whitespace-nowrap font-mono tabular-nums">
                       <div>{week.weekStartDate}</div>
-                      <div className="text-zinc-400 dark:text-[#A1A1AA] font-normal text-2xs">al {week.weekEndDate}</div>
+                      <div className="text-zinc-500 dark:text-zinc-400 font-normal text-2xs">al {week.weekEndDate}</div>
                     </td>
 
                     {/* Midweek In Person */}
-                    <td className="px-2 py-2 text-center bg-indigo-50/20 dark:bg-indigo-950/10">
+                    <td className="px-2 py-2 text-center bg-indigo-500/5 dark:bg-indigo-500/10">
                       <input
                         type="number"
                         min="0"
@@ -941,12 +948,12 @@ export const AsistenciaTab: React.FC = () => {
                           )
                         }
                         placeholder="0"
-                        className="w-16 px-2 py-1.5 border border-zinc-300 dark:border-[#27272A] rounded-lg text-center font-semibold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] focus:ring-2 focus:ring-indigo-500 outline-hidden"
+                        className="w-16 px-2.5 py-1.5 border border-zinc-200/80 dark:border-white/10 rounded-xl text-center font-bold font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
                       />
                     </td>
 
                     {/* Midweek Zoom */}
-                    <td className="px-2 py-2 text-center bg-indigo-50/20 dark:bg-indigo-950/10">
+                    <td className="px-2 py-2 text-center bg-indigo-500/5 dark:bg-indigo-500/10">
                       <input
                         type="number"
                         min="0"
@@ -960,17 +967,17 @@ export const AsistenciaTab: React.FC = () => {
                           )
                         }
                         placeholder="0"
-                        className="w-16 px-2 py-1.5 border border-zinc-300 dark:border-[#27272A] rounded-lg text-center font-semibold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] focus:ring-2 focus:ring-indigo-500 outline-hidden"
+                        className="w-16 px-2.5 py-1.5 border border-zinc-200/80 dark:border-white/10 rounded-xl text-center font-bold font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
                       />
                     </td>
 
                     {/* Midweek Total */}
-                    <td className="px-2 py-2 text-center bg-indigo-100/40 dark:bg-indigo-950/30 font-bold text-indigo-900 dark:text-indigo-300 text-sm font-mono tabular-nums">
+                    <td className="px-2 py-2 text-center bg-indigo-500/10 dark:bg-indigo-500/20 font-black text-indigo-900 dark:text-indigo-300 text-sm font-mono tabular-nums">
                       {att.midweek.total}
                     </td>
 
                     {/* Weekend In Person */}
-                    <td className="px-2 py-2 text-center bg-blue-50/20 dark:bg-blue-950/10">
+                    <td className="px-2 py-2 text-center bg-blue-500/5 dark:bg-blue-500/10">
                       <input
                         type="number"
                         min="0"
@@ -984,12 +991,12 @@ export const AsistenciaTab: React.FC = () => {
                           )
                         }
                         placeholder="0"
-                        className="w-16 px-2 py-1.5 border border-zinc-300 dark:border-[#27272A] rounded-lg text-center font-semibold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] focus:ring-2 focus:ring-blue-500 outline-hidden"
+                        className="w-16 px-2.5 py-1.5 border border-zinc-200/80 dark:border-white/10 rounded-xl text-center font-bold font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                       />
                     </td>
 
                     {/* Weekend Zoom */}
-                    <td className="px-2 py-2 text-center bg-blue-50/20 dark:bg-blue-950/10">
+                    <td className="px-2 py-2 text-center bg-blue-500/5 dark:bg-blue-500/10">
                       <input
                         type="number"
                         min="0"
@@ -1003,17 +1010,17 @@ export const AsistenciaTab: React.FC = () => {
                           )
                         }
                         placeholder="0"
-                        className="w-16 px-2 py-1.5 border border-zinc-300 dark:border-[#27272A] rounded-lg text-center font-semibold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] focus:ring-2 focus:ring-blue-500 outline-hidden"
+                        className="w-16 px-2.5 py-1.5 border border-zinc-200/80 dark:border-white/10 rounded-xl text-center font-bold font-mono tabular-nums text-zinc-900 dark:text-white bg-white dark:bg-black/30 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                       />
                     </td>
 
                     {/* Weekend Total */}
-                    <td className="px-2 py-2 text-center bg-blue-100/40 dark:bg-blue-950/30 font-bold text-blue-900 dark:text-blue-300 text-sm font-mono tabular-nums">
+                    <td className="px-2 py-2 text-center bg-blue-500/10 dark:bg-blue-500/20 font-black text-blue-900 dark:text-blue-300 text-sm font-mono tabular-nums">
                       {att.weekend.total}
                     </td>
 
                     {/* Week Combined Total */}
-                    <td className="px-4 py-3 text-center font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-base font-mono tabular-nums">
+                    <td className="px-4 py-3.5 text-center font-black text-zinc-900 dark:text-white text-base font-mono tabular-nums">
                       {weekCombinedTotal}
                     </td>
                   </tr>
@@ -1044,24 +1051,24 @@ export const AsistenciaTab: React.FC = () => {
         };
 
         return (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] w-full max-w-lg rounded-2xl p-6 sm:p-8 relative space-y-6">
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/15 w-full max-w-lg rounded-3xl p-6 sm:p-8 relative space-y-6 shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-4">
+              <div className="flex items-center justify-between border-b border-zinc-200/70 dark:border-white/10 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                    <Smartphone size={20} />
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-inner">
+                    <Smartphone size={22} />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
                       Contador Táctil en Vivo
                     </h3>
-                    <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Diseñado para conteo ágil con una mano en el Salón</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Diseñado para conteo ágil con una mano en el Salón</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsCounterOpen(false)}
-                  className="p-2 text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] rounded-xl hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer transition-colors"
+                  className="p-2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white rounded-xl hover:bg-zinc-100 dark:hover:bg-white/10 cursor-pointer transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -1072,20 +1079,20 @@ export const AsistenciaTab: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setCounterTarget((prev) => ({ ...prev, meetingType: 'midweek' }))}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                    className={`py-2.5 px-3.5 rounded-2xl font-bold text-xs transition-all cursor-pointer ${
                       counterTarget.meetingType === 'midweek'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]'
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                        : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10'
                     }`}
                   >
                     Entre Semana ({settings.midweekMeetingDay})
                   </button>
                   <button
                     onClick={() => setCounterTarget((prev) => ({ ...prev, meetingType: 'weekend' }))}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                    className={`py-2.5 px-3.5 rounded-2xl font-bold text-xs transition-all cursor-pointer ${
                       counterTarget.meetingType === 'weekend'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]'
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                        : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10'
                     }`}
                   >
                     Fin de Semana ({settings.weekendMeetingDay})
@@ -1095,37 +1102,37 @@ export const AsistenciaTab: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setCounterTarget((prev) => ({ ...prev, channel: 'inPerson' }))}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    className={`py-2.5 px-3.5 rounded-2xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
                       counterTarget.channel === 'inPerson'
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]'
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20'
+                        : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10'
                     }`}
                   >
-                    <Building2 size={14} /> Presencial (Salón)
+                    <Building2 size={15} /> Presencial (Salón)
                   </button>
                   <button
                     onClick={() => setCounterTarget((prev) => ({ ...prev, channel: 'zoom' }))}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    className={`py-2.5 px-3.5 rounded-2xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
                       counterTarget.channel === 'zoom'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-[#27272A]'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+                        : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/10'
                     }`}
                   >
-                    <Video size={14} /> Zoom (Conexiones)
+                    <Video size={15} /> Zoom (Conexiones)
                   </button>
                 </div>
               </div>
 
               {/* Pantalla Gigante del Contador */}
-              <div className="bg-zinc-50 dark:bg-[#18181F] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-6 text-center space-y-4">
-                <div className="text-xs uppercase tracking-widest text-zinc-400 dark:text-[#A1A1AA] font-semibold">
+              <div className="bg-zinc-100/80 dark:bg-black/50 rounded-3xl border border-zinc-200/80 dark:border-white/10 p-6 sm:p-8 text-center space-y-3 shadow-inner">
+                <div className="text-xs uppercase tracking-widest text-zinc-400 dark:text-zinc-400 font-bold">
                   {counterTarget.meetingType === 'midweek' ? 'Entre Semana' : 'Fin de Semana'} •{' '}
                   {counterTarget.channel === 'inPerson' ? 'Presencial' : 'Zoom'}
                 </div>
-                <div className="text-6xl sm:text-7xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+                <div className="text-7xl sm:text-8xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
                   {currentCount}
                 </div>
-                <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium font-mono tabular-nums">
+                <div className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold font-mono tabular-nums">
                   Total de la reunión: {curAtt[counterTarget.meetingType].total}
                 </div>
               </div>
@@ -1136,7 +1143,7 @@ export const AsistenciaTab: React.FC = () => {
                 <div className="grid grid-cols-3 gap-3">
                   <button
                     onClick={() => handleCountDelta(-1)}
-                    className="h-20 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-black text-2xl flex items-center justify-center active:scale-95 transition-all cursor-pointer border border-rose-500/20"
+                    className="h-20 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-black text-2xl flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all cursor-pointer border border-rose-500/25"
                     title="Restar 1"
                   >
                     <Minus size={28} />
@@ -1144,7 +1151,7 @@ export const AsistenciaTab: React.FC = () => {
 
                   <button
                     onClick={() => handleCountDelta(1)}
-                    className="col-span-2 h-20 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-3xl flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer"
+                    className="col-span-2 h-20 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-3xl flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/25 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
                     title="Sumar 1"
                   >
                     <Plus size={32} />
@@ -1153,16 +1160,16 @@ export const AsistenciaTab: React.FC = () => {
                 </div>
 
                 {/* Botones de Lotes Rápido (+5, +10, Reiniciar) */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2.5">
                   <button
                     onClick={() => handleCountDelta(5)}
-                    className="py-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] font-bold text-xs text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums active:scale-95 transition-all cursor-pointer"
+                    className="py-3.5 rounded-2xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-black text-xs text-zinc-800 dark:text-white font-mono tabular-nums hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-xs"
                   >
                     +5 Filas
                   </button>
                   <button
                     onClick={() => handleCountDelta(10)}
-                    className="py-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] font-bold text-xs text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums active:scale-95 transition-all cursor-pointer"
+                    className="py-3.5 rounded-2xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-black text-xs text-zinc-800 dark:text-white font-mono tabular-nums hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-xs"
                   >
                     +10 Grupo
                   </button>
@@ -1172,9 +1179,9 @@ export const AsistenciaTab: React.FC = () => {
                         handleAttendanceChange(activeW.id, counterTarget.meetingType, counterTarget.channel, 0);
                       }
                     }}
-                    className="py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 font-bold text-xs text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="py-3.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 font-black text-xs text-rose-600 dark:text-rose-400 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                   >
-                    <RotateCcw size={12} /> Cero
+                    <RotateCcw size={14} /> Cero
                   </button>
                 </div>
               </div>
@@ -1182,7 +1189,7 @@ export const AsistenciaTab: React.FC = () => {
               {/* Botón Guardar y Salir */}
               <button
                 onClick={() => setIsCounterOpen(false)}
-                className="w-full py-3 rounded-xl bg-zinc-900 dark:bg-[#27272A] hover:bg-zinc-800 dark:hover:bg-[#323238] text-white font-bold text-sm border border-zinc-900 dark:border-[#3E3E42] active:scale-98 transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-800 dark:from-white/20 dark:to-white/10 hover:from-zinc-800 hover:to-zinc-700 text-white font-bold text-sm border border-zinc-900 dark:border-white/15 shadow-lg hover:scale-[1.01] active:scale-98 transition-all cursor-pointer"
               >
                 Listo / Guardar en el Registro
               </button>

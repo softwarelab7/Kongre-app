@@ -72,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
+        <div className="min-h-dvh bg-zinc-900 text-zinc-100 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-zinc-800 border border-zinc-700 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl text-center">
             <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
               <ShieldAlert className="w-8 h-8" />

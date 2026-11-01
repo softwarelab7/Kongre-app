@@ -1509,7 +1509,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     }
 
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col py-2 sm:py-5 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col py-2 sm:py-5 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
         <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col justify-center">
           <div className="w-full bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-3.5 sm:p-5">
             {successCard}
@@ -1524,7 +1524,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col py-2 sm:py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col py-2 sm:py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col">
         {/* Main Card */}
         <div className="w-full bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1 kg-register-box-enter">

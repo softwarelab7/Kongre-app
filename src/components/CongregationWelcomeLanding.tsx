@@ -1327,7 +1327,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const isSessionSubView = activeTab === 'email_login' || activeTab === 'code_login' || activeTab === 'invite_code_login';
 
   return (
-    <div className="min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
+    <div className="min-h-dvh lg:h-dvh lg:max-h-dvh lg:overflow-hidden bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
       {/* ========================================================= */}
       {/* 0. MOBILE HERO & SHEET VIEW (< md) - FIEL A BIENVENIDA-HTML*/}
       {/* ========================================================= */}

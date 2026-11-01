@@ -81,7 +81,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col justify-center items-center p-4">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-lg bg-white dark:bg-[#121216] rounded-3xl p-6 sm:p-8 shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col items-center text-center">
         {/* Brand Emblem */}
         <div className="flex items-center justify-center mb-6">

@@ -8,11 +8,26 @@
 @import "leaflet/dist/leaflet.css";
 
 @layer base {
+  :root {
+    --ease-apple-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-apple-spring: cubic-bezier(0.2, 0.9, 0.3, 1);
+    --ease-apple-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     overscroll-behavior: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   html.dark {

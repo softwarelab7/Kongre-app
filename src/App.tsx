@@ -1596,7 +1596,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] text-zinc-900 dark:text-[#F4F4F5] flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-[#09090B] text-zinc-900 dark:text-[#F4F4F5] flex flex-col font-sans transition-colors duration-200">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}

@@ -34,9 +34,10 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           <div
             key={toast.id}
             className={`
-              pointer-events-auto w-full sm:min-w-[300px] sm:max-w-md bg-white dark:bg-[#121216] 
-              border border-zinc-200 dark:border-[#27272A] rounded-2xl p-3.5 sm:p-4 
-              flex items-center gap-3.5 sm:gap-4 animate-in slide-in-from-bottom-4 sm:slide-in-from-right-8 fade-in duration-300
+              pointer-events-auto w-full sm:min-w-[300px] sm:max-w-md bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md
+              border border-zinc-200/90 dark:border-[#27272A] rounded-2xl p-3.5 sm:p-4 
+              flex items-center gap-3.5 sm:gap-4 animate-in slide-in-from-bottom-3 sm:slide-in-from-right-6 fade-in duration-200 ease-out
+              shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.55)]
             `}
           >
             <div className={`
@@ -51,19 +52,20 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               {toast.type === 'warning' && <AlertTriangle size={20} strokeWidth={2.5} />}
               {toast.type === 'info' && <Info size={20} strokeWidth={2.5} />}
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] leading-tight">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] leading-tight truncate">
                 {toast.type === 'success' ? '¡Éxito!' : 
                  toast.type === 'error' ? 'Error' : 
                  toast.type === 'warning' ? 'Advertencia' : 'Información'}
               </p>
-              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 font-medium">
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 font-medium line-clamp-2">
                 {toast.message}
               </p>
             </div>
             <button 
               onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] transition-colors cursor-pointer"
+              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:scale-95 select-none cursor-pointer shrink-0"
+              aria-label="Cerrar notificación"
             >
               <X size={16} />
             </button>

@@ -83,9 +83,9 @@ export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.75, y: 16 }}
+          initial={{ opacity: 0, scale: 0.92, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.75, y: 16 }}
+          exit={{ opacity: 0, scale: 0.92, y: 8, transition: { duration: 0.14, ease: [0.4, 0, 1, 1] } }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           className={`fixed z-30 transition-all duration-300 ease-in-out ${
             // En móvil: sobre la barra de navegación inferior (bottom-20)
@@ -111,8 +111,8 @@ export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({
             <motion.button
               type="button"
               onClick={scrollToTop}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               aria-label="Volver arriba en la página"
               title="Volver arriba"
               className="relative w-12 h-12 rounded-full flex items-center justify-center bg-white/95 dark:bg-[#18181F]/95 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-[0_4px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_28px_rgba(79,70,229,0.25)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.45)] dark:hover:shadow-[0_8px_28px_rgba(99,102,241,0.3)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#09090B]"

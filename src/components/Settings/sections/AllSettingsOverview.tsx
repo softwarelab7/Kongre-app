@@ -106,36 +106,37 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* SECCIÓN DESTACADA: PREFERENCIAS DE NOTIFICACIÓN DE ASIGNACIONES */}
-      <div className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-violet-200/80 dark:border-violet-500/30 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/[0.06]">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="p-3 bg-violet-50 dark:bg-violet-500/15 rounded-2xl text-violet-600 dark:text-violet-400 shrink-0">
-              <BellRing size={22} />
+      <div className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-[#27272A] shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <BellRing size={18} />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
+                <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
                   Preferencias de Notificación
                 </h3>
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                     notifPrefs.enabled
                       ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
                   }`}
                 >
+                  <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${notifPrefs.enabled ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
                   {notifPrefs.enabled
-                    ? `Activo • ${notifPrefs.notifyDaysBefore === 1 ? '1 día antes' : `${notifPrefs.notifyDaysBefore} días antes`}`
+                    ? `Activo · ${notifPrefs.notifyDaysBefore === 1 ? '1 día antes' : `${notifPrefs.notifyDaysBefore} días antes`}`
                     : 'Pausado'}
                 </span>
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Configura cuántos días antes deseas recibir el recordatorio automático de tus asignaciones (ej. 1, 3 o 7 días antes), hora del aviso y alertas en segundo plano.
+                Recordatorios automáticos de tus partes, asignaciones y privilegios.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() =>
@@ -146,23 +147,23 @@ export const AllSettingsOverview: React.FC<AllSettingsOverviewProps> = ({
                     : 'Recordatorios automáticos pausados.'
                 )
               }
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
                 notifPrefs.enabled
                   ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200'
               }`}
             >
-              {notifPrefs.enabled ? <BellRing size={14} /> : <BellOff size={14} />}
-              <span>{notifPrefs.enabled ? 'Recordatorios Activos' : 'Activar Recordatorios'}</span>
+              {notifPrefs.enabled ? <BellRing size={13} /> : <BellOff size={13} />}
+              <span>{notifPrefs.enabled ? 'Activado' : 'Pausado'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('notificaciones')}
-              className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#22222A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border border-zinc-200/80 dark:border-[#27272A]"
             >
-              <Sliders size={14} />
-              <span>Opciones Avanzadas</span>
+              <Sliders size={13} />
+              <span>Ajustes</span>
             </button>
           </div>
         </div>

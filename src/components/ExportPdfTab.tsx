@@ -1603,7 +1603,7 @@ export const ExportPdfTab: React.FC = () => {
                     )
                     .map((pub) => (
                       <option key={pub.id} value={pub.id}>
-                        {pub.name} (Grupo {pub.groupId || 1})
+                        {pub.name} (Grupo {pub.groupNumber || 1})
                       </option>
                     ))}
                 </select>
@@ -1627,13 +1627,13 @@ export const ExportPdfTab: React.FC = () => {
                   <div>
                     <span className="text-[10px] text-zinc-400 block">Meses activos</span>
                     <span className="font-extrabold text-zinc-900 dark:text-white">
-                      {s21CardData.totals.monthsActive} / 12
+                      {s21CardData.totalMonthsActive} / 12
                     </span>
                   </div>
                   <div>
                     <span className="text-[10px] text-zinc-400 block">Horas totales</span>
                     <span className="font-extrabold text-indigo-600 dark:text-indigo-400">
-                      {s21CardData.totals.totalHours} h
+                      {s21CardData.totalHours} h
                     </span>
                   </div>
                 </div>

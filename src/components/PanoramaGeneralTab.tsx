@@ -1029,8 +1029,8 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       {
         id: 'sec-asistencia',
         title: 'Asistencia S-88',
-        meta: currentWeek?.attendance?.midweek?.present || currentWeek?.attendance?.weekend?.present
-          ? `Último: ${(currentWeek?.attendance?.weekend?.present || currentWeek?.attendance?.midweek?.present || 0)} presencial`
+        meta: currentWeek?.attendance?.midweek?.inPerson || currentWeek?.attendance?.weekend?.inPerson
+          ? `Último: ${(currentWeek?.attendance?.weekend?.inPerson || currentWeek?.attendance?.midweek?.inPerson || 0)} presencial`
           : 'Reuniones y conteo',
         icon: UserCheck,
         targetTab: 'asistencia' as ActiveTab,

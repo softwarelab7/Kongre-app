@@ -1361,6 +1361,12 @@ export interface ClmPrograma {
   lectura_semana?: string;
   rango_semana?: string;
   sala_auxiliar_habilitada?: boolean;
+  canto_inicial?: number;
+  canto_medio?: number;
+  canto_final?: number;
+  presidente_nid?: string;
+  oracion_inicial_nid?: string;
+  oracion_final_nid?: string;
 }
 
 export interface CongregationEvent {

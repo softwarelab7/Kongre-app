@@ -10,6 +10,8 @@ import {
   User,
   Loader2,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
@@ -212,6 +214,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const [isSettingsWizardOpen, setIsSettingsWizardOpen] = useState(false);
 
   const tabsRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const [congName, setCongName] = useState(() => {
     const raw =
@@ -394,15 +398,46 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
     settings.hallAddress,
   ]);
 
+  const checkTabsScroll = useCallback(() => {
+    if (tabsRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+      setCanScrollLeft(scrollLeft > 6);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTabsScroll();
+    const handleResize = () => checkTabsScroll();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [checkTabsScroll, activeTab]);
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabsRef.current) {
+      const offset = direction === 'left' ? -260 : 260;
+      tabsRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+      setTimeout(checkTabsScroll, 300);
+    }
+  };
+
+  const handleTabsWheel = (e: React.WheelEvent) => {
+    if (tabsRef.current && Math.abs(e.deltaY) > 0) {
+      tabsRef.current.scrollLeft += e.deltaY;
+      checkTabsScroll();
+    }
+  };
+
   // Tab auto-scroll
   useEffect(() => {
     if (tabsRef.current) {
       const activeEl = tabsRef.current.querySelector<HTMLElement>('[data-active="true"]');
       if (activeEl) {
-        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }
+      setTimeout(checkTabsScroll, 200);
     }
-  }, [activeTab]);
+  }, [activeTab, checkTabsScroll]);
 
   const [savedFeedback, setSavedFeedback] = useState(false);
 
@@ -507,112 +542,159 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-300 pb-12">
-      {/* 1. Barra de Herramientas y Pestañas Unificada */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        {/* Pestañas de categorías con diseño Pill Container */}
-        <div
-          ref={tabsRef}
-          className="p-1.5 bg-zinc-100 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0"
-        >
-          {tabKeys.map((tabKey) => {
-            const config = SETTINGS_TABS_CONFIG[tabKey];
-            const isActive = activeTab === tabKey;
-            const Icon = config.icon;
-
-            return (
-              <button
-                key={tabKey}
-                type="button"
-                data-active={isActive}
-                onClick={() => setActiveTab(tabKey)}
-                className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A]'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/50 dark:hover:bg-[#18181F]'
-                }`}
-              >
-                <Icon
-                  size={14}
-                  className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-[#71717A]'}
-                />
-                <span>{config.label}</span>
-                {tabKey === 'all' && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
-                      isActive
-                        ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300'
-                        : 'bg-zinc-200 text-zinc-600 dark:bg-[#27272A] dark:text-[#A1A1AA]'
-                    }`}
-                  >
-                    HUB
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Acciones principales de Ajustes en barra limpia y compacta */}
-        <div className="flex items-center gap-2 shrink-0 justify-end">
-          {/* Indicador de cambios sin guardar o sincronizado */}
-          <div
-            className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border ${
-              isFormDirty
-                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                : 'bg-zinc-100 dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
-            }`}
-            title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isFormDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
+      {/* 1. Barra de Herramientas y Navegación de Ajustes */}
+      <div className="space-y-3">
+        {/* Fila Superior: Título, Estado de Sincronización y Acciones */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Ajustes de la Congregación
+            </h2>
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                isFormDirty
+                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+                  : 'bg-zinc-100 dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
               }`}
-            />
-            <span className="hidden md:inline">
-              {isFormDirty ? 'Cambios pendientes' : user ? 'Google Sincronizado' : 'Modo Seguro'}
-            </span>
+              title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isFormDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
+                }`}
+              />
+              <span>
+                {isFormDirty ? 'Cambios pendientes' : user ? 'Google Sincronizado' : 'Modo Seguro'}
+              </span>
+            </div>
           </div>
 
-          {onNavigateToProfile && (
+          <div className="flex items-center gap-2 shrink-0">
+            {onNavigateToProfile && (
+              <button
+                type="button"
+                onClick={onNavigateToProfile}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-[#121216] dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
+                title="Configurar foto, teléfono y contacto personal"
+              >
+                <User size={13} className="text-zinc-500 dark:text-[#A1A1AA]" />
+                <span>Mi Perfil</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={onNavigateToProfile}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-zinc-50 dark:bg-[#121216] dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
-              title="Configurar foto, teléfono y contacto personal"
+              onClick={() => handleSaveSettings()}
+              disabled={isSaving}
+              className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-xl text-white text-xs font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
+                savedFeedback
+                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+                  : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+              }`}
+              title="Guardar todos los cambios de configuración"
             >
-              <User size={14} className="text-zinc-500 dark:text-[#A1A1AA]" />
-              <span className="hidden sm:inline">Mi Perfil</span>
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Guardando...</span>
+                </>
+              ) : savedFeedback ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>¡Guardado!</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Guardar Ajustes</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Fila Completa de Pestañas con Controles de Desplazamiento y Fades */}
+        <div className="relative flex items-center">
+          {/* Botón Scroll Izquierdo */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              onClick={() => scrollTabs('left')}
+              className="absolute left-1 z-20 w-7 h-7 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
+              title="Desplazar a la izquierda"
+              aria-label="Desplazar a la izquierda"
+            >
+              <ChevronLeft size={14} />
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => handleSaveSettings()}
-            disabled={isSaving}
-            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
-              savedFeedback
-                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
-                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
-            }`}
-            title="Guardar todos los cambios de configuración"
+          {/* Fade Izquierdo */}
+          {canScrollLeft && (
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-zinc-100 dark:from-[#121216] to-transparent z-10 rounded-l-2xl" />
+          )}
+
+          {/* Contenedor de Pestañas con soporte wheel y scroll suave */}
+          <div
+            ref={tabsRef}
+            onScroll={checkTabsScroll}
+            onWheel={handleTabsWheel}
+            className="p-1.5 bg-zinc-100 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth w-full"
           >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Guardando...</span>
-              </>
-            ) : savedFeedback ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                <span>¡Guardado!</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Guardar Ajustes</span>
-              </>
-            )}
-          </button>
+            {tabKeys.map((tabKey) => {
+              const config = SETTINGS_TABS_CONFIG[tabKey];
+              const isActive = activeTab === tabKey;
+              const Icon = config.icon;
+
+              return (
+                <button
+                  key={tabKey}
+                  type="button"
+                  data-active={isActive}
+                  onClick={() => setActiveTab(tabKey)}
+                  className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/50 dark:hover:bg-[#18181F]'
+                  }`}
+                >
+                  <Icon
+                    size={14}
+                    className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-[#71717A]'}
+                  />
+                  <span>{config.label}</span>
+                  {tabKey === 'all' && (
+                    <span
+                      className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                        isActive
+                          ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300'
+                          : 'bg-zinc-200 text-zinc-600 dark:bg-[#27272A] dark:text-[#A1A1AA]'
+                      }`}
+                    >
+                      HUB
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Fade Derecho */}
+          {canScrollRight && (
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-zinc-100 dark:from-[#121216] to-transparent z-10 rounded-r-2xl" />
+          )}
+
+          {/* Botón Scroll Derecho */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => scrollTabs('right')}
+              className="absolute right-1 z-20 w-7 h-7 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
+              title="Desplazar a la derecha"
+              aria-label="Desplazar a la derecha"
+            >
+              <ChevronRight size={14} />
+            </button>
+          )}
         </div>
       </div>
 

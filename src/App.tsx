@@ -91,6 +91,7 @@ import { ToastProvider, useToast } from './context/ToastContext';
 import { ModalProvider } from './context/ModalContext';
 import { StudyInspectorProvider, useStudyInspector } from './context/StudyInspectorContext';
 import { StudyInspectorPanel } from './components/jw';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 
 export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   inicio: 'inicio',
@@ -1468,6 +1469,8 @@ const AppContent: React.FC = () => {
         updateInfo={desktopUpdate}
         onClose={() => setIsDesktopUpdateOpen(false)}
       />
+      {/* Botón flotante para volver arriba */}
+      <ScrollToTopButton />
     </>
   );
 }
@@ -1995,6 +1998,9 @@ const AppContent: React.FC = () => {
         activeAnnotation={activeAnnotation}
         onSaveAnnotation={saveAnnotation}
       />
+
+      {/* Botón flotante para volver arriba de forma ágil */}
+      <ScrollToTopButton isInspectorOpen={isInspectorOpen} />
 
     </div>
   );

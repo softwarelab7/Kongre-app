@@ -170,7 +170,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   }, [settings.congregationNumber, settings.congregationId]);
 
   const pendingPinChangeRequests = useMemo(
-    () => pinChangeRequests.filter((r) => r.estado === 'pendiente'),
+    () => pinChangeRequests.filter((r) => r.status === 'pendiente'),
     [pinChangeRequests]
   );
 
@@ -182,17 +182,17 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       const targetPub = publishers.find(
         (p) =>
           p.id === req.publisher_id ||
-          p.name.toLowerCase().trim() === req.publisher_nombre.toLowerCase().trim()
+          p.name.toLowerCase().trim() === req.publisher_name.toLowerCase().trim()
       );
       const targetId = targetPub?.id || req.publisher_id;
       const targetRole: TheocraticRole =
-        targetPub?.theocraticRole || (req.rol as TheocraticRole) || 'publico';
+        targetPub?.theocraticRole || (req.role as TheocraticRole) || 'publico';
 
       assignPersonalPinToPublisher(
         targetId,
         newGeneratedPin,
         targetRole,
-        req.publisher_nombre,
+        req.publisher_name,
         req.publisher_email,
         targetPub?.privilege
       );
@@ -205,16 +205,17 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
         });
       }
 
-      await updateSolicitudCambioPinStatusInSupabase(
-        req.id,
-        'atendida',
-        currentBrotherName || effectiveRoleInfo.shortName || 'Anciano',
-        newGeneratedPin
-      );
+      await updateSolicitudCambioPinStatusInSupabase({
+        requestId: req.id,
+        status: 'atendida',
+        resolvedBy: currentBrotherName || effectiveRoleInfo.shortName || 'Anciano',
+        newPinMasked: newGeneratedPin,
+        congregationId: settings.congregationId || settings.congregationNumber,
+      });
 
       setPinChangeRequests(loadLocalPinChangeRequests());
       setFeedback(
-        `PIN anterior revocado para ${req.publisher_nombre}. Nuevo PIN asignado: ${newGeneratedPin} (registrado en SolicitudesCambioPin).`
+        `PIN anterior revocado para ${req.publisher_name}. Nuevo PIN asignado: ${newGeneratedPin} (registrado en SolicitudesCambioPin).`
       );
       setTimeout(() => setFeedback(null), 5000);
     } finally {
@@ -945,13 +946,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white">
-                      {req.publisher_nombre}
+                      {req.publisher_name}
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300">
-                      Motivo: {req.razon_etiqueta}
+                      Motivo: {req.reason_label}
                     </span>
                     <span className="text-[10px] text-zinc-400">
-                      {new Date(req.fecha_solicitud).toLocaleString('es-MX', {
+                      {new Date(req.created_at).toLocaleString('es-MX', {
                         day: '2-digit',
                         month: 'short',
                         hour: '2-digit',
@@ -959,9 +960,9 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                       })}
                     </span>
                   </div>
-                  {req.detalles && (
+                  {req.details && (
                     <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
-                      Nota del publicador: “{req.detalles}”
+                      Nota del publicador: “{req.details}”
                     </p>
                   )}
                 </div>
@@ -983,11 +984,12 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   <button
                     type="button"
                     onClick={async () => {
-                      await updateSolicitudCambioPinStatusInSupabase(
-                        req.id,
-                        'rechazada',
-                        currentBrotherName || 'Anciano'
-                      );
+                      await updateSolicitudCambioPinStatusInSupabase({
+                        requestId: req.id,
+                        status: 'rechazada',
+                        resolvedBy: currentBrotherName || 'Anciano',
+                        congregationId: settings.congregationId || settings.congregationNumber,
+                      });
                       setPinChangeRequests(loadLocalPinChangeRequests());
                     }}
                     className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"

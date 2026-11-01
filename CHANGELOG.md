@@ -6,6 +6,60 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.42] — 31 de Octubre, 2026
+**Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB, Visor Interactivo PDF, Autoasignación de Fin de Semana, Botón de Retorno Rápido y Anillo Reactivo de Sincronización**
+
+- ⬆️ **Botón Flotante Reactivo de Retorno al Inicio (`ScrollToTopButton.tsx`, `App.tsx`):**
+  - Implementación de un botón flotante con anillo SVG circular de progreso dinámico que refleja visualmente el porcentaje de avance de lectura/scroll en la pantalla.
+  - Aparición suave con animación (`motion/react`) tras rebasar el umbral de desplazamiento, con micro-animaciones en hover y retroalimentación táctil interactiva.
+  - Posicionamiento inteligente adaptativo: respeta la barra inferior de navegación móvil (`bottom-20 md:bottom-6`) y ajusta automáticamente su margen lateral cuando el panel de estudio acoplado JW está abierto (`lg:right-[436px]`).
+  - Acción de retorno fluido (`smooth scroll`) instantánea en cualquier plataforma (Web, PWA y Tauri Desktop).
+- 📝 **Panel de Estudio y Notas Teocráticas JW Rediseñado (`StudyInspectorPanel.tsx`):**
+  - Transformación integral de la experiencia del panel acoplado, enfocándolo exclusivamente en la toma ágil de notas personales, anotaciones de estudio y referencias teocráticas sin distracciones ni saturación visual.
+- 🛡️ **Revocación y Sustitución de Credenciales Teocráticas (`CredentialRevocationModal.tsx`, `SecurityContext.tsx`, `types/index.ts`):**
+  - Implementación del modal teocrático de revocación inmediata de credenciales y PINs ante contingencias de seguridad, con categorización de motivos oficiales (`olvido`, `extravio_robo`, `rotacion_rutinaria`, `sospecha_compromiso`, `desasociacion_baja`).
+  - Generación instantánea de nuevo PIN numérico de 6 dígitos con entropía criptográfica y opción de reemplazo asistido.
+  - Registro auditable del evento con fecha, hora, motivo, detalles y actor responsable, invalidando las credenciales anteriores sin desestabilizar la sesión local.
+- 👨‍💼 **Panel de Auditoría de Códigos y Canjes para Ancianos (`ElderCodeRedemptionsPanel.tsx`, `UserProfileSettingsView.tsx`, `AccessCredentialsSection.tsx`):**
+  - Nuevo panel exclusivo para el cuerpo de ancianos en la sección de seguridad de usuarios, facilitando la supervisión exhaustiva de accesos y canjes de invitaciones.
+  - Identificación detallada del hardware vinculado por publicador: tipo de dispositivo (móvil, tablet, escritorio), navegador web, sistema operativo y fecha/hora de canje.
+  - Pestaña de historial de revocaciones para trazabilidad teocrática completa y botón directo para revocar o rotar credenciales en caliente.
+  - Integración de tarjetas de estado de canje e historial de revocaciones en el editor de publicadores del directorio.
+- 📱 **Monitoreo de Dispositivos y Solicitud de Cambio de PIN (`ProfileDevicesAndCodesSection.tsx`, `PinManagementModal.tsx`, `pinChangeRequestsService.ts`):**
+  - Visualización transparente para cada publicador en su perfil personal de sus dispositivos activos vinculados, ID de hardware enmascarado y geolocalización aproximada segura basada en zona horaria (`detectApproximateLocation`).
+  - Capacidad de cerrar sesiones remotas y auditar la actividad de acceso.
+  - Modal y servicio para enviar solicitudes de cambio de PIN dirigidas a los ancianos, con almacenamiento local en IndexedDB/localStorage y sincronización en la nube con Supabase.
+- 🌐 **Panel Integral de Sincronización y Estado Offline (`OfflineDashboard.tsx`, `App.tsx`):**
+  - Sustitución del antiguo modal de cola por un panel integral de diagnóstico sin conexión y almacén local.
+  - Resumen en tiempo real del inventario de datos en caché local: publicadores activos, semanas lectivas, informes de servicio (S-4/S-21), territorios, avisos, eventos, cuentas y literatura.
+  - Inspección exhaustiva de la cola de mutaciones pendientes en IndexedDB, con botones para forzar sincronización manual inmediata y depuración de operaciones completadas.
+- 📄 **Visor Interactivo y Navegación de Documentos PDF (`ExportPdfTab.tsx`, `package.json`):**
+  - Incorporación de la biblioteca `react-pdf` (`v11.0.0`) y configuración del worker local y fallback en CDN.
+  - Visor interactivo con controles de cambio de página (`ChevronLeft` / `ChevronRight`), zoom incremental multinivel (`ZoomIn` / `ZoomOut`), rotación de pliegos (`RotateCw`), botón de ajuste a pantalla y visor a pantalla completa.
+- 🔄 **Indicador Reactivo de Sincronización en Tiempo Real (`Navbar.tsx`):**
+  - Anillo luminoso dinámico y badge contextual en el avatar del usuario con tres estados: Sincronizando (ámbar), Sin Conexión (rosa pulsante) y En Línea (esmeralda).
+  - Contador visual en vivo de mutaciones pendientes en cola local (`pendingOfflineCount`).
+  - Sincronización manual forzada con un solo toque directamente desde el avatar o estado, con toast de confirmación y feedback táctil.
+- 🤖 **Autoasignación Inteligente para Fin de Semana y Programa Completo (`ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
+  - Autoasignación simultánea con un solo clic de Entre Semana (VMC) y Fin de Semana (`handleAutoAssignAllMeetings`).
+  - Algoritmo especializado para la Reunión de Fin de Semana (`handleAutoAssignWeekendOnly`) seleccionando automáticamente hermanos varones aptos para Presidente, Lector de La Atalaya y Oraciones según privilegios y rotación histórica.
+  - Almacenamiento local preventivo en `localStorage` de las asignaciones generadas (`clm_programa_${date}`).
+- ⚡ **Barra Superior de Acceso Rápido Departamental (`GlobalSectionQuickBar.tsx`, `App.tsx`):**
+  - Integración de una barra de navegación rápida en la cabecera para transicionar ágilmente entre los departamentos principales (Ministerio Personal, Reuniones, Secretaría, Territorios, Servicios y Finanzas) sin fricción de menús secundarios.
+- 🎛️ **Matriz Contextual de Herramientas Rápidas por Rol (`ResumenInicioTab.tsx`):**
+  - Componente adaptativo `QuickAccessGrid` con accesos rápidos y badges contextuales adaptados al rol teocrático activo (Secretario, Anciano/Coordinador, Auxiliar de VMC, Superintendente de Servicio/Grupo y encargados departamentales de Cuentas, Literatura o Mantenimiento).
+- 📋 **Acceso Prominente al Registro de Asistencia S-88 (`PanoramaGeneralTab.tsx`):**
+  - Tarjeta ejecutiva destacada en el panorama general con métricas en vivo de asistencia presencial y por videoconferencia (Zoom) de la semana corriente y botón de registro directo.
+- 📇 **Auto-consulta S-21 y Solicitud Directa de PIN en Pantalla de Bloqueo (`PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
+  - Acceso directo a la subpestaña de tarjetas personales S-21 dentro de Mi Ministerio para auto-consulta del historial de predicación.
+  - Enlace de asistencia inmediata en la pantalla de desbloqueo de PIN personal para solicitar reemplazo de PIN al cuerpo de ancianos en caso de olvido o pérdida de equipo.
+- 🛡️ **Bandeja de Gestión de Solicitudes de PIN para Ancianos (`RolesManagerTab.tsx`):**
+  - Pestaña de administración y resolución inmediata de solicitudes de PIN emitidas por los publicadores, permitiendo aprobar y generar credenciales seguras con un solo toque y registro de auditoría.
+- 📦 **Consolidación del Ecosistema de Paquetes con Bun (`bun.lock`, `package-lock.json`):**
+  - Migración definitiva del gestor de dependencias a Bun (`bun.lock`), eliminando más de 9.000 líneas redundantes de `package-lock.json` y optimizando la velocidad del ciclo de desarrollo.
+
+---
+
 ### [v0.1.0-alpha.41] — 31 de Octubre, 2026
 **Estandarización Visual Táctil Neutra JW Library, Erradicación de Paneles de Color Saturados, Depuración del Catálogo y Aislamiento de Reuniones**
 

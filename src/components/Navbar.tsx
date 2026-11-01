@@ -240,12 +240,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       return {
         label: 'Sincronizando',
         shortLabel: 'Sincronizando...',
-        ringClass:
-          'ring-2 ring-amber-500 dark:ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
-        badgeBg: 'bg-amber-500 text-white border-white dark:border-[#09090B]',
-        pillClass:
-          'bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border-amber-400/50 dark:border-amber-500/40',
-        dotClass: 'bg-amber-500 animate-ping',
+        badgeBg: 'bg-amber-500 text-white',
+        dotClass: 'bg-amber-500 animate-pulse',
         solidDotClass: 'bg-amber-500',
         description: 'Sincronizando cambios con la nube...',
       };
@@ -254,33 +250,22 @@ export const Navbar: React.FC<NavbarProps> = ({
       return {
         label: 'Desconectado',
         shortLabel: pendingOfflineCount > 0 ? `Offline (${pendingOfflineCount})` : 'Desconectado',
-        ringClass:
-          'ring-2 ring-rose-500 dark:ring-rose-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
-        badgeBg: 'bg-rose-500 text-white border-white dark:border-[#09090B] animate-pulse',
-        pillClass:
-          'bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 border-rose-400/50 dark:border-rose-500/40',
-        dotClass: 'bg-rose-500 animate-ping',
+        badgeBg: 'bg-rose-500 text-white',
+        dotClass: 'bg-rose-500',
         solidDotClass: 'bg-rose-500',
         description:
           pendingOfflineCount > 0
-            ? `Sin conexión · ${pendingOfflineCount} cambio(s) en cola local. Clic para reintentar.`
-            : 'Sin conexión a Internet · Clic en tu foto para reintentar sincronización.',
+            ? `Sin conexión · ${pendingOfflineCount} cambio(s) en cola local.`
+            : 'Sin conexión a Internet · Datos respaldados localmente.',
       };
     }
     return {
       label: 'En línea',
-      shortLabel: pendingOfflineCount > 0 ? `En línea (${pendingOfflineCount})` : 'En línea',
-      ringClass:
-        'ring-2 ring-emerald-500 dark:ring-emerald-400 ring-offset-2 ring-offset-white dark:ring-offset-[#09090B]',
-      badgeBg: 'bg-emerald-500 hover:bg-emerald-600 text-white border-white dark:border-[#09090B]',
-      pillClass:
-        'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border-emerald-400/50 dark:border-emerald-500/40',
+      shortLabel: 'En línea',
+      badgeBg: 'bg-emerald-500 text-white',
       dotClass: 'bg-emerald-500',
       solidDotClass: 'bg-emerald-500',
-      description:
-        pendingOfflineCount > 0
-          ? `En línea · ${pendingOfflineCount} elemento(s) por subir. Clic para forzar sincronización.`
-          : 'En línea y sincronizado · Haz clic en tu foto de perfil para forzar la sincronización.',
+      description: 'En línea y sincronizado con Supabase.',
     };
   }, [effectiveSyncState, pendingOfflineCount]);
 
@@ -821,7 +806,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       shortTitle: 'Supervisión',
       icon: NAV_ICONS.supervision,
       primaryTab: 'conflictos' as ActiveTab,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'] as ActiveTab[],
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'roles'] as ActiveTab[],
       badge: conflicts.length || undefined,
       badgeColor: 'bg-amber-500 text-white',
       colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
@@ -977,6 +962,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               return (
                 <div key={cat.id} className="relative w-full flex justify-center">
+                  {/* Indicador de pestaña activa acoplado al borde exterior de la barra */}
+                  {isCatActive && (
+                    <motion.span
+                      layoutId="desktopSidebarActiveBar"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none"
+                    />
+                  )}
+
                   <button
                     type="button"
                     onClick={() => {
@@ -1002,16 +996,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                     {/* Badge count indicator */}
                     {cat.badge && (
-                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#09090B] animate-pulse" />
-                    )}
-
-                    {/* Active Accent Indicator (JW Library Purple/Indigo vertical bar on left edge) */}
-                    {isCatActive && (
-                      <motion.span
-                        layoutId="desktopSidebarActiveBar"
-                        transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none"
-                      />
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#09090B] animate-pulse" />
                     )}
                   </button>
                 </div>
@@ -1021,62 +1006,88 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Bottom Quick Settings, Profile & Sidebar Collapse Button */}
           <div className="mt-auto pt-2 flex flex-col items-center gap-1.5 border-t border-zinc-200 dark:border-[#27272A] w-full shrink-0">
-            <button
-              type="button"
-              onClick={() => handleSelectTab('perfil')}
-              aria-label="Mi Perfil y Contacto"
-              aria-current={activeTab === 'perfil' ? 'page' : undefined}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeTab === 'perfil'
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-[#18181F] dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs'
-                  : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
-              }`}
-              title="Mi Perfil y Contacto"
-            >
-              <User className="w-4 h-4 stroke-[1.8]" />
-            </button>
-            {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+            {/* Perfil */}
+            <div className="relative w-full flex justify-center">
+              {activeTab === 'perfil' && (
+                <motion.span
+                  layoutId="desktopSidebarActiveBar"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none"
+                />
+              )}
               <button
                 type="button"
-                onClick={() => handleSelectTab('ajustes')}
-                aria-label="Ajustes de la Congregación"
-                aria-current={activeTab === 'ajustes' ? 'page' : undefined}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                  activeTab === 'ajustes'
+                onClick={() => handleSelectTab('perfil')}
+                aria-label="Mi Perfil y Contacto"
+                aria-current={activeTab === 'perfil' ? 'page' : undefined}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                  activeTab === 'perfil'
                     ? 'bg-indigo-50 text-indigo-600 dark:bg-[#18181F] dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs'
                     : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                 }`}
-                title="Ajustes de la Congregación"
+                title="Mi Perfil y Contacto"
               >
-                <Settings className="w-4 h-4 stroke-[1.8]" />
+                <User className="w-4 h-4 stroke-[1.8]" />
               </button>
+            </div>
+
+            {/* Ajustes */}
+            {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+              <div className="relative w-full flex justify-center">
+                {activeTab === 'ajustes' && (
+                  <motion.span
+                    layoutId="desktopSidebarActiveBar"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-indigo-600 dark:bg-indigo-500 pointer-events-none"
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('ajustes')}
+                  aria-label="Ajustes de la Congregación"
+                  aria-current={activeTab === 'ajustes' ? 'page' : undefined}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                    activeTab === 'ajustes'
+                      ? 'bg-indigo-50 text-indigo-600 dark:bg-[#18181F] dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs'
+                      : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
+                  }`}
+                  title="Ajustes de la Congregación"
+                >
+                  <Settings className="w-4 h-4 stroke-[1.8]" />
+                </button>
+              </div>
             )}
 
             {/* Botón integrado directamente en la barra lateral para ocultarla */}
             {onToggleSidebar && (
-              <button
-                type="button"
-                onClick={onToggleSidebar}
-                aria-label="Ocultar barra lateral"
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group"
-                title="Ocultar barra lateral (Ctrl+B / ⌘B)"
-              >
-                <PanelLeftClose className="w-4 h-4 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform" />
-              </button>
+              <div className="relative w-full flex justify-center">
+                <button
+                  type="button"
+                  onClick={onToggleSidebar}
+                  aria-label="Ocultar barra lateral"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group"
+                  title="Ocultar barra lateral (Ctrl+B / ⌘B)"
+                >
+                  <PanelLeftClose className="w-4 h-4 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+              </div>
             )}
 
+            {/* Versión compacta y elegante sin desbordamiento */}
             {onOpenVersionModal && (
               <button
                 type="button"
                 onClick={onOpenVersionModal}
-                aria-label={`Versión actual Kongre v${CURRENT_APP_VERSION} (Alfa), ver historial de versiones`}
-                className="flex items-center gap-1.5 px-2 py-0.5 mt-0.5 rounded-md text-[10px] font-mono tabular-nums font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer select-none border border-transparent hover:border-zinc-200 dark:hover:border-[#27272A]"
-                title={`Kongre v${CURRENT_APP_VERSION} (Alfa) - Clic para ver historial de versiones y cambios`}
+                aria-label={`Versión Kongre v${CURRENT_APP_VERSION} (Alfa)`}
+                className="w-11 py-1 rounded-lg flex flex-col items-center justify-center text-center text-[9px] font-mono tabular-nums text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group select-none mt-0.5"
+                title={`Kongre v${CURRENT_APP_VERSION} (Alfa) - Clic para ver historial de cambios`}
               >
-                <span>v{CURRENT_APP_VERSION}</span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[8px] font-sans font-medium uppercase bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
-                  <span className="w-1 h-1 rounded-full bg-amber-500 shrink-0" />
-                  Alfa
+                <span className="text-[9.5px] font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  v{CURRENT_APP_VERSION.replace('-alpha.', 'α.')}
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[7.5px] font-sans font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                  <span className="w-1 h-1 rounded-full bg-amber-500" />
+                  <span>alfa</span>
                 </span>
               </button>
             )}
@@ -1337,21 +1348,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </button>
 
-              {/* Panel de Estudio e Inspector Toggle (Zero Context-Switching JW) */}
+              {/* Botón Notas de Estudio (Bloc de Notas) */}
               {onToggleInspector && (
                 <button
                   type="button"
                   onClick={onToggleInspector}
-                  aria-label="Panel de Estudio e Inspector (Referencias cruzadas y Notas)"
+                  aria-label="Notas de Estudio (Bloc de notas)"
                   aria-expanded={isInspectorOpen}
                   className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                     isInspectorOpen
                       ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                       : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F]'
                   }`}
-                  title="Panel de Estudio e Inspector (Referencias cruzadas y Notas)"
+                  title="Notas de Estudio"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
+                  <FileText className="w-3.5 h-3.5" />
                 </button>
               )}
 
@@ -1367,41 +1378,41 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={onToggleInspector}
-                  aria-label="Panel de Estudio e Inspector"
+                  aria-label="Notas de Estudio"
                   className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                     isInspectorOpen
                       ? 'bg-indigo-600 text-white'
                       : 'text-zinc-500 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                   }`}
+                  title="Notas de Estudio"
                 >
-                  <BookOpen className="w-4 h-4" />
+                  <FileText className="w-4 h-4" />
                 </button>
               )}
               <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={30} />
             </div>
 
-            {/* Cluster C: User Profile Photo with Single Color-Coded Sync Status Indicator & Dropdown Menu */}
+            {/* Cluster C: User Profile Capsule & Dropdown Menu */}
             <div className="relative" ref={dropdownRef}>
-              <div
-                className={`flex items-center h-9 sm:h-10 pl-1 pr-1 sm:pl-1.5 sm:pr-2 rounded-2xl bg-zinc-100/90 dark:bg-[#121216] hover:bg-white dark:hover:bg-[#18181F] border transition-all shadow-2xs gap-1 sm:gap-1.5 ${
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
+                }}
+                aria-label="Menú de cuenta, perfil y cerrar sesión"
+                aria-expanded={openDropdown === 'user'}
+                title={`${effectiveDisplayName || 'Usuario'} · ${syncVisualConfig.label}`}
+                className={`flex items-center gap-1.5 sm:gap-2 h-9 pl-1 pr-2 sm:pr-2.5 rounded-full bg-zinc-100/90 dark:bg-[#121216] hover:bg-zinc-200/60 dark:hover:bg-[#18181F] border transition-all cursor-pointer shadow-2xs active:scale-[0.98] ${
                   effectiveSyncState === 'syncing'
-                    ? 'border-amber-400/80 dark:border-amber-500/60'
+                    ? 'border-amber-400/60 dark:border-amber-500/50'
                     : effectiveSyncState === 'offline'
-                    ? 'border-rose-400/80 dark:border-rose-500/60'
-                    : 'border-emerald-400/60 dark:border-emerald-500/40'
+                    ? 'border-rose-400/60 dark:border-rose-500/50'
+                    : 'border-zinc-200/80 dark:border-[#27272A]'
                 }`}
               >
-                {/* 1. CLICKABLE PROFILE PHOTO + SINGLE COLOR-CODED SYNC STATUS RING & CORNER BADGE */}
-                <button
-                  type="button"
-                  onClick={handleForceSync}
-                  aria-label={`${syncVisualConfig.label}: Haz clic en la foto de perfil para forzar la sincronización`}
-                  title={syncVisualConfig.description}
-                  className="group/sync relative flex items-center gap-1.5 py-0.5 pr-1 rounded-xl cursor-pointer focus:outline-none active:scale-95 transition-transform"
-                >
-                  <div
-                    className={`relative w-7 h-7 sm:w-7 sm:h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-[11px] overflow-hidden shrink-0 transition-all duration-300 ${syncVisualConfig.ringClass}`}
-                  >
+                {/* 1. Avatar with subtle micro-status dot */}
+                <div className="relative shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-[11px] overflow-hidden shadow-2xs">
                     {(() => {
                       const effectiveAvatar = isDemoMode
                         ? userProfile?.photoURL || null
@@ -1418,7 +1429,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         return (
                           <img
                             src={effectiveAvatar}
-                            alt="Foto de perfil y estado de sincronización"
+                            alt="Foto de perfil"
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.currentTarget as HTMLElement).style.display = 'none';
@@ -1435,61 +1446,43 @@ export const Navbar: React.FC<NavbarProps> = ({
                     })()}
                   </div>
 
-                  {/* Single Corner Sync Status Badge on Profile Photo */}
+                  {/* Elegant micro status dot */}
                   <span
-                    className={`absolute -bottom-0.5 left-4.5 sm:left-5 w-4 h-4 rounded-full border-2 flex items-center justify-center shadow-xs transition-colors duration-300 ${syncVisualConfig.badgeBg}`}
-                  >
-                    {effectiveSyncState === 'syncing' ? (
-                      <RefreshCw className="w-2.5 h-2.5 animate-spin" />
-                    ) : effectiveSyncState === 'offline' ? (
-                      <WifiOff className="w-2.5 h-2.5" />
-                    ) : (
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
-                    )}
-                  </span>
-
-                  {/* Visible Color Status Pill Integrated with Profile Photo (Desktop sm+) */}
-                  <span
-                    className={`hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10.5px] font-bold border transition-colors ${syncVisualConfig.pillClass}`}
-                  >
-                    <span className="relative flex h-1.5 w-1.5 shrink-0">
-                      {effectiveSyncState !== 'online' && (
-                        <span
-                          className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${syncVisualConfig.dotClass}`}
-                        />
-                      )}
-                      <span
-                        className={`relative inline-flex rounded-full h-1.5 w-1.5 ${syncVisualConfig.solidDotClass}`}
-                      />
-                    </span>
-                    <span>{syncVisualConfig.shortLabel}</span>
-                  </span>
-                </button>
-
-                {/* Subtle Divider */}
-                <span className="h-4 w-px bg-zinc-200 dark:bg-[#27272A]" aria-hidden="true" />
-
-                {/* 2. PROFILE MENU DROPDOWN TRIGGER */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
-                  }}
-                  aria-label="Menú de cuenta, perfil y cerrar sesión"
-                  aria-expanded={openDropdown === 'user'}
-                  className="flex items-center gap-1 py-1 px-1 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
-                  title="Abrir menú de Mi Perfil y Cuenta"
-                >
-                  <span className="hidden lg:inline-block max-w-[96px] truncate text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] text-left">
-                    {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
-                  </span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 text-zinc-500 dark:text-[#A1A1AA] shrink-0 transition-transform duration-150 ${
-                      openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
+                    className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ring-white dark:ring-[#121216] transition-colors ${
+                      effectiveSyncState === 'syncing'
+                        ? 'bg-amber-500 animate-pulse'
+                        : effectiveSyncState === 'offline'
+                        ? 'bg-rose-500'
+                        : 'bg-emerald-500'
                     }`}
                   />
-                </button>
-              </div>
+                </div>
+
+                {/* Optional Status Pill ONLY when syncing or offline with pending */}
+                {effectiveSyncState === 'syncing' && (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                    <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                    <span>Sincronizando...</span>
+                  </span>
+                )}
+                {effectiveSyncState === 'offline' && pendingOfflineCount > 0 && (
+                  <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded-md text-[10.5px] font-bold bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300">
+                    Offline ({pendingOfflineCount})
+                  </span>
+                )}
+
+                {/* User First Name */}
+                <span className="hidden sm:inline-block max-w-[110px] truncate text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] text-left">
+                  {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
+                </span>
+
+                {/* Chevron */}
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA] shrink-0 transition-transform duration-150 ${
+                    openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
+                  }`}
+                />
+              </button>
 
               {/* Floating Sync Feedback Toast right under Profile Photo */}
               {syncFeedbackToast && (
@@ -1565,19 +1558,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Redesigned User Profile Panel Popover (Mobile & Desktop) */}
               {openDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-2.5 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#121216] rounded-2xl shadow-xl border border-zinc-200 dark:border-[#27272A] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  {/* Modern Identity Header Card with Click-to-Sync Profile Photo */}
-                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mb-2.5 space-y-2.5">
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#121216] rounded-2xl shadow-xl border border-zinc-200/90 dark:border-[#27272A] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  {/* 1. Identity & Sync Card */}
+                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] mb-2 space-y-2.5">
                     <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={handleForceSync}
-                        title={syncVisualConfig.description}
-                        className="group/drop-avatar relative shrink-0 cursor-pointer active:scale-95 transition-transform"
-                      >
-                        <div
-                          className={`w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs overflow-hidden transition-all ${syncVisualConfig.ringClass}`}
-                        >
+                      {/* Avatar with Status Dot */}
+                      <div className="relative shrink-0">
+                        <div className="w-11 h-11 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs overflow-hidden">
                           {(() => {
                             const effectiveAvatar = isDemoMode
                               ? userProfile?.photoURL || null
@@ -1608,17 +1595,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                           })()}
                         </div>
                         <span
-                          className={`absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shadow-xs ${syncVisualConfig.badgeBg}`}
-                        >
-                          {effectiveSyncState === 'syncing' ? (
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                          ) : effectiveSyncState === 'offline' ? (
-                            <WifiOff className="w-3 h-3" />
-                          ) : (
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          )}
-                        </span>
-                      </button>
+                          className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#18181F] ${
+                            effectiveSyncState === 'syncing'
+                              ? 'bg-amber-500 animate-pulse'
+                              : effectiveSyncState === 'offline'
+                              ? 'bg-rose-500'
+                              : 'bg-emerald-500'
+                          }`}
+                        />
+                      </div>
 
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight">
@@ -1628,39 +1613,66 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <Building2 className="w-3 h-3 text-zinc-400 shrink-0" />
                           <span className="truncate">{displayCongregationName}</span>
                         </p>
-                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                        <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 max-w-full">
                           <ShieldCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
                           <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* OfflineDashboard & Local Data Status Button */}
-                    {onOpenQueueModal && (
-                      <div className="pt-1 border-t border-zinc-200/70 dark:border-[#27272A]">
-                        <button
-                          type="button"
-                          onClick={() => {
+                    {/* Integrated Sync Status & Actions Row */}
+                    <div className="pt-2 border-t border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onOpenQueueModal) {
                             setOpenDropdown(null);
                             onOpenQueueModal();
-                          }}
-                          className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer active:scale-[0.98] ${syncVisualConfig.pillClass}`}
-                          title="Abrir panel de datos locales y cola de sincronización"
-                        >
-                          <span className="flex items-center gap-1.5 min-w-0">
-                            <CloudCheck className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">
-                              Panel Offline · {pendingOfflineCount} pendientes
-                            </span>
-                          </span>
-                          <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-80" />
-                        </button>
-                      </div>
-                    )}
+                          }
+                        }}
+                        className="flex items-center gap-1.5 min-w-0 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left group"
+                        title="Ver cola y estado de datos locales en OfflineDashboard"
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 ${
+                            effectiveSyncState === 'syncing'
+                              ? 'bg-amber-500 animate-pulse'
+                              : effectiveSyncState === 'offline'
+                              ? 'bg-rose-500'
+                              : 'bg-emerald-500'
+                          }`}
+                        />
+                        <span className="truncate">
+                          {effectiveSyncState === 'syncing'
+                            ? 'Sincronizando...'
+                            : effectiveSyncState === 'offline'
+                            ? pendingOfflineCount > 0
+                              ? `Sin conexión (${pendingOfflineCount})`
+                              : 'Sin conexión'
+                            : pendingOfflineCount > 0
+                            ? `En línea (${pendingOfflineCount} pendientes)`
+                            : 'En línea y sincronizado'}
+                        </span>
+                        {onOpenQueueModal && (
+                          <ChevronRight className="w-3 h-3 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleForceSync}
+                        disabled={isForcingSync}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#22222A] text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs transition-all cursor-pointer active:scale-95 disabled:opacity-50 shrink-0"
+                        title="Forzar sincronización inmediata con Supabase"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isForcingSync ? 'animate-spin text-indigo-500' : 'text-zinc-500 dark:text-zinc-400'}`} />
+                        <span>Sincronizar</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* 2-Column Quick Access Cards */}
-                  <div className="grid grid-cols-2 gap-2 mb-2.5">
+                  {/* 2. Quick Access Cards: Mi Perfil & Mi Portal */}
+                  <div className="grid grid-cols-2 gap-2 mb-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -1669,8 +1681,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
                         activeTab === 'perfil'
-                          ? 'bg-indigo-50/90 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 shadow-2xs'
-                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#18181F]/80 border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
+                          ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
+                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
                       }`}
                     >
                       <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
@@ -1678,7 +1690,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold leading-tight truncate">Mi Perfil</span>
-                        <span className="block text-[10px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">Cuenta y avisos</span>
+                        <span className="block text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Cuenta y PIN</span>
                       </div>
                     </button>
 
@@ -1690,8 +1702,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
                         activeTab === 'mi_vista'
-                          ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 shadow-2xs'
-                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#18181F]/80 border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
                       }`}
                     >
                       <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -1699,23 +1711,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
                       <div className="min-w-0">
                         <span className="block text-xs font-bold leading-tight truncate">Mi Portal</span>
-                        <span className="block text-[10px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">Partes e informe</span>
+                        <span className="block text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Asignaciones</span>
                       </div>
                     </button>
                   </div>
 
-                  {/* Management & Security List */}
-                  <div className="space-y-1 pt-1 border-t border-zinc-200 dark:border-[#27272A]">
+                  {/* 3. Navigation List Items */}
+                  <div className="space-y-0.5 pt-1.5 border-t border-zinc-200/80 dark:border-[#27272A]">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenDropdown(null);
                         handleSelectTab('roles');
                       }}
-                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                     >
                       <span className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           <Shield className="w-3.5 h-3.5" />
                         </div>
                         <span className="truncate">{canManageRoles ? 'Roles y Permisos' : 'Cambiar Rol / PIN'}</span>
@@ -1730,10 +1742,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           handleSelectTab('ajustes');
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                             <Settings className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Ajustes de la Congregación</span>
@@ -1749,10 +1761,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenAuditLog();
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                             <ClipboardList className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Registro de Auditoría</span>
@@ -1768,10 +1780,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           lockSession();
                         }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 rounded-xl transition cursor-pointer text-left group"
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
                         <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                             <Lock className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Bloquear Sesión con PIN</span>
@@ -1786,37 +1798,42 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setOpenDropdown(null);
                         setDesktopDownloadOpen(true);
                       }}
-                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/80 dark:hover:bg-indigo-950/40 rounded-xl transition cursor-pointer text-left group"
+                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                     >
                       <span className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           <Monitor className="w-3.5 h-3.5" />
                         </div>
-                        <span className="truncate">Descargar Kongre App</span>
+                        <span className="truncate">Instalador para PC</span>
                       </span>
-                      <Download className="w-3.5 h-3.5 text-indigo-500 group-hover:translate-y-0.5 transition-transform shrink-0" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 shrink-0">
+                        <span>Descargar</span>
+                        <Download className="w-3 h-3 group-hover:translate-y-0.5 transition-transform" />
+                      </span>
                     </button>
+                  </div>
 
-                    {/* iOS-Style Theme Switcher Row (Claro / Sepia / AMOLED) */}
-                    <div className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] mt-1">
-                      <span className="text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] flex items-center gap-2">
+                  {/* 4. Theme Selector Inset */}
+                  <div className="mt-2 pt-2 border-t border-zinc-200/80 dark:border-[#27272A]">
+                    <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+                      <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
                         {themeMode === 'dark' ? (
-                          <Moon className="w-4 h-4 text-indigo-400" />
+                          <Moon className="w-3.5 h-3.5 text-indigo-400" />
                         ) : themeMode === 'sepia' ? (
-                          <BookOpen className="w-4 h-4 text-amber-700" />
+                          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
                         ) : (
-                          <Sun className="w-4 h-4 text-amber-500" />
+                          <Sun className="w-3.5 h-3.5 text-amber-500" />
                         )}
-                        <span>Tema visual</span>
+                        <span>Tema</span>
                       </span>
-                      <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-200/80 dark:bg-[#09090B] border border-zinc-300/60 dark:border-[#27272A] gap-0.5">
+                      <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-200/70 dark:bg-[#09090B] border border-zinc-300/50 dark:border-[#27272A] gap-0.5">
                         <button
                           type="button"
                           onClick={() => setThemeMode('light')}
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'light'
-                              ? 'bg-white text-zinc-900 shadow-xs'
-                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800'
+                              ? 'bg-white text-zinc-900 shadow-2xs'
+                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                           }`}
                           title="Modo Claro"
                         >
@@ -1828,10 +1845,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           onClick={() => setThemeMode('sepia')}
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'sepia'
-                              ? 'bg-[#EAE0C8] text-[#2C221E] shadow-xs'
+                              ? 'bg-[#EAE0C8] text-[#2C221E] shadow-2xs font-extrabold'
                               : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-800'
                           }`}
-                          title="Modo Sepia (Lectura Prolongada)"
+                          title="Modo Sepia"
                         >
                           <BookOpen className="w-3 h-3 text-amber-700" />
                           <span>Sepia</span>
@@ -1841,7 +1858,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           onClick={() => setThemeMode('dark')}
                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                             themeMode === 'dark'
-                              ? 'bg-[#18181F] text-white border border-[#27272A] shadow-xs'
+                              ? 'bg-[#18181F] text-white border border-[#27272A] shadow-2xs'
                               : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-white'
                           }`}
                           title="Modo AMOLED"
@@ -1853,8 +1870,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   </div>
 
-                  {/* Clean Footer with Version & Sign Out */}
-                  <div className="border-t border-zinc-200 dark:border-[#27272A] mt-2.5 pt-2 flex items-center justify-between gap-2">
+                  {/* 5. Clean Footer with Version & Sign Out */}
+                  <div className="border-t border-zinc-200/80 dark:border-[#27272A] mt-2 pt-2 flex items-center justify-between gap-2">
                     {onOpenVersionModal ? (
                       <button
                         type="button"
@@ -1862,10 +1879,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenVersionModal();
                         }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10.5px] font-mono tabular-nums font-semibold text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10.5px] font-mono tabular-nums font-semibold text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition cursor-pointer"
+                        title="Ver historial de novedades y versiones"
                       >
                         <span>v{CURRENT_APP_VERSION}</span>
-                        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                        <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
                           Alfa
                         </span>
                       </button>
@@ -1881,7 +1899,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setOpenDropdown(null);
                         handleLogout();
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer active:scale-95"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Cerrar Sesión</span>

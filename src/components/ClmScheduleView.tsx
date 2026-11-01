@@ -30,6 +30,7 @@ import {
   Sparkles,
   Save,
   CheckCircle2,
+  Calendar,
   CalendarDays,
   FileText,
   RefreshCw,
@@ -67,14 +68,17 @@ const SECTION_BANNERS = {
   tesoros: {
     label: 'TESOROS DE LA BIBLIA',
     bgClass: 'bg-[#5A6B7C]',
+    bgColor: '#5A6B7C',
   },
   maestros: {
     label: 'SEAMOS MEJORES MAESTROS',
     bgClass: 'bg-[#C67D0A]',
+    bgColor: '#C67D0A',
   },
   vida_cristiana: {
     label: 'NUESTRA VIDA CRISTIANA',
     bgClass: 'bg-[#962828]',
+    bgColor: '#962828',
   },
 };
 

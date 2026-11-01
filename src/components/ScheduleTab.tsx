@@ -309,7 +309,7 @@ export const ScheduleTab: React.FC = () => {
         currentWeek,
         publishers
       );
-    const assignedClm = autoAsignarLocal(existingClm, publishers, clmProgramas);
+    const assignedClm = autoAsignarLocal(existingClm, publishers);
     updateClmPrograma(assignedClm);
     try {
       localStorage.setItem(`clm_programa_${currentWeek.weekStartDate}`, JSON.stringify(assignedClm));
@@ -324,7 +324,7 @@ export const ScheduleTab: React.FC = () => {
     if (!currentWeek) return;
     const updated = JSON.parse(JSON.stringify(currentWeek)) as WeekSchedule;
     const activeMalePublishers = publishers.filter(
-      (p) => p.isActive !== false && p.gender === 'hermano'
+      (p) => p.is_active !== false && (p as any).isActive !== false && p.gender === 'hermano'
     );
     const usedIds = new Set<string>();
 
@@ -434,7 +434,7 @@ export const ScheduleTab: React.FC = () => {
         currentWeek,
         publishers
       );
-    const assignableClmParts = clmProg.partes.filter((p) => p.tipo !== 'cancion');
+    const assignableClmParts = clmProg.partes.filter((p) => (p.tipo as string) !== 'cancion');
     const midweekTotal = 3 + assignableClmParts.length;
     const midweekAssigned =
       (clmProg.presidente_nid ? 1 : 0) +

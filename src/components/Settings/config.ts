@@ -26,7 +26,7 @@ export const SETTINGS_TABS_CONFIG: Record<SettingsCategoryTab, SettingsTabConfig
     pillBg: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900',
   },
   notificaciones: {
-    label: 'Preferencias de Notificación',
+    label: 'Notificaciones',
     icon: BellRing,
     desc: 'Configura cuántos días antes deseas recibir recordatorios automáticos de tus asignaciones (1, 3 o 7 días antes)',
     badge: 'Recordatorios',

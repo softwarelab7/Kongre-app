@@ -25,19 +25,74 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.41';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.42';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.31.8041';
+export const CURRENT_BUILD_CODE = '2026.10.31.8042';
 export const BUILD_DATE = '31 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '0.1.0-alpha.42',
+    buildCode: '2026.10.31.8042',
+    date: '31 de Octubre, 2026',
+    title: 'Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB, Visor PDF y Autoasignación de Fin de Semana',
+    isCurrent: true,
+    highlight: 'Modal teocrático de revocación y reemplazo asistido de credenciales con trazabilidad, panel de auditoría de canjes y hardware para ancianos, centro OfflineDashboard sobre IndexedDB, previsualizador interactivo PDF con react-pdf, autoasignación integral de reuniones y anillo reactivo de sincronización en cabecera.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Botón Flotante Reactivo de Retorno al Inicio (ScrollToTopButton.tsx, App.tsx): Botón interactivo con anillo SVG de progreso de desplazamiento, micro-animaciones fluidas con motion/react y posicionamiento adaptativo para móvil y panel de estudio acoplado.',
+      },
+      {
+        category: 'improvement',
+        text: 'Rediseño del Panel de Estudio y Notas Teocráticas JW (StudyInspectorPanel.tsx): Optimización visual táctil neutra enfocada en notas personales, anotaciones de estudio y referencias bíblicas sin saturación visual.',
+      },
+      {
+        category: 'security',
+        text: 'Revocación y Sustitución de Credenciales Teocráticas (CredentialRevocationModal.tsx, SecurityContext.tsx): Modal teocrático para invalidar de inmediato credenciales y PINs comprometidos u olvidados, con motivos justificados (olvido, extravío/robo, rotación, sospecha de compromiso, desasociación) y generación instantánea de nuevo PIN seguro.',
+      },
+      {
+        category: 'feature',
+        text: 'Panel de Auditoría de Códigos y Canjes para Ancianos (ElderCodeRedemptionsPanel.tsx, AccessCredentialsSection.tsx): Visualización de dispositivos vinculados (móvil, tablet, PC), navegadores, sistemas operativos y fecha/hora de canje para cada publicador, con historial de revocaciones y rotación asistida.',
+      },
+      {
+        category: 'feature',
+        text: 'Gestión de Dispositivos y Solicitud de Cambio de PIN (ProfileDevicesAndCodesSection.tsx, PinManagementModal.tsx, pinChangeRequestsService.ts): Panel en el perfil del publicador con sesiones activas, ubicación estimada segura, cierre remoto de sesión y solicitudes teocráticas de cambio de PIN con respaldo en Supabase.',
+      },
+      {
+        category: 'feature',
+        text: 'Centro de Diagnóstico y Estado Offline (OfflineDashboard.tsx): Monitor integral de la base de datos local en IndexedDB con recuento de registros en caché, inspección de la cola de sincronización y sincronización manual inmediata.',
+      },
+      {
+        category: 'feature',
+        text: 'Visor Interactivo de Documentos PDF (ExportPdfTab.tsx): Integración de react-pdf con controles de paginación, zoom multinivel, rotación y modo pantalla completa.',
+      },
+      {
+        category: 'improvement',
+        text: 'Indicador Reactivo de Sincronización en Tiempo Real (Navbar.tsx): Anillo dinámico y badge en el avatar con estados En Línea, Sincronizando y Desconectado, contador de elementos pendientes y forzado manual con feedback táctil.',
+      },
+      {
+        category: 'feature',
+        text: 'Autoasignación Inteligente para Fin de Semana y Programa Completo (ScheduleTab.tsx, ClmScheduleView.tsx): Asignación coordinada de Entre Semana y Fin de Semana con filtro por hermanos idóneos y persistencia local inmediata.',
+      },
+      {
+        category: 'improvement',
+        text: 'Barra Rápida Departamental y Matriz por Rol (GlobalSectionQuickBar.tsx, ResumenInicioTab.tsx): Navegación rápida entre departamentos en cabecera y cuadrícula adaptativa QuickAccessGrid según el rol teocrático.',
+      },
+      {
+        category: 'improvement',
+        text: 'Persistencia en Asignaciones VMC y Entorno con Bun (ClmScheduleView.tsx, bun.lock): Almacenamiento local inmediato para autoasignaciones y optimización del entorno de dependencias mediante Bun.',
+      },
+    ],
+  },
+  {
     version: '0.1.0-alpha.41',
     buildCode: '2026.10.31.8041',
     date: '31 de Octubre, 2026',
     title: 'Estandarización Visual Táctil Neutra JW Library, Erradicación de Paneles Saturados y Aislamiento de Reuniones',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Estandarización estética integral en toda la aplicación adoptando la paleta táctil neutra de JW Library (superficies AMOLED oscuras, bordes sutiles y botones monocromáticos), eliminación de la barra de pestañas en el catálogo y desacoplamiento estricto del ministerio personal dentro de la sección de reuniones.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

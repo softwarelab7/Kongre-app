@@ -1098,7 +1098,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* =========================================================================
           2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
          ========================================================================= */}
-      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-md border-b border-zinc-200 dark:border-[#27272A] transition-all duration-200`}>
+      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} pt-[env(safe-area-inset-top,0px)] bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-2xl border-b border-zinc-200/70 dark:border-white/[0.08] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-200`}>
         <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-3">
           {/* 1. LEFT: Sidebar Toggle & Structured Breadcrumb Context */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">

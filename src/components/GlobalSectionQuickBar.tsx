@@ -398,14 +398,14 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
   };
 
   return (
-    <div className="mb-4 bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
+    <div className="mb-4 kg-glass-surface kg-sheen-top p-3 sm:p-4 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-md">
       {/* Left: Back to Cards Hub button + Current Section Title */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
           data-mobile-back-btn="true"
           onClick={handleBackToCardsHub}
-          className="px-3 sm:px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0 border border-zinc-200/70 dark:border-[#27272A]"
+          className="px-3 sm:px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.09] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shrink-0 border border-zinc-200/70 dark:border-white/[0.08]"
           title="Volver al tablero de todas las tarjetas"
         >
           <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -441,10 +441,10 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 active:scale-95 ${
                   isCurr
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-[#27272A]'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-black'
+                    : 'bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-white/[0.06]'
                 }`}
                 title={sib.label}
               >

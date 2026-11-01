@@ -1098,7 +1098,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
       {/* =====================================================================
           TOP NAVIGATION BAR (Inspired by about.organized-app.com & guide.organized-app.com)
           ===================================================================== */}
-      <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-[#121216]/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-[#27272A]/80">
+      <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top,0px)] bg-white/80 dark:bg-[#0c0c10]/80 backdrop-blur-2xl border-b border-zinc-200/70 dark:border-white/[0.08] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
           {/* Left: Brand Identity (Unified with App Brand & AnimatedLogo) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -1115,7 +1115,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
           </div>
 
           {/* Center: Switch between About (about.organized-app.com style) & Guide (guide.organized-app.com style) */}
-          <nav className="hidden md:flex items-center gap-1 bg-zinc-100/90 dark:bg-[#18181F]/80 p-1 rounded-xl border border-zinc-200/70 dark:border-[#27272A]/70">
+          <nav className="hidden md:flex items-center gap-1 bg-zinc-100/80 dark:bg-white/[0.05] p-1 rounded-xl border border-zinc-200/70 dark:border-white/[0.08] backdrop-blur-md">
             {[
               { id: 'about' as WebsiteSection, label: 'Acerca de Kongre', icon: Compass },
               { id: 'guide' as WebsiteSection, label: 'Guía de Usuario (Docs)', icon: BookOpen },
@@ -1133,8 +1133,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-xs'
-                      : 'text-zinc-600 dark:text-[#D4D4D8] hover:text-zinc-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white shadow-xs font-black'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -1224,7 +1224,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-zinc-900 dark:via-indigo-950/50 dark:to-zinc-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden"
+              className="relative w-full rounded-3xl kg-ambient-mesh kg-grid-mask kg-sheen-top bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30 dark:from-[#0d0d12] dark:via-[#131220] dark:to-[#0a0a0f] border border-indigo-200/70 dark:border-indigo-500/25 p-6 sm:p-10 lg:p-12 shadow-2xl shadow-indigo-500/10 dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden"
             >
               {/* Floating ambient glow orbs */}
               <motion.div
@@ -1234,7 +1234,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   scale: [1, 1.08, 1],
                 }}
                 transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-indigo-500/15 dark:bg-indigo-600/20 blur-3xl pointer-events-none"
+                className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-indigo-500/15 dark:bg-indigo-600/25 blur-3xl pointer-events-none"
               />
               <motion.div
                 animate={{
@@ -1243,7 +1243,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   scale: [1, 1.1, 1],
                 }}
                 transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-violet-500/15 dark:bg-violet-600/20 blur-3xl pointer-events-none"
+                className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-violet-500/15 dark:bg-purple-600/20 blur-3xl pointer-events-none"
               />
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
@@ -1253,28 +1253,33 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0, y: -14, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/90 dark:bg-indigo-950/90 border border-indigo-200 dark:border-indigo-800 text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 shadow-2xs"
+                    className="kg-glow-badge cursor-default mb-2"
                   >
+                    <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
                     <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    <span>Aplicación Integral para Congregaciones</span>
+                    <span>Plataforma Teocrática Integral · 100% Offline</span>
                   </motion.div>
 
                   <motion.h1
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-zinc-900 dark:text-white leading-[1.12]"
+                    className="text-3xl sm:text-5xl lg:text-[46px] font-black tracking-tight leading-[1.08] text-zinc-900 dark:text-white"
                   >
-                    Simplifica y organiza toda la vida de tu congregación en un solo lugar.
+                    Simplifica y organiza{' '}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 dark:from-indigo-400 dark:via-violet-300 dark:to-indigo-200">
+                      toda tu congregación
+                    </span>{' '}
+                    en un solo lugar.
                   </motion.h1>
 
                   <motion.p
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-sm sm:text-base text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl"
+                    className="text-sm sm:text-base text-zinc-600 dark:text-[#D4D4D8] leading-relaxed max-w-2xl font-normal"
                   >
-                    <strong>Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
+                    <strong className="font-bold text-zinc-900 dark:text-white">Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
                   </motion.p>
 
                   {/* Primary Action Buttons with Motion Physics */}
@@ -1290,7 +1295,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       whileTap={{ scale: 0.97 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => onGoToPortal()}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-600/25 cursor-pointer group"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 cursor-pointer group"
                     >
                       <KeyRound className="w-4 h-4" />
                       <span>Usar Kongre en el Navegador</span>
@@ -1327,7 +1332,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.35 }}
-                    className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-zinc-600 dark:text-[#D4D4D8] border-t border-indigo-100/90 dark:border-[#27272A]"
+                    className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-zinc-600 dark:text-[#D4D4D8] border-t border-indigo-100/90 dark:border-white/[0.08]"
                   >
                     <span className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -1351,22 +1356,22 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                   className="lg:col-span-5 xl:col-span-5"
                 >
-                  <div className="rounded-3xl bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/90 dark:border-[#27272A] shadow-2xl p-4 sm:p-5 space-y-3.5 relative overflow-hidden backdrop-blur-xl group">
+                  <div className="rounded-3xl kg-glass-surface kg-sheen-top p-4 sm:p-5 space-y-3.5 relative overflow-hidden backdrop-blur-2xl group shadow-2xl">
                     {/* Ambient subtle card glow */}
-                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+                    <div className="absolute -top-16 -right-16 w-56 h-56 bg-indigo-500/15 dark:bg-indigo-500/30 rounded-full blur-3xl pointer-events-none" />
 
                     {/* Cockpit Window Header (macOS style window buttons + Congregation Live Badge) */}
-                    <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
+                    <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/[0.08] pb-3">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90 shadow-xs inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90 shadow-xs inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90 shadow-xs inline-block" />
                         </div>
                         <span className="text-[11px] font-bold text-zinc-700 dark:text-[#D4D4D8] pl-1.5 flex items-center gap-1.5">
-                          <span>Kongre</span>
+                          <span className="font-extrabold">Kongre</span>
                           <span className="text-zinc-400 dark:text-[#71717A] font-normal">·</span>
-                          <span className="font-normal text-zinc-500 dark:text-[#A1A1AA]">Congregación Central</span>
+                          <span className="font-medium text-zinc-500 dark:text-[#A1A1AA]">Congregación Central</span>
                         </span>
                       </div>
 
@@ -1377,7 +1382,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </div>
 
                     {/* Interactive Cockpit Tabs */}
-                    <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F]/80 text-[11px] font-bold">
+                    <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-zinc-200/60 dark:bg-white/[0.06] text-[11px] font-bold backdrop-blur-md">
                       {[
                         { id: 'reuniones' as const, label: 'Reunión' },
                         { id: 'asistencia' as const, label: 'S-88' },
@@ -1390,10 +1395,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             key={tab.id}
                             type="button"
                             onClick={() => setHeroPreviewTab(tab.id)}
-                            className={`py-1 rounded-lg text-center transition-all cursor-pointer ${
+                            className={`py-1.5 rounded-lg text-center transition-all cursor-pointer ${
                               isTabActive
-                                ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-black'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-white/15 text-indigo-600 dark:text-white shadow-xs font-black'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                           >
                             {tab.label}
@@ -1596,45 +1601,45 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-white/80 dark:bg-[#111116]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-sm space-y-3.5 relative overflow-hidden backdrop-blur-xl group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-black text-base flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-black text-lg flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/60 shadow-md shadow-indigo-500/10">
                     1
                   </div>
-                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                     Configuración en 2 Minutos
                   </h3>
-                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     El Coordinador o Secretario crea la congregación desde cualquier dispositivo. Cero servidores complicados ni configuraciones técnicas.
                   </p>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-white/80 dark:bg-[#111116]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-sm space-y-3.5 relative overflow-hidden backdrop-blur-xl group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400 font-black text-base flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400 font-black text-lg flex items-center justify-center border border-violet-200/60 dark:border-violet-800/60 shadow-md shadow-violet-500/10">
                     2
                   </div>
-                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                     Acceso con PIN y Roles Teocráticos
                   </h3>
-                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     Cada hermano recibe un código de invitación y PIN personal. Cada uno ve exactamente lo que le corresponde según sus privilegios.
                   </p>
                 </motion.div>
 
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm space-y-3 relative overflow-hidden"
+                  className="p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-white/80 dark:bg-[#111116]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-sm space-y-3.5 relative overflow-hidden backdrop-blur-xl group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 font-black text-base flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 font-black text-lg flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/60 shadow-md shadow-emerald-500/10">
                     3
                   </div>
-                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                     100% Offline con Sincronización P2P
                   </h3>
-                  <p className="text-xs text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-zinc-600 dark:text-[#D4D4D8] leading-relaxed">
                     Funciona en el Salón del Reino y en la predicación sin señal. Cuando hay conexión, los datos se sincronizan cifrados de extremo a extremo.
                   </p>
                 </motion.div>
@@ -1663,7 +1668,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </div>
 
                 {/* Animated Role Tabs with Sliding Pill & Emblems */}
-                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-zinc-200/70 dark:bg-[#121216] p-1.5 rounded-2xl border border-zinc-300/60 dark:border-[#27272A]">
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-zinc-200/60 dark:bg-white/[0.05] p-1.5 rounded-2xl border border-zinc-300/60 dark:border-white/[0.08] backdrop-blur-md">
                   {ROLE_PERSONAS.map((role) => {
                     const isSelected = role.id === selectedRolePersona;
                     const RoleIcon =
@@ -1711,7 +1716,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] p-6 sm:p-8 lg:p-10 shadow-sm"
+                  className="rounded-3xl kg-glass-surface kg-sheen-top p-6 sm:p-8 lg:p-10 shadow-2xl"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     <div className="lg:col-span-5 space-y-4">
@@ -1819,7 +1824,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-indigo-50/80 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-indigo-200/80 dark:border-indigo-800/70 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-indigo-50/60 via-white to-white dark:from-[#121218] dark:via-[#15141e] dark:to-[#0f0e15] border border-indigo-200/80 dark:border-indigo-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1868,7 +1873,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-emerald-50/60 via-white to-white dark:from-[#121218] dark:via-[#111815] dark:to-[#0f0e15] border border-emerald-200/80 dark:border-emerald-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -1904,7 +1909,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-violet-50/60 via-white to-white dark:from-[#121218] dark:via-[#171322] dark:to-[#0f0e15] border border-violet-200/80 dark:border-violet-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -1940,7 +1945,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-amber-50/70 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-amber-200/80 dark:border-amber-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-amber-50/60 via-white to-white dark:from-[#121218] dark:via-[#1a1711] dark:to-[#0f0e15] border border-amber-200/80 dark:border-amber-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1989,7 +1994,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] shadow-sm flex flex-col justify-between gap-5 group"
+                  className="p-6 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-indigo-50/60 via-white to-white dark:from-[#121218] dark:via-[#131220] dark:to-[#0f0e15] border border-indigo-200/80 dark:border-indigo-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -2025,7 +2030,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -4 }}
-                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-violet-50/70 via-white to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-850 border border-violet-200/80 dark:border-violet-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl kg-card-bento kg-sheen-top bg-gradient-to-br from-violet-50/60 via-white to-white dark:from-[#121218] dark:via-[#161222] dark:to-[#0f0e15] border border-violet-200/80 dark:border-violet-500/30 shadow-sm flex flex-col justify-between gap-5 group backdrop-blur-xl"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">

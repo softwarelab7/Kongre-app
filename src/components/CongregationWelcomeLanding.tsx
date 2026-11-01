@@ -87,26 +87,26 @@ const FEATURE_ACCENT_STYLES: Record<
   }
 > = {
   indigo: {
-    card: 'bg-linear-to-br from-indigo-50/90 via-white to-violet-50/40 dark:from-indigo-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-indigo-200/80 dark:border-indigo-800/70 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10',
-    iconBox: 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15',
+    card: 'kg-card-bento kg-sheen-top bg-gradient-to-br from-indigo-50/70 via-white to-violet-50/30 dark:from-[#131222] dark:via-[#111116] dark:to-[#0f0e15] border-indigo-200/70 dark:border-indigo-500/30 hover:border-indigo-400 dark:hover:border-indigo-400 shadow-sm backdrop-blur-md',
+    iconBox: 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/30 ring-2 ring-indigo-500/20',
     kicker: 'text-indigo-600 dark:text-indigo-400',
     titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-300',
   },
   emerald: {
-    card: 'bg-linear-to-br from-emerald-50/90 via-white to-teal-50/40 dark:from-emerald-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-emerald-200/80 dark:border-emerald-800/70 hover:border-emerald-400 dark:hover:border-emerald-500 shadow-xs hover:shadow-md hover:shadow-emerald-500/10',
-    iconBox: 'bg-linear-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/15',
+    card: 'kg-card-bento kg-sheen-top bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/30 dark:from-[#0f1915] dark:via-[#111116] dark:to-[#0f0e15] border-emerald-200/70 dark:border-emerald-500/30 hover:border-emerald-400 dark:hover:border-emerald-400 shadow-sm backdrop-blur-md',
+    iconBox: 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-600/30 ring-2 ring-emerald-500/20',
     kicker: 'text-emerald-600 dark:text-emerald-400',
     titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-300',
   },
   amber: {
-    card: 'bg-linear-to-br from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/45 dark:via-zinc-800/90 dark:to-zinc-900 border-amber-200/80 dark:border-amber-800/70 hover:border-amber-400 dark:hover:border-amber-500 shadow-xs hover:shadow-md hover:shadow-amber-500/10',
-    iconBox: 'bg-linear-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 ring-2 ring-amber-500/15',
+    card: 'kg-card-bento kg-sheen-top bg-gradient-to-br from-amber-50/70 via-white to-orange-50/30 dark:from-[#1a1711] dark:via-[#111116] dark:to-[#0f0e15] border-amber-200/70 dark:border-amber-500/30 hover:border-amber-400 dark:hover:border-amber-400 shadow-sm backdrop-blur-md',
+    iconBox: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/30 ring-2 ring-amber-500/20',
     kicker: 'text-amber-600 dark:text-amber-400',
     titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-300',
   },
   sky: {
-    card: 'bg-linear-to-br from-sky-50/90 via-white to-blue-50/40 dark:from-sky-950/50 dark:via-zinc-800/90 dark:to-zinc-900 border-sky-200/80 dark:border-sky-800/70 hover:border-sky-400 dark:hover:border-sky-500 shadow-xs hover:shadow-md hover:shadow-sky-500/10',
-    iconBox: 'bg-linear-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 ring-2 ring-sky-500/15',
+    card: 'kg-card-bento kg-sheen-top bg-gradient-to-br from-sky-50/70 via-white to-blue-50/30 dark:from-[#0e1724] dark:via-[#111116] dark:to-[#0f0e15] border-sky-200/70 dark:border-sky-500/30 hover:border-sky-400 dark:hover:border-sky-400 shadow-sm backdrop-blur-md',
+    iconBox: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/30 ring-2 ring-sky-500/20',
     kicker: 'text-sky-600 dark:text-sky-400',
     titleHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-300',
   },
@@ -1538,7 +1538,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* ========================================================= */}
         {/* 1. TOP HEADER                                            */}
         {/* ========================================================= */}
-        <header className="w-full bg-card border-b border-line px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 sticky top-0 z-30 transition-colors">
+        <header className="w-full bg-white/80 dark:bg-[#0c0c10]/80 backdrop-blur-2xl border-b border-zinc-200/70 dark:border-white/[0.08] px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 sticky top-0 z-30 transition-colors shadow-xs">
           {/* Logo and Brand */}
           <div className="flex items-center gap-2 shrink-0">
             <AnimatedLogo height={28} onClick={() => setActiveTab('home')} />
@@ -1597,20 +1597,21 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {!isFullWidthView && (
             <section className="hidden lg:block space-y-0">
               <div
-                className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand mb-1.5 select-none"
+                className="kg-glow-badge mb-2.5 select-none"
               >
-                <ShieldCheck size={13} className="text-brand shrink-0" aria-hidden />
-                <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                <ShieldCheck size={13} className="text-indigo-600 dark:text-indigo-400 shrink-0" aria-hidden />
+                <span>Gestor Teocrático Integral • 100% Offline</span>
               </div>
 
-              <h1 className="mb-1.5 text-[clamp(24px,2.4vw,38px)] font-black leading-[1.08] tracking-tight text-ink">
+              <h1 className="mb-2 text-[clamp(26px,2.6vw,40px)] font-black leading-[1.08] tracking-tight text-zinc-900 dark:text-white">
                 Toda la gestión teocrática de tu congregación,{' '}
-                <em className="bg-linear-to-r from-(--t1) to-(--t2) bg-clip-text not-italic text-transparent">
+                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 dark:from-indigo-400 dark:via-violet-300 dark:to-indigo-200 bg-clip-text text-transparent">
                   en un solo lugar.
-                </em>
+                </span>
               </h1>
 
-              <p className="max-w-[500px] text-xs sm:text-[13px] leading-relaxed text-muted mb-3">
+              <p className="max-w-[500px] text-xs sm:text-[13px] leading-relaxed text-zinc-600 dark:text-[#D4D4D8] mb-3.5">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
 
@@ -1655,10 +1656,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <section
               key={isFullWidthView ? `portal-wide-${activeTab}` : `portal-${activeTab}`}
               aria-label="Portal de acceso"
-              className={`card rounded-3xl border border-zinc-200/90 dark:border-[#27272A] bg-card relative ${
+              className={`rounded-3xl kg-glass-surface kg-sheen-top relative ${
                 isFullWidthView
                   ? 'p-4 sm:p-6 lg:p-7 kg-register-box-enter shadow-2xl overflow-visible'
-                  : 'p-3.5 sm:p-4.5 lg:p-4.5 kg-home-box-enter shadow-xl overflow-hidden'
+                  : 'p-3.5 sm:p-4.5 lg:p-4.5 kg-home-box-enter shadow-2xl overflow-hidden'
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >

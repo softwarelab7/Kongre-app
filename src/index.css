@@ -739,3 +739,118 @@
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem) !important;
   }
 }
+
+/* ============================================================================
+   LINEAR & APPLE CRAFT: ELEVATED DESIGN SYSTEM SURFACES
+   ============================================================================ */
+.kg-ambient-mesh {
+  position: relative;
+  overflow: hidden;
+}
+
+.kg-ambient-mesh::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 60%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.08) 40%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+html.dark .kg-ambient-mesh::before,
+[data-theme="dark"] .kg-ambient-mesh::before,
+[data-theme="cabina"] .kg-ambient-mesh::before {
+  background: radial-gradient(ellipse at 50% -10%, rgba(99, 102, 241, 0.28) 0%, rgba(139, 92, 246, 0.14) 45%, transparent 80%);
+}
+
+.kg-glass-surface {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+html.dark .kg-glass-surface,
+[data-theme="dark"] .kg-glass-surface,
+[data-theme="cabina"] .kg-glass-surface {
+  background: rgba(18, 18, 22, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.kg-card-bento {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease;
+  position: relative;
+}
+
+.kg-card-bento:hover {
+  transform: translateY(-3px);
+}
+
+html.dark .kg-card-bento {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+}
+
+html.dark .kg-card-bento:hover {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 16px 36px -10px rgba(0, 0, 0, 0.75);
+}
+
+.kg-glow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(99, 102, 241, 0.1);
+  color: #4338ca;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.18);
+}
+
+html.dark .kg-glow-badge {
+  color: #a5b4fc;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.25);
+}
+
+.kg-grid-mask {
+  background-image: radial-gradient(rgba(99, 102, 241, 0.14) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html.dark .kg-grid-mask,
+[data-theme="dark"] .kg-grid-mask,
+[data-theme="cabina"] .kg-grid-mask {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.kg-sheen-top {
+  position: relative;
+}
+
+.kg-sheen-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+  pointer-events: none;
+}
+
+html.dark .kg-sheen-top::after {
+  background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.6), transparent);
+}
+

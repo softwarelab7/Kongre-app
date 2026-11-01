@@ -277,38 +277,38 @@ export const TerritoriosTab: React.FC = () => {
     switch (type) {
       case 'residencial':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A]">
-            <Home className="w-3 h-3 text-zinc-500 dark:text-[#A1A1AA]" /> Residencial
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10">
+            <Home className="w-3 h-3 text-zinc-500 dark:text-zinc-400 shrink-0" /> Residencial
           </span>
         );
       case 'negocios':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
-            <Building2 className="w-3 h-3 text-teal-600 dark:text-teal-400" /> Negocios
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
+            <Building2 className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" /> Negocios
           </span>
         );
       case 'edificios':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20">
-            <Layers className="w-3 h-3 text-indigo-600 dark:text-indigo-400" /> Edificios
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20">
+            <Layers className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" /> Edificios
           </span>
         );
       case 'rural':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-            <TreePine className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Rural
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+            <TreePine className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" /> Rural
           </span>
         );
       case 'telefonico':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20">
-            <Phone className="w-3 h-3 text-purple-600 dark:text-purple-400" /> Telefónico
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20">
+            <Phone className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" /> Telefónico
           </span>
         );
       case 'campana':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-            <Compass className="w-3 h-3 text-rose-600 dark:text-rose-400" /> Campaña
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
+            <Compass className="w-3 h-3 text-rose-600 dark:text-rose-400 shrink-0" /> Campaña
           </span>
         );
       default:
@@ -321,8 +321,9 @@ export const TerritoriosTab: React.FC = () => {
     const today = new Date();
     if (territory.status === 'disponible') {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-          <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Disponible
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50 shrink-0" />
+          <span>Disponible</span>
         </span>
       );
     }
@@ -330,8 +331,9 @@ export const TerritoriosTab: React.FC = () => {
     const isOverdue = territory.status === 'vencido' || (territory.dueDate && new Date(territory.dueDate) < today);
     if (isOverdue) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-          <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400" /> Vencido (+4m)
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30">
+          <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400 shrink-0" />
+          <span>Vencido (+4m)</span>
         </span>
       );
     }
@@ -342,16 +344,18 @@ export const TerritoriosTab: React.FC = () => {
       fifteenDays.setDate(today.getDate() + 15);
       if (d <= fifteenDays) {
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-            <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Por vencer
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+            <span>Por vencer</span>
           </span>
         );
       }
     }
 
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20">
-        <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400" /> Asignado
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/25">
+        <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0" />
+        <span>Asignado</span>
       </span>
     );
   };
@@ -554,35 +558,35 @@ ${mapLink}${noVisitsText}
       )}
 
       {/* Barra Unificada de Vistas y Acciones de Territorio */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         {/* View Mode Toggle - 2-column grid on mobile so nothing clips */}
-        <div className="grid grid-cols-2 sm:flex rounded-xl border border-zinc-200/70 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1.5 gap-1">
+        <div className="grid grid-cols-2 sm:flex rounded-2xl border border-zinc-200/70 dark:border-white/10 bg-zinc-100/80 dark:bg-white/5 p-1.5 gap-1.5">
           <button
             onClick={() => setViewMode('cards')}
-            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer active:scale-95 ${
               viewMode === 'cards'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 border border-white/20 kg-sheen-top'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
             }`}
           >
             <span className="truncate">Tarjetas</span>
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer active:scale-95 ${
               viewMode === 'table'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 border border-white/20 kg-sheen-top'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
             }`}
           >
             <span className="truncate">Tabla</span>
           </button>
           <button
             onClick={() => setViewMode('map')}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer active:scale-95 ${
               viewMode === 'map'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 border border-white/20 kg-sheen-top'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
             }`}
           >
             <Map className={`w-3.5 h-3.5 shrink-0 ${viewMode === 'map' ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'}`} />
@@ -590,10 +594,10 @@ ${mapLink}${noVisitsText}
           </button>
           <button
             onClick={() => setViewMode('s13')}
-            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer active:scale-95 ${
               viewMode === 's13'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 border border-white/20 kg-sheen-top'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10'
             }`}
           >
             <span className="truncate">Fichero S-13</span>
@@ -603,7 +607,7 @@ ${mapLink}${noVisitsText}
         <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0">
           <button
             onClick={handleDownloadOfficialS13}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A] rounded-xl transition cursor-pointer active:scale-95"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-zinc-700 dark:text-zinc-200 bg-zinc-100/80 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 border border-zinc-200/80 dark:border-white/10 rounded-2xl transition-all cursor-pointer active:scale-95"
             title="Cargar el PDF oficial S-13 de JW Hub para que la app lo rellene y descargue"
           >
             <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -612,7 +616,7 @@ ${mapLink}${noVisitsText}
 
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-indigo-500/25 border border-white/20 transition-all active:scale-95 cursor-pointer kg-sheen-top"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Nuevo Territorio</span>
@@ -620,92 +624,92 @@ ${mapLink}${noVisitsText}
         </div>
       </div>
 
-      {/* KPI Stats Ribbon (2-column non-clipping grid on mobile) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+      {/* KPI Stats Ribbon (5 Bento cards) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <button
           type="button"
           onClick={() => setStatusFilter('todos')}
-          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`kg-card-bento kg-sheen-top p-3.5 sm:p-4 rounded-2xl transition-all duration-300 flex items-center gap-3 text-left cursor-pointer active:scale-95 ${
             statusFilter === 'todos'
-              ? 'border-indigo-500 ring-2 ring-indigo-500/15 dark:border-indigo-400'
-              : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-500/50'
+              ? 'border-indigo-500/80 ring-2 ring-indigo-500/20 shadow-md shadow-indigo-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-400/50'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-            <Map className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-2xs">
+            <Map className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] leading-tight">{stats.total}</div>
-            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Total Territorios</div>
+            <div className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-zinc-900 dark:text-white leading-tight">{stats.total}</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider truncate">Total Territorios</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('disponible')}
-          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`kg-card-bento kg-sheen-top p-3.5 sm:p-4 rounded-2xl transition-all duration-300 flex items-center gap-3 text-left cursor-pointer active:scale-95 ${
             statusFilter === 'disponible'
-              ? 'border-emerald-500 ring-2 ring-emerald-500/15 dark:border-emerald-400'
-              : 'border-zinc-200 dark:border-[#27272A] hover:border-emerald-300 dark:hover:border-emerald-500/50'
+              ? 'border-emerald-500/80 ring-2 ring-emerald-500/20 shadow-md shadow-emerald-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-emerald-400/50'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-2xs">
+            <CheckCircle2 className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 leading-tight">{stats.disponibles}</div>
-            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Disponibles</div>
+            <div className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 leading-tight">{stats.disponibles}</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider truncate">Disponibles</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('asignado')}
-          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`kg-card-bento kg-sheen-top p-3.5 sm:p-4 rounded-2xl transition-all duration-300 flex items-center gap-3 text-left cursor-pointer active:scale-95 ${
             statusFilter === 'asignado'
-              ? 'border-teal-500 ring-2 ring-teal-500/15 dark:border-teal-400'
-              : 'border-zinc-200 dark:border-[#27272A] hover:border-teal-300 dark:hover:border-teal-500/50'
+              ? 'border-teal-500/80 ring-2 ring-teal-500/20 shadow-md shadow-teal-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-teal-400/50'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
-            <User className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 shadow-2xs">
+            <User className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-teal-600 dark:text-teal-400 leading-tight">{stats.asignados}</div>
-            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">En Trabajo</div>
+            <div className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-teal-600 dark:text-teal-400 leading-tight">{stats.asignados}</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider truncate">En Trabajo</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('vencido')}
-          className={`bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`kg-card-bento kg-sheen-top p-3.5 sm:p-4 rounded-2xl transition-all duration-300 flex items-center gap-3 text-left cursor-pointer active:scale-95 ${
             statusFilter === 'vencido'
-              ? 'border-rose-500 ring-2 ring-rose-500/15 dark:border-rose-400'
-              : 'border-zinc-200 dark:border-[#27272A] hover:border-rose-300 dark:hover:border-rose-500/50'
+              ? 'border-rose-500/80 ring-2 ring-rose-500/20 shadow-md shadow-rose-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-rose-400/50'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 shadow-2xs">
+            <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg sm:text-xl font-bold font-mono tabular-nums text-rose-600 dark:text-rose-400 leading-tight">{stats.vencidos}</div>
-            <div className="text-[11px] sm:text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium truncate">Vencidos (&gt;4m)</div>
+            <div className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-rose-600 dark:text-rose-400 leading-tight">{stats.vencidos}</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider truncate">Vencidos (&gt;4m)</div>
           </div>
         </button>
 
-        <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-3 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
-          <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 text-[11px] font-semibold uppercase tracking-wider mb-0.5">
+        <div className="col-span-2 sm:col-span-1 kg-card-bento kg-sheen-top p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">
             <span>Cobertura Anual</span>
-            <Compass className="w-3.5 h-3.5" />
+            <Compass className="w-4 h-4" />
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-lg sm:text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] leading-tight">{stats.coveragePercentage}%</span>
-            <span className="text-[11px] font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA]">({stats.completedLastYear}/{stats.total})</span>
+            <span className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-zinc-900 dark:text-white leading-tight">{stats.coveragePercentage}%</span>
+            <span className="text-[11px] font-mono tabular-nums text-zinc-500 dark:text-zinc-400">({stats.completedLastYear}/{stats.total})</span>
           </div>
-          <div className="w-full bg-zinc-100 dark:bg-[#18181F] rounded-full h-1.5 mt-1.5 overflow-hidden">
+          <div className="w-full bg-zinc-200/70 dark:bg-white/10 rounded-full h-2 mt-2 overflow-hidden p-0.5 shadow-inner">
             <div
-              className="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full transition-all"
+              className="bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 h-full rounded-full transition-all duration-500 shadow-xs"
               style={{ width: `${Math.min(stats.coveragePercentage, 100)}%` }}
             />
           </div>
@@ -714,21 +718,23 @@ ${mapLink}${noVisitsText}
 
       {/* Radar S-13: Alertas de Territorios Vencidos (>4 meses) o Por Vencer */}
       {(s13Radar.overdue.length > 0 || s13Radar.expiringSoon.length > 0) && (
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-amber-500/30 dark:border-amber-500/20 p-4 shadow-xs space-y-3">
+        <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-amber-500/30 dark:border-amber-500/20 p-5 shadow-sm space-y-3.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <h3 className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
                 Radar S-13: Control de Plazo de 4 Meses ({s13Radar.overdue.length} vencidos •{' '}
                 {s13Radar.expiringSoon.length} por vencer)
               </h3>
             </div>
-            <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
               Envía recordatorio amigable por WhatsApp o registra la devolución en 1 clic
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {[...s13Radar.overdue, ...s13Radar.expiringSoon].slice(0, 6).map((terr) => {
               const assignee = terr.currentAssigneeId
                 ? publishersMap.get(terr.currentAssigneeId)
@@ -737,25 +743,25 @@ ${mapLink}${noVisitsText}
               return (
                 <div
                   key={terr.id}
-                  className="p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] flex flex-col justify-between gap-2 text-xs shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
+                  className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] flex flex-col justify-between gap-3 text-xs shadow-2xs hover:border-amber-500/40 transition-all"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                      <span className="font-extrabold text-zinc-900 dark:text-white truncate">
                         Territorio #{terr.number} — {terr.name}
                       </span>
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] inline-flex items-center gap-1.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${isOver ? 'bg-rose-500' : 'bg-amber-500'}`} />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 inline-flex items-center gap-1.5 shrink-0">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isOver ? 'bg-rose-500 shadow-xs shadow-rose-500/50' : 'bg-amber-500'}`} />
                         {isOver ? 'Vencido (+4m)' : 'Por vencer'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-600 dark:text-[#A1A1AA] mt-1">
-                      Tenencia: <strong className="text-zinc-800 dark:text-[#F4F4F5]">{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
-                      <strong className="font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">{terr.dueDate || '—'}</strong>
+                    <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1.5">
+                      Tenencia: <strong className="text-zinc-800 dark:text-zinc-200">{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
+                      <strong className="font-mono tabular-nums text-zinc-800 dark:text-zinc-200">{terr.dueDate || '—'}</strong>
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-zinc-200/60 dark:border-[#27272A]">
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-white/10">
                     <button
                       type="button"
                       onClick={() => {
@@ -766,24 +772,24 @@ ${mapLink}${noVisitsText}
                         );
                         openWhatsAppLink(assignee?.phone || '', msg);
                       }}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                     >
-                      <MessageCircle className="w-3 h-3" />
+                      <MessageCircle className="w-3.5 h-3.5" />
                       <span>Recordar S-13</span>
                     </button>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => openReturnModal(terr)}
-                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-[10px] font-bold hover:bg-zinc-50 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         Recibir
                       </button>
                       <button
                         type="button"
                         onClick={() => openExtendModal(terr)}
-                        className="px-2 py-1 rounded-lg bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-[10px] font-bold hover:bg-zinc-50 dark:hover:bg-[#27272A] cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
                       >
                         Prorrogar
                       </button>
@@ -797,7 +803,7 @@ ${mapLink}${noVisitsText}
       )}
 
       {/* Controls & Filter Bar */}
-      <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+      <div className="kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl space-y-3.5 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search box */}
           <div className="relative flex-1">
@@ -807,7 +813,7 @@ ${mapLink}${noVisitsText}
               placeholder="Buscar por número, nombre, calle o publicador..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-9 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              className="w-full pl-10 pr-9 py-2.5 border border-zinc-200/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] text-zinc-900 dark:text-white placeholder:text-zinc-400 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-2xs"
             />
             {searchTerm && (
               <button
@@ -821,46 +827,46 @@ ${mapLink}${noVisitsText}
         </div>
 
         {/* Filter chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/80 dark:border-[#27272A] text-xs">
-          <span className="text-zinc-400 dark:text-[#A1A1AA] flex items-center gap-1 font-medium mr-1">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/60 dark:border-white/10 text-xs">
+          <span className="text-zinc-400 dark:text-zinc-400 flex items-center gap-1 font-bold mr-1">
             <Filter className="w-3.5 h-3.5" /> Estado:
           </span>
           <button
             onClick={() => setStatusFilter('todos')}
-            className={`px-2.5 py-1 rounded-full border transition ${
+            className={`px-3 py-1.5 rounded-2xl font-bold transition-all cursor-pointer active:scale-95 border ${
               statusFilter === 'todos'
-                ? 'bg-indigo-600 text-white border-indigo-600 font-medium'
-                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-white/20 shadow-xs'
+                : 'bg-white/70 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border-zinc-200/70 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             Todos ({territories.length})
           </button>
           <button
             onClick={() => setStatusFilter('disponible')}
-            className={`px-2.5 py-1 rounded-full border transition ${
+            className={`px-3 py-1.5 rounded-2xl font-bold transition-all cursor-pointer active:scale-95 border ${
               statusFilter === 'disponible'
-                ? 'bg-emerald-600 text-white border-emerald-600 font-medium'
-                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-white/20 shadow-xs'
+                : 'bg-white/70 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border-zinc-200/70 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             Disponibles ({stats.disponibles})
           </button>
           <button
             onClick={() => setStatusFilter('asignado')}
-            className={`px-2.5 py-1 rounded-full border transition ${
+            className={`px-3 py-1.5 rounded-2xl font-bold transition-all cursor-pointer active:scale-95 border ${
               statusFilter === 'asignado'
-                ? 'bg-teal-600 text-white border-teal-600 font-medium'
-                : 'bg-white dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-50 dark:hover:bg-[#27272A]'
+                ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white border-white/20 shadow-xs'
+                : 'bg-white/70 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border-zinc-200/70 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10'
             }`}
           >
             Asignados ({stats.asignados})
           </button>
           <button
             onClick={() => setStatusFilter('vencido')}
-            className={`px-2.5 py-1 rounded-full border transition ${
+            className={`px-3 py-1.5 rounded-2xl font-bold transition-all cursor-pointer active:scale-95 border ${
               statusFilter === 'vencido'
-                ? 'bg-rose-600 text-white border-rose-600 font-medium'
-                : 'bg-white dark:bg-[#18181F] text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/40 hover:bg-rose-50 dark:hover:bg-rose-950/20'
+                ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-white/20 shadow-xs'
+                : 'bg-white/70 dark:bg-white/[0.04] text-rose-600 dark:text-rose-400 border-rose-200/80 dark:border-rose-900/40 hover:bg-rose-50 dark:hover:bg-rose-950/20'
             }`}
           >
             Vencidos ({stats.vencidos})
@@ -871,7 +877,7 @@ ${mapLink}${noVisitsText}
             <select
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value)}
-              className="py-1 px-2.5 border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="py-1.5 px-3 border border-zinc-200/80 dark:border-white/10 rounded-xl text-xs font-bold bg-white/80 dark:bg-white/10 text-zinc-700 dark:text-zinc-200 focus:outline-none cursor-pointer"
             >
               <option value="todos">Todos los Tipos</option>
               <option value="residencial">Residencial</option>
@@ -886,7 +892,7 @@ ${mapLink}${noVisitsText}
               <select
                 value={zoneFilter}
                 onChange={e => setZoneFilter(e.target.value)}
-                className="py-1 px-2.5 border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="py-1.5 px-3 border border-zinc-200/80 dark:border-white/10 rounded-xl text-xs font-bold bg-white/80 dark:bg-white/10 text-zinc-700 dark:text-zinc-200 focus:outline-none cursor-pointer"
               >
                 <option value="todos">Todas las Zonas</option>
                 {zones.map(z => (
@@ -902,10 +908,12 @@ ${mapLink}${noVisitsText}
 
       {/* Main Content Area */}
       {filteredTerritories.length === 0 ? (
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-12 text-center shadow-xs">
-          <Map className="w-12 h-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-zinc-800 dark:text-[#F4F4F5] mb-1">No se encontraron territorios</h3>
-          <p className="text-sm text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto mb-4">
+        <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-12 text-center shadow-lg">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <Map className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">No se encontraron territorios</h3>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-5 leading-relaxed">
             No hay ningún territorio que coincida con los filtros seleccionados o el término de búsqueda.
           </p>
           <button
@@ -915,13 +923,13 @@ ${mapLink}${noVisitsText}
               setTypeFilter('todos');
               setZoneFilter('todos');
             }}
-            className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition font-medium cursor-pointer"
+            className="px-5 py-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:scale-105 active:scale-95 transition-all shadow-xs cursor-pointer"
           >
             Restablecer filtros
           </button>
         </div>
       ) : viewMode === 'cards' ? (
-        /* CARDS GRID VIEW */
+        /* CARDS GRID VIEW CON ESTILO BENTO */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {filteredTerritories.map(terr => {
             const assignee = terr.currentAssigneeId ? publishersMap.get(terr.currentAssigneeId) : null;
@@ -931,35 +939,35 @@ ${mapLink}${noVisitsText}
             return (
               <div
                 key={terr.id}
-                className={`bg-white dark:bg-[#18181F] rounded-2xl border transition-all hover:border-zinc-300 dark:hover:border-zinc-600 flex flex-col justify-between ${
+                className={`kg-card-bento kg-sheen-top rounded-3xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative border ${
                   isOverdue
-                    ? 'border-rose-500/50 ring-1 ring-rose-500/20'
+                    ? 'border-rose-500/50 shadow-lg shadow-rose-500/10'
                     : isAssigned
-                    ? 'border-teal-500/30'
-                    : 'border-zinc-200 dark:border-[#27272A]'
+                    ? 'border-teal-500/40 shadow-lg shadow-teal-500/5'
+                    : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5'
                 }`}
               >
                 {/* Card Top */}
                 <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-[#121216] text-white font-mono font-bold tabular-nums flex items-center justify-center text-base border border-zinc-700/50 dark:border-[#27272A] shadow-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 dark:from-white/10 dark:to-white/5 text-white font-mono font-black tabular-nums flex items-center justify-center text-base border border-zinc-700/50 dark:border-white/15 shadow-inner shrink-0">
                         {terr.number}
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-sm leading-tight line-clamp-1" title={terr.name}>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-zinc-900 dark:text-white text-sm leading-tight truncate" title={terr.name}>
                           {terr.name}
                         </h3>
-                        <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-zinc-400 dark:text-[#A1A1AA]" />
-                          <span>{terr.zone}</span>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 mt-0.5">
+                          <MapPin className="w-3 h-3 text-zinc-400 dark:text-zinc-500 shrink-0" />
+                          <span className="truncate">{terr.zone}</span>
                           <span>•</span>
-                          <span className="font-mono tabular-nums">~{terr.estimatedHomes} hogares</span>
+                          <span className="font-mono tabular-nums shrink-0">~{terr.estimatedHomes} h.</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end gap-1 shrink-0">
                       {getStatusBadge(terr)}
                       {getTypeBadge(terr.type)}
                     </div>
@@ -967,17 +975,17 @@ ${mapLink}${noVisitsText}
 
                   {/* Boundaries description */}
                   {terr.boundsDescription && (
-                    <div className="bg-zinc-50 dark:bg-[#121216] p-2.5 rounded-xl text-xs text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/70 dark:border-[#27272A] leading-relaxed">
-                      <span className="font-medium text-zinc-700 dark:text-[#F4F4F5]">Límites: </span>
+                    <div className="p-2.5 rounded-2xl bg-zinc-100/70 dark:bg-white/[0.04] border border-zinc-200/60 dark:border-white/5 text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                      <span className="font-bold text-zinc-800 dark:text-white">Límites: </span>
                       {terr.boundsDescription}
                     </div>
                   )}
 
                   {/* No-visit warning badge */}
                   {terr.noVisits && terr.noVisits.length > 0 && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 text-xs">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25 text-xs font-semibold">
                       <ShieldAlert className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-                      <span className="font-medium font-mono tabular-nums">
+                      <span className="font-mono tabular-nums">
                         {terr.noVisits.length} {terr.noVisits.length === 1 ? 'casa NO visitar' : 'casas NO visitar'}
                       </span>
                     </div>
@@ -985,58 +993,61 @@ ${mapLink}${noVisitsText}
 
                   {/* Assignment Status details */}
                   {isAssigned && assignee ? (
-                    <div className="bg-teal-500/5 dark:bg-teal-950/20 p-3 rounded-xl border border-teal-500/20 space-y-1.5">
+                    <div className="p-3.5 rounded-2xl bg-teal-500/10 dark:bg-teal-500/15 border border-teal-500/20 dark:border-teal-500/30 space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Asignado a:</span>
-                        <span className="font-semibold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1">
-                          <User className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                        <span className="text-zinc-500 dark:text-zinc-400">Asignado a:</span>
+                        <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                           {assignee.name}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Fecha asignado:</span>
-                        <span className="text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums">{terr.assignedDate || 'Reciente'}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">Fecha asignado:</span>
+                        <span className="text-zinc-700 dark:text-zinc-300 font-mono tabular-nums">{terr.assignedDate || 'Reciente'}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-zinc-500 dark:text-[#A1A1AA]">Límite (4 meses):</span>
-                        <span className={`font-mono tabular-nums font-medium ${isOverdue ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-zinc-700 dark:text-[#F4F4F5]'}`}>
+                        <span className="text-zinc-500 dark:text-zinc-400">Límite (4 meses):</span>
+                        <span className={`font-mono tabular-nums font-semibold ${isOverdue ? 'text-rose-600 dark:text-rose-400 font-black' : 'text-zinc-700 dark:text-zinc-300'}`}>
                           {terr.dueDate || 'Sin definir'}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-emerald-500/5 dark:bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/20 flex items-center justify-between text-xs">
-                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">Disponible para entrega</span>
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 dark:border-emerald-500/30 flex items-center justify-between text-xs">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Disponible para entrega
+                      </span>
                       {terr.lastCompletedDate && (
-                        <span className="text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">Completado: {terr.lastCompletedDate}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400 font-mono tabular-nums text-[11px]">Comp.: {terr.lastCompletedDate}</span>
                       )}
                     </div>
                   )}
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="p-3 bg-zinc-50/70 dark:bg-[#121216] border-t border-zinc-100 dark:border-[#27272A] rounded-b-2xl flex items-center justify-between gap-2">
+                <div className="p-3 bg-zinc-50/80 dark:bg-black/25 backdrop-blur-md border-t border-zinc-200/70 dark:border-white/5 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setDetailModalTerritory(terr)}
-                      className="p-1.5 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] rounded-lg transition cursor-pointer"
+                      className="p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-white/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                       title="Ver Ficha S-13 y No Visitar"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleShareWhatsApp(terr)}
-                      className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition cursor-pointer"
+                      className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                       title="Compartir por WhatsApp"
                     >
                       <Share2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setPolygonEditorTerritory(terr)}
-                      className={`p-1.5 rounded-lg transition cursor-pointer ${
+                      className={`p-1.5 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer ${
                         terr.polygon && terr.polygon.length >= 3
-                          ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-950/30'
-                          : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                          ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-950/40'
+                          : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10'
                       }`}
                       title={terr.polygon && terr.polygon.length >= 3 ? "Editar polígono perimetral en el mapa" : "Delimitar polígono en el mapa"}
                     >
@@ -1047,7 +1058,7 @@ ${mapLink}${noVisitsText}
                         href={terr.mapUrl.trim()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition"
+                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-500/10 rounded-xl hover:scale-105 active:scale-95 transition-all"
                         title="Abrir en Google Maps"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -1057,7 +1068,7 @@ ${mapLink}${noVisitsText}
                         href={`https://maps.google.com/?q=${encodeURIComponent(`${terr.name} ${settings.congregationName}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition"
+                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-500/10 rounded-xl hover:scale-105 active:scale-95 transition-all"
                         title="Buscar en Google Maps"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -1065,14 +1076,14 @@ ${mapLink}${noVisitsText}
                     )}
                     <button
                       onClick={() => openEditModal(terr)}
-                      className="p-1.5 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] rounded-lg transition cursor-pointer"
+                      className="p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-white/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                       title="Editar datos del territorio"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDigitalCardTerritory(terr)}
-                      className="flex items-center gap-1 px-2 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-lg transition border border-indigo-200 dark:border-indigo-800/40 cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-xl hover:scale-105 active:scale-95 transition-all border border-indigo-200/70 dark:border-indigo-800/40 cursor-pointer"
                       title="Generar Tarjeta Digital y Código QR para el publicador"
                     >
                       <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -1083,17 +1094,17 @@ ${mapLink}${noVisitsText}
                   {/* Primary status action */}
                   <div>
                     {isAssigned ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => openExtendModal(terr)}
-                          className="px-2.5 py-1 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] rounded-lg transition cursor-pointer"
+                          className="px-2.5 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-white/10 hover:bg-zinc-100 dark:hover:bg-white/15 border border-zinc-200/80 dark:border-white/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                           title="Ampliar plazo de entrega"
                         >
                           Ampliar
                         </button>
                         <button
                           onClick={() => openReturnModal(terr)}
-                          className="px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg transition flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" /> Devolver
                         </button>
@@ -1101,7 +1112,7 @@ ${mapLink}${noVisitsText}
                     ) : (
                       <button
                         onClick={() => openAssignModal(terr)}
-                        className="px-3.5 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
+                        className="px-3.5 py-1 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
                       >
                         <User className="w-3.5 h-3.5" /> Asignar
                       </button>
@@ -1113,67 +1124,67 @@ ${mapLink}${noVisitsText}
           })}
         </div>
       ) : viewMode === 'table' ? (
-        /* TABLE VIEW */
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
+        /* TABLE VIEW CON ESTILO GLASS */
+        <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="data-table w-full text-left text-sm">
-              <thead className="bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider border-b border-zinc-200 dark:border-[#27272A]">
+              <thead className="bg-zinc-100/80 dark:bg-white/[0.03] backdrop-blur-md text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-wider border-b border-zinc-200/80 dark:border-white/10">
                 <tr>
-                  <th className="py-3 px-4">Nº</th>
-                  <th className="py-3 px-4">Territorio y Zona</th>
-                  <th className="py-3 px-4">Tipo</th>
-                  <th className="py-3 px-4">Hogares</th>
-                  <th className="py-3 px-4">Estado</th>
-                  <th className="py-3 px-4">Publicador Asignado</th>
-                  <th className="py-3 px-4">Vencimiento</th>
-                  <th className="py-3 px-4 text-right">Acciones</th>
+                  <th className="py-3.5 px-4">Nº</th>
+                  <th className="py-3.5 px-4">Territorio y Zona</th>
+                  <th className="py-3.5 px-4">Tipo</th>
+                  <th className="py-3.5 px-4">Hogares</th>
+                  <th className="py-3.5 px-4">Estado</th>
+                  <th className="py-3.5 px-4">Publicador Asignado</th>
+                  <th className="py-3.5 px-4">Vencimiento</th>
+                  <th className="py-3.5 px-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+              <tbody className="divide-y divide-zinc-200/50 dark:divide-white/[0.05]">
                 {filteredTerritories.map(terr => {
                   const assignee = terr.currentAssigneeId ? publishersMap.get(terr.currentAssigneeId) : null;
                   const isAssigned = terr.status !== 'disponible';
                   const isOverdue = terr.status === 'vencido' || (terr.dueDate && new Date(terr.dueDate) < new Date());
 
                   return (
-                    <tr key={terr.id} className="hover:bg-zinc-50/80 dark:hover:bg-[#18181F]/60 transition">
-                      <td className="py-3 px-4 font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">#{terr.number}</td>
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-zinc-800 dark:text-[#F4F4F5]">{terr.name}</div>
-                        <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">{terr.zone}</div>
+                    <tr key={terr.id} className="hover:bg-zinc-100/60 dark:hover:bg-white/[0.04] transition-colors">
+                      <td className="py-3.5 px-4 font-black font-mono tabular-nums text-zinc-900 dark:text-white">#{terr.number}</td>
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-zinc-900 dark:text-white">{terr.name}</div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400">{terr.zone}</div>
                       </td>
                       <td className="py-3 px-4">{getTypeBadge(terr.type)}</td>
                       <td className="py-3 px-4 font-mono tabular-nums text-zinc-600 dark:text-[#A1A1AA]">~{terr.estimatedHomes}</td>
                       <td className="py-3 px-4">{getStatusBadge(terr)}</td>
                       <td className="py-3 px-4">
                         {isAssigned && assignee ? (
-                          <div className="font-medium text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
+                          <div className="font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
                               {assignee.name.charAt(0)}
                             </div>
-                            <span>{assignee.name}</span>
+                            <span className="truncate max-w-[160px]">{assignee.name}</span>
                           </div>
                         ) : (
                           <span className="text-xs text-zinc-400 dark:text-zinc-500 italic">Sin asignar</span>
                         )}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         {isAssigned && terr.dueDate ? (
-                          <span className={`text-xs font-mono tabular-nums ${isOverdue ? 'font-bold text-rose-600 dark:text-rose-400' : 'text-zinc-600 dark:text-[#A1A1AA]'}`}>
+                          <span className={`text-xs font-mono tabular-nums ${isOverdue ? 'font-black text-rose-600 dark:text-rose-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                             {terr.dueDate}
                           </span>
                         ) : (
                           <span className="text-xs text-zinc-400 dark:text-zinc-500">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setPolygonEditorTerritory(terr)}
-                            className={`p-1 rounded-lg cursor-pointer ${
+                            className={`p-1.5 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer ${
                               terr.polygon && terr.polygon.length >= 3
-                                ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/30'
-                                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A]'
+                                ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-950/40'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10'
                             }`}
                             title="Delimitar Polígono en Mapa"
                           >
@@ -1181,14 +1192,14 @@ ${mapLink}${noVisitsText}
                           </button>
                           <button
                             onClick={() => handleShareWhatsApp(terr)}
-                            className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg cursor-pointer"
+                            className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             title="WhatsApp"
                           >
                             <Share2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDetailModalTerritory(terr)}
-                            className="p-1 text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded-lg cursor-pointer"
+                            className="p-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             title="Ver Ficha S-13"
                           >
                             <Eye className="w-4 h-4" />
@@ -1196,14 +1207,14 @@ ${mapLink}${noVisitsText}
                           {isAssigned ? (
                             <button
                               onClick={() => openReturnModal(terr)}
-                              className="px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg border border-emerald-500/20 cursor-pointer"
+                              className="px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             >
                               Devolver
                             </button>
                           ) : (
                             <button
                               onClick={() => openAssignModal(terr)}
-                              className="px-2.5 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-xs cursor-pointer"
+                              className="px-3.5 py-1 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-xl shadow-md shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
                             >
                               Asignar
                             </button>

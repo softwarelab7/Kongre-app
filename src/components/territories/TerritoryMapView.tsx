@@ -441,7 +441,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
     : null;
 
   return (
-    <div className="relative w-full h-[76vh] min-h-[550px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-[#27272A] shadow-xl flex flex-col bg-zinc-900">
+    <div className="relative w-full h-[76vh] min-h-[550px] rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-white/10 shadow-2xl flex flex-col bg-zinc-950">
       {/* Top Floating Control Bar */}
       <div className="absolute top-3 left-3 right-3 z-[400] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Left Side: Search & Quick Filters */}
@@ -454,7 +454,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
               placeholder="Buscar #, nombre, zona o publicador..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-100 text-xs shadow-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-2xl kg-glass-surface border border-zinc-200/80 dark:border-white/10 text-zinc-900 dark:text-white text-xs shadow-xl focus:ring-2 focus:ring-indigo-500/50 focus:outline-none transition-all placeholder:text-zinc-400"
             />
             {searchTerm && (
               <button
@@ -467,33 +467,33 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           </div>
 
           {/* Status Quick Filter Chips */}
-          <div className="hidden lg:flex items-center gap-1 bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md p-1 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-lg text-xs">
+          <div className="hidden lg:flex items-center gap-1 kg-glass-surface p-1 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-xl text-xs">
             <button
               onClick={() => setStatusFilter('todos')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 statusFilter === 'todos'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-zinc-200'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               Todos ({territories.length})
             </button>
             <button
               onClick={() => setStatusFilter('disponible')}
-              className={`px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 statusFilter === 'disponible'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20'
                   : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Disponibles</span>
             </button>
             <button
               onClick={() => setStatusFilter('asignado')}
-              className={`px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 statusFilter === 'asignado'
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
                   : 'text-blue-600 dark:text-blue-400 hover:bg-blue-500/10'
               }`}
             >
@@ -502,13 +502,13 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('vencido')}
-              className={`px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 statusFilter === 'vencido'
-                  ? 'bg-rose-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-500/20'
                   : 'text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               <span>Vencidos</span>
             </button>
           </div>
@@ -518,7 +518,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
             <select
               value={zoneFilter}
               onChange={(e) => setZoneFilter(e.target.value)}
-              className="bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] px-3 py-2 rounded-xl text-xs shadow-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="kg-glass-surface border border-zinc-200/80 dark:border-white/10 text-zinc-800 dark:text-white px-3.5 py-2.5 rounded-2xl text-xs shadow-xl focus:ring-2 focus:ring-indigo-500/50 focus:outline-none cursor-pointer"
             >
               <option value="todos">Todas las Zonas</option>
               {zones.map((z) => (
@@ -533,7 +533,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
         {/* Right Side: Map Controls & Actions */}
         <div className="flex items-center gap-2 pointer-events-auto">
           {/* Base Layer Switcher */}
-          <div className="flex items-center bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md p-1 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-lg">
+          <div className="flex items-center kg-glass-surface p-1 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-xl">
             {(Object.keys(MAP_TILE_PROVIDERS) as MapTileLayerKey[]).map((key) => {
               const prov = MAP_TILE_PROVIDERS[key];
               const isActive = activeTile === key;
@@ -542,10 +542,10 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
                   key={key}
                   type="button"
                   onClick={() => handleChangeTile(key)}
-                  className={`p-1.5 sm:px-2 sm:py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all ${
+                  className={`p-1.5 sm:px-2.5 sm:py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                     isActive
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-zinc-200'
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                   title={prov.name}
                 >
@@ -560,7 +560,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           <button
             type="button"
             onClick={handleFitAll}
-            className="p-2 rounded-xl bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] shadow-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors"
+            className="p-2.5 rounded-2xl kg-glass-surface border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 shadow-xl hover:bg-zinc-100 dark:hover:bg-white/10 hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="Centrar todos los territorios"
           >
             <Maximize2 className="w-4 h-4" />
@@ -571,7 +571,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
             type="button"
             onClick={handleLocateMe}
             disabled={isLocating}
-            className="p-2 rounded-xl bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] shadow-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors disabled:opacity-50"
+            className="p-2.5 rounded-2xl kg-glass-surface border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 shadow-xl hover:bg-zinc-100 dark:hover:bg-white/10 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
             title="Mi ubicación GPS en el mapa"
           >
             <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin text-blue-500' : ''}`} />
@@ -581,7 +581,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           <button
             type="button"
             onClick={handleExportGeoJson}
-            className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-xl bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] shadow-lg hover:bg-zinc-100 dark:hover:bg-[#27272A] text-xs font-medium transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl kg-glass-surface border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 shadow-xl hover:bg-zinc-100 dark:hover:bg-white/10 text-xs font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="Descargar territorios en formato GeoJSON"
           >
             <Download className="w-3.5 h-3.5" />
@@ -592,7 +592,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           <button
             type="button"
             onClick={onCreateTerritory}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-lg shadow-indigo-500/20 text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-xl shadow-indigo-500/25 text-xs font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Nuevo Territorio</span>
@@ -631,45 +631,45 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
 
       {/* Floating Bottom Card: Selected Territory Details */}
       {selectedTerritory && selectedStatusInfo && (
-        <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-[400] bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xl space-y-3 animate-slide-up">
+        <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-[400] kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/15 shadow-2xl space-y-3.5 animate-slide-up">
           {/* Card Header */}
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <div
                 style={{ backgroundColor: selectedStatusInfo.fill }}
-                className="w-9 h-9 rounded-xl text-white font-black text-sm flex items-center justify-center shadow-md"
+                className="w-10 h-10 rounded-2xl text-white font-mono font-black text-sm flex items-center justify-center shadow-md shrink-0"
               >
                 #{selectedTerritory.number}
               </div>
-              <div>
-                <h3 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 line-clamp-1">
+              <div className="min-w-0">
+                <h3 className="font-bold text-sm text-zinc-900 dark:text-white truncate">
                   {selectedTerritory.name}
                 </h3>
-                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {selectedTerritory.zone} • ~{selectedTerritory.estimatedHomes} hogares
                 </p>
               </div>
             </div>
             <button
               onClick={() => setSelectedTerritory(null)}
-              className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+              className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Status & Metrics Pills */}
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
-            <span className={`px-2 py-0.5 rounded-full font-medium border ${selectedStatusInfo.badgeClass}`}>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+            <span className={`px-2.5 py-1 rounded-full font-bold border ${selectedStatusInfo.badgeClass}`}>
               {selectedStatusInfo.label}
             </span>
             {selectedPerimeter > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] font-medium">
+              <span className="px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 font-mono font-medium">
                 Perímetro: {formatDistance(selectedPerimeter)}
               </span>
             )}
             {selectedArea > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8] font-medium">
+              <span className="px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 font-mono font-medium">
                 Área: {formatArea(selectedArea)}
               </span>
             )}
@@ -677,12 +677,12 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
 
           {/* Assignee / Dates */}
           {selectedTerritory.status === 'asignado' && (
-            <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181F]/60 border border-zinc-100 dark:border-[#27272A]/80 text-xs space-y-1">
-              <div className="flex items-center gap-1.5 font-medium text-zinc-700 dark:text-[#E4E4E7]">
+            <div className="p-3 rounded-2xl bg-zinc-100/70 dark:bg-white/[0.04] border border-zinc-200/60 dark:border-white/5 text-xs space-y-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-white">
                 <User className="w-3.5 h-3.5 text-blue-500" />
                 <span>{selectedAssignee ? selectedAssignee.name : 'Hermano asignado'}</span>
               </div>
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA] pt-0.5">
+              <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
                 <span>Asignado: {selectedTerritory.assignedDate || 'N/A'}</span>
                 <span>Vence: {selectedTerritory.dueDate || 'N/A'}</span>
               </div>
@@ -691,7 +691,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
 
           {/* No Visit Warning Indicator */}
           {selectedTerritory.noVisits && selectedTerritory.noVisits.length > 0 && (
-            <div className="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1.5 font-medium">
+            <div className="px-3 py-2 rounded-2xl bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/25 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2 font-semibold">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               <span>{selectedTerritory.noVisits.length} casa(s) con solicitud de NO VISITAR</span>
             </div>
@@ -701,14 +701,14 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
             <button
               onClick={() => onOpenDigitalCard(selectedTerritory)}
-              className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+              className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Tarjeta Digital</span>
             </button>
             <button
               onClick={() => onEditPolygon(selectedTerritory)}
-              className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#E4E4E7] font-medium flex items-center justify-center gap-1.5 transition-colors"
+              className="px-3.5 py-2.5 rounded-xl border border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-800 dark:text-white font-bold flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>Editar Polígono</span>
@@ -716,7 +716,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
             {selectedTerritory.status === 'disponible' ? (
               <button
                 onClick={() => onAssignTerritory(selectedTerritory)}
-                className="col-span-2 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                className="col-span-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Asignar a un Publicador</span>
@@ -724,7 +724,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
             ) : (
               <button
                 onClick={() => onReturnTerritory(selectedTerritory)}
-                className="col-span-2 px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#D4D4D8] font-medium flex items-center justify-center gap-1.5 transition-colors"
+                className="col-span-2 px-3.5 py-2.5 rounded-xl border border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-800 dark:text-white font-bold flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Registrar Devolución</span>

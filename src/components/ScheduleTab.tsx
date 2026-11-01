@@ -711,7 +711,7 @@ export const ScheduleTab: React.FC = () => {
       <div
         onTouchStart={handleWeekTouchStart}
         onTouchEnd={handleWeekTouchEnd}
-        className="relative z-20 bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-3 sm:p-4 shadow-xs space-y-2.5 sm:space-y-3"
+        className="relative z-20 kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-3.5 sm:p-5 shadow-xl backdrop-blur-xl space-y-3 sm:space-y-4"
       >
         {/* Fila 1: Navegación de Semana y Selector de Modalidad (Apilados limpiamente en móvil, en línea en desktop) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3">
@@ -723,12 +723,12 @@ export const ScheduleTab: React.FC = () => {
 
             {/* Cápsula de navegación de semana interactiva con selector rápido */}
             <div className="relative flex items-center gap-1.5 flex-1 md:flex-initial min-w-0">
-              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] p-1 rounded-xl">
+              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-zinc-100/80 dark:bg-zinc-800/60 backdrop-blur-md border border-zinc-200/80 dark:border-white/10 p-1 rounded-2xl shadow-inner">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-[#121216] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-white/10 disabled:opacity-20 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                   title="Semana anterior (o desliza a la derecha)"
                   aria-label="Semana anterior"
                 >
@@ -738,7 +738,7 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsWeekPickerOpen((prev) => !prev)}
-                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] hover:bg-white dark:hover:bg-[#121216] transition-all cursor-pointer select-none shadow-2xs"
+                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] hover:bg-white dark:hover:bg-white/10 transition-all cursor-pointer select-none shadow-2xs"
                   title="Clic para abrir selector de semanas, meses y calendario"
                 >
                   <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -746,7 +746,7 @@ export const ScheduleTab: React.FC = () => {
                     {formatTheocraticWeekRangeShort(currentWeek.weekStartDate, currentWeek.weekEndDate)}
                   </span>
                   {isCurrentWeekToday && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" title="Semana en curso (Hoy)" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse inline-block shrink-0" title="Semana en curso (Hoy)" />
                   )}
                   <ChevronDown
                     className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0 ${
@@ -758,7 +758,7 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={goToNextWeek}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-[#121216] transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-white/10 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
                   title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente (o desliza a la izquierda)' : 'Crear siguiente semana'}
                   aria-label="Semana siguiente"
                 >
@@ -771,7 +771,7 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={goToToday}
-                  className="min-h-[38px] sm:min-h-0 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/70 text-xs font-extrabold hover:bg-indigo-100 transition-all cursor-pointer shrink-0 active:scale-95"
+                  className="min-h-[38px] sm:min-h-0 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 text-indigo-700 dark:text-indigo-300 border border-indigo-400/40 text-xs font-extrabold transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs hover:shadow-indigo-500/20"
                   title="Volver a la semana actual (Hoy)"
                 >
                   Hoy
@@ -786,7 +786,7 @@ export const ScheduleTab: React.FC = () => {
                     onClick={() => setIsWeekPickerOpen(false)}
                   />
 
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-[#121216] border-0 sm:border border-zinc-200 dark:border-[#27272A] rounded-none sm:rounded-2xl shadow-xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] kg-glass-surface bg-white/95 dark:bg-[#121216]/95 border-0 sm:border border-zinc-200/80 dark:border-white/10 rounded-none sm:rounded-2xl shadow-2xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150 backdrop-blur-xl">
                     <div className="flex items-center justify-between pb-2.5 sm:pb-2 border-b border-zinc-100 dark:border-[#27272A]">
                       <div className="flex items-center gap-2">
                         <button
@@ -946,18 +946,18 @@ export const ScheduleTab: React.FC = () => {
 
           {/* Bloque 1B: Selector de tipo de reunión con indicadores de progreso */}
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A] gap-1">
+            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-zinc-100/80 dark:bg-zinc-800/60 p-1 rounded-2xl border border-zinc-200/80 dark:border-white/10 gap-1 backdrop-blur-md">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'all'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 <span>Todo</span>
-                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300">
                   {meetingProgress.midweekAssigned + meetingProgress.weekendAssigned}/
                   {meetingProgress.midweekTotal + meetingProgress.weekendTotal}
                 </span>
@@ -965,18 +965,18 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('midweek')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'midweek'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 <span className="truncate">Entre Semana</span>
                 <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
                     meetingProgress.midweekAssigned >= meetingProgress.midweekTotal && meetingProgress.midweekTotal > 0
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                      : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                      : 'bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300'
                   }`}
                 >
                   {meetingProgress.midweekAssigned}/{meetingProgress.midweekTotal}
@@ -985,18 +985,18 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('weekend')}
-                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
+                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
                   viewMode === 'weekend'
-                    ? 'bg-white dark:bg-[#121216] text-emerald-600 dark:text-emerald-400 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs font-bold'
+                    ? 'bg-white dark:bg-[#121216] text-emerald-600 dark:text-emerald-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                 }`}
               >
                 <span className="truncate">Fin de Semana</span>
                 <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
                     meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                      : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                      : 'bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300'
                   }`}
                 >
                   {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal}
@@ -1007,7 +1007,7 @@ export const ScheduleTab: React.FC = () => {
             {/* Botón Nueva Semana sutil (solo en desktop md+) */}
             <button
               onClick={addNextWeek}
-              className="hidden md:flex p-2 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer shrink-0"
+              className="hidden md:flex p-2.5 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 transition-all cursor-pointer shrink-0 active:scale-95"
               title="Añadir nueva semana"
             >
               <Plus className="w-4 h-4" />
@@ -1016,9 +1016,9 @@ export const ScheduleTab: React.FC = () => {
         </div>
 
         {/* ── BARRA DE HERRAMIENTAS DE ACCIONES ── */}
-        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-2.5 border-t border-zinc-200 dark:border-[#27272A] w-full text-xs">
+        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-3 border-t border-zinc-200/80 dark:border-white/10 w-full text-xs">
           {/* Lado izquierdo: Acciones clave con diseño limpio */}
-          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             {!isReadOnly ? (
               <button
                 onClick={
@@ -1026,21 +1026,21 @@ export const ScheduleTab: React.FC = () => {
                     ? handleAutoAssignWeekendOnly
                     : handleAutoAssignAllMeetings
                 }
-                className="min-h-[34px] sm:min-h-0 flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+                className="min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold transition-all shadow-md shadow-indigo-500/20 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                 title="Autoasignar toda esta semana respetando rotación y sin cruces"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 <span>Autoasignar</span>
               </button>
             ) : (
-              <span className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] sm:text-xs font-medium px-2 py-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] rounded-lg truncate">
+              <span className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] sm:text-xs font-medium px-2.5 py-1 bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 rounded-xl truncate">
                 Solo lectura ({effectiveRoleInfo.shortName})
               </span>
             )}
 
             <button
               onClick={() => setIsBatchWhatsAppOpen(true)}
-              className="min-h-[34px] sm:min-h-0 flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+              className="min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-semibold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0 shadow-xs"
               title="Enviar recordatorios de la semana por WhatsApp"
             >
               <MessageCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1049,12 +1049,12 @@ export const ScheduleTab: React.FC = () => {
           </div>
 
           {/* Lado derecho: Documentos, Cruces y Menú Más */}
-          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
             {/* S-89 oficial (en escritorio visible directo, en móvil dentro de Más Opciones) */}
             <button
               type="button"
               onClick={handlePrintS89}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-medium transition-all cursor-pointer active:scale-95 shadow-xs"
               title="Descargar hojas oficiales de asignación S-89 en PDF"
             >
               <FileText className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -1065,7 +1065,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenS38}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-medium transition-all cursor-pointer active:scale-95 shadow-xs"
               title="Registros S-38 y folleto de oratoria"
             >
               <Award className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -1076,7 +1076,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsTimerModalOpen(true)}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-50/70 hover:bg-amber-100/80 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 border border-amber-200/80 dark:border-amber-800/60 font-semibold transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 font-semibold transition-all cursor-pointer active:scale-95 shadow-xs"
               title="Abrir Modo Atril y Cronómetro de Presidencia"
             >
               <Timer className="w-3.5 h-3.5 text-amber-500 shrink-0" />
@@ -1087,17 +1087,17 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsConflictsModalOpen(true)}
-              className={`min-h-[34px] sm:min-h-0 flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap shrink-0 ${
+              className={`min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap shrink-0 shadow-xs ${
                 weekConflictsCount > 0
-                  ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 font-mono tabular-nums'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
+                  ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/40 font-mono tabular-nums shadow-[0_0_10px_rgba(244,63,94,0.2)]'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100/80 dark:hover:bg-white/10'
               }`}
               title="Auditoría de cruces de esta semana"
             >
               {weekConflictsCount > 0 ? (
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0 animate-bounce" />
               ) : (
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               )}
               <span className="font-mono tabular-nums">{weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}</span>
             </button>
@@ -1273,13 +1273,13 @@ export const ScheduleTab: React.FC = () => {
 
       {/* SPECIAL EVENT BANNER IF ACTIVE */}
       {currentWeek.specialEvent?.isSpecial && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/20 border-2 border-amber-400/80 dark:border-amber-500/30 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Sparkle className="w-6 h-6" />
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-amber-400/60 dark:border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-4 sm:p-5 text-amber-950 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl backdrop-blur-xl relative overflow-hidden">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/30">
+              <Sparkle className="w-6 h-6 animate-pulse" />
             </div>
             <div className="min-w-0">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-amber-200 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 px-2.5 py-0.5 rounded-full inline-block">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full inline-block">
                 Fecha Especial Programada
               </span>
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] mt-1 truncate">
@@ -1303,7 +1303,7 @@ export const ScheduleTab: React.FC = () => {
               setEventNotes(currentWeek.specialEvent?.notes || '');
               setIsSpecialEventModalOpen(true);
             }}
-            className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-amber-300 dark:border-amber-500/30 text-xs font-bold text-amber-900 dark:text-amber-300 transition-all shrink-0 cursor-pointer active:scale-95 shadow-2xs"
+            className="px-4 py-2 rounded-xl bg-white/90 hover:bg-amber-50 dark:bg-white/10 dark:hover:bg-white/15 border border-amber-300/80 dark:border-amber-500/40 text-xs font-bold text-amber-900 dark:text-amber-200 transition-all shrink-0 cursor-pointer active:scale-95 shadow-sm"
           >
             Modificar Evento
           </button>
@@ -1313,7 +1313,7 @@ export const ScheduleTab: React.FC = () => {
       {/* REUNIÓN DE ENTRE SEMANA (VMC - ASIGNADOR OFICIAL) */}
       {(viewMode === 'all' || viewMode === 'midweek') && (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden bg-white dark:bg-[#121216] shadow-xs">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-300">
             <ClmScheduleView
               key={currentWeek.weekStartDate}
               publishers={publishers}
@@ -1335,24 +1335,24 @@ export const ScheduleTab: React.FC = () => {
       {(viewMode === 'all' || viewMode === 'weekend') && (
         <div className="space-y-4">
           <div
-            className={`rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden bg-white dark:bg-[#121216] shadow-xs transition-opacity ${
+            className={`kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-300 ${
               currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
             }`}
           >
             {/* ── ENCABEZADO FDS REDISEÑADO CON IDENTIDAD VISUAL, PROGRESO Y SALTO RÁPIDO ── */}
-            <div className="border-t-4 border-t-emerald-600 dark:border-t-emerald-500 px-3.5 sm:px-5 py-3.5 sm:py-4 bg-gradient-to-b from-emerald-50/50 via-zinc-50/70 to-white dark:from-emerald-950/25 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200 dark:border-[#27272A] flex flex-col gap-3 text-xs">
+            <div className="border-t-4 border-t-emerald-600 dark:border-t-emerald-500 px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-b from-emerald-50/60 via-zinc-50/70 to-white dark:from-emerald-950/30 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-white/10 flex flex-col gap-3.5 text-xs">
               {/* Fila 1: Identidad visual, Fecha/Hora completa y Barra de Progreso */}
               <div className="flex items-start sm:items-center justify-between gap-3">
-                <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/25">
+                    <CalendarCheck className="w-5 h-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight">
                         Reunión del Fin de Semana
                       </h3>
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
                         Pública y La Atalaya
                       </span>
                     </div>
@@ -1368,16 +1368,16 @@ export const ScheduleTab: React.FC = () => {
 
                 {/* Indicador de progreso de 6 segmentos */}
                 <div
-                  className={`flex flex-col items-end px-2.5 py-1.5 rounded-xl border shrink-0 ${
+                  className={`flex flex-col items-end px-3 py-1.5 rounded-2xl border shrink-0 backdrop-blur-md ${
                     meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
-                      ? 'bg-emerald-50/90 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300'
-                      : 'bg-white border-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:border-[#27272A] dark:text-[#F4F4F5]'
+                      ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                      : 'bg-zinc-100/80 dark:bg-white/5 border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                   title="Progreso de asignaciones de Fin de Semana"
                 >
                   <div className="flex items-center gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
                     <CheckCircle2
-                      size={12}
+                      size={13}
                       className={
                         meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
                           ? 'text-emerald-600 dark:text-emerald-400'
@@ -1388,14 +1388,14 @@ export const ScheduleTab: React.FC = () => {
                       {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal} asignados
                     </span>
                   </div>
-                  <div className="grid grid-cols-6 gap-0.5 w-20 h-1.5 mt-1">
+                  <div className="grid grid-cols-6 gap-0.5 w-24 h-1.5 mt-1.5">
                     {[1, 2, 3, 4, 5, 6].map((step) => (
                       <span
                         key={step}
-                        className={`h-full rounded-xs transition-colors ${
+                        className={`h-full rounded-full transition-all duration-300 ${
                           meetingProgress.weekendAssigned >= step
-                            ? 'bg-emerald-500 dark:bg-emerald-400'
-                            : 'bg-zinc-200 dark:bg-zinc-700'
+                            ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]'
+                            : 'bg-zinc-200 dark:bg-white/15'
                         }`}
                       />
                     ))}
@@ -1404,7 +1404,7 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* Fila 2: Resumen de Bosquejo y Cánticos + Botones de Acción Rápida */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-200/70 dark:border-[#27272A]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-zinc-200/80 dark:border-white/10">
                 <div className="flex items-center gap-2 flex-wrap min-w-0">
                   <button
                     type="button"
@@ -1412,10 +1412,10 @@ export const ScheduleTab: React.FC = () => {
                       setWeekendEditTab('discurso');
                       setIsWeekendEditModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#204d74]/10 hover:bg-[#204d74]/20 dark:bg-[#204d74]/30 text-[#204d74] dark:text-sky-300 border border-[#204d74]/20 text-[11px] font-bold transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 dark:bg-sky-500/15 dark:hover:bg-sky-500/25 text-sky-800 dark:text-sky-300 border border-sky-500/30 text-[11px] font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
                     title="Clic para editar bosquejo u orador"
                   >
-                    <Mic size={11} className="shrink-0" />
+                    <Mic size={12} className="shrink-0" />
                     <span>
                       {currentWeek.weekend.publicTalkOutlineNumber
                         ? `Bosquejo #${currentWeek.weekend.publicTalkOutlineNumber}`
@@ -1429,10 +1429,10 @@ export const ScheduleTab: React.FC = () => {
                       setWeekendEditTab('canciones');
                       setIsWeekendEditModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A] text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-[11px] font-semibold text-zinc-700 dark:text-[#A1A1AA] font-mono tabular-nums transition-all cursor-pointer active:scale-95 shadow-2xs"
                     title="Clic para editar los cánticos del fin de semana"
                   >
-                    <Music size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <Music size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>
                       Cánticos {currentWeek.weekend.openingSong || 12}, {currentWeek.weekend.middleSong || 68},{' '}
                       {currentWeek.weekend.closingSong || 138}
@@ -1445,7 +1445,7 @@ export const ScheduleTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleAutoAssignWeekendOnly}
-                      className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                      className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95"
                       title="Autoasignar presidente, oraciones, conductor y lector del fin de semana"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
@@ -1457,7 +1457,7 @@ export const ScheduleTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleQuickSyncOrganized('weekend')}
-                      className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                      className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
                       title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                     >
                       <RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1471,7 +1471,7 @@ export const ScheduleTab: React.FC = () => {
                       setOrganizedModalTab('bosquejos');
                       setIsOrganizedModalOpen(true);
                     }}
-                    className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
                     title="Ver catálogo oficial de 194 bosquejos"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -1481,7 +1481,7 @@ export const ScheduleTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsTimerModalOpen(true)}
-                    className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-[#F4F4F5] border border-transparent dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
                     title="Abrir cronómetro de atril para Discurso Público y Estudio de La Atalaya"
                   >
                     <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -1491,7 +1491,7 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* Fila 3: Barra de salto rápido a secciones de Fin de Semana */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-2 border-t border-zinc-200/60 dark:border-[#27272A]">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2.5 border-t border-zinc-200/80 dark:border-white/10">
                 {[
                   {
                     id: 'fds-sec-apertura',
@@ -1500,8 +1500,8 @@ export const ScheduleTab: React.FC = () => {
                       (currentWeek.weekend.presidentId ? 1 : 0) + (currentWeek.weekend.initialPrayerId ? 1 : 0),
                     total: 2,
                     pillClass:
-                      'bg-zinc-200/70 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300/60 dark:border-zinc-700',
-                    dotClass: 'bg-emerald-500',
+                      'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 border-zinc-200/80 dark:border-white/10',
+                    dotClass: 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]',
                   },
                   {
                     id: 'fds-sec-discurso',
@@ -1509,8 +1509,8 @@ export const ScheduleTab: React.FC = () => {
                     assigned: currentWeek.weekend.publicTalkSpeaker ? 1 : 0,
                     total: 1,
                     pillClass:
-                      'bg-[#204d74]/10 hover:bg-[#204d74]/20 dark:bg-[#204d74]/25 dark:hover:bg-[#204d74]/35 text-[#204d74] dark:text-sky-300 border-[#204d74]/25',
-                    dotClass: 'bg-[#204d74] dark:bg-sky-400',
+                      'bg-sky-500/10 hover:bg-sky-500/20 dark:bg-sky-500/15 dark:hover:bg-sky-500/25 text-sky-800 dark:text-sky-300 border-sky-500/30',
+                    dotClass: 'bg-sky-500 shadow-[0_0_6px_rgba(14,165,233,0.6)]',
                   },
                   {
                     id: 'fds-sec-atalaya',
@@ -1520,8 +1520,8 @@ export const ScheduleTab: React.FC = () => {
                       (currentWeek.weekend.atalayaLectorId ? 1 : 0),
                     total: 2,
                     pillClass:
-                      'bg-[#1d6349]/10 hover:bg-[#1d6349]/20 dark:bg-[#1d6349]/25 dark:hover:bg-[#1d6349]/35 text-[#1d6349] dark:text-emerald-300 border-[#1d6349]/25',
-                    dotClass: 'bg-[#1d6349] dark:bg-emerald-400',
+                      'bg-emerald-500/10 hover:bg-emerald-500/20 dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 border-emerald-500/30',
+                    dotClass: 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]',
                   },
                   {
                     id: 'fds-sec-conclusion',
@@ -1529,8 +1529,8 @@ export const ScheduleTab: React.FC = () => {
                     assigned: currentWeek.weekend.finalPrayerId ? 1 : 0,
                     total: 1,
                     pillClass:
-                      'bg-zinc-200/70 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300/60 dark:border-zinc-700',
-                    dotClass: 'bg-teal-500',
+                      'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 border-zinc-200/80 dark:border-white/10',
+                    dotClass: 'bg-teal-500 shadow-[0_0_6px_rgba(20,184,166,0.6)]',
                   },
                 ].map((sec) => (
                   <button
@@ -1540,7 +1540,7 @@ export const ScheduleTab: React.FC = () => {
                       const el = document.getElementById(sec.id);
                       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition cursor-pointer shrink-0 shadow-2xs ${sec.pillClass}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 ${sec.pillClass}`}
                   >
                     <span className={`w-2 h-2 rounded-full ${sec.dotClass}`} />
                     <span>{sec.label}</span>
@@ -1889,13 +1889,15 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* 2. SECCIÓN: DISCURSO PÚBLICO (30 MIN) */}
-              <div id="fds-sec-discurso" className="mt-2 scroll-mt-24">
-                <div className="w-full bg-[#204d74] text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none">
-                  <div className="flex items-center gap-2">
-                    <Mic className="w-4 h-4 text-sky-200 shrink-0" />
+              <div id="fds-sec-discurso" className="mt-3 scroll-mt-24">
+                <div className="w-full bg-gradient-to-r from-[#1e3a5f] to-[#2563eb] text-white py-3 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-md select-none border-y border-blue-400/20">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-lg bg-white/15 flex items-center justify-center">
+                      <Mic className="w-3.5 h-3.5 text-sky-200 shrink-0" />
+                    </div>
                     <span>DISCURSO PÚBLICO (30 MIN)</span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/15 text-white/95">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/20 text-white font-bold backdrop-blur-xs">
                     {currentWeek.weekend.publicTalkSpeaker ? '1/1 asignado' : '0/1 asignado'}
                   </span>
                 </div>
@@ -2038,13 +2040,15 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* 4. SECCIÓN: ESTUDIO DE LA ATALAYA (60 MIN) */}
-              <div id="fds-sec-atalaya" className="mt-2 scroll-mt-24">
-                <div className="w-full bg-[#1d6349] text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-emerald-200 shrink-0" />
+              <div id="fds-sec-atalaya" className="mt-3 scroll-mt-24">
+                <div className="w-full bg-gradient-to-r from-[#14532d] to-[#059669] text-white py-3 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-md select-none border-y border-emerald-400/20">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-lg bg-white/15 flex items-center justify-center">
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+                    </div>
                     <span>ESTUDIO DE LA ATALAYA (60 MIN)</span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/15 text-white/95">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/20 text-white font-bold backdrop-blur-xs">
                     {(currentWeek.weekend.atalayaConductorId ? 1 : 0) + (currentWeek.weekend.atalayaLectorId ? 1 : 0)}/2 asignados
                   </span>
                 </div>

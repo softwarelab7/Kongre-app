@@ -1531,7 +1531,7 @@ export default function ClmScheduleView({
 
                   <button
                     onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                    className="min-h-[36px] sm:min-h-0 px-3 py-1.5 sm:py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
+                    className="min-h-[36px] sm:min-h-0 px-3.5 py-1.5 sm:py-1 rounded-full text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                     title="Toca para editar o cambiar asignación"
                   >
                     <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1545,7 +1545,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       handleAssignInline(part.id, '', 'main');
                     }}
-                    className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800/60 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-500/10 dark:bg-rose-500/20 dark:text-rose-300 border border-rose-500/30 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
                     aria-label="Quitar asignado"
                   >
@@ -1557,10 +1557,10 @@ export default function ClmScheduleView({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                        className="min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                        className="min-h-[34px] sm:min-h-0 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                         title="Cambiar ayudante"
                       >
-                        <span className="text-[10px] text-indigo-500 font-bold">Ayud.:</span>
+                        <span className="text-[10px] text-indigo-500 dark:text-indigo-400 font-bold">Ayud.:</span>
                         <span className="truncate max-w-[135px] sm:max-w-none">{part.asignado_auxiliar_nombre}</span>
                       </button>
                       <button
@@ -1569,7 +1569,7 @@ export default function ClmScheduleView({
                           e.stopPropagation();
                           handleAssignInline(part.id, '', 'assistant');
                         }}
-                        className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800/60 transition-all cursor-pointer shadow-2xs active:scale-95"
+                        className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-500/10 dark:bg-rose-500/20 dark:text-rose-300 border border-rose-500/30 transition-all cursor-pointer shadow-2xs active:scale-95"
                         title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
                         aria-label="Quitar ayudante"
                       >
@@ -1588,7 +1588,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         setSelectedStudentForModal(studentPub);
                       }}
-                      className="p-2 sm:p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-[#18181F] dark:text-indigo-400 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
+                      className="p-2 sm:p-1.5 rounded-full text-indigo-600 dark:text-indigo-400 hover:text-white hover:bg-indigo-600 bg-indigo-500/10 dark:bg-white/5 border border-indigo-500/30 dark:border-white/10 transition-all cursor-pointer shadow-2xs active:scale-95"
                       title={`Ver Ficha Oficial S-38 e historial de ${studentPub.full_name || studentPub.name}`}
                       aria-label="Ver Ficha S-38"
                     >
@@ -1603,7 +1603,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       setSelectedPartForReplacement(part);
                     }}
-                    className="p-2 sm:p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-[#18181F] dark:text-amber-400 dark:hover:bg-amber-600 border border-amber-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="p-2 sm:p-1.5 rounded-full text-amber-600 dark:text-amber-400 hover:text-white hover:bg-amber-600 bg-amber-500/10 dark:bg-white/5 border border-amber-500/30 dark:border-white/10 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Buscar sustituto para ${part.asignado_nombre}`}
                     aria-label="Sustituir asignación"
                   >
@@ -1617,7 +1617,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       handleSendWhatsAppSingle(part, 'main', false);
                     }}
-                    className="p-2 sm:p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-[#18181F] dark:text-emerald-400 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
+                    className="p-2 sm:p-1.5 rounded-full text-emerald-600 dark:text-emerald-400 hover:text-white hover:bg-emerald-600 bg-emerald-500/10 dark:bg-white/5 border border-emerald-500/30 dark:border-white/10 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Enviar asignación por WhatsApp a ${part.asignado_nombre}`}
                     aria-label="Enviar WhatsApp al titular"
                   >
@@ -1632,7 +1632,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleSendWhatsAppSingle(part, 'assistant', false);
                       }}
-                      className="hidden sm:inline-flex p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-[#18181F] dark:text-indigo-400 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs active:scale-95"
+                      className="hidden sm:inline-flex p-1.5 rounded-full text-indigo-600 dark:text-indigo-400 hover:text-white hover:bg-indigo-600 bg-indigo-500/10 dark:bg-white/5 border border-indigo-500/30 dark:border-white/10 transition-all cursor-pointer shadow-2xs active:scale-95"
                       title={`Enviar asignación por WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
                       aria-label="Enviar WhatsApp al ayudante"
                     >
@@ -1644,7 +1644,7 @@ export default function ClmScheduleView({
             ) : (
               <button
                 onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                className="min-h-[36px] sm:min-h-0 px-4 py-1.5 sm:px-3.5 sm:py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1 active:scale-95"
+                className="min-h-[36px] sm:min-h-0 px-4 py-1.5 sm:px-3.5 sm:py-1 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-2xs flex items-center gap-1 active:scale-95"
               >
                 + Sin Asignar
               </button>
@@ -2232,19 +2232,19 @@ export default function ClmScheduleView({
         </>
       ) : (
         /* ── ENCABEZADO VMC REDISEÑADO (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="border-t-4 border-t-indigo-600 dark:border-t-indigo-500 px-3.5 sm:px-5 py-3.5 sm:py-4 bg-gradient-to-b from-indigo-50/50 via-zinc-50/70 to-white dark:from-indigo-950/25 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-[#27272A] flex flex-col gap-3 text-xs">
+        <div className="border-t-4 border-t-indigo-600 dark:border-t-indigo-500 px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-b from-indigo-50/60 via-zinc-50/70 to-white dark:from-indigo-950/30 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-white/10 flex flex-col gap-3.5 text-xs">
           {/* Fila 1: Identidad visual, Fecha/Hora completa y Barra de Progreso */}
           <div className="flex items-start sm:items-center justify-between gap-3">
-            <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25">
+                <BookOpen className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight">
                     Reunión Entre Semana
                   </h3>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
                     Vida y Ministerio (VMC)
                   </span>
                 </div>
@@ -2269,32 +2269,32 @@ export default function ClmScheduleView({
               const isComplete = assigned >= total;
               return (
                 <div
-                  className={`flex flex-col items-end px-2.5 py-1.5 rounded-xl border shrink-0 ${
+                  className={`flex flex-col items-end px-3 py-1.5 rounded-2xl border shrink-0 backdrop-blur-md ${
                     isComplete
-                      ? 'bg-emerald-50/90 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300'
-                      : 'bg-white border-zinc-200 text-zinc-700 dark:bg-[#18181F] dark:border-[#27272A] dark:text-[#F4F4F5]'
+                      ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                      : 'bg-zinc-100/80 dark:bg-white/5 border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                   title="Progreso de asignaciones de Entre Semana"
                 >
                   <div className="flex items-center gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
                     <CheckCircle2
-                      size={12}
+                      size={13}
                       className={isComplete ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-500'}
                     />
                     <span>
                       {assigned}/{total} asignados
                     </span>
                   </div>
-                  <div className="grid grid-cols-5 gap-0.5 w-20 h-1.5 mt-1">
+                  <div className="grid grid-cols-5 gap-0.5 w-24 h-1.5 mt-1.5">
                     {[20, 40, 60, 80, 100].map((step) => (
                       <span
                         key={step}
-                        className={`h-full rounded-xs transition-colors ${
+                        className={`h-full rounded-full transition-all duration-300 ${
                           pct >= step - 10
                             ? isComplete
-                              ? 'bg-emerald-500'
-                              : 'bg-indigo-600 dark:bg-indigo-400'
-                            : 'bg-zinc-200 dark:bg-zinc-700'
+                              ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]'
+                              : 'bg-indigo-600 dark:bg-indigo-400 shadow-[0_0_6px_rgba(99,102,241,0.7)]'
+                            : 'bg-zinc-200 dark:bg-white/15'
                         }`}
                       />
                     ))}
@@ -2305,7 +2305,7 @@ export default function ClmScheduleView({
           </div>
 
           {/* Fila 2: Lectura Bíblica Semanal + Cánticos + Botones de Acción Rápida */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-200/70 dark:border-[#27272A]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-zinc-200/80 dark:border-white/10">
             <div className="flex items-center gap-2 flex-wrap min-w-0">
               <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 Lectura:
@@ -2320,8 +2320,8 @@ export default function ClmScheduleView({
                 onSelectReference={(ref) => openReference(ref)}
               />
               {effectivePrograma && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-[11px] font-semibold text-zinc-600 dark:text-[#A1A1AA] font-mono tabular-nums">
-                  <Music size={11} className="text-indigo-500 shrink-0" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 text-[11px] font-semibold text-zinc-700 dark:text-[#A1A1AA] font-mono tabular-nums shadow-2xs">
+                  <Music size={12} className="text-indigo-500 shrink-0" />
                   <span>
                     Cánticos {effectivePrograma.canto_inicial || 4}, {effectivePrograma.canto_medio || 89},{' '}
                     {effectivePrograma.canto_final || 120}
@@ -2335,17 +2335,17 @@ export default function ClmScheduleView({
               <button
                 type="button"
                 onClick={handleAutoAssign}
-                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer active:scale-95 shadow-2xs"
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs transition-all cursor-pointer active:scale-95 shadow-md shadow-indigo-500/20"
                 title="Autoasignar partes de Entre Semana (VMC) respetando rotación"
               >
-                <Sparkles size={12} className="text-amber-300 shrink-0" />
+                <Sparkles size={13} className="text-amber-300 shrink-0" />
                 <span>Autoasignar VMC</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleSyncOrganized}
-                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition-all cursor-pointer active:scale-95 shadow-2xs"
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all cursor-pointer active:scale-95 shadow-2xs"
                 title="Sincronizar bosquejos y tiempos de la Guía de Actividades"
               >
                 <RefreshCw size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -2353,7 +2353,7 @@ export default function ClmScheduleView({
               </button>
 
               <div
-                className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] shadow-2xs select-none"
+                className="inline-flex items-center px-3 py-1 rounded-xl bg-white/90 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5] shadow-2xs select-none"
                 title="Activar o desactivar Sala Auxiliar para esta semana"
               >
                 <SplashCheckbox
@@ -2370,7 +2370,7 @@ export default function ClmScheduleView({
                   setTimerInitialPartId(undefined);
                   setIsTimerModalOpen(true);
                 }}
-                className="min-h-[32px] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-[#18181F] dark:hover:bg-[#27272A] dark:text-[#F4F4F5] border border-transparent dark:border-[#27272A] transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95"
+                className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-[#F4F4F5] border border-transparent dark:border-white/10 transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95"
                 title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
               >
                 <Clock size={12} className="shrink-0 text-amber-400" />
@@ -2380,8 +2380,8 @@ export default function ClmScheduleView({
           </div>
 
           {/* Fila 3: Navegación Rápida por Secciones de VMC + Selector de Sala */}
-          <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-[#27272A] flex-wrap">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-zinc-200/80 dark:border-white/10 flex-wrap">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
               {[
                 {
                   id: 'section-tesoros',
@@ -2389,8 +2389,8 @@ export default function ClmScheduleView({
                   shortLabel: 'Tesoros',
                   items: groupedSections.tesoros,
                   pillClass:
-                    'bg-[#5A6B7C]/10 hover:bg-[#5A6B7C]/20 text-[#475664] dark:bg-[#5A6B7C]/25 dark:hover:bg-[#5A6B7C]/35 dark:text-slate-200 border-[#5A6B7C]/25',
-                  dotClass: 'bg-[#5A6B7C] dark:bg-slate-300',
+                    'bg-[#5A6B7C]/15 hover:bg-[#5A6B7C]/25 text-[#334155] dark:text-slate-200 border-[#5A6B7C]/30',
+                  dotClass: 'bg-[#5A6B7C] shadow-[0_0_6px_rgba(90,107,124,0.6)]',
                 },
                 {
                   id: 'section-maestros',
@@ -2398,8 +2398,8 @@ export default function ClmScheduleView({
                   shortLabel: 'Maestros',
                   items: groupedSections.maestros,
                   pillClass:
-                    'bg-[#C67D0A]/10 hover:bg-[#C67D0A]/20 text-[#9c6106] dark:bg-[#C67D0A]/25 dark:hover:bg-[#C67D0A]/35 dark:text-amber-200 border-[#C67D0A]/25',
-                  dotClass: 'bg-[#C67D0A] dark:bg-amber-400',
+                    'bg-[#C67D0A]/15 hover:bg-[#C67D0A]/25 text-[#9c6106] dark:text-amber-200 border-[#C67D0A]/30',
+                  dotClass: 'bg-[#C67D0A] shadow-[0_0_6px_rgba(198,125,10,0.6)]',
                 },
                 {
                   id: 'section-vida_cristiana',
@@ -2407,8 +2407,8 @@ export default function ClmScheduleView({
                   shortLabel: 'Vida Cristiana',
                   items: groupedSections.vidaCristiana,
                   pillClass:
-                    'bg-[#962828]/10 hover:bg-[#962828]/20 text-[#7d2020] dark:bg-[#962828]/25 dark:hover:bg-[#962828]/35 dark:text-rose-200 border-[#962828]/25',
-                  dotClass: 'bg-[#962828] dark:bg-rose-400',
+                    'bg-[#962828]/15 hover:bg-[#962828]/25 text-[#7d2020] dark:text-rose-200 border-[#962828]/30',
+                  dotClass: 'bg-[#962828] shadow-[0_0_6px_rgba(150,40,40,0.6)]',
                 },
               ].map((sec) => {
                 const secAssigned = sec.items.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length;
@@ -2421,7 +2421,7 @@ export default function ClmScheduleView({
                       const el = document.getElementById(sec.id);
                       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap shadow-2xs ${sec.pillClass}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap shadow-2xs active:scale-95 ${sec.pillClass}`}
                   >
                     <span className={`w-2 h-2 rounded-full shrink-0 ${sec.dotClass}`} />
                     <span className="sm:hidden">{sec.shortLabel}</span>
@@ -2435,12 +2435,12 @@ export default function ClmScheduleView({
             </div>
 
             {showAuxRoom && (
-              <div className="flex items-center gap-1.5 ml-auto">
-                <div className="inline-flex items-center gap-0.5 bg-white dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold shadow-2xs">
+              <div className="flex items-center gap-2 ml-auto">
+                <div className="inline-flex items-center gap-0.5 bg-zinc-100/80 dark:bg-white/5 p-1 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-xs font-semibold shadow-inner backdrop-blur-md">
                   <button
                     type="button"
                     onClick={() => setActiveRoom('principal')}
-                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                       activeRoom === 'principal'
                         ? 'bg-indigo-600 text-white font-bold shadow-xs'
                         : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
@@ -2452,7 +2452,7 @@ export default function ClmScheduleView({
                   <button
                     type="button"
                     onClick={() => setActiveRoom('auxiliar')}
-                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                       activeRoom === 'auxiliar'
                         ? 'bg-amber-500 text-white font-bold shadow-xs'
                         : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
@@ -2465,10 +2465,10 @@ export default function ClmScheduleView({
                 <button
                   type="button"
                   onClick={() => setIsAuxCounselorModalOpen(true)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer shadow-2xs"
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-2xs active:scale-95"
                   title="Consejero de la Sala Auxiliar"
                 >
-                  <UserCheck size={12} className="shrink-0" />
+                  <UserCheck size={13} className="shrink-0" />
                   <span>
                     {auxCounselorPart?.asignado_nombre
                       ? auxCounselorPart.asignado_nombre.split(' ')[0]
@@ -2576,15 +2576,17 @@ export default function ClmScheduleView({
 
         {/* 2. Sección: TESOROS DE LA BIBLIA */}
         {groupedSections.tesoros.length > 0 && (
-          <div id="section-tesoros" className="mt-2 scroll-mt-24">
+          <div id="section-tesoros" className="mt-3 scroll-mt-24">
             <div
-              className={`w-full ${SECTION_BANNERS.tesoros.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
+              className="w-full bg-gradient-to-r from-[#334155] to-[#64748b] text-white py-3 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-md select-none border-y border-slate-400/20"
             >
-              <span className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 opacity-90 shrink-0" />
+              <span className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-white/15 flex items-center justify-center">
+                  <BookOpen className="w-3.5 h-3.5 text-slate-200 shrink-0" />
+                </div>
                 <span>{SECTION_BANNERS.tesoros.label}</span>
               </span>
-              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/20 text-white font-bold backdrop-blur-xs">
                 {groupedSections.tesoros.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
                 {groupedSections.tesoros.length} asignados
               </span>
@@ -2595,15 +2597,17 @@ export default function ClmScheduleView({
 
         {/* 3. Sección: SEAMOS MEJORES MAESTROS */}
         {groupedSections.maestros.length > 0 && (
-          <div id="section-maestros" className="mt-2 scroll-mt-24">
+          <div id="section-maestros" className="mt-3 scroll-mt-24">
             <div
-              className={`w-full ${SECTION_BANNERS.maestros.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
+              className="w-full bg-gradient-to-r from-[#b45309] to-[#f59e0b] text-white py-3 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-md select-none border-y border-amber-400/20"
             >
-              <span className="flex items-center gap-2">
-                <Award className="w-4 h-4 opacity-90 shrink-0" />
+              <span className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-white/15 flex items-center justify-center">
+                  <Award className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                </div>
                 <span>{SECTION_BANNERS.maestros.label}</span>
               </span>
-              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/20 text-white font-bold backdrop-blur-xs">
                 {groupedSections.maestros.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
                 {groupedSections.maestros.length} asignados
               </span>
@@ -2617,15 +2621,17 @@ export default function ClmScheduleView({
 
         {/* 5. Sección: NUESTRA VIDA CRISTIANA */}
         {groupedSections.vidaCristiana.length > 0 && (
-          <div id="section-vida_cristiana" className="mt-2 scroll-mt-24">
+          <div id="section-vida_cristiana" className="mt-3 scroll-mt-24">
             <div
-              className={`w-full ${SECTION_BANNERS.vida_cristiana.bgClass} text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-xs select-none`}
+              className="w-full bg-gradient-to-r from-[#881337] to-[#be123c] text-white py-3 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider flex items-center justify-between shadow-md select-none border-y border-rose-400/20"
             >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 opacity-90 shrink-0" />
+              <span className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-white/15 flex items-center justify-center">
+                  <Sparkles className="w-3.5 h-3.5 text-rose-200 shrink-0" />
+                </div>
                 <span>{SECTION_BANNERS.vida_cristiana.label}</span>
               </span>
-              <span className="text-[11px] font-mono tabular-nums font-semibold opacity-90">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-white/20 text-white font-bold backdrop-blur-xs">
                 {groupedSections.vidaCristiana.filter((p) => Boolean(p.asignado_nid || p.asignado_nombre)).length}/
                 {groupedSections.vidaCristiana.length} asignados
               </span>

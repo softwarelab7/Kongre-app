@@ -42,6 +42,10 @@ export const VERSION_HISTORY: VersionRecord[] = [
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [
       {
+        category: 'improvement',
+        text: 'Erradicación Total de Diálogos Nativos del Navegador (ModalContext.tsx, StudyInspectorPanel.tsx, etc.): Reemplazo de todos los avisos de "localhost dice..." (window.confirm / window.alert) por modales estilizados con diseño Kongre y notificaciones toast no invasivas.',
+      },
+      {
         category: 'feature',
         text: 'Botón Flotante Reactivo de Retorno al Inicio (ScrollToTopButton.tsx, App.tsx): Botón interactivo con anillo SVG de progreso de desplazamiento, micro-animaciones fluidas con motion/react y posicionamiento adaptativo para móvil y panel de estudio acoplado.',
       },

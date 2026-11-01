@@ -66,6 +66,8 @@ import {
   ArrowLeft,
   LayoutGrid,
 } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
+import { useToast } from '../context/ToastContext';
 import {
   isNotificationSupported,
   getNotificationPermission,
@@ -130,6 +132,8 @@ export const PersonalViewTab: React.FC = () => {
     disableTwoFactorForPublisher,
     verifyTwoFactorForPublisher,
   } = useAuth();
+  const { confirm } = useModal();
+  const { showToast } = useToast();
 
   // Módulo activo dentro del Portal del Publicador
   const [activeModule, setActiveModule] = useState<PublisherPortalTab>('asignaciones');
@@ -601,14 +605,21 @@ export const PersonalViewTab: React.FC = () => {
   // Desactivar 2FA para el publicador activo
   const handleDisable2FA = async () => {
     if (!selectedPublisherId) return;
-    if (!window.confirm('¿Deseas desactivar la verificación en dos pasos (2FA) para tu cuenta?')) return;
+    const confirmed = await confirm({
+      title: 'Desactivar 2FA',
+      message: '¿Deseas desactivar la verificación en dos pasos (2FA) para tu cuenta?',
+      confirmText: 'Desactivar',
+      cancelText: 'Cancelar',
+      type: 'warning',
+    });
+    if (!confirmed) return;
     setIs2FADisabling(true);
     try {
       const res = await disableTwoFactorForPublisher(selectedPublisherId);
       if (res.success) {
-        alert('Verificación en dos pasos desactivada exitosamente.');
+        showToast('Verificación en dos pasos desactivada exitosamente.', 'success');
       } else {
-        alert(res.message || 'No se pudo desactivar 2FA.');
+        showToast(res.message || 'No se pudo desactivar 2FA.', 'error');
       }
     } finally {
       setIs2FADisabling(false);

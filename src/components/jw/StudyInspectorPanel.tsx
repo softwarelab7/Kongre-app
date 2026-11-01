@@ -20,6 +20,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { ReferenceItem, UserAnnotation, HighlightColor } from '../../types/jwDesignSystem';
+import { useModal } from '../../context/ModalContext';
+import { useToast } from '../../context/ToastContext';
 
 export interface StudyInspectorPanelProps {
   isOpen: boolean;
@@ -139,6 +141,8 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
   activeAnnotation,
   onSaveAnnotation,
 }) => {
+  const { confirm } = useModal();
+  const { showToast } = useToast();
   const [notes, setNotes] = useState<StudyNote[]>(() => loadSavedNotes());
   const [activeNoteId, setActiveNoteId] = useState<string>(() => notes[0]?.id || '');
   const [activeView, setActiveView] = useState<'editor' | 'list'>('editor');
@@ -315,9 +319,16 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
   };
 
   // Delete note
-  const handleDeleteNote = (idToDelete: string, e?: React.MouseEvent) => {
+  const handleDeleteNote = async (idToDelete: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (window.confirm('¿Deseas eliminar esta nota permanentemente?')) {
+    const confirmed = await confirm({
+      title: 'Eliminar nota',
+      message: '¿Deseas eliminar esta nota permanentemente?',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      type: 'danger',
+    });
+    if (confirmed) {
       const remaining = notes.filter((n) => n.id !== idToDelete);
       setNotes(remaining);
       if (activeNoteId === idToDelete) {
@@ -327,6 +338,7 @@ export const StudyInspectorPanel: React.FC<StudyInspectorPanelProps> = ({
           setActiveView('list');
         }
       }
+      showToast('Nota eliminada permanentemente', 'info');
     }
   };
 

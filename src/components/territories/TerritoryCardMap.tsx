@@ -14,6 +14,7 @@ import {
   formatArea,
 } from './TerritoryMapUtils';
 import { Navigation, Maximize2, Layers, ExternalLink, Compass } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 interface TerritoryCardMapProps {
   territory: Territory;
@@ -24,6 +25,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
   territory,
   heightClass = 'h-[320px] sm:h-[380px]',
 }) => {
+  const { showToast } = useToast();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
@@ -161,7 +163,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
   // Locate User GPS
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      alert('Tu dispositivo no soporta geolocalización.');
+      showToast('Tu dispositivo no soporta geolocalización.', 'warning');
       return;
     }
 
@@ -198,7 +200,7 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
       },
       (err) => {
         setIsLocating(false);
-        alert(`No se pudo obtener la señal GPS: ${err.message}`);
+        showToast(`No se pudo obtener la señal GPS: ${err.message}`, 'error');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

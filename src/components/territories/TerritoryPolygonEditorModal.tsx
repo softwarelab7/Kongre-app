@@ -29,6 +29,8 @@ import {
   Maximize2,
   Minimize2,
 } from 'lucide-react';
+import { useModal } from '../../context/ModalContext';
+import { useToast } from '../../context/ToastContext';
 
 interface TerritoryPolygonEditorModalProps {
   isOpen: boolean;
@@ -55,6 +57,8 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
   onSave,
   defaultCenter = [4.6097, -74.0817], // Bogotá default
 }) => {
+  const { confirm } = useModal();
+  const { showToast } = useToast();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
@@ -283,9 +287,16 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
     setVertices((prev) => prev.slice(0, prev.length - 1));
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
     if (vertices.length > 0) {
-      if (window.confirm('¿Deseas borrar todos los puntos del polígono de este territorio?')) {
+      const confirmed = await confirm({
+        title: 'Borrar puntos',
+        message: '¿Deseas borrar todos los puntos del polígono de este territorio?',
+        confirmText: 'Borrar todo',
+        cancelText: 'Cancelar',
+        type: 'danger',
+      });
+      if (confirmed) {
         setVertices([]);
       }
     }
@@ -300,7 +311,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      alert('Tu navegador no soporta geolocalización.');
+      showToast('Tu navegador no soporta geolocalización.', 'warning');
       return;
     }
     setIsLocating(true);
@@ -314,7 +325,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
       },
       (err) => {
         setIsLocating(false);
-        alert(`No se pudo obtener la ubicación: ${err.message}`);
+        showToast(`No se pudo obtener la ubicación: ${err.message}`, 'error');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -358,7 +369,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
 
   const handleSave = () => {
     if (vertices.length > 0 && vertices.length < 3) {
-      alert('Un territorio debe tener al menos 3 puntos para formar un polígono perimetral cerrado.');
+      showToast('Un territorio debe tener al menos 3 puntos para formar un polígono perimetral cerrado.', 'warning');
       return;
     }
 
@@ -381,10 +392,10 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
           mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40] });
         }
       } else {
-        alert('No se encontró un polígono válido con al menos 3 coordenadas en el GeoJSON.');
+        showToast('No se encontró un polígono válido con al menos 3 coordenadas en el GeoJSON.', 'error');
       }
     } catch {
-      alert('El formato no es un JSON válido. Asegúrate de pegar un GeoJSON correcto.');
+      showToast('El formato no es un JSON válido. Asegúrate de pegar un GeoJSON correcto.', 'error');
     }
   };
 

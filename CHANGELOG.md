@@ -9,6 +9,10 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 ### [v0.1.0-alpha.42] — 31 de Octubre, 2026
 **Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB, Visor Interactivo PDF, Autoasignación de Fin de Semana, Botón de Retorno Rápido y Anillo Reactivo de Sincronización**
 
+- 🚫 **Erradicación Total de Diálogos Nativos del Navegador (`ModalContext.tsx`, `StudyInspectorPanel.tsx`, `PersonalViewTab.tsx`, `TerritoriosTab.tsx`, `CleaningDutiesTab.tsx`, `InformeSucursalS1Tab.tsx`, `ErrorBoundary.tsx`):**
+  - Eliminación definitiva de todos los cuadros de diálogo intrusivos del navegador (`window.confirm`, `window.alert`, avisos de "localhost dice...") que interrumpían la experiencia de usuario.
+  - Sustitución integral por modales estilizados con la estética teocrática de Kongre (`useModal` con soporte para confirmaciones de peligro/advertencia/información) y notificaciones toast no invasivas (`useToast`).
+  - Cobertura completa en la eliminación de notas del panel de estudio JW, desactivación de 2FA, reseteo de caché en pantalla de error, gestión de territorios y turnos de limpieza.
 - ⬆️ **Botón Flotante Reactivo de Retorno al Inicio (`ScrollToTopButton.tsx`, `App.tsx`):**
   - Implementación de un botón flotante con anillo SVG circular de progreso dinámico que refleja visualmente el porcentaje de avance de lectura/scroll en la pantalla.
   - Aparición suave con animación (`motion/react`) tras rebasar el umbral de desplazamiento, con micro-animaciones en hover y retroalimentación táctil interactiva.

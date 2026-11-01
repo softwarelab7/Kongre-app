@@ -10,6 +10,7 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
+  showResetConfirm: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -17,10 +18,11 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
     error: null,
     errorInfo: null,
+    showResetConfirm: false,
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error, errorInfo: null };
+    return { hasError: true, error, errorInfo: null, showResetConfirm: false };
   }
 
   public componentDidMount() {
@@ -37,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleVisibilityRecovery = () => {
     if (typeof document !== 'undefined' && document.visibilityState === 'visible' && this.state.hasError) {
-      this.setState({ hasError: false, error: null, errorInfo: null });
+      this.setState({ hasError: false, error: null, errorInfo: null, showResetConfirm: false });
     }
   };
 
@@ -50,23 +52,21 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
-  private handleResetCache = () => {
-    if (confirm('¿Deseas reiniciar la memoria caché local para solucionar el error? Tus datos en la nube no se perderán.')) {
-      try {
-        sessionStorage.clear();
-        const keepKeys = ['kongre_security_congregation_pin_hash', 'kongre_is_registered_congregation'];
-        const saved: Record<string, string> = {};
-        keepKeys.forEach((k) => {
-          const v = localStorage.getItem(k);
-          if (v) saved[k] = v;
-        });
-        localStorage.clear();
-        Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v));
-      } catch (e) {
-        console.error('Error clearing storage:', e);
-      }
-      window.location.href = window.location.origin;
+  private executeResetCache = () => {
+    try {
+      sessionStorage.clear();
+      const keepKeys = ['kongre_security_congregation_pin_hash', 'kongre_is_registered_congregation'];
+      const saved: Record<string, string> = {};
+      keepKeys.forEach((k) => {
+        const v = localStorage.getItem(k);
+        if (v) saved[k] = v;
+      });
+      localStorage.clear();
+      Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {
+      console.error('Error clearing storage:', e);
     }
+    window.location.href = window.location.origin;
   };
 
   public render() {
@@ -115,7 +115,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
               <button
                 type="button"
-                onClick={this.handleResetCache}
+                onClick={() => this.setState({ showResetConfirm: true })}
                 className="py-2.5 px-4 rounded-xl bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 title="Limpia datos en caché corruptos"
               >
@@ -123,6 +123,37 @@ export class ErrorBoundary extends Component<Props, State> {
                 <span>Restablecer caché</span>
               </button>
             </div>
+
+            {/* In-app custom confirmation modal (no native browser popups) */}
+            {this.state.showResetConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+                <div className="bg-zinc-800 border border-zinc-700 max-w-sm w-full rounded-2xl p-5 text-left space-y-4 shadow-2xl">
+                  <div className="flex items-center gap-2.5 text-amber-400">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <h3 className="font-bold text-sm text-white">¿Restablecer memoria caché?</h3>
+                  </div>
+                  <p className="text-xs text-zinc-300 leading-relaxed">
+                    Esta acción reiniciará la memoria caché local para solucionar el error. Tus datos sincronizados en la nube no se perderán.
+                  </p>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => this.setState({ showResetConfirm: false })}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-700 text-zinc-200 hover:bg-zinc-600 cursor-pointer transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={this.executeResetCache}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white cursor-pointer transition-colors"
+                    >
+                      Sí, restablecer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       );

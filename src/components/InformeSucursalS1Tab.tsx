@@ -32,8 +32,12 @@ import {
   Sparkles,
   Info,
 } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
+import { useToast } from '../context/ToastContext';
 
 export const InformeSucursalS1Tab: React.FC = () => {
+  const { confirm } = useModal();
+  const { showToast } = useToast();
   const {
     weeks,
     publishers,
@@ -116,7 +120,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
       setTimeout(() => setCopiedSuccess(false), 3000);
     } catch {
       // Fallback
-      alert('Resumen copiado al portapapeles');
+      showToast('Resumen copiado al portapapeles', 'success');
     }
   };
 
@@ -147,8 +151,15 @@ export const InformeSucursalS1Tab: React.FC = () => {
     setShowSubmissionModal(false);
   };
 
-  const handleRevertSubmission = () => {
-    if (window.confirm('¿Deseas cambiar el estado a "Pendiente de Envío" para este mes?')) {
+  const handleRevertSubmission = async () => {
+    const confirmed = await confirm({
+      title: 'Cambiar estado de informe',
+      message: '¿Deseas cambiar el estado a "Pendiente de Envío" para este mes?',
+      confirmText: 'Cambiar a pendiente',
+      cancelText: 'Cancelar',
+      type: 'warning',
+    });
+    if (confirmed) {
       markBranchReportS1Status(
         selectedMonth,
         'pendiente',
@@ -157,6 +168,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
         submitForm.notes
       );
       setShowSubmissionModal(false);
+      showToast('Estado cambiado a Pendiente de Envío', 'info');
     }
   };
 

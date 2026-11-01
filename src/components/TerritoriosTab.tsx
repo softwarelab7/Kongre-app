@@ -52,8 +52,10 @@ import {
   fillOfficialS13Pdf,
   downloadPdfBytesLocally,
 } from '../services/localOfficialFormsService';
+import { useModal } from '../context/ModalContext';
 
 export const TerritoriosTab: React.FC = () => {
+  const { confirm } = useModal();
   const {
     territories,
     publishers,
@@ -136,9 +138,16 @@ export const TerritoriosTab: React.FC = () => {
   };
 
   // Seed handler for demo map polygons
-  const handleSeedSamplePolygons = () => {
-    if (window.confirm('¿Deseas cargar 4 territorios de muestra con mapas y polígonos delimitados para probar el mapa interactivo?')) {
-      SAMPLE_TERRITORIES_WITH_POLYGONS.forEach((sample) => {
+  const handleSeedSamplePolygons = async () => {
+    const confirmed = await confirm({
+      title: 'Territorios de muestra',
+      message: '¿Deseas cargar 4 territorios de muestra con mapas y polígonos delimitados para probar el mapa interactivo?',
+      confirmText: 'Cargar territorios',
+      cancelText: 'Cancelar',
+      type: 'info',
+    });
+    if (!confirmed) return;
+    SAMPLE_TERRITORIES_WITH_POLYGONS.forEach((sample) => {
         const exists = territories.find(t => t.number === sample.number);
         if (exists) {
           updateTerritory({
@@ -154,7 +163,6 @@ export const TerritoriosTab: React.FC = () => {
         }
       });
       showToast('Territorios de muestra con polígonos cargados exitosamente.');
-    }
   };
 
   // Distinct Zones
@@ -1825,8 +1833,15 @@ ${mapLink}${noVisitsText}
             {/* Modal Bottom */}
             <div className="flex items-center justify-between pt-3 border-t border-zinc-200 dark:border-[#27272A]">
               <button
-                onClick={() => {
-                  if (confirm(`¿Estás seguro de eliminar el territorio #${detailModalTerritory.number}?`)) {
+                onClick={async () => {
+                  const confirmed = await confirm({
+                    title: 'Eliminar territorio',
+                    message: `¿Estás seguro de eliminar el territorio #${detailModalTerritory.number}?`,
+                    confirmText: 'Eliminar',
+                    cancelText: 'Cancelar',
+                    type: 'danger',
+                  });
+                  if (confirmed) {
                     deleteTerritory(detailModalTerritory.id);
                     setDetailModalTerritory(null);
                     showToast('Territorio eliminado.');

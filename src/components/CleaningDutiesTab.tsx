@@ -57,8 +57,10 @@ import {
   CheckSquare,
   PackageCheck,
 } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export const CleaningDutiesTab: React.FC = () => {
+  const { confirm } = useModal();
   const {
     preachingGroups,
     updatePreachingGroups,
@@ -254,7 +256,14 @@ export const CleaningDutiesTab: React.FC = () => {
   };
 
   const handleDeleteGroup = async (num: number) => {
-    if (confirm(`¿Eliminar el Grupo #${num}?`)) {
+    const confirmed = await confirm({
+      title: 'Eliminar grupo',
+      message: `¿Deseas eliminar el Grupo #${num}?`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      type: 'danger',
+    });
+    if (confirmed) {
       await updatePreachingGroups(preachingGroups.filter(g => g.number !== num));
     }
   };
@@ -577,9 +586,16 @@ export const CleaningDutiesTab: React.FC = () => {
   };
 
   // Clear all duties for the week
-  const handleClearAllWeekDuties = () => {
+  const handleClearAllWeekDuties = async () => {
     if (!selectedWeek) return;
-    if (confirm('¿Deseas quitar a todas las personas asignadas a turnos de esta semana?')) {
+    const confirmed = await confirm({
+      title: 'Quitar asignaciones',
+      message: '¿Deseas quitar a todas las personas asignadas a turnos de esta semana?',
+      confirmText: 'Quitar todos',
+      cancelText: 'Cancelar',
+      type: 'warning',
+    });
+    if (confirmed) {
       clearWeekAssignments(selectedWeek.id, 'duties');
     }
   };

@@ -37,6 +37,7 @@ import {
   X,
   Compass,
 } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 interface TerritoryMapViewProps {
   territories: Territory[];
@@ -63,6 +64,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
   onCreateTerritory,
   onSeedSamplePolygons,
 }) => {
+  const { showToast } = useToast();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
@@ -367,7 +369,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
   // Locate User (GPS)
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      alert('Tu navegador o dispositivo no soporta geolocalización.');
+      showToast('Tu navegador o dispositivo no soporta geolocalización.', 'warning');
       return;
     }
 
@@ -403,7 +405,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
       },
       (err) => {
         setIsLocating(false);
-        alert(`No se pudo obtener la ubicación GPS: ${err.message}`);
+        showToast(`No se pudo obtener la ubicación GPS: ${err.message}`, 'error');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );

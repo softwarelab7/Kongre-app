@@ -1775,7 +1775,11 @@ const AppContent: React.FC = () => {
                 {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
                 {activeTab === 'panel_electrico' && <PanelElectricoTab />}
                 {activeTab === 'mantenimiento' && <MantenimientoTab />}
-                {activeTab === 'tablero_anuncios' && <TableroAnunciosTab />}
+                {activeTab === 'tablero_anuncios' && (
+                  <TableroAnunciosTab
+                    onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                  />
+                )}
                 {activeTab === 'conflictos' && (
                   <ConflictCenterTab onNavigateToWeek={handleNavigateToWeek} />
                 )}

@@ -926,15 +926,15 @@ export const DiscursosPublicosTab: React.FC = () => {
       )}
 
       {/* Barra de Acciones y Navegación de Discursos Públicos */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
           {/* Sub-tab Navigation Pills (Grid on mobile so nothing clips) */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1 gap-1 w-full xl:w-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/90 dark:bg-[#18181F]/90 p-1 gap-1 w-full xl:w-auto shadow-inner">
             <button
               onClick={() => setActiveSubTab('programa')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubTab === 'programa'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -944,9 +944,9 @@ export const DiscursosPublicosTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('directorio_khs')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubTab === 'directorio_khs'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -959,9 +959,9 @@ export const DiscursosPublicosTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('salientes')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubTab === 'salientes'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -976,9 +976,9 @@ export const DiscursosPublicosTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('catalogo')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubTab === 'catalogo'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -988,9 +988,9 @@ export const DiscursosPublicosTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('historial')}
-              className={`col-span-2 sm:col-span-1 flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`col-span-2 sm:col-span-1 flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubTab === 'historial'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -1003,21 +1003,21 @@ export const DiscursosPublicosTab: React.FC = () => {
           <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full xl:w-auto shrink-0">
             <button
               onClick={() => handleOpenAddVisitingSpeaker()}
-              className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition-all active:scale-95 cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-zinc-100/90 dark:bg-[#18181F] hover:bg-zinc-200/80 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-2xs truncate"
             >
               <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">Orador</span>
             </button>
             <button
               onClick={handleOpenAddCong}
-              className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] font-semibold text-xs transition-all active:scale-95 cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-zinc-100/90 dark:bg-[#18181F] hover:bg-zinc-200/80 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-2xs truncate"
             >
               <Building className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">Cong. Vecina</span>
             </button>
             <button
               onClick={handleOpenAddOutgoing}
-              className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all active:scale-95 cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-sm shadow-indigo-500/20 truncate"
             >
               <Send className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">Nueva Salida</span>
@@ -1033,12 +1033,13 @@ export const DiscursosPublicosTab: React.FC = () => {
         <div className="space-y-4">
           {/* Executive Summary Banner */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 flex items-center gap-3 shadow-xs">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-                <Mic className="w-4 h-4 text-zinc-500" />
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 flex items-center gap-3.5 shadow-sm relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-indigo-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-200/70 dark:border-indigo-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+                <Mic className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                   {weeks.filter((w) => Boolean(w.weekend.publicTalkSpeaker)).length} / {weeks.length}
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -1047,12 +1048,13 @@ export const DiscursosPublicosTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 flex items-center gap-3 shadow-xs">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-                <Building className="w-4 h-4 text-zinc-500" />
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 flex items-center gap-3.5 shadow-sm relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+                <Building className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                   {weeks.filter((w) => w.weekend.isVisitingSpeaker).length}
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -1061,12 +1063,13 @@ export const DiscursosPublicosTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 flex items-center gap-3 shadow-xs">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-                <Utensils className="w-4 h-4 text-zinc-500" />
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 flex items-center gap-3.5 shadow-sm relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-amber-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+                <Utensils className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                   {weeks.filter((w) => Boolean(w.weekend.hospitalityPublisherId)).length}
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -1075,12 +1078,13 @@ export const DiscursosPublicosTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 flex items-center gap-3 shadow-xs">
-              <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-                <ArrowRightLeft className="w-4 h-4 text-zinc-500" />
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 flex items-center gap-3.5 shadow-sm relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-purple-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-200/70 dark:border-purple-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+                <ArrowRightLeft className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+                <div className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                   {outgoingSpeakers.length} salidas
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -1147,12 +1151,12 @@ export const DiscursosPublicosTab: React.FC = () => {
               return (
                 <div
                   key={week.id}
-                  className={`bg-white dark:bg-[#121216] rounded-xl border p-5 transition-colors flex flex-col justify-between ${
+                  className={`kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border p-5 shadow-sm transition-colors flex flex-col justify-between ${
                     localSpeakerOutgoingClash
                       ? 'border-rose-300 ring-1 ring-rose-300 dark:border-rose-500/40'
                       : outlineEval?.isRepeatedRecently
                       ? 'border-amber-300 ring-1 ring-amber-300 dark:border-amber-500/40'
-                      : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-500/40'
+                      : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40'
                   }`}
                 >
                   <div>
@@ -1408,7 +1412,7 @@ export const DiscursosPublicosTab: React.FC = () => {
       {activeSubTab === 'directorio_khs' && (
         <div className="space-y-6">
           {/* Filter & Search Bar */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col lg:flex-row gap-3 items-center justify-between">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 shadow-sm flex flex-col lg:flex-row gap-3 items-center justify-between">
             <div className="relative w-full lg:w-96">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -1416,7 +1420,7 @@ export const DiscursosPublicosTab: React.FC = () => {
                 value={directorySearch}
                 onChange={(e) => setDirectorySearch(e.target.value)}
                 placeholder="Buscar congregación, orador, coordinador o # bosquejo..."
-                className="w-full pl-9 pr-4 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] rounded-xl text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-indigo-500 outline-hidden transition-all"
+                className="w-full pl-9 pr-4 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 rounded-2xl text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-indigo-500 outline-hidden transition-all shadow-inner"
               />
             </div>
 
@@ -1424,7 +1428,7 @@ export const DiscursosPublicosTab: React.FC = () => {
               <select
                 value={selectedCongFilter}
                 onChange={(e) => setSelectedCongFilter(e.target.value)}
-                className="px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-xs bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500"
+                className="px-3.5 py-2 border border-zinc-200/80 dark:border-white/10 rounded-full text-xs bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500 shadow-2xs"
               >
                 <option value="todas">Todas las congregaciones ({neighboringCongregations.length})</option>
                 {neighboringCongregations.map((c) => (
@@ -1434,12 +1438,12 @@ export const DiscursosPublicosTab: React.FC = () => {
                 ))}
               </select>
 
-              <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+              <div className="flex items-center bg-zinc-100/90 dark:bg-[#18181F]/90 p-1 rounded-full border border-zinc-200/80 dark:border-white/10 shadow-inner">
                 <button
                   onClick={() => setDirectoryView('ambos')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all active:scale-[0.98] ${
                     directoryView === 'ambos'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA]'
                   }`}
                 >
@@ -1447,9 +1451,9 @@ export const DiscursosPublicosTab: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setDirectoryView('congregaciones')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all active:scale-[0.98] ${
                     directoryView === 'congregaciones'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA]'
                   }`}
                 >
@@ -1457,9 +1461,9 @@ export const DiscursosPublicosTab: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setDirectoryView('oradores')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all active:scale-[0.98] ${
                     directoryView === 'oradores'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA]'
                   }`}
                 >
@@ -1474,7 +1478,7 @@ export const DiscursosPublicosTab: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
+                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2 tracking-tight">
                     <Building className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span>Directorio de Congregaciones Vecinas (Intercambio)</span>
                   </h3>
@@ -1484,7 +1488,7 @@ export const DiscursosPublicosTab: React.FC = () => {
                 </div>
                 <button
                   onClick={handleOpenAddCong}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-500/30 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200/80 dark:border-indigo-500/30 cursor-pointer active:scale-[0.98] transition-all shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Nueva Congregación</span>
@@ -1492,7 +1496,7 @@ export const DiscursosPublicosTab: React.FC = () => {
               </div>
 
               {filteredNeighboringCongs.length === 0 ? (
-                <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-8 text-center">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-8 text-center shadow-sm">
                   <Building className="w-10 h-10 text-zinc-300 dark:text-[#27272A] mx-auto mb-2" />
                   <h4 className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-sm">
                     No hay congregaciones vecinas registradas
@@ -1513,7 +1517,7 @@ export const DiscursosPublicosTab: React.FC = () => {
                     return (
                       <div
                         key={cong.id}
-                        className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col justify-between hover:border-indigo-500/40 transition-colors"
+                        className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between hover:border-indigo-500/40 transition-colors"
                       >
                         <div>
                           <div className="flex items-start justify-between gap-2 mb-2.5">
@@ -1611,7 +1615,7 @@ export const DiscursosPublicosTab: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
+                  <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2 tracking-tight">
                     <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Oradores Visitantes Acreditados y Bosquejos Preparados</span>
                   </h3>
@@ -1621,7 +1625,7 @@ export const DiscursosPublicosTab: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleOpenAddVisitingSpeaker()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-500/30 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200/80 dark:border-emerald-500/30 cursor-pointer active:scale-[0.98] transition-all shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Nuevo Orador Visitante</span>
@@ -1629,7 +1633,7 @@ export const DiscursosPublicosTab: React.FC = () => {
               </div>
 
               {filteredVisitingSpeakers.length === 0 ? (
-                <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-8 text-center">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-8 text-center shadow-sm">
                   <Mic className="w-10 h-10 text-zinc-300 dark:text-[#27272A] mx-auto mb-2" />
                   <h4 className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-sm">
                     No hay oradores visitantes en esta vista
@@ -1643,7 +1647,7 @@ export const DiscursosPublicosTab: React.FC = () => {
                   {filteredVisitingSpeakers.map((sp) => (
                     <div
                       key={sp.id}
-                      className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col justify-between hover:border-emerald-500/40 transition-colors"
+                      className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between hover:border-emerald-500/40 transition-colors"
                     >
                       <div>
                         <div className="flex items-start justify-between gap-2 mb-2">
@@ -1764,9 +1768,9 @@ export const DiscursosPublicosTab: React.FC = () => {
       ========================================== */}
       {activeSubTab === 'salientes' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121216] rounded-xl p-4 border border-zinc-200 dark:border-[#27272A]">
+          <div className="kg-glass-surface kg-sheen-top flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm">
             <div>
-              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
+              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base tracking-tight">
                 Discursos en Congregaciones Vecinas (Salidas Protegidas)
               </h3>
               <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
@@ -1775,7 +1779,7 @@ export const DiscursosPublicosTab: React.FC = () => {
             </div>
             <button
               onClick={handleOpenAddOutgoing}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors shrink-0 cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all active:scale-[0.98] shadow-sm shadow-indigo-500/20 shrink-0 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Registrar Salida</span>
@@ -1783,7 +1787,7 @@ export const DiscursosPublicosTab: React.FC = () => {
           </div>
 
           {outgoingSpeakers.length === 0 ? (
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-8 text-center">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-8 text-center shadow-sm">
               <Send className="w-12 h-12 text-zinc-300 dark:text-[#27272A] mx-auto mb-3" />
               <h4 className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-base">
                 No hay salidas registradas
@@ -1812,10 +1816,10 @@ export const DiscursosPublicosTab: React.FC = () => {
                 return (
                   <div
                     key={item.id}
-                    className={`bg-white dark:bg-[#121216] rounded-xl border p-5 transition-colors flex flex-col justify-between ${
+                    className={`kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border p-5 shadow-sm transition-colors flex flex-col justify-between ${
                       itemConflicts.length > 0
                         ? 'border-rose-300 ring-1 ring-rose-300 dark:border-rose-500/40'
-                        : 'border-zinc-200 dark:border-[#27272A] hover:border-indigo-500/40'
+                        : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40'
                     }`}
                   >
                     <div>
@@ -1927,15 +1931,15 @@ export const DiscursosPublicosTab: React.FC = () => {
       ========================================== */}
       {activeSubTab === 'catalogo' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
             <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={catalogQuery}
                 onChange={(e) => setCatalogQuery(e.target.value)}
                 placeholder="Buscar por número (ej: 23) o título..."
-                className="w-full pl-9 pr-4 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] rounded-xl text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-indigo-500 outline-hidden transition-all"
+                className="w-full pl-9 pr-4 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 rounded-2xl text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-indigo-500 outline-hidden transition-all shadow-inner"
               />
             </div>
 
@@ -1944,7 +1948,7 @@ export const DiscursosPublicosTab: React.FC = () => {
               <select
                 value={catalogCategory}
                 onChange={(e) => setCatalogCategory(e.target.value)}
-                className="px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-white dark:bg-[#18181F] font-medium text-zinc-700 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500"
+                className="px-3.5 py-2 border border-zinc-200/80 dark:border-white/10 rounded-full text-xs bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5] outline-hidden focus:border-indigo-500 shadow-2xs"
               >
                 <option value="todas">Todas las categorías</option>
                 {categories.map((cat) => (
@@ -1969,15 +1973,15 @@ export const DiscursosPublicosTab: React.FC = () => {
               return (
                 <div
                   key={outline.number}
-                  className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 hover:border-indigo-500/40 transition-colors flex flex-col justify-between"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:border-indigo-500/40 transition-colors flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs font-mono tabular-nums border border-indigo-200/70 dark:border-indigo-500/30 shrink-0">
+                      <span className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs font-mono tabular-nums border border-indigo-200/70 dark:border-indigo-500/30 shrink-0 shadow-2xs">
                         #{outline.number}
                       </span>
                       {outline.category && (
-                        <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-2 py-0.5 rounded-full truncate">
+                        <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA] bg-zinc-100/90 dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/10 px-2.5 py-0.5 rounded-full truncate">
                           {outline.category}
                         </span>
                       )}
@@ -2044,17 +2048,17 @@ export const DiscursosPublicosTab: React.FC = () => {
           SUBTAB 5: HISTORIAL DE DISCURSOS
       ========================================== */}
       {activeSubTab === 'historial' && (
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
-          <div className="p-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
+        <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-zinc-200/60 dark:border-white/10 flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
+              <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base tracking-tight">
                 Historial de Discursos Presentados en el Salón
               </h3>
               <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Registro cronológico para auditoría teocrática y control de repetición de bosquejos S-99.
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-bold font-mono tabular-nums">
+            <span className="px-3 py-1 rounded-full bg-zinc-100/90 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 text-xs font-bold font-mono tabular-nums shadow-2xs">
               {talkHistory.length} discursos registrados
             </span>
           </div>
@@ -2119,8 +2123,8 @@ export const DiscursosPublicosTab: React.FC = () => {
           MODAL 1: EDIT WEEKEND TALK & 1-CLICK HOSPITALITY
       ========================================== */}
       {editingWeek && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-xl w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3 shrink-0">
               <div>
                 <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base sm:text-lg">
@@ -2596,10 +2600,10 @@ export const DiscursosPublicosTab: React.FC = () => {
           MODAL 2: ADD/EDIT OUTGOING SPEAKER (WITH LIVE CONFLICT RADAR)
       ========================================== */}
       {isOutgoingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <form
             onSubmit={handleSaveOutgoing}
-            className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]"
+            className="kg-glass-surface kg-sheen-top rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3 shrink-0">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base flex items-center gap-2">
@@ -2885,10 +2889,10 @@ export const DiscursosPublicosTab: React.FC = () => {
           MODAL 3: NEIGHBORING CONGREGATION CRUD
       ========================================== */}
       {isCongModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <form
             onSubmit={handleSaveCong}
-            className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]"
+            className="kg-glass-surface kg-sheen-top rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
@@ -3048,10 +3052,10 @@ export const DiscursosPublicosTab: React.FC = () => {
           MODAL 4: VISITING SPEAKER DIRECTORY CRUD (WITH S-99 OUTLINE PICKER)
       ========================================== */}
       {isVisitingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <form
             onSubmit={handleSaveVisitingSpeaker}
-            className="bg-white dark:bg-[#121216] rounded-2xl max-w-xl w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]"
+            className="kg-glass-surface kg-sheen-top rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col p-5 sm:p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
@@ -3300,10 +3304,10 @@ export const DiscursosPublicosTab: React.FC = () => {
           MODAL 5: QUICK 1-CLICK SCHEDULE VISITING SPEAKER ONTO WEEK
       ========================================== */}
       {quickScheduleSpeaker && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <form
             onSubmit={handleConfirmQuickSchedule}
-            className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]"
+            className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
@@ -3425,8 +3429,8 @@ export const DiscursosPublicosTab: React.FC = () => {
 
       {/* MODAL 6: PREPARED OUTLINES FOR LOCAL BROTHERS */}
       {selectedOutlineForBrothers && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 space-y-4 border border-zinc-200 dark:border-[#27272A]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 space-y-4 border border-zinc-200/80 dark:border-white/10 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <div>
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold font-mono tabular-nums bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-500/30">

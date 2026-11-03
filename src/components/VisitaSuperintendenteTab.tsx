@@ -366,16 +366,16 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
       )}
 
       {/* Barra de Acciones de la Visita del SC (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase font-mono tabular-nums bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase font-mono tabular-nums bg-zinc-100/90 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 shadow-2xs">
             {circuitVisit.circuitNumber || 'Circuito'}
           </span>
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5">
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-500/30 flex items-center gap-1.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             {circuitVisit.status === 'proxima' ? 'Próxima Visita' : circuitVisit.status === 'en_curso' ? 'En Curso' : 'Concluida'}
           </span>
-          <span className="text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5]">
+          <span className="text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] tracking-tight">
             Hno. {circuitVisit.overseerName}{circuitVisit.wifeName ? ` y Hna. ${circuitVisit.wifeName}` : ''}
           </span>
           <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] hidden md:inline font-mono tabular-nums">
@@ -386,7 +386,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
         <div className="grid grid-cols-1 sm:grid-cols-3 md:flex md:items-center gap-2 w-full md:w-auto">
           <button
             onClick={handleShareFullProgramWhatsApp}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-sm shadow-emerald-500/20 transition-all active:scale-[0.98] cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>WhatsApp Programa</span>
@@ -394,7 +394,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
           <button
             onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl transition-all shadow-sm shadow-indigo-500/20 active:scale-[0.98] cursor-pointer"
             title="Imprimir Carpeta Ejecutiva A4 para el Superintendente de Circuito"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -403,7 +403,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
           <button
             onClick={openEditVisitModal}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold rounded-xl transition border border-zinc-200/80 dark:border-[#27272A] shadow-xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-zinc-100/90 hover:bg-zinc-200/80 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold rounded-2xl transition-all border border-zinc-200/80 dark:border-white/10 shadow-2xs active:scale-[0.98] cursor-pointer"
           >
             <Edit2 className="w-3.5 h-3.5" />
             <span>Editar Datos</span>
@@ -413,39 +413,43 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
       {/* Quick Highlights Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-indigo-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
           <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Discurso Entre Semana (30m)</div>
-          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate" title={circuitVisit.midweekTalkTheme}>
+          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight" title={circuitVisit.midweekTalkTheme}>
             {circuitVisit.midweekTalkTheme}
           </div>
           <div className="text-indigo-600 dark:text-indigo-400 text-[11px] mt-0.5 font-bold font-mono tabular-nums">Cántico {circuitVisit.midweekSongNumber || '-'}</div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-purple-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
           <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Discurso Público Fin de Semana</div>
-          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate" title={circuitVisit.weekendPublicTalkTheme}>
+          <div className="font-semibold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight" title={circuitVisit.weekendPublicTalkTheme}>
             {circuitVisit.weekendPublicTalkTheme}
           </div>
           <div className="text-zinc-400 dark:text-zinc-500 text-[11px] mt-0.5">Reunión pública de 30 min</div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
           <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Hospitalidad & Comidas</div>
-          <div className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+          <div className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
             {mealsStats.confirmed} de {mealsStats.total} Confirmadas
           </div>
           <div className="text-emerald-600 dark:text-emerald-400 text-[11px] mt-0.5 font-bold">Almuerzos y cenas organizadas</div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-amber-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
           <div className="text-zinc-500 dark:text-[#A1A1AA] font-medium mb-1">Registros & Auditoría (Checklist)</div>
           <div className="flex items-center gap-2">
-            <span className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">{checklistStats.percent}% completado</span>
+            <span className="font-semibold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">{checklistStats.percent}% completado</span>
             <span className="text-zinc-400 dark:text-zinc-500 text-[11px] font-mono tabular-nums">({checklistStats.completed}/{checklistStats.total})</span>
           </div>
-          <div className="w-full bg-zinc-100 dark:bg-[#18181F] rounded-full h-1 mt-1.5 overflow-hidden">
+          <div className="w-full bg-zinc-100 dark:bg-[#18181F] rounded-full h-1.5 mt-1.5 overflow-hidden">
             <div
-              className="bg-emerald-500 h-1 rounded-full transition-all duration-300"
+              className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${checklistStats.percent}%` }}
             />
           </div>
@@ -453,12 +457,12 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
       </div>
 
       {/* Sub-tabs Navigation */}
-      <div className="bg-white dark:bg-[#121216] p-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-1.5 overflow-x-auto">
+      <div className="kg-glass-surface kg-sheen-top p-1.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center gap-1.5 overflow-x-auto">
         <button
           onClick={() => setActiveSubTab('programa')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer active:scale-[0.98] ${
             activeSubTab === 'programa'
-              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
               : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
@@ -468,9 +472,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
         <button
           onClick={() => setActiveSubTab('comidas')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer active:scale-[0.98] ${
             activeSubTab === 'comidas'
-              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
               : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
@@ -480,9 +484,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
         <button
           onClick={() => setActiveSubTab('predicacion')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer active:scale-[0.98] ${
             activeSubTab === 'predicacion'
-              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
               : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
@@ -492,9 +496,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
         <button
           onClick={() => setActiveSubTab('checklist')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer active:scale-[0.98] ${
             activeSubTab === 'checklist'
-              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
               : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
@@ -504,9 +508,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
         <button
           onClick={() => setActiveSubTab('carpeta_ejecutiva')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer active:scale-[0.98] ${
             activeSubTab === 'carpeta_ejecutiva'
-              ? 'bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
+              ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
               : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/50'
           }`}
         >
@@ -523,15 +527,15 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           {/* Talk Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Midweek service talk */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-500/30">
                   Reunión Entre Semana
                 </span>
                 <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug tracking-tight">
                   {circuitVisit.midweekTalkTheme}
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
@@ -549,15 +553,15 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
             </div>
 
             {/* Weekend public talk */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-500/30">
                   Fin de Semana • Público
                 </span>
                 <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug tracking-tight">
                   {circuitVisit.weekendPublicTalkTheme}
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
@@ -575,15 +579,15 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
             </div>
 
             {/* Weekend concluding talk */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-500/30">
                   Fin de Semana • Conclusión
                 </span>
                 <span className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">30 Minutos</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] leading-snug tracking-tight">
                   {circuitVisit.weekendFinalTalkTheme}
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1">
@@ -602,10 +606,10 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           </div>
 
           {/* Special Meetings Section */}
-          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
                   <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <span>Reuniones Especiales Convocadas</span>
                 </h3>
@@ -615,7 +619,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
               </div>
               <button
                 onClick={() => setIsAddMeetingModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-semibold shadow-sm shadow-indigo-500/20 transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Reunión</span>
@@ -624,7 +628,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {circuitVisit.specialMeetings.map((sp) => (
-                <div key={sp.id} className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 space-y-2 relative group">
+                <div key={sp.id} className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 space-y-2 relative group">
                   <button
                     onClick={() => removeSpecialMeeting(sp.id)}
                     className="absolute top-3 right-3 text-zinc-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition p-1 cursor-pointer"
@@ -649,7 +653,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
                     </p>
                   </div>
                   {sp.notes && (
-                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic bg-white dark:bg-[#121216] p-2 rounded border border-zinc-200/60 dark:border-[#27272A] mt-1">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic bg-white dark:bg-[#121216] p-2 rounded-xl border border-zinc-200/60 dark:border-white/10 mt-1">
                       {sp.notes}
                     </p>
                   )}
@@ -667,7 +671,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
         <div className="space-y-6">
           {/* Preferences Banner */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-xs">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 rounded-3xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-sm">
               <div className="font-bold flex items-center gap-1.5 text-zinc-900 dark:text-[#F4F4F5]">
                 <Utensils className="w-4 h-4 text-amber-500" />
                 <span>Preferencias Alimentarias & Alergias de los Hermanos Visitantes:</span>
@@ -677,9 +681,9 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] p-4 rounded-xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-xs">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 rounded-3xl space-y-1.5 text-zinc-700 dark:text-zinc-300 text-xs shadow-sm">
               <div className="font-bold flex items-center gap-1.5 text-zinc-900 dark:text-[#F4F4F5]">
-                <Home className="w-4 h-4 text-zinc-500" />
+                <Home className="w-4 h-4 text-indigo-500" />
                 <span>Alojamiento & Hospedaje:</span>
               </div>
               <p className="leading-relaxed">
@@ -689,10 +693,10 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           </div>
 
           {/* Meals Table / Grid */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-zinc-200/60 dark:border-white/10 flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2">
+                <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base flex items-center gap-2 tracking-tight">
                   <Utensils className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <span>Calendario de Comidas (Martes a Domingo)</span>
                 </h3>
@@ -700,7 +704,7 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
                   Familias anfitrionas coordinadas para almorzar o cenar con el superintendente de circuito y su esposa.
                 </p>
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full font-mono tabular-nums bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full font-mono tabular-nums bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-500/30 shadow-2xs">
                 {mealsStats.confirmed} de {mealsStats.total} confirmadas
               </span>
             </div>
@@ -794,10 +798,10 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
       {/* ========================================================= */}
       {activeSubTab === 'predicacion' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
                   <Compass className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   <span>Salidas al Ministerio con el Superintendente y su Esposa</span>
                 </h3>
@@ -827,7 +831,7 @@ ${m.notes ? `• Nota: ${m.notes}` : ''}`;
 ${ministryList}`;
                   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition self-start sm:self-auto cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-semibold shadow-sm shadow-emerald-500/20 transition-all active:scale-[0.98] self-start sm:self-auto cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Compartir Salidas por WhatsApp</span>
@@ -840,18 +844,18 @@ ${ministryList}`;
                 const wifeComp = m.wifeCompanionPublisherId ? publishersMap.get(m.wifeCompanionPublisherId) : null;
 
                 return (
-                  <div key={m.id} className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 space-y-3">
+                  <div key={m.id} className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/50 space-y-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm font-mono tabular-nums">
                             {m.day} {m.date.slice(5)}
                           </span>
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded font-mono tabular-nums bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300">
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full font-mono tabular-nums bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300">
                             {m.time}
                           </span>
                           {m.groupNumber && (
-                            <span className="text-xs px-2 py-0.5 rounded font-mono tabular-nums bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-medium">
+                            <span className="text-xs px-2.5 py-0.5 rounded-full font-mono tabular-nums bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-medium">
                               Grupo {m.groupNumber}
                             </span>
                           )}
@@ -867,14 +871,14 @@ ${ministryList}`;
 
                       <button
                         onClick={() => openEditMinistryModal(m)}
-                        className="p-1.5 text-zinc-500 dark:text-[#A1A1AA] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-zinc-200/60 dark:hover:bg-[#27272A] rounded-md transition cursor-pointer"
+                        className="p-1.5 text-zinc-500 dark:text-[#A1A1AA] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-zinc-200/60 dark:hover:bg-[#27272A] rounded-xl transition cursor-pointer"
                         title="Editar acompañantes y punto de salida"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-lg border border-zinc-200 dark:border-[#27272A] space-y-2 text-xs">
+                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200/80 dark:border-white/10 space-y-2 text-xs shadow-2xs">
                       <div className="flex items-center justify-between">
                         <span className="text-zinc-500 dark:text-[#A1A1AA]">Acompaña al Hno. {circuitVisit.overseerName}:</span>
                         <span className="font-semibold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-1">
@@ -892,7 +896,7 @@ ${ministryList}`;
                     </div>
 
                     {m.notes && (
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-[#18181F] p-2 rounded border border-zinc-200 dark:border-[#27272A]">
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-[#18181F] p-2 rounded-xl border border-zinc-200/80 dark:border-white/10">
                         {m.notes}
                       </p>
                     )}
@@ -909,10 +913,10 @@ ${ministryList}`;
       {/* ========================================================= */}
       {activeSubTab === 'checklist' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 dark:border-[#27272A] pb-3">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-white/10 pb-3">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
                   <CheckSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   <span>Lista de Verificación de Archivos y Registros de la Congregación</span>
                 </h3>
@@ -922,7 +926,7 @@ ${ministryList}`;
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs font-semibold px-3 py-1 rounded-full font-mono tabular-nums bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                <span className="text-xs font-semibold px-3 py-1 rounded-full font-mono tabular-nums bg-zinc-100/90 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 shadow-2xs">
                   {checklistStats.completed} de {checklistStats.total} listos ({checklistStats.percent}%)
                 </span>
               </div>
@@ -933,10 +937,10 @@ ${ministryList}`;
                 <div
                   key={item.id}
                   onClick={() => toggleVisitChecklistItem(item.id)}
-                  className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
                     item.completed
-                      ? 'bg-zinc-50/70 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] opacity-75'
-                      : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-700 dark:text-[#F4F4F5]'
+                      ? 'bg-zinc-50/70 dark:bg-[#18181F]/40 border-zinc-200/80 dark:border-white/10 opacity-75'
+                      : 'bg-white dark:bg-[#121216] border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 text-zinc-700 dark:text-[#F4F4F5] shadow-2xs'
                   }`}
                 >
                   <div className="mt-0.5 pointer-events-none">
@@ -953,7 +957,7 @@ ${ministryList}`;
                         {item.task}
                       </p>
                       {item.assignedRole && (
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] shrink-0">
+                        <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100/90 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200/80 dark:border-white/10 shrink-0">
                           {item.assignedRole}
                         </span>
                       )}
@@ -978,9 +982,9 @@ ${ministryList}`;
       {activeSubTab === 'carpeta_ejecutiva' && (
         <div className="space-y-6">
           {/* Header & Actions */}
-          <div className="bg-white dark:bg-[#121216] p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
                 <FileCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>Dossier Ejecutivo de Auditoría para la Visita del Superintendente de Circuito</span>
               </h3>
@@ -993,7 +997,7 @@ ${ministryList}`;
               <select
                 value={selectedServiceYear}
                 onChange={(e) => setSelectedServiceYear(e.target.value)}
-                className="px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-zinc-50 dark:bg-[#18181F] outline-hidden cursor-pointer"
+                className="px-3.5 py-2 border border-zinc-200/80 dark:border-white/10 rounded-full text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] bg-zinc-50/90 dark:bg-[#18181F] outline-hidden cursor-pointer shadow-2xs"
               >
                 <option value="2025-2026">Año de Servicio 2025-2026</option>
                 <option value="2026-2027">Año de Servicio 2026-2027</option>
@@ -1013,7 +1017,7 @@ ${ministryList}`;
                   a.rel = 'noopener noreferrer';
                   a.click();
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-100/90 hover:bg-zinc-200/80 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-white/10 text-zinc-800 dark:text-zinc-200 rounded-2xl text-xs font-bold shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Enviar Resumen WhatsApp</span>
@@ -1023,7 +1027,7 @@ ${ministryList}`;
                 onClick={() =>
                   printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)
                 }
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-white rounded-xl text-xs font-bold border border-transparent dark:border-[#27272A] shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold shadow-sm shadow-indigo-500/20 transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Imprimir Dossier A4</span>
@@ -1034,11 +1038,12 @@ ${ministryList}`;
           {/* 4 Executive Summary Blocks */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Roster Block */}
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-2 relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
               <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 1. Publicadores y Nombramientos
               </div>
-              <div className="text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+              <div className="text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                 {executiveReport.roster.totalPublishers}{' '}
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   ({executiveReport.roster.activeCount} activos)
@@ -1065,11 +1070,12 @@ ${ministryList}`;
             </div>
 
             {/* S-88 Attendance Block */}
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-2 relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-indigo-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
               <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 2. Asistencia S-88 (Promedios)
               </div>
-              <div className="text-2xl font-black font-mono tabular-nums text-indigo-700 dark:text-indigo-400">
+              <div className="text-2xl font-black font-mono tabular-nums text-indigo-700 dark:text-indigo-400 tracking-tight">
                 {executiveReport.attendanceS88.avgWeekendTotal}{' '}
                 <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">fin de semana</span>
               </div>
@@ -1100,11 +1106,12 @@ ${ministryList}`;
             </div>
 
             {/* Pioneer 600h Audit Block */}
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-2 relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-amber-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
               <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 3. Auditoría Precursores (600h)
               </div>
-              <div className="text-2xl font-black font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
+              <div className="text-2xl font-black font-mono tabular-nums text-emerald-700 dark:text-emerald-400 tracking-tight">
                 {executiveReport.ministryS1.pioneerAudit.summary.onTrackCount} /{' '}
                 {executiveReport.ministryS1.pioneerAudit.summary.totalRegularPioneers}{' '}
                 <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">en meta</span>
@@ -1131,11 +1138,12 @@ ${ministryList}`;
             </div>
 
             {/* S-13 Territories Block */}
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-2 relative overflow-hidden group">
+              <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-blue-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
               <div className="text-[11px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA]">
                 4. Territorios S-13 (Cobertura)
               </div>
-              <div className="text-2xl font-black font-mono tabular-nums text-blue-700 dark:text-blue-400">
+              <div className="text-2xl font-black font-mono tabular-nums text-blue-700 dark:text-blue-400 tracking-tight">
                 {executiveReport.territoriesS13.coveragePercent}%{' '}
                 <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">anual</span>
               </div>
@@ -1168,9 +1176,9 @@ ${ministryList}`;
           </div>
 
           {/* Groups Breakdown Table */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A]">
-              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-zinc-200/60 dark:border-white/10">
+              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm tracking-tight">
                 Estado por Grupos de Servicio del Campo (Revisión con el Superintendente de Servicio)
               </h4>
             </div>
@@ -1227,9 +1235,9 @@ ${ministryList}`;
           </div>
 
           {/* Pioneer Audit Table inside Circuit Visit */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-zinc-200 dark:border-[#27272A]">
-              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-zinc-200/60 dark:border-white/10">
+              <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm tracking-tight">
                 Revisión de Tarjetas S-21 de Precursores Regulares (Meta Anual: 600 h / 50 h mensuales)
               </h4>
             </div>
@@ -1305,8 +1313,8 @@ ${ministryList}`;
       {/* MODAL: EDITAR INFORMACIÓN DE LA VISITA */}
       {/* ========================================================= */}
       {isEditVisitModalOpen && visitFormData && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-xl w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4 animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base sm:text-lg">Configuración de la Visita del SC</h3>
               <button
@@ -1449,8 +1457,8 @@ ${ministryList}`;
       {/* MODAL: EDITAR ARREGLO DE COMIDA */}
       {/* ========================================================= */}
       {editMealModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4 animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
                 <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
@@ -1567,8 +1575,8 @@ ${ministryList}`;
       {/* MODAL: EDITAR SALIDA DE PREDICACIÓN */}
       {/* ========================================================= */}
       {editMinistryModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4 animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
                 <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">
@@ -1692,8 +1700,8 @@ ${ministryList}`;
       {/* MODAL: AGREGAR REUNIÓN ESPECIAL */}
       {/* ========================================================= */}
       {isAddMeetingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-zinc-200 dark:border-[#27272A] space-y-4 animate-scale-in">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4 animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-base">Agregar Reunión Especial</h3>
               <button onClick={() => setIsAddMeetingModalOpen(false)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] p-1 cursor-pointer">

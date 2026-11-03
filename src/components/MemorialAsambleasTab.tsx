@@ -453,14 +453,14 @@ export const MemorialAsambleasTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Barra de Acciones y Navegación de Memorial & Asambleas (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
         {/* Sub-tab Navigation Pills in responsive grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]/80 dark:border-[#27272A]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 rounded-2xl bg-zinc-100/90 dark:bg-[#18181F]/90 border border-zinc-200/80 dark:border-white/10 shadow-inner">
           <button
             onClick={() => setActiveSubTab('memorial')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-[0.98] ${
               activeSubTab === 'memorial'
-                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-[#27272A] shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
@@ -470,9 +470,9 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('asambleas')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-[0.98] ${
               activeSubTab === 'asambleas'
-                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-[#27272A] shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
@@ -485,24 +485,24 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('checklist')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-[0.98] ${
               activeSubTab === 'checklist'
-                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-[#27272A] shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span className="truncate">Checklist</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums font-bold shrink-0 bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono tabular-nums font-bold shrink-0 bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10">
               {checklistReadyCount}/{checklist.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('informe_sucursal')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-[0.98] ${
               activeSubTab === 'informe_sucursal'
-                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-[#27272A] shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-xs font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
@@ -525,7 +525,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 handleOpenWhatsApp(msg);
               }
             }}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-2xl transition-all shadow-sm shadow-emerald-500/20 active:scale-[0.98] cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>Programa WhatsApp</span>
@@ -533,7 +533,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-semibold text-xs rounded-xl border border-zinc-200 dark:border-[#27272A]/80 dark:border-[#27272A] transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-zinc-100/90 dark:bg-[#18181F] hover:bg-zinc-200/80 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-semibold text-xs rounded-2xl border border-zinc-200/80 dark:border-white/10 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir Cuadro</span>
@@ -547,17 +547,18 @@ export const MemorialAsambleasTab: React.FC = () => {
       {activeSubTab === 'memorial' && currentPlan && (
         <div className="space-y-6">
           {/* Header Card with Year, Date and Sunset Info */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-red-700 shrink-0">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-rose-500/10 blur-2xl pointer-events-none" />
+            <div className="flex items-start gap-4 relative">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-500/15 border border-red-200/70 dark:border-red-500/30 flex items-center justify-center text-red-700 dark:text-red-400 shrink-0 shadow-xs">
                 <Flame className="w-6 h-6" />
               </div>
               <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                     Conmemoración del Año {currentPlan.serviceYear}
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-300 border border-red-200/70 dark:border-red-500/30">
                     14 de Nisán
                   </span>
                 </div>
@@ -567,18 +568,18 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-50/90 dark:bg-[#18181F]/90 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-center shadow-inner">
               <div>
                 <span className="text-[11px] font-semibold text-zinc-400 dark:text-[#71717A] block uppercase">
                   Fecha
                 </span>
-                <span className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5]">{currentPlan.date}</span>
+                <span className="text-sm font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">{currentPlan.date}</span>
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-zinc-400 dark:text-[#71717A] block uppercase">
                   Puesta de Sol
                 </span>
-                <span className="text-sm font-bold text-amber-700">
+                <span className="text-sm font-bold font-mono tabular-nums text-amber-700 dark:text-amber-400">
                   {currentPlan.sunsetTime} hrs
                 </span>
               </div>
@@ -586,13 +587,13 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <span className="text-[11px] font-semibold text-zinc-400 dark:text-[#71717A] block uppercase">
                   Hora Inicio
                 </span>
-                <span className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5]">{currentPlan.time} hrs</span>
+                <span className="text-sm font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">{currentPlan.time} hrs</span>
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-zinc-400 dark:text-[#71717A] block uppercase">
                   Cánticos
                 </span>
-                <span className="text-sm font-bold text-indigo-700">
+                <span className="text-sm font-bold font-mono tabular-nums text-indigo-700 dark:text-indigo-400">
                   {currentPlan.initialSongNumber} y {currentPlan.finalSongNumber}
                 </span>
               </div>
@@ -600,20 +601,20 @@ export const MemorialAsambleasTab: React.FC = () => {
           </div>
 
           {/* Quick Edit Details Banner */}
-          <div className="bg-zinc-50 dark:bg-[#18181F] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-4">
-            <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] flex items-center gap-2">
+          <div className="kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div className="text-xs text-zinc-600 dark:text-[#A1A1AA] flex items-center gap-2 flex-wrap">
               <MapPin className="w-4 h-4 text-zinc-400 dark:text-[#71717A]" />
               <span>
-                <strong>Lugar:</strong> {currentPlan.location}
+                <strong className="text-zinc-900 dark:text-[#F4F4F5]">Lugar:</strong> {currentPlan.location}
               </span>
-              <span className="mx-2 text-zinc-300">•</span>
+              <span className="mx-2 text-zinc-300 dark:text-zinc-700">•</span>
               <span>
-                <strong>Tema del Discurso:</strong> "{currentPlan.speakerTheme}"
+                <strong className="text-zinc-900 dark:text-[#F4F4F5]">Tema del Discurso:</strong> "{currentPlan.speakerTheme}"
               </span>
             </div>
             <button
               onClick={() => setIsEditingPlanDetails(!isEditingPlanDetails)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-[#E4E4E7] bg-white hover:bg-zinc-100 dark:bg-[#18181F] rounded-lg border border-zinc-300 dark:border-[#27272A] shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-[#E4E4E7] bg-white hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>{isEditingPlanDetails ? 'Ocultar Edición' : 'Editar Datos del Evento'}</span>
@@ -622,9 +623,9 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           {/* Form to Edit Details if opened */}
           {isEditingPlanDetails && (
-            <div className="bg-white p-5 rounded-2xl border border-indigo-200 shadow-md space-y-4">
-              <h3 className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-indigo-600" />
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-indigo-200/80 dark:border-indigo-500/30 shadow-md space-y-4">
+              <h3 className="text-sm font-bold text-zinc-800 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
+                <Edit3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Configurar Detalles de la Conmemoración</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -634,7 +635,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="date"
                     value={currentPlan.date}
                     onChange={e => handleUpdatePlanField('date', e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -645,7 +646,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="time"
                     value={currentPlan.time}
                     onChange={e => handleUpdatePlanField('time', e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -656,7 +657,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="time"
                     value={currentPlan.sunsetTime}
                     onChange={e => handleUpdatePlanField('sunsetTime', e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="sm:col-span-2">
@@ -667,7 +668,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="text"
                     value={currentPlan.location}
                     onChange={e => handleUpdatePlanField('location', e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -680,14 +681,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                       placeholder="Inicial"
                       value={currentPlan.initialSongNumber}
                       onChange={e => handleUpdatePlanField('initialSongNumber', Number(e.target.value))}
-                      className="w-1/2 text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                      className="w-1/2 text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                     />
                     <input
                       type="number"
                       placeholder="Final"
                       value={currentPlan.finalSongNumber}
                       onChange={e => handleUpdatePlanField('finalSongNumber', Number(e.target.value))}
-                      className="w-1/2 text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                      className="w-1/2 text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                 </div>
@@ -699,7 +700,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="text"
                     value={currentPlan.speakerTheme}
                     onChange={e => handleUpdatePlanField('speakerTheme', e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -707,10 +708,10 @@ export const MemorialAsambleasTab: React.FC = () => {
           )}
 
           {/* Section: Cuadro de Asignaciones Principales (Honor Roll) */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
                   <Award className="w-5 h-5 text-amber-500" />
                   <span>Cuadro Principal de Asignaciones Espirituales</span>
                 </h3>
@@ -723,7 +724,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Presidente */}
-              <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between">
+              <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
@@ -734,7 +735,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   <select
                     value={currentPlan.chairmanPublisherId}
                     onChange={e => handleUpdatePlanField('chairmanPublisherId', e.target.value)}
-                    className="w-full text-xs font-medium px-2.5 py-2 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] focus:ring-2 focus:ring-indigo-500"
+                    className="w-full text-xs font-medium px-2.5 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">Seleccionar Anciano...</option>
                     {elders.map(e => (
@@ -758,7 +759,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         );
                         handleOpenWhatsApp(msg, phone);
                       }}
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-1 cursor-pointer"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -768,18 +769,18 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Orador */}
-              <div className="p-4 rounded-xl border border-red-200 bg-linear-to-b from-red-50/50 to-white hover:border-red-300 transition-all flex flex-col justify-between">
+              <div className="p-4 rounded-2xl border border-red-200/80 dark:border-red-500/30 bg-red-50/40 dark:bg-red-500/10 hover:border-red-300 transition-all flex flex-col justify-between shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-red-600">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
                       Orador del Discurso
                     </span>
-                    <Flame className="w-4 h-4 text-red-500" />
+                    <Flame className="w-4 h-4 text-red-500 dark:text-red-400" />
                   </div>
                   <select
                     value={currentPlan.speakerPublisherId}
                     onChange={e => handleUpdatePlanField('speakerPublisherId', e.target.value)}
-                    className="w-full text-xs font-bold text-red-950 px-2.5 py-2 rounded-lg border border-red-300 bg-white focus:ring-2 focus:ring-red-500"
+                    className="w-full text-xs font-bold text-red-950 dark:text-[#F4F4F5] px-2.5 py-2 rounded-xl border border-red-300 dark:border-red-500/30 bg-white dark:bg-[#121216] focus:ring-2 focus:ring-red-500"
                   >
                     <option value="">Seleccionar Orador (Anciano)...</option>
                     {elders.map(e => (
@@ -789,8 +790,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="mt-3 pt-2 border-t border-red-100 flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 dark:text-[#71717A] truncate max-w-[150px]">
+                <div className="mt-3 pt-2 border-t border-red-100 dark:border-red-500/20 flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate max-w-[150px]">
                     {currentPlan.speakerTheme}
                   </span>
                   {currentPlan.speakerPublisherId && (
@@ -805,7 +806,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         );
                         handleOpenWhatsApp(msg, phone);
                       }}
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-1 cursor-pointer"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -815,18 +816,18 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Oración Pan */}
-              <div className="p-4 rounded-xl border border-amber-200 bg-linear-to-b from-amber-50/50 to-white hover:border-amber-300 transition-all flex flex-col justify-between">
+              <div className="p-4 rounded-2xl border border-amber-200/80 dark:border-amber-500/30 bg-amber-50/40 dark:bg-amber-500/10 hover:border-amber-300 transition-all flex flex-col justify-between shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                       Oración por el Pan
                     </span>
-                    <BookOpen className="w-4 h-4 text-amber-600" />
+                    <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   </div>
                   <select
                     value={currentPlan.breadPrayerPublisherId}
                     onChange={e => handleUpdatePlanField('breadPrayerPublisherId', e.target.value)}
-                    className="w-full text-xs font-medium px-2.5 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-amber-500"
+                    className="w-full text-xs font-medium px-2.5 py-2 rounded-xl border border-amber-300 dark:border-amber-500/30 bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">Seleccionar Hermano Nombrado...</option>
                     {brothers.map(b => (
@@ -836,8 +837,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="mt-3 pt-2 border-t border-amber-100 flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 dark:text-[#71717A]">Cuerpo de Cristo</span>
+                <div className="mt-3 pt-2 border-t border-amber-100 dark:border-amber-500/20 flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Cuerpo de Cristo</span>
                   {currentPlan.breadPrayerPublisherId && (
                     <button
                       onClick={() => {
@@ -850,7 +851,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         );
                         handleOpenWhatsApp(msg, phone);
                       }}
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-1 cursor-pointer"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -860,18 +861,18 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Oración Vino */}
-              <div className="p-4 rounded-xl border border-rose-200 bg-linear-to-b from-rose-50/50 to-white hover:border-rose-300 transition-all flex flex-col justify-between">
+              <div className="p-4 rounded-2xl border border-rose-200/80 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-500/10 hover:border-rose-300 transition-all flex flex-col justify-between shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
                       Oración por el Vino
                     </span>
-                    <Wine className="w-4 h-4 text-rose-600" />
+                    <Wine className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   </div>
                   <select
                     value={currentPlan.winePrayerPublisherId}
                     onChange={e => handleUpdatePlanField('winePrayerPublisherId', e.target.value)}
-                    className="w-full text-xs font-medium px-2.5 py-2 rounded-lg border border-rose-300 bg-white focus:ring-2 focus:ring-rose-500"
+                    className="w-full text-xs font-medium px-2.5 py-2 rounded-xl border border-rose-300 dark:border-rose-500/30 bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-rose-500"
                   >
                     <option value="">Seleccionar Hermano Nombrado...</option>
                     {brothers.map(b => (
@@ -881,8 +882,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="mt-3 pt-2 border-t border-rose-100 flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 dark:text-[#71717A]">Sangre del Pacto</span>
+                <div className="mt-3 pt-2 border-t border-rose-100 dark:border-rose-500/20 flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">Sangre del Pacto</span>
                   {currentPlan.winePrayerPublisherId && (
                     <button
                       onClick={() => {
@@ -895,7 +896,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         );
                         handleOpenWhatsApp(msg, phone);
                       }}
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-1 cursor-pointer"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -907,11 +908,11 @@ export const MemorialAsambleasTab: React.FC = () => {
           </div>
 
           {/* Section: Servidores de los Emblemas (Pan y Vino) */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                  <Wine className="w-5 h-5 text-red-600" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
+                  <Wine className="w-5 h-5 text-red-600 dark:text-red-400" />
                   <span>Servidores de los Emblemas (Pan y Vino)</span>
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
@@ -922,7 +923,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
               <button
                 onClick={() => setIsAddSectionModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-2xl shadow-sm shadow-red-500/20 transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Sección</span>
@@ -933,11 +934,11 @@ export const MemorialAsambleasTab: React.FC = () => {
               {currentPlan.emblemServers.map((sec, idx) => (
                 <div
                   key={sec.id}
-                  className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/50 hover:border-zinc-300 dark:border-[#27272A] transition-all space-y-3 relative group"
+                  className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all space-y-3 relative group"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-red-100 text-red-800 text-xs font-bold flex items-center justify-center">
+                      <span className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-300 text-xs font-bold font-mono tabular-nums flex items-center justify-center">
                         {idx + 1}
                       </span>
                       <h4 className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">{sec.sectionName}</h4>
@@ -945,7 +946,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
                     <button
                       onClick={() => handleRemoveSection(sec.id)}
-                      className="text-zinc-400 dark:text-[#71717A] hover:text-red-600 p-1 opacity-60 group-hover:opacity-100 transition-opacity"
+                      className="text-zinc-400 dark:text-[#71717A] hover:text-red-600 p-1 opacity-60 group-hover:opacity-100 transition-opacity cursor-pointer"
                       title="Eliminar sección"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -953,8 +954,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2.5 rounded-lg bg-white border border-zinc-200 dark:border-[#27272A]">
-                      <span className="text-[10px] font-semibold text-amber-700 block mb-1">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10 shadow-2xs">
+                      <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">
                         🥖 Servidor del Pan
                       </span>
                       <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] block truncate">
@@ -962,8 +963,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-lg bg-white border border-zinc-200 dark:border-[#27272A]">
-                      <span className="text-[10px] font-semibold text-rose-700 block mb-1">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10 shadow-2xs">
+                      <span className="text-[10px] font-semibold text-rose-700 dark:text-rose-400 block mb-1">
                         🍷 Servidor del Vino
                       </span>
                       <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] block truncate">
@@ -973,7 +974,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   </div>
 
                   {sec.notes && (
-                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic bg-white p-2 rounded-lg border border-zinc-200 dark:border-[#27272A]">
+                    <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] italic bg-white dark:bg-[#121216] p-2 rounded-xl border border-zinc-200/80 dark:border-white/10">
                       💡 {sec.notes}
                     </p>
                   )}
@@ -1021,7 +1022,7 @@ export const MemorialAsambleasTab: React.FC = () => {
           </div>
 
           {/* Section: Acomodadores del Memorial */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1036,7 +1037,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
               <button
                 onClick={() => setIsAddAttendantModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Acomodador</span>
@@ -1062,11 +1063,11 @@ export const MemorialAsambleasTab: React.FC = () => {
                 return (
                   <div
                     key={att.id}
-                    className="p-3.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:border-zinc-300 dark:border-[#27272A] transition-all flex flex-col justify-between"
+                    className="kg-card-bento kg-sheen-top p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-[#18181F]/80 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all flex flex-col justify-between shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1">
                           <Icon className="w-3 h-3" />
                           <span>{config.label}</span>
                         </span>
@@ -1100,7 +1101,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                           );
                           handleOpenWhatsApp(msg, phone);
                         }}
-                        className="text-[11px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium"
+                        className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 font-medium"
                       >
                         <Send className="w-3 h-3" />
                         <span>Notificar WhatsApp</span>
@@ -1113,21 +1114,21 @@ export const MemorialAsambleasTab: React.FC = () => {
           </div>
 
           {/* Section: Preparación de Emblemas & Arreglos Físicos */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-500" />
               <span>Preparación de Emblemas & Arreglos del Salón</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/50 space-y-2">
+              <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/60 space-y-2">
                 <span className="font-bold text-zinc-700 dark:text-[#E4E4E7] block">🥖 Preparación del Pan Ácimo</span>
                 <select
                   value={currentPlan.preparation.breadPreparationPublisherId || ''}
                   onChange={e =>
                     handleUpdatePlanField('preparation.breadPreparationPublisherId', e.target.value)
                   }
-                  className="w-full text-xs p-2 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full text-xs p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Hermano/Familia...</option>
                   {activePublishers.map(p => (
@@ -1141,14 +1142,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/50 space-y-2">
+              <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/60 space-y-2">
                 <span className="font-bold text-zinc-700 dark:text-[#E4E4E7] block">🍷 Vino Tinto Puro</span>
                 <select
                   value={currentPlan.preparation.wineProviderPublisherId || ''}
                   onChange={e =>
                     handleUpdatePlanField('preparation.wineProviderPublisherId', e.target.value)
                   }
-                  className="w-full text-xs p-2 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full text-xs p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Encargado...</option>
                   {activePublishers.map(p => (
@@ -1162,14 +1163,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/50 space-y-2">
+              <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/60 space-y-2">
                 <span className="font-bold text-zinc-700 dark:text-[#E4E4E7] block">🌸 Mesa y Flores</span>
                 <select
                   value={currentPlan.preparation.tableArrangementPublisherId || ''}
                   onChange={e =>
                     handleUpdatePlanField('preparation.tableArrangementPublisherId', e.target.value)
                   }
-                  className="w-full text-xs p-2 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full text-xs p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Encargado...</option>
                   {activePublishers.map(p => (
@@ -1183,14 +1184,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]/50 space-y-2">
+              <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/60 space-y-2">
                 <span className="font-bold text-zinc-700 dark:text-[#E4E4E7] block">🧹 Limpieza General Previa</span>
                 <select
                   value={currentPlan.preparation.cleaningPublisherId || ''}
                   onChange={e =>
                     handleUpdatePlanField('preparation.cleaningPublisherId', e.target.value)
                   }
-                  className="w-full text-xs p-2 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full text-xs p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Encargado / Grupo...</option>
                   {activePublishers.map(p => (
@@ -1207,7 +1208,7 @@ export const MemorialAsambleasTab: React.FC = () => {
           </div>
 
           {/* Section: Campaña de Invitación al Memorial */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1232,7 +1233,8 @@ export const MemorialAsambleasTab: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] text-center shadow-xs">
+              <div className="kg-card-bento kg-sheen-top relative overflow-hidden bg-white/80 dark:bg-[#18181F]/70 p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-center shadow-2xs">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-500/15 blur-2xl" />
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1.5 mb-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
                   Invitaciones Recibidas
@@ -1242,7 +1244,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] text-center shadow-xs">
+              <div className="kg-card-bento kg-sheen-top relative overflow-hidden bg-white/80 dark:bg-[#18181F]/70 p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-center shadow-2xs">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-24 h-24 rounded-full bg-amber-500/15 blur-2xl" />
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1.5 mb-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                   Por Publicador
@@ -1252,7 +1255,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] text-center shadow-xs">
+              <div className="kg-card-bento kg-sheen-top relative overflow-hidden bg-white/80 dark:bg-[#18181F]/70 p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-center shadow-2xs">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-24 h-24 rounded-full bg-emerald-500/15 blur-2xl" />
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1.5 mb-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                   Territorios Cubiertos
@@ -1263,7 +1267,8 @@ export const MemorialAsambleasTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] text-center shadow-xs">
+              <div className="kg-card-bento kg-sheen-top relative overflow-hidden bg-white/80 dark:bg-[#18181F]/70 p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 text-center shadow-2xs">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-24 h-24 rounded-full bg-purple-500/15 blur-2xl" />
                 <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center justify-center gap-1.5 mb-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
                   Porcentaje de Cobertura
@@ -1312,7 +1317,7 @@ export const MemorialAsambleasTab: React.FC = () => {
       {activeSubTab === 'asambleas' && (
         <div className="space-y-6">
           {/* Header & Filter Controls */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Building className="w-6 h-6 text-indigo-600" />
@@ -1324,17 +1329,17 @@ export const MemorialAsambleasTab: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex rounded-xl bg-zinc-100 dark:bg-[#18181F] p-1 border border-zinc-200 dark:border-[#27272A] text-xs">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex rounded-full bg-zinc-200/70 dark:bg-zinc-900/90 p-1 border border-zinc-200/80 dark:border-white/10 text-xs shadow-inner">
                 {(['todos', 'circuito_con_sc', 'circuito_sin_sc', 'regional'] as const).map(
                   f => (
                     <button
                       key={f}
                       onClick={() => setAssemblyFilter(f)}
-                      className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+                      className={`px-3 py-1.5 rounded-full font-medium transition-all ${
                         assemblyFilter === f
-                          ? 'bg-white text-zinc-900 dark:text-[#F4F4F5] font-bold shadow-2xs'
-                          : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:text-[#F4F4F5]'
+                          ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] font-bold shadow-xs'
+                          : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                       }`}
                     >
                       {f === 'todos'
@@ -1369,18 +1374,18 @@ export const MemorialAsambleasTab: React.FC = () => {
                   <div
                     key={ass.id}
                     onClick={() => setSelectedAssemblyId(ass.id)}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                    className={`kg-card-bento kg-sheen-top p-4 rounded-3xl border cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-indigo-50/70 border-indigo-400 ring-2 ring-indigo-200 shadow-xs'
-                        : 'bg-white border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:border-[#27272A]'
+                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-500/60 ring-2 ring-indigo-200 dark:ring-indigo-500/20 shadow-sm'
+                        : 'kg-glass-surface border-zinc-200/80 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-500/40'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span
                         className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                           ass.type === 'regional'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-blue-100 text-blue-800'
+                            ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/50'
+                            : 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/50'
                         }`}
                       >
                         {ass.type === 'regional'
@@ -1404,11 +1409,11 @@ export const MemorialAsambleasTab: React.FC = () => {
                       <span className="truncate">{ass.venue}</span>
                     </p>
 
-                    <div className="mt-3 pt-2 border-t border-zinc-200 dark:border-[#27272A]/60 flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
+                    <div className="mt-3 pt-2 border-t border-zinc-200/60 dark:border-[#27272A]/60 flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                       <span>{ass.volunteers.length} Voluntarios</span>
                       <span>{ass.baptismCandidates.length} Bautismos</span>
                       {ass.busArrangement.hasBus && (
-                        <span className="text-indigo-600 font-semibold flex items-center gap-0.5">
+                        <span className="text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-0.5">
                           <Bus className="w-3 h-3" />
                           <span>Autobús</span>
                         </span>
@@ -1422,14 +1427,14 @@ export const MemorialAsambleasTab: React.FC = () => {
             {/* Selected Assembly Detail Panel */}
             {selectedAssembly && (
               <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-indigo-700 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
                           {selectedAssembly.circuitNumber || 'Programa Oficial'}
                         </span>
-                        <span className="text-zinc-300">•</span>
+                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
                         <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">{selectedAssembly.dates}</span>
                       </div>
                       <h2 className="text-xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] mt-1">
@@ -1447,7 +1452,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                           const msg = buildAssemblyWhatsApp(selectedAssembly, publishers);
                           handleOpenWhatsApp(msg);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-2xs transition-all active:scale-95"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all active:scale-95"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                         <span>Avisar WhatsApp</span>
@@ -1455,7 +1460,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
                       <button
                         onClick={() => deleteTheocraticAssembly(selectedAssembly.id)}
-                        className="p-2 text-zinc-400 dark:text-[#71717A] hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        className="p-2 text-zinc-400 dark:text-[#71717A] hover:text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                         title="Eliminar asamblea"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1464,7 +1469,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   </div>
 
                   {/* Cleaning Department Assigned */}
-                  <div className="p-4 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="p-4 rounded-2xl bg-white/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                     <div>
                       <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider block">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
@@ -1498,15 +1503,15 @@ export const MemorialAsambleasTab: React.FC = () => {
 
                   {/* Bus Arrangement Card */}
                   {selectedAssembly.busArrangement.hasBus && (
-                    <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+                    <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Bus className="w-5 h-5 text-indigo-700" />
+                          <Bus className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
                           <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             Arreglos de Autobús de la Congregación
                           </h4>
                         </div>
-                        <span className="text-xs font-bold text-indigo-900 bg-indigo-100 px-2.5 py-0.5 rounded-full">
+                        <span className="text-xs font-bold text-indigo-900 dark:text-indigo-200 bg-indigo-100 dark:bg-indigo-900/60 px-2.5 py-0.5 rounded-full">
                           {selectedAssembly.busArrangement.seatsBooked} /{' '}
                           {selectedAssembly.busArrangement.seatsTotal} Asientos
                         </span>
@@ -1533,14 +1538,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                         </div>
                         <div>
                           <span className="text-zinc-400 dark:text-[#71717A] block text-[10px]">Aporte / Asiento</span>
-                          <span className="font-bold text-emerald-700">
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400">
                             {selectedAssembly.busArrangement.farePerSeat} €
                           </span>
                         </div>
                       </div>
 
                       {/* Seats Progress Bar */}
-                      <div className="w-full bg-zinc-200 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-zinc-200 dark:bg-[#18181F] rounded-full h-2 overflow-hidden">
                         <div
                           className="bg-indigo-600 h-2 rounded-full"
                           style={{
@@ -1560,16 +1565,16 @@ export const MemorialAsambleasTab: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-                        <Droplets className="w-4 h-4 text-cyan-600" />
+                        <Droplets className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                         <span>Candidatos al Bautismo de la Congregación</span>
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-100 text-cyan-800 font-bold">
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-cyan-100 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 font-bold">
                           {selectedAssembly.baptismCandidates.length}
                         </span>
                       </h4>
 
                       <button
                         onClick={() => setIsAddBaptismCandidateModalOpen(true)}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-1"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Agregar Candidato</span>
@@ -1577,7 +1582,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     </div>
 
                     {selectedAssembly.baptismCandidates.length === 0 ? (
-                      <div className="p-4 rounded-xl border border-dashed border-zinc-200 dark:border-[#27272A] text-center text-xs text-zinc-400 dark:text-[#71717A]">
+                      <div className="p-4 rounded-2xl border border-dashed border-zinc-200 dark:border-[#27272A] text-center text-xs text-zinc-400 dark:text-[#71717A]">
                         No hay candidatos registrados aún para esta asamblea.
                       </div>
                     ) : (
@@ -1585,14 +1590,14 @@ export const MemorialAsambleasTab: React.FC = () => {
                         {selectedAssembly.baptismCandidates.map(cand => (
                           <div
                             key={cand.id}
-                            className="p-3 rounded-xl border border-cyan-200 bg-cyan-50/40 flex items-center justify-between"
+                            className="p-3 rounded-2xl border border-cyan-200 dark:border-cyan-800/50 bg-cyan-50/40 dark:bg-cyan-950/25 flex items-center justify-between"
                           >
                             <div>
                               <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] block">
                                 {getPublisherName(publishers, cand.publisherId)}
                               </span>
-                              <span className="text-[11px] text-cyan-800 flex items-center gap-1 mt-0.5">
-                                <Check className="w-3 h-3 text-cyan-600" />
+                              <span className="text-[11px] text-cyan-800 dark:text-cyan-300 flex items-center gap-1 mt-0.5">
+                                <Check className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                                 <span>Preguntas repasadas por ancianos</span>
                               </span>
                             </div>
@@ -1622,14 +1627,14 @@ export const MemorialAsambleasTab: React.FC = () => {
 
                       <button
                         onClick={() => setIsAddVolunteerModalOpen(true)}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-1"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Agregar Voluntario</span>
                       </button>
                     </div>
 
-                    <div className="border border-zinc-200 dark:border-[#27272A] rounded-xl overflow-hidden">
+                    <div className="border border-zinc-200/80 dark:border-white/10 rounded-2xl overflow-hidden">
                       <table className="w-full text-left text-xs">
                         <thead className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] font-bold">
                           <tr>
@@ -1641,7 +1646,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         </thead>
                         <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
                           {selectedAssembly.volunteers.map(vol => (
-                            <tr key={vol.id} className="hover:bg-zinc-50 dark:bg-[#18181F]/50">
+                            <tr key={vol.id} className="hover:bg-zinc-50 dark:hover:bg-[#18181F]/50">
                               <td className="py-2.5 px-3 font-semibold text-zinc-800 dark:text-[#F4F4F5]">
                                 {getPublisherName(publishers, vol.publisherId)}
                               </td>
@@ -1676,7 +1681,7 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* SUBTAB 3: CHECKLIST TEOCRÁTICO                             */}
       {/* ========================================================= */}
       {activeSubTab === 'checklist' && (
-        <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1700,7 +1705,7 @@ export const MemorialAsambleasTab: React.FC = () => {
             {checklist.map(item => (
               <div
                 key={item.id}
-                className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] transition-all flex items-start gap-3.5 shadow-xs"
+                className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-[#18181F]/70 transition-all flex items-start gap-3.5 shadow-2xs"
               >
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                   {item.isReady ? <Check className="w-4 h-4 text-emerald-500" /> : <AlertCircle className="w-4 h-4 text-amber-500" />}
@@ -1731,7 +1736,7 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* SUBTAB 4: INFORME OFICIAL A LA SUCURSAL                    */}
       {/* ========================================================= */}
       {activeSubTab === 'informe_sucursal' && currentPlan && (
-        <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1750,7 +1755,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   const msg = buildMemorialReportWhatsApp(currentPlan);
                   handleOpenWhatsApp(msg);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-2xs transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all active:scale-95"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Notificar Ancianos WhatsApp</span>
@@ -1761,7 +1766,7 @@ export const MemorialAsambleasTab: React.FC = () => {
           <form onSubmit={handleSaveReportNumbers} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {/* Presencial */}
-              <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-2">
+              <div className="kg-card-bento kg-sheen-top p-5 rounded-3xl bg-zinc-50/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/10 space-y-2">
                 <span className="text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider block">
                   1. Asistencia Presencial (Salón)
                 </span>
@@ -1778,7 +1783,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Streaming */}
-              <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-2">
+              <div className="kg-card-bento kg-sheen-top p-5 rounded-3xl bg-zinc-50/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/10 space-y-2">
                 <span className="text-xs font-bold text-zinc-600 dark:text-[#A1A1AA] uppercase tracking-wider block">
                   2. Conexiones Zoom / Streaming
                 </span>
@@ -1797,7 +1802,8 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Total Calculado */}
-              <div className="p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 space-y-2">
+              <div className="kg-card-bento kg-sheen-top relative overflow-hidden p-5 rounded-3xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 space-y-2">
+                <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-indigo-500/20 blur-2xl" />
                 <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider block">
                   ⭐ ASISTENCIA TOTAL
                 </span>
@@ -1812,7 +1818,7 @@ export const MemorialAsambleasTab: React.FC = () => {
             </div>
 
             {/* Participantes Ungidos */}
-            <div className="p-5 rounded-2xl bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 space-y-3">
+            <div className="p-5 rounded-3xl bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h4 className="text-sm font-bold text-red-950 dark:text-red-200 flex items-center gap-2">
@@ -1833,7 +1839,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     onChange={e =>
                       handleUpdatePlanField('report.partakersCount', Number(e.target.value))
                     }
-                    className="w-20 text-center font-extrabold text-base p-1.5 rounded-lg border border-red-300 dark:border-red-800 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
+                    className="w-20 text-center font-extrabold text-base p-1.5 rounded-xl border border-red-300 dark:border-red-800 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   />
                 </div>
               </div>
@@ -1847,13 +1853,13 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder="Ej. Sin participantes ungidos en la congregación local."
                   value={currentPlan.report.partakerNames || ''}
                   onChange={e => handleUpdatePlanField('report.partakerNames', e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full text-xs p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
             </div>
 
             {/* Reported Checkbox */}
-            <div className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] flex items-center justify-between">
+            <div className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 flex items-center justify-between">
               <SplashCheckbox
                 size="sm"
                 checked={currentPlan.report.reportedToBranch}
@@ -1870,7 +1876,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     type="date"
                     value={currentPlan.report.reportedDate || ''}
                     onChange={e => handleUpdatePlanField('report.reportedDate', e.target.value)}
-                    className="text-xs p-1.5 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                    className="text-xs p-1.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   />
                 </div>
               )}
@@ -1893,8 +1899,8 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* MODAL: AGREGAR SECCIÓN SERVIDORES EMBLEMAS                */}
       {/* ========================================================= */}
       {isAddSectionModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Wine className="w-5 h-5 text-red-600" />
@@ -1902,7 +1908,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsAddSectionModalOpen(false)}
-                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:text-[#A1A1AA]"
+                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:hover:text-[#A1A1AA]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1919,7 +1925,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder="Ej. Pasillo Central Derecho (Filas 11 a 20)"
                   value={newSection.sectionName}
                   onChange={e => setNewSection({ ...newSection, sectionName: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-red-500"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:ring-2 focus:ring-red-500"
                 />
               </div>
 
@@ -1933,7 +1939,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewSection({ ...newSection, breadServerPublisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-red-500 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-red-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Hermano Nombrado...</option>
                   {brothers.map(b => (
@@ -1954,7 +1960,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewSection({ ...newSection, wineServerPublisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-red-500 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-red-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Hermano Nombrado...</option>
                   {brothers.map(b => (
@@ -1974,7 +1980,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder="Ej. Iniciar por la primera fila hacia atrás de forma continua"
                   value={newSection.notes}
                   onChange={e => setNewSection({ ...newSection, notes: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -1982,7 +1988,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddSectionModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:bg-[#18181F] font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:hover:bg-[#18181F] font-semibold"
                 >
                   Cancelar
                 </button>
@@ -2002,8 +2008,8 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* MODAL: AGREGAR ACOMODADOR MEMORIAL                        */}
       {/* ========================================================= */}
       {isAddAttendantModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-600" />
@@ -2011,7 +2017,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsAddAttendantModalOpen(false)}
-                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:text-[#A1A1AA]"
+                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:hover:text-[#A1A1AA]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2028,7 +2034,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                       role: e.target.value as MemorialAttendant['role'],
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="entrada_principal">Entrada Principal y Recepción</option>
                   <option value="pasillo_interior">Pasillo Interior y Búsqueda de Asientos</option>
@@ -2046,7 +2052,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewAttendant({ ...newAttendant, publisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500 bg-white"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Hermano...</option>
                   {brothers.map(b => (
@@ -2064,7 +2070,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder="Ej. Estar en la puerta 40 minutos antes del inicio"
                   value={newAttendant.notes}
                   onChange={e => setNewAttendant({ ...newAttendant, notes: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -2072,7 +2078,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddAttendantModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:bg-[#18181F] font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:hover:bg-[#18181F] font-semibold"
                 >
                   Cancelar
                 </button>
@@ -2092,8 +2098,8 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* MODAL: NUEVA ASAMBLEA                                     */}
       {/* ========================================================= */}
       {isAddAssemblyModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Building className="w-5 h-5 text-indigo-600" />
@@ -2101,7 +2107,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsAddAssemblyModalOpen(false)}
-                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:text-[#A1A1AA]"
+                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:hover:text-[#A1A1AA]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2116,7 +2122,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     onChange={e =>
                       setNewAssembly({ ...newAssembly, type: e.target.value as AssemblyType })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   >
                     <option value="circuito_con_sc">Circuito con SC (1 día)</option>
                     <option value="circuito_sin_sc">Circuito c/ Representante Sucursal (1 día)</option>
@@ -2132,7 +2138,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     onChange={e =>
                       setNewAssembly({ ...newAssembly, serviceYear: Number(e.target.value) })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   />
                 </div>
               </div>
@@ -2145,7 +2151,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder='Ej. "¡Prediquemos las buenas noticias con valor!"'
                   value={newAssembly.theme}
                   onChange={e => setNewAssembly({ ...newAssembly, theme: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -2158,7 +2164,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     placeholder="Ej. Sábado 7 de Noviembre de 2026"
                     value={newAssembly.dates}
                     onChange={e => setNewAssembly({ ...newAssembly, dates: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   />
                 </div>
 
@@ -2169,7 +2175,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                     placeholder="Ej. Salón de Asambleas de Bellavista"
                     value={newAssembly.venue}
                     onChange={e => setNewAssembly({ ...newAssembly, venue: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                    className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                   />
                 </div>
               </div>
@@ -2185,7 +2191,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewAssembly({ ...newAssembly, assignedCleaningDepartment: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -2201,7 +2207,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                       cleaningCoordinatorPublisherId: e.target.value,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Hermano...</option>
                   {brothers.map(b => (
@@ -2213,7 +2219,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </div>
 
               {/* Bus toggle */}
-              <div className="p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] space-y-3">
+              <div className="p-3 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 space-y-3">
                 <SplashCheckbox
                   size="sm"
                   checked={newAssembly.hasBus}
@@ -2233,7 +2239,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         onChange={e =>
                           setNewAssembly({ ...newAssembly, seatsTotal: Number(e.target.value) })
                         }
-                        className="w-full p-2 rounded-lg border border-zinc-300 dark:border-[#27272A]"
+                        className="w-full p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                       />
                     </div>
                     <div>
@@ -2246,7 +2252,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                         onChange={e =>
                           setNewAssembly({ ...newAssembly, farePerSeat: Number(e.target.value) })
                         }
-                        className="w-full p-2 rounded-lg border border-zinc-300 dark:border-[#27272A]"
+                        className="w-full p-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                       />
                     </div>
                   </div>
@@ -2257,7 +2263,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddAssemblyModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:bg-[#18181F] font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:hover:bg-[#18181F] font-semibold"
                 >
                   Cancelar
                 </button>
@@ -2277,8 +2283,8 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* MODAL: AGREGAR VOLUNTARIO ASAMBLEA                        */}
       {/* ========================================================= */}
       {isAddVolunteerModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-600" />
@@ -2286,7 +2292,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsAddVolunteerModalOpen(false)}
-                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:text-[#A1A1AA]"
+                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:hover:text-[#A1A1AA]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2301,7 +2307,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewVolunteer({ ...newVolunteer, publisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Publicador...</option>
                   {activePublishers.map(p => (
@@ -2322,7 +2328,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                       department: e.target.value as AssemblyVolunteer['department'],
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="limpieza">Limpieza</option>
                   <option value="acomodadores">Acomodadores</option>
@@ -2344,7 +2350,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   placeholder="Ej. Limpieza intermedia tras el programa matutino"
                   value={newVolunteer.roleOrShift}
                   onChange={e => setNewVolunteer({ ...newVolunteer, roleOrShift: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -2352,7 +2358,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddVolunteerModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:bg-[#18181F] font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:hover:bg-[#18181F] font-semibold"
                 >
                   Cancelar
                 </button>
@@ -2372,8 +2378,8 @@ export const MemorialAsambleasTab: React.FC = () => {
       {/* MODAL: AGREGAR CANDIDATO BAUTISMO                         */}
       {/* ========================================================= */}
       {isAddBaptismCandidateModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Droplets className="w-5 h-5 text-cyan-600" />
@@ -2381,7 +2387,7 @@ export const MemorialAsambleasTab: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsAddBaptismCandidateModalOpen(false)}
-                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:text-[#A1A1AA]"
+                className="text-zinc-400 dark:text-[#71717A] hover:text-zinc-600 dark:hover:text-[#A1A1AA]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2396,7 +2402,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                   onChange={e =>
                     setNewBaptismCandidate({ ...newBaptismCandidate, publisherId: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 >
                   <option value="">Seleccionar Publicador...</option>
                   {activePublishers.map(p => (
@@ -2421,7 +2427,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                       reviewedByElders: e.target.value,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A]"
+                  className="w-full p-2.5 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
                 />
               </div>
 
@@ -2429,7 +2435,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddBaptismCandidateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:bg-[#18181F] font-semibold"
+                  className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] text-zinc-700 dark:text-[#E4E4E7] hover:bg-zinc-50 dark:hover:bg-[#18181F] font-semibold"
                 >
                   Cancelar
                 </button>

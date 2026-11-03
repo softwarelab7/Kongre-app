@@ -338,14 +338,14 @@ export const HospitalidadTab: React.FC = () => {
       )}
 
       {/* Top Navigation & Actions Bar */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+      <div className="kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="grid grid-cols-2 sm:inline-flex rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1 gap-1 w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:inline-flex rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-100/90 dark:bg-[#18181F]/90 p-1 gap-1 w-full sm:w-auto shadow-inner">
             <button
               onClick={() => setActiveSubView('cuadrante')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubView === 'cuadrante'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -355,9 +355,9 @@ export const HospitalidadTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubView('anfitriones')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer truncate active:scale-[0.98] ${
                 activeSubView === 'anfitriones'
-                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -370,7 +370,7 @@ export const HospitalidadTab: React.FC = () => {
             {activeSubView === 'cuadrante' && (
               <button
                 onClick={handleAutoAssignAllPendingWeeks}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 text-xs font-bold transition-all cursor-pointer truncate"
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-500/30 text-xs font-bold transition-all cursor-pointer active:scale-[0.98] shadow-2xs truncate"
                 title="Asignar automáticamente familias anfitrionas a todas las semanas pendientes según rotación y capacidad"
               >
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
@@ -380,7 +380,7 @@ export const HospitalidadTab: React.FC = () => {
 
             <button
               onClick={handleCopyWhatsAppList}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-2xl bg-zinc-100/90 dark:bg-[#18181F] hover:bg-zinc-200/80 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] shadow-2xs truncate"
             >
               {copiedSuccess ? (
                 <>
@@ -397,7 +397,7 @@ export const HospitalidadTab: React.FC = () => {
 
             <button
               onClick={openNewModal}
-              className={`${activeSubView === 'cuadrante' ? 'col-span-2 sm:col-span-1' : ''} flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer active:scale-95 truncate`}
+              className={`${activeSubView === 'cuadrante' ? 'col-span-2 sm:col-span-1' : ''} flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all cursor-pointer active:scale-[0.98] shadow-sm shadow-indigo-500/20 truncate`}
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="truncate">Nuevo Anfitrión</span>
@@ -408,12 +408,13 @@ export const HospitalidadTab: React.FC = () => {
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center gap-3.5 relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-purple-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-200/70 dark:border-purple-500/25 flex items-center justify-center shrink-0 shadow-2xs">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               {stats.total}
             </div>
             <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -422,12 +423,13 @@ export const HospitalidadTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center gap-3.5 relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+            <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               {stats.activeCount}
             </div>
             <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -436,12 +438,13 @@ export const HospitalidadTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-            <Utensils className="w-5 h-5 text-zinc-500" />
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center gap-3.5 relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-amber-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+            <Utensils className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               {stats.totalCapacity} <span className="text-xs font-normal text-zinc-500 dark:text-[#A1A1AA]">pers.</span>
             </div>
             <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -450,12 +453,13 @@ export const HospitalidadTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
-            <Calendar className="w-5 h-5 text-zinc-500" />
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center gap-3.5 relative overflow-hidden group">
+          <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-indigo-500/10 blur-xl pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" />
+          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-200/70 dark:border-indigo-500/25 flex items-center justify-center shrink-0 shadow-2xs">
+            <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+            <div className="text-xl sm:text-2xl font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               {stats.assignedWeeksCount} / {weeks.length}
             </div>
             <div className="text-xs text-zinc-500 dark:text-[#A1A1AA] font-medium">
@@ -495,7 +499,7 @@ export const HospitalidadTab: React.FC = () => {
             return (
               <div
                 key={week.id}
-                className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 flex flex-col justify-between gap-4"
+                className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between gap-4"
               >
                 <div>
                   {/* Header */}
@@ -700,7 +704,7 @@ export const HospitalidadTab: React.FC = () => {
       {activeSubView === 'anfitriones' && (
         <>
           {/* Filter and Search Bar */}
-          <div className="bg-white dark:bg-[#121216] p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
             <div className="relative w-full sm:w-80">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
               <input
@@ -708,7 +712,7 @@ export const HospitalidadTab: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por familia, teléfono o notas..."
-                className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] placeholder-zinc-400 focus:outline-hidden focus:border-indigo-500 transition-all"
+                className="w-full pl-10 pr-4 py-2 text-sm rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/80 text-zinc-800 dark:text-[#F4F4F5] placeholder-zinc-400 focus:outline-hidden focus:border-indigo-500 transition-all shadow-inner"
               />
             </div>
 
@@ -718,12 +722,12 @@ export const HospitalidadTab: React.FC = () => {
                 <span>Filtro:</span>
               </div>
 
-              <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] p-1 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+              <div className="flex items-center gap-1 bg-zinc-100/90 dark:bg-[#18181F]/90 p-1 rounded-full border border-zinc-200/80 dark:border-white/10 shadow-inner">
                 <button
                   onClick={() => setFilterStatus('all')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer active:scale-[0.98] ${
                     filterStatus === 'all'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
@@ -731,9 +735,9 @@ export const HospitalidadTab: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilterStatus('active')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer active:scale-[0.98] ${
                     filterStatus === 'active'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
@@ -741,9 +745,9 @@ export const HospitalidadTab: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setFilterStatus('allergies')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer active:scale-[0.98] ${
                     filterStatus === 'allergies'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200 dark:border-[#27272A]'
+                      ? 'bg-white dark:bg-[#121216] text-indigo-700 dark:text-indigo-400 font-bold border border-zinc-200/80 dark:border-white/10 shadow-xs'
                       : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
                   }`}
                 >
@@ -755,8 +759,8 @@ export const HospitalidadTab: React.FC = () => {
 
           {/* Host Families Grid */}
           {filteredHosts.length === 0 ? (
-            <div className="p-12 text-center bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A]">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 border border-indigo-100 dark:border-indigo-500/20">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-12 text-center rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 border border-indigo-200/70 dark:border-indigo-500/25 shadow-xs">
                 <Coffee className="w-8 h-8" />
               </div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
@@ -767,7 +771,7 @@ export const HospitalidadTab: React.FC = () => {
               </p>
               <button
                 onClick={openNewModal}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all cursor-pointer"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all cursor-pointer active:scale-[0.98] shadow-sm shadow-indigo-500/20"
               >
                 <Plus className="w-4 h-4" />
                 <span>Añadir Primera Familia</span>
@@ -785,7 +789,7 @@ export const HospitalidadTab: React.FC = () => {
                 return (
                   <div
                     key={host.id}
-                    className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 flex flex-col justify-between transition-colors hover:border-indigo-500/40"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between transition-colors hover:border-indigo-500/40"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-3 mb-3">
@@ -907,15 +911,15 @@ export const HospitalidadTab: React.FC = () => {
 
       {/* Modal: Crear / Editar Anfitrión */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50 dark:bg-[#18181F]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top w-full max-w-lg rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-5 border-b border-zinc-200/60 dark:border-white/10 flex items-center justify-between bg-zinc-50/70 dark:bg-[#18181F]/70">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/70 dark:border-indigo-500/25 shadow-2xs">
                   <Coffee className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                     {editingHost ? 'Editar Anfitrión' : 'Nuevo Anfitrión de Hospitalidad'}
                   </h3>
                   <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
@@ -925,7 +929,7 @@ export const HospitalidadTab: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
+                className="p-2 rounded-2xl text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

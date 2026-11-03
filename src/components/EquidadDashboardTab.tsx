@@ -537,13 +537,14 @@ export const EquidadDashboardTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Barra Superior de Control y Acciones */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="space-y-1">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="relative space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold tracking-wider uppercase bg-indigo-600 text-white">
+            <span className="kg-glow-badge px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
               Ponderación de Carga
             </span>
-            <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight">
               Tablero de Equidad y Peso de Carga por Publicador
             </h2>
           </div>
@@ -552,15 +553,15 @@ export const EquidadDashboardTab: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full lg:w-auto">
+        <div className="relative grid grid-cols-2 sm:flex sm:items-center gap-2 w-full lg:w-auto">
           {/* Selector de Período */}
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as KhsTimeRangeFilter)}
-            className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             {TIME_RANGE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">
                 {opt.label}
               </option>
             ))}
@@ -570,7 +571,7 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowWeightsModal(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-white/[0.04] hover:bg-zinc-50 dark:hover:bg-white/[0.08] text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] transition-colors cursor-pointer"
           >
             <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>Configurar Pesos</span>
@@ -580,16 +581,16 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={handleShareWhatsApp}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors cursor-pointer"
           >
             {copiedWhatsApp ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Resumen Copiado</span>
               </>
             ) : (
               <>
-                <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+                <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Resumen Ancianos</span>
               </>
             )}
@@ -599,7 +600,7 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={() => printKhsEquityAuditReport(audit, settings, timeRangeLabel)}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 dark:hover:bg-[#27272A] text-xs font-bold text-white transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-xs font-bold text-white dark:text-zinc-900 transition-colors cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir Auditoría</span>
@@ -610,46 +611,48 @@ export const EquidadDashboardTab: React.FC = () => {
       {/* KPIs Ejecutivos de Equidad */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Índice de Equidad */}
-        <div className="bg-white dark:bg-[#121216] p-5 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-start justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-start justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-indigo-500/15 blur-2xl" />
+          <div className="relative space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
               Índice de Equidad
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-black text-indigo-600">
+              <span className="text-3xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400">
                 {audit.equityIndexScore}%
               </span>
-              <span className="text-xs font-semibold text-emerald-600">
+              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
                 {statusCounts.confirmRate}% confirm.
               </span>
             </div>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
               {audit.optimalCount} de {audit.totalActivePublishers} en rango óptimo
             </p>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <div className="relative w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0">
             <Scale className="w-5 h-5" />
           </div>
         </div>
 
         {/* KPI 2: Peso de Carga Total */}
-        <div className="bg-white dark:bg-[#121216] p-5 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex items-start justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-start justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/15 blur-2xl" />
+          <div className="relative space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA]">
               Peso de Carga Total
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-black text-zinc-900">
+              <span className="text-3xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
                 {audit.totalWeightedPoints}
               </span>
-              <span className="text-xs font-bold text-zinc-500">pts</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-[#A1A1AA]">pts</span>
             </div>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
               {audit.totalAssignmentsCount} asignaciones • Promedio:{' '}
-              <strong>{audit.averagePointsPerPublisher} pts</strong>
+              <strong className="font-mono">{audit.averagePointsPerPublisher} pts</strong>
             </p>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
+          <div className="relative w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 flex items-center justify-center shrink-0">
             <BarChart3 className="w-5 h-5" />
           </div>
         </div>
@@ -660,13 +663,14 @@ export const EquidadDashboardTab: React.FC = () => {
           onClick={() =>
             setStatusFilter(statusFilter === 'sobrecargado' ? 'all' : 'sobrecargado')
           }
-          className={`text-left p-5 rounded-3xl border transition-all flex items-start justify-between cursor-pointer shadow-xs ${
+          className={`kg-card-bento relative overflow-hidden text-left p-5 rounded-3xl border transition-all flex items-start justify-between cursor-pointer shadow-sm ${
             statusFilter === 'sobrecargado'
               ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-md'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-zinc-400 dark:hover:border-zinc-600'
+              : 'kg-glass-surface kg-sheen-top border-zinc-200/80 dark:border-white/10 hover:border-rose-500/40 dark:hover:border-rose-400/40'
           }`}
         >
-          <div className="space-y-1">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-rose-500/15 blur-2xl" />
+          <div className="relative space-y-1">
             <span className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
               statusFilter === 'sobrecargado' ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-500 dark:text-[#A1A1AA]'
             }`}>
@@ -691,10 +695,10 @@ export const EquidadDashboardTab: React.FC = () => {
               Clic para filtrar hermanos con carga &gt;140%
             </p>
           </div>
-          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
+          <div className={`relative w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
             statusFilter === 'sobrecargado'
               ? 'bg-zinc-800 text-rose-400 border-zinc-700 dark:bg-zinc-100 dark:text-rose-600 dark:border-zinc-200'
-              : 'bg-zinc-100 dark:bg-[#18181F] text-rose-500 border-zinc-200 dark:border-[#27272A]'
+              : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
           }`}>
             <Flame className="w-5 h-5" />
           </div>
@@ -706,13 +710,14 @@ export const EquidadDashboardTab: React.FC = () => {
           onClick={() =>
             setStatusFilter(statusFilter === 'unused_roles' ? 'all' : 'unused_roles')
           }
-          className={`text-left p-5 rounded-3xl border transition-all flex items-start justify-between cursor-pointer shadow-xs ${
+          className={`kg-card-bento relative overflow-hidden text-left p-5 rounded-3xl border transition-all flex items-start justify-between cursor-pointer shadow-sm ${
             statusFilter === 'unused_roles'
               ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-md'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-zinc-400 dark:hover:border-zinc-600'
+              : 'kg-glass-surface kg-sheen-top border-zinc-200/80 dark:border-white/10 hover:border-amber-500/40 dark:hover:border-amber-400/40'
           }`}
         >
-          <div className="space-y-1">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl" />
+          <div className="relative space-y-1">
             <span className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
               statusFilter === 'unused_roles' ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-500 dark:text-[#A1A1AA]'
             }`}>
@@ -737,10 +742,10 @@ export const EquidadDashboardTab: React.FC = () => {
               Clic para ver hermanos habilitados sin usar
             </p>
           </div>
-          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
+          <div className={`relative w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
             statusFilter === 'unused_roles'
               ? 'bg-zinc-800 text-amber-400 border-zinc-700 dark:bg-zinc-100 dark:text-amber-600 dark:border-zinc-200'
-              : 'bg-zinc-100 dark:bg-[#18181F] text-amber-500 border-zinc-200 dark:border-[#27272A]'
+              : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
           }`}>
             <Clock className="w-5 h-5" />
           </div>
@@ -748,13 +753,13 @@ export const EquidadDashboardTab: React.FC = () => {
       </div>
 
       {/* Desglose Global por Categorías de Esfuerzo */}
-      <div className="bg-white dark:bg-[#121216] p-5 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
+            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Distribución Congregacional por Área de Responsabilidad (Puntos)</span>
           </h3>
-          <span className="text-[11px] text-zinc-500">
+          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
             Incluye VMC, Fin de Semana, Audio/Acomodadores, Limpieza, Carritos y Salidas al Campo
           </span>
         </div>
@@ -770,7 +775,7 @@ export const EquidadDashboardTab: React.FC = () => {
             return (
               <div
                 key={cat}
-                className="p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 space-y-1.5"
+                className="p-3 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-white/[0.03] space-y-1.5"
               >
                 <div className="flex items-center justify-between">
                   <span
@@ -778,12 +783,12 @@ export const EquidadDashboardTab: React.FC = () => {
                   >
                     {meta.shortLabel}
                   </span>
-                  <span className="text-xs font-extrabold text-zinc-700">{pct}%</span>
+                  <span className="text-xs font-extrabold font-mono text-zinc-700 dark:text-[#D4D4D8]">{pct}%</span>
                 </div>
-                <div className="text-base font-black text-zinc-900">
-                  {stat.points} <span className="text-xs font-semibold text-zinc-500">pts</span>
+                <div className="text-base font-black font-mono text-zinc-900 dark:text-[#F4F4F5]">
+                  {stat.points} <span className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA]">pts</span>
                 </div>
-                <div className="text-[11px] text-zinc-500">
+                <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
                   {stat.count} asignaciones registradas
                 </div>
               </div>
@@ -794,13 +799,13 @@ export const EquidadDashboardTab: React.FC = () => {
 
       {/* Sugerencias Inteligentes de Rebalanceo */}
       {audit.rebalanceSuggestions.length > 0 && (
-        <div className="bg-white dark:bg-[#121216] p-5 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
               <ArrowRightLeft className="w-4 h-4 text-indigo-500" />
               <span>Sugerencias de Rebalanceo Teocrático (Asistente de Alivio)</span>
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
+            <span className="kg-glow-badge px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200/80 dark:border-white/10 font-mono tabular-nums">
               {audit.rebalanceSuggestions.length} recomendaciones
             </span>
           </div>
@@ -812,10 +817,10 @@ export const EquidadDashboardTab: React.FC = () => {
             {audit.rebalanceSuggestions.map((sug) => (
               <div
                 key={sug.id}
-                className="p-3.5 rounded-2xl bg-zinc-50/50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2 text-xs"
+                className="p-3.5 rounded-2xl bg-zinc-50/60 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 shadow-2xs space-y-2 text-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-md font-semibold text-[10px] bg-zinc-100 dark:bg-[#121216] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
+                  <span className="px-2 py-0.5 rounded-md font-semibold text-[10px] bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200/80 dark:border-white/10">
                     Rol: {sug.roleLabel}
                   </span>
                   <span className="text-[10px] font-semibold text-zinc-400 dark:text-[#71717A]">
@@ -824,7 +829,7 @@ export const EquidadDashboardTab: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between gap-2 pt-1">
-                  <div className="flex-1 p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A]">
+                  <div className="flex-1 p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10">
                     <div className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                       Dar alivio a:
@@ -839,7 +844,7 @@ export const EquidadDashboardTab: React.FC = () => {
 
                   <ArrowRightLeft className="w-4 h-4 text-zinc-400 shrink-0" />
 
-                  <div className="flex-1 p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A]">
+                  <div className="flex-1 p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10">
                     <div className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       Priorizar a:
@@ -859,23 +864,23 @@ export const EquidadDashboardTab: React.FC = () => {
       )}
 
       {/* Visualización Comparativa con Recharts: Análisis Gráfico de Carga y Desequilibrios */}
-      <div className="bg-white p-5 sm:p-6 rounded-3xl border border-zinc-200 shadow-xs space-y-5">
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-white/10">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-base font-bold text-zinc-900">
+              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                 Comparativa Gráfica de Carga y Detección de Desequilibrios
               </h3>
               <span className="text-xs text-zinc-400">·</span>
-              <span className="text-xs font-medium text-zinc-500">
-                Promedio filtrado: <strong className="text-indigo-700 font-mono">{filteredAveragePoints} pts</strong>
+              <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA]">
+                Promedio filtrado: <strong className="text-indigo-700 dark:text-indigo-400 font-mono">{filteredAveragePoints} pts</strong>
               </span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span className="kg-glow-badge px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
                 {selectedGroupsLabel}
               </span>
             </div>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
               Filtra y compara el esfuerzo acumulado por grupos de servicio específicos, publicadores y privilegios. Haz clic en cualquier barra para inspeccionar al publicador.
             </p>
           </div>
@@ -886,30 +891,30 @@ export const EquidadDashboardTab: React.FC = () => {
               value={groupSelectValue}
               onChange={(e) => handleGroupDropdownChange(e.target.value)}
               aria-label="Filtrar comparativa por grupo de servicio"
-              className="px-3 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50/70 text-xs font-bold text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-1.5 rounded-xl border border-indigo-500/25 bg-indigo-500/10 text-xs font-bold text-indigo-800 dark:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="all">Todos los Grupos ({preachingGroups.length})</option>
+              <option value="all" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Todos los Grupos ({preachingGroups.length})</option>
               {selectedGroups.length > 1 && (
-                <option value="multi">
+                <option value="multi" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">
                   Comparando {selectedGroups.length} grupos ({selectedGroups.map((n) => `#${n}`).join(', ')})
                 </option>
               )}
               {preachingGroups.map((g) => (
-                <option key={g.number} value={String(g.number)}>
+                <option key={g.number} value={String(g.number)} className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">
                   {g.name || `Grupo #${g.number}`} (G#{g.number})
                 </option>
               ))}
             </select>
 
             {/* Selector segmentado de modo de gráfico */}
-            <div className="flex flex-wrap items-center gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200/70">
+            <div className="flex flex-wrap items-center gap-1 p-1 bg-zinc-100/90 dark:bg-white/[0.04] rounded-xl border border-zinc-200/80 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setChartMode('stacked_categories')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   chartMode === 'stacked_categories'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                    ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Por Áreas (Apilado)
@@ -917,10 +922,10 @@ export const EquidadDashboardTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setChartMode('cohort_deviation')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                   chartMode === 'cohort_deviation'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                    ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 Brecha vs. Privilegio
@@ -928,10 +933,10 @@ export const EquidadDashboardTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setChartMode('cohort_distribution')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1 ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer ${
                   chartMode === 'cohort_distribution'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                    ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <PieChartIcon className="w-3.5 h-3.5" />
@@ -940,10 +945,10 @@ export const EquidadDashboardTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setChartMode('service_groups')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1 ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer ${
                   chartMode === 'service_groups'
-                    ? 'bg-white text-indigo-700 shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                    ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <Users className="w-3.5 h-3.5" />
@@ -956,12 +961,12 @@ export const EquidadDashboardTab: React.FC = () => {
               <select
                 value={chartSliceMode}
                 onChange={(e) => setChartSliceMode(e.target.value as ChartSliceMode)}
-                className="px-3 py-1.5 rounded-xl border border-zinc-200 bg-zinc-50 text-xs font-bold text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="extremes">Contraste: 8 Más vs. 8 Menos Cargados</option>
-                <option value="top15">Top 15 Mayor Carga</option>
-                <option value="bottom15">Top 15 Menor Carga</option>
-                <option value="all25">Vista General (hasta 25)</option>
+                <option value="extremes" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Contraste: 8 Más vs. 8 Menos Cargados</option>
+                <option value="top15" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Top 15 Mayor Carga</option>
+                <option value="bottom15" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Top 15 Menor Carga</option>
+                <option value="all25" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Vista General (hasta 25)</option>
               </select>
             )}
           </div>
@@ -969,20 +974,20 @@ export const EquidadDashboardTab: React.FC = () => {
 
         {/* Barra Multi-Selector de Grupos de Servicio Específicos */}
         {preachingGroups.length > 0 && (
-          <div className="p-3 rounded-2xl bg-zinc-50/90 border border-zinc-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="p-3 rounded-2xl bg-zinc-50/90 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] font-bold text-zinc-700 inline-flex items-center gap-1.5 mr-1">
-                <Users className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="text-[11px] font-bold text-zinc-700 dark:text-[#D4D4D8] inline-flex items-center gap-1.5 mr-1">
+                <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Grupos de Servicio:</span>
               </span>
 
               <button
                 type="button"
                 onClick={() => setSelectedGroups([])}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all border ${
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer ${
                   selectedGroups.length === 0
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
-                    : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-100'
+                    : 'bg-white dark:bg-white/[0.04] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/[0.08]'
                 }`}
               >
                 Todos ({audit.reports.length})
@@ -996,18 +1001,18 @@ export const EquidadDashboardTab: React.FC = () => {
                     type="button"
                     onClick={() => handleToggleServiceGroup(gStat.groupNumber)}
                     title={`${gStat.groupName}: ${gStat.memberCount} publicadores · Promedio ${gStat.avgPoints} pts (${gStat.totalPoints} pts totales)`}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all border inline-flex items-center gap-1.5 ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all border inline-flex items-center gap-1.5 cursor-pointer ${
                       isSelected
                         ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
-                        : 'bg-white text-zinc-700 border-zinc-200 hover:border-indigo-300 hover:bg-indigo-50/40'
+                        : 'bg-white dark:bg-white/[0.04] text-zinc-700 dark:text-[#D4D4D8] border-zinc-200/80 dark:border-white/10 hover:border-indigo-300 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30'
                     }`}
                   >
                     <span>{gStat.group.name || `Grupo #${gStat.groupNumber}`}</span>
                     <span
-                      className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
                         isSelected
                           ? 'bg-indigo-500/80 text-white'
-                          : 'bg-zinc-100 text-zinc-600'
+                          : 'bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300'
                       }`}
                     >
                       {gStat.avgPoints} pts prom.
@@ -1019,13 +1024,13 @@ export const EquidadDashboardTab: React.FC = () => {
 
             {selectedGroups.length > 0 && (
               <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                <span className="text-[11px] font-semibold text-indigo-700">
+                <span className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-400">
                   {filteredReports.length} pub. en selección
                 </span>
                 <button
                   type="button"
                   onClick={() => setSelectedGroups([])}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 text-[11px] font-bold text-zinc-600"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-white/[0.06] border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 text-[11px] font-bold text-zinc-600 dark:text-zinc-300 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                   <span>Limpiar filtro</span>
@@ -1695,14 +1700,14 @@ export const EquidadDashboardTab: React.FC = () => {
       </div>
 
       {/* Matriz Principal de Peso de Carga por Publicador */}
-      <div className="bg-white p-5 sm:p-6 rounded-3xl border border-zinc-200 shadow-xs space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-white/10">
           <div>
-            <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
+              <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               <span>Radiografía de Peso de Carga por Publicador ({filteredReports.length})</span>
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
               Haz clic en cualquier publicador para inspeccionar su historial ponderado y sus privilegios habilitados sin uso.
             </p>
           </div>
@@ -1716,35 +1721,35 @@ export const EquidadDashboardTab: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar publicador..."
-                className="pl-8 pr-3 py-1.5 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 w-44"
+                className="pl-8 pr-3 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-zinc-900 dark:text-[#F4F4F5] text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 w-44"
               />
             </div>
 
             <select
               value={cohortFilter}
               onChange={(e) => setCohortFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 bg-zinc-50"
+              className="px-2.5 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-[#E4E4E7] bg-zinc-50/80 dark:bg-white/[0.04]"
             >
-              <option value="all">Todos los Privilegios</option>
-              <option value="anciano">Ancianos</option>
-              <option value="siervo_ministerial">Siervos Ministeriales</option>
-              <option value="hermano_bautizado">Hermanos / Estudiantes</option>
-              <option value="hermana_estudiante">Hermanas</option>
+              <option value="all" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Todos los Privilegios</option>
+              <option value="anciano" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Ancianos</option>
+              <option value="siervo_ministerial" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Siervos Ministeriales</option>
+              <option value="hermano_bautizado" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Hermanos / Estudiantes</option>
+              <option value="hermana_estudiante" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Hermanas</option>
             </select>
 
             <select
               value={groupSelectValue}
               onChange={(e) => handleGroupDropdownChange(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 bg-zinc-50"
+              className="px-2.5 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-[#E4E4E7] bg-zinc-50/80 dark:bg-white/[0.04]"
             >
-              <option value="all">Todos los Grupos</option>
+              <option value="all" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Todos los Grupos</option>
               {selectedGroups.length > 1 && (
-                <option value="multi">
+                <option value="multi" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">
                   Grupos ({selectedGroups.map((n) => `#${n}`).join(', ')})
                 </option>
               )}
               {preachingGroups.map((g) => (
-                <option key={g.number} value={String(g.number)}>
+                <option key={g.number} value={String(g.number)} className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">
                   {g.name || `Grupo #${g.number}`}
                 </option>
               ))}
@@ -1753,33 +1758,33 @@ export const EquidadDashboardTab: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 bg-zinc-50"
+              className="px-2.5 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-[#E4E4E7] bg-zinc-50/80 dark:bg-white/[0.04]"
             >
-              <option value="all">Todos los Estados</option>
-              <option value="sobrecargado">Sobrecargados (&gt;140%)</option>
-              <option value="fatigue">Con Alerta de Fatiga (3+ sem.)</option>
-              <option value="optimo">Carga Óptima</option>
-              <option value="subutilizado">Subutilizados (&lt;60%)</option>
-              <option value="en_descanso">En Descanso (+35 días o 0 pts)</option>
-              <option value="unused_roles">Con Roles Habilitados Sin Uso</option>
+              <option value="all" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Todos los Estados</option>
+              <option value="sobrecargado" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Sobrecargados (&gt;140%)</option>
+              <option value="fatigue" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Con Alerta de Fatiga (3+ sem.)</option>
+              <option value="optimo" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Carga Óptima</option>
+              <option value="subutilizado" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Subutilizados (&lt;60%)</option>
+              <option value="en_descanso" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">En Descanso (+35 días o 0 pts)</option>
+              <option value="unused_roles" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Con Roles Habilitados Sin Uso</option>
             </select>
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-2.5 py-1.5 rounded-xl border border-indigo-200 text-xs font-bold text-indigo-700 bg-indigo-50/60"
+              className="px-2.5 py-1.5 rounded-xl border border-indigo-500/25 text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10"
             >
-              <option value="weighted">Ordenar: Peso Ponderado (Mayor)</option>
-              <option value="raw">Ordenar: N° Asignaciones</option>
-              <option value="rest">Ordenar: Más Días en Descanso</option>
-              <option value="streak">Ordenar: Mayor Racha Semanal</option>
+              <option value="weighted" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Ordenar: Peso Ponderado (Mayor)</option>
+              <option value="raw" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Ordenar: N° Asignaciones</option>
+              <option value="rest" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Ordenar: Más Días en Descanso</option>
+              <option value="streak" className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white">Ordenar: Mayor Racha Semanal</option>
             </select>
           </div>
         </div>
 
         {/* Leyenda de Colores de la Barra Apilada */}
-        <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-600 bg-zinc-50 px-3.5 py-2 rounded-2xl border border-zinc-200/70">
-          <span className="font-bold text-zinc-700">Leyenda de Peso:</span>
+        <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-600 dark:text-[#A1A1AA] bg-zinc-50/80 dark:bg-white/[0.03] px-3.5 py-2 rounded-2xl border border-zinc-200/70 dark:border-white/10">
+          <span className="font-bold text-zinc-700 dark:text-[#D4D4D8]">Leyenda de Peso:</span>
           {(Object.keys(KHS_CATEGORY_META) as KhsWeightCategory[]).map((cat) => (
             <div key={cat} className="flex items-center gap-1.5">
               <span className={`w-2.5 h-2.5 rounded-xs ${KHS_CATEGORY_META[cat].barClass}`} />
@@ -1810,8 +1815,8 @@ export const EquidadDashboardTab: React.FC = () => {
                   key={rep.publisher.id}
                   className={`rounded-2xl border transition-all ${
                     isExpanded
-                      ? 'border-indigo-300 bg-indigo-50/20 shadow-xs'
-                      : 'border-zinc-200/90 bg-white hover:border-zinc-300'
+                      ? 'border-indigo-500/40 bg-indigo-500/5 shadow-xs'
+                      : 'border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-white/[0.02] hover:border-zinc-300 dark:hover:border-white/20'
                   }`}
                 >
                   <button
@@ -1819,25 +1824,25 @@ export const EquidadDashboardTab: React.FC = () => {
                     onClick={() =>
                       setExpandedPublisherId(isExpanded ? null : rep.publisher.id)
                     }
-                    className="w-full text-left p-3.5 space-y-2"
+                    className="w-full text-left p-3.5 space-y-2 cursor-pointer"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-bold text-sm text-zinc-900">
+                        <span className="font-bold text-sm text-zinc-900 dark:text-[#F4F4F5]">
                           {rep.displayName}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 text-zinc-600">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-[#A1A1AA]">
                           {rep.cohortLabel} • G#{rep.publisher.groupNumber || 1}
                         </span>
                         {renderStatusBadge(rep.loadStatus, rep.hasFatigueAlert)}
                         {rep.hasFatigueAlert && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-500/15 text-orange-800 dark:text-orange-300 border border-orange-500/25">
                             <Flame className="w-3 h-3" />
                             {rep.maxConsecutiveWeeks} sem. seguidas
                           </span>
                         )}
                         {rep.unusedRoleLabels.length > 0 && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/25">
                             <ShieldAlert className="w-3 h-3" />
                             {rep.unusedRoleLabels.length} rol(es) sin usar
                           </span>
@@ -1846,10 +1851,10 @@ export const EquidadDashboardTab: React.FC = () => {
 
                       <div className="flex items-center gap-3 self-end sm:self-auto">
                         <div className="text-right">
-                          <span className="text-sm font-black text-indigo-700">
+                          <span className="text-sm font-black font-mono text-indigo-700 dark:text-indigo-400">
                             {rep.totalWeightedPoints} pts
                           </span>
-                          <span className="text-[11px] text-zinc-500 ml-1.5">
+                          <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] ml-1.5">
                             ({rep.totalRawAssignments} asig. •{' '}
                             {rep.daysSinceLastAssignment >= 900
                               ? 'Sin asignar'
@@ -1866,7 +1871,7 @@ export const EquidadDashboardTab: React.FC = () => {
                     </div>
 
                     {/* Barra Horizontal Multicolor Apilada */}
-                    <div className="w-full h-3 bg-zinc-100 rounded-full overflow-hidden flex">
+                    <div className="w-full h-3 bg-zinc-100 dark:bg-white/[0.06] rounded-full overflow-hidden flex">
                       {rep.totalWeightedPoints > 0 && (
                         <div
                           className="h-full flex rounded-full overflow-hidden transition-all duration-500"
@@ -1895,20 +1900,20 @@ export const EquidadDashboardTab: React.FC = () => {
 
                   {/* Panel Expandido: Auditoría Individual */}
                   {isExpanded && (
-                    <div className="px-4 pb-4 pt-2 border-t border-zinc-200/70 space-y-3 text-xs bg-zinc-50/60 rounded-b-2xl">
+                    <div className="px-4 pb-4 pt-2 border-t border-zinc-200/70 dark:border-white/10 space-y-3 text-xs bg-zinc-50/60 dark:bg-white/[0.02] rounded-b-2xl">
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                         {(Object.keys(KHS_CATEGORY_META) as KhsWeightCategory[]).map(
                           (cat) => (
                             <div
                               key={cat}
-                              className="p-2.5 rounded-xl bg-white border border-zinc-200/80"
+                              className="p-2.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10"
                             >
-                              <div className="text-[10px] font-bold text-zinc-500">
+                              <div className="text-[10px] font-bold text-zinc-500 dark:text-[#A1A1AA]">
                                 {KHS_CATEGORY_META[cat].shortLabel}
                               </div>
-                              <div className="text-sm font-black text-zinc-900 mt-0.5">
+                              <div className="text-sm font-black font-mono text-zinc-900 dark:text-[#F4F4F5] mt-0.5">
                                 {rep.pointsByCategory[cat]} pts{' '}
-                                <span className="text-[11px] font-normal text-zinc-500">
+                                <span className="text-[11px] font-normal text-zinc-500 dark:text-[#A1A1AA]">
                                   ({rep.countsByCategory[cat]}x)
                                 </span>
                               </div>
@@ -1919,14 +1924,14 @@ export const EquidadDashboardTab: React.FC = () => {
 
                       {/* Roles Habilitados Sin Uso */}
                       {rep.unusedRoleLabels.length > 0 && (
-                        <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 flex flex-wrap items-center gap-1.5">
-                          <span className="font-bold text-amber-900 mr-1">
+                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex flex-wrap items-center gap-1.5">
+                          <span className="font-bold text-amber-900 dark:text-amber-300 mr-1">
                             Privilegios habilitados en su ficha con 0 asignaciones en este período:
                           </span>
                           {rep.unusedRoleLabels.map((lbl) => (
                             <span
                               key={lbl}
-                              className="px-2 py-0.5 rounded-md bg-white border border-amber-300 text-amber-900 font-semibold text-[11px]"
+                              className="px-2 py-0.5 rounded-md bg-white dark:bg-[#121216] border border-amber-300 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 font-semibold text-[11px]"
                             >
                               {lbl}
                             </span>
@@ -1936,7 +1941,7 @@ export const EquidadDashboardTab: React.FC = () => {
 
                       {/* Historial de Asignaciones Ponderadas */}
                       <div className="space-y-1.5">
-                        <div className="font-bold text-zinc-700">
+                        <div className="font-bold text-zinc-700 dark:text-[#D4D4D8]">
                           Desglose de Participaciones Registradas ({rep.events.length}):
                         </div>
                         {rep.events.length === 0 ? (
@@ -1948,15 +1953,15 @@ export const EquidadDashboardTab: React.FC = () => {
                             {rep.events.map((ev, i) => (
                               <span
                                 key={`${ev.date}-${ev.roleKey}-${i}`}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-zinc-200 text-[11px]"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-white/10 text-[11px]"
                               >
-                                <span className="font-semibold text-zinc-500">
+                                <span className="font-semibold text-zinc-500 dark:text-[#A1A1AA]">
                                   {ev.date}
                                 </span>
-                                <span className="font-bold text-zinc-800">
+                                <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
                                   {ev.roleLabel}
                                 </span>
-                                <span className="px-1.5 py-0.2 rounded-sm bg-indigo-50 text-indigo-700 font-extrabold text-[10px]">
+                                <span className="px-1.5 py-0.2 rounded-sm bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-extrabold text-[10px]">
                                   +{ev.points} pts
                                 </span>
                               </span>
@@ -1974,13 +1979,13 @@ export const EquidadDashboardTab: React.FC = () => {
       </div>
 
       {/* Comparativa de Peso de Carga por Grupos de Predicación */}
-      <div className="bg-white p-6 rounded-3xl border border-zinc-200 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-100">
-          <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
-            <Users className="w-5 h-5 text-emerald-600" />
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-white/10">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2 tracking-tight">
+            <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <span>Equidad y Peso de Carga por Grupos de Predicación</span>
           </h3>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
             Haz clic en cualquier tarjeta de grupo para filtrar o comparar su carga en los gráficos.
           </span>
         </div>
@@ -1993,41 +1998,41 @@ export const EquidadDashboardTab: React.FC = () => {
                 key={item.group.number}
                 type="button"
                 onClick={() => handleToggleServiceGroup(item.groupNumber)}
-                className={`p-4 rounded-2xl border text-left transition-all space-y-2 text-xs ${
+                className={`p-4 rounded-2xl border text-left transition-all space-y-2 text-xs cursor-pointer ${
                   isSelected
-                    ? 'border-indigo-500 bg-indigo-50/40 ring-2 ring-indigo-500/20 shadow-xs'
-                    : 'border-zinc-200 bg-zinc-50/70 hover:border-indigo-300 hover:bg-white'
+                    ? 'border-indigo-500 bg-indigo-500/10 ring-2 ring-indigo-500/20 shadow-xs'
+                    : 'border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-white/[0.03] hover:border-indigo-400/50 hover:bg-white dark:hover:bg-white/[0.06]'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-zinc-900 text-sm">
+                  <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">
                     {item.group.name || `Grupo #${item.group.number}`}
                   </span>
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] ${
                       isSelected
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-indigo-50 text-indigo-700'
+                        : 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300'
                     }`}
                   >
                     #{item.group.number}
                   </span>
                 </div>
 
-                <div className="space-y-1 text-zinc-600">
+                <div className="space-y-1 text-zinc-600 dark:text-[#A1A1AA]">
                   <p>
-                    Integrantes activos: <strong>{item.memberCount}</strong>
+                    Integrantes activos: <strong className="text-zinc-900 dark:text-white">{item.memberCount}</strong>
                   </p>
                   <p>
                     Peso de Carga:{' '}
-                    <strong className="text-indigo-700">{item.totalPoints} pts</strong>{' '}
+                    <strong className="text-indigo-700 dark:text-indigo-400 font-mono">{item.totalPoints} pts</strong>{' '}
                     <span className="text-[11px] text-zinc-400">
                       ({item.totalPart} asig.)
                     </span>
                   </p>
                   <p>
                     Promedio por publicador:{' '}
-                    <strong className="text-emerald-700">{item.avgPoints} pts</strong>
+                    <strong className="text-emerald-700 dark:text-emerald-400 font-mono">{item.avgPoints} pts</strong>
                   </p>
                 </div>
               </button>
@@ -2038,22 +2043,22 @@ export const EquidadDashboardTab: React.FC = () => {
 
       {/* Modal Configurador de Pesos de Carga */}
       {showWeightsModal && (
-        <div className="fixed inset-0 z-50 bg-zinc-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-2xl max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden">
-            <div className="p-5 border-b border-zinc-200 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl max-w-2xl w-full max-h-[88vh] flex flex-col overflow-hidden">
+            <div className="p-5 border-b border-zinc-200/80 dark:border-white/10 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-extrabold text-zinc-900 flex items-center gap-2">
-                  <Sliders className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                  <Sliders className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   <span>Configurador de Puntos de Peso de Carga</span>
                 </h3>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
                   Ajusta cuántos puntos de esfuerzo suma cada tipo de privilegio en la congregación y en el asignador automático.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowWeightsModal(false)}
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2083,13 +2088,13 @@ export const EquidadDashboardTab: React.FC = () => {
                         return (
                           <div
                             key={def.key}
-                            className="p-3 rounded-2xl border border-zinc-200 bg-zinc-50/70 flex items-center justify-between gap-3"
+                            className="p-3 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-white/[0.03] flex items-center justify-between gap-3"
                           >
                             <div className="min-w-0">
-                              <div className="text-xs font-bold text-zinc-900 truncate">
+                              <div className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate">
                                 {def.shortLabel}
                               </div>
-                              <div className="text-[11px] text-zinc-500 truncate">
+                              <div className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate">
                                 {def.description}
                               </div>
                             </div>
@@ -2106,9 +2111,9 @@ export const EquidadDashboardTab: React.FC = () => {
                                     parseFloat(e.target.value) || def.defaultPoints
                                   )
                                 }
-                                className="w-16 px-2 py-1 rounded-xl border border-zinc-300 bg-white text-center text-xs font-extrabold text-indigo-700"
+                                className="w-16 px-2 py-1 rounded-xl border border-zinc-300 dark:border-white/15 bg-white dark:bg-[#18181F] text-center text-xs font-extrabold font-mono text-indigo-700 dark:text-indigo-400"
                               />
-                              <span className="text-[11px] font-bold text-zinc-500">
+                              <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA]">
                                 pts
                               </span>
                             </div>
@@ -2121,11 +2126,11 @@ export const EquidadDashboardTab: React.FC = () => {
               })}
             </div>
 
-            <div className="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between">
+            <div className="p-4 border-t border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.02] flex items-center justify-between">
               <button
                 type="button"
                 onClick={handleResetWeights}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-xs font-bold text-zinc-700"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-300 dark:border-white/15 bg-white dark:bg-white/[0.05] hover:bg-zinc-100 text-xs font-bold text-zinc-700 dark:text-[#E4E4E7] cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Restaurar Oficiales</span>
@@ -2134,7 +2139,7 @@ export const EquidadDashboardTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowWeightsModal(false)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white cursor-pointer"
               >
                 Listo y Aplicar
               </button>

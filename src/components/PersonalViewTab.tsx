@@ -863,7 +863,8 @@ export const PersonalViewTab: React.FC = () => {
   if (!isAuthenticatedPublisher) {
     return (
       <div className="w-full max-w-lg mx-auto py-8 sm:py-14 px-4 animate-in fade-in zoom-in-95 duration-300">
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center">
+          <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-purple-500/10 dark:bg-purple-500/15 blur-3xl" />
           {/* Logo / Badge */}
           <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
             <KeyRound size={32} />
@@ -1017,7 +1018,7 @@ export const PersonalViewTab: React.FC = () => {
   return (
     <div className="w-full space-y-5 animate-in fade-in duration-300">
       {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (COMPACTA) */}
-      <div className="bg-white dark:bg-[#121216] px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
             {selectedPublisher?.name ? selectedPublisher.name[0].toUpperCase() : 'P'}
@@ -1291,11 +1292,11 @@ export const PersonalViewTab: React.FC = () => {
                       key={card.id}
                       type="button"
                       onClick={() => setActiveModule(card.id)}
-                      className="group text-left bg-white dark:bg-[#121216] hover:bg-zinc-50/80 dark:hover:bg-[#18181F] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+                      className="kg-card-bento kg-glass-surface kg-sheen-top group text-left hover:bg-zinc-50/80 dark:hover:bg-[#18181F] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-400/60 dark:hover:border-indigo-500/40 shadow-sm transition-all flex flex-col justify-between gap-4 cursor-pointer"
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between gap-3">
-                          <div className={`w-11 h-11 rounded-2xl ${card.iconBg} ${card.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-105`}>
+                          <div className={`kg-glow-badge w-11 h-11 rounded-2xl ${card.iconBg} ${card.iconColor} flex items-center justify-center shrink-0 transition-transform group-hover:scale-105`}>
                             <Icon className="w-5 h-5" />
                           </div>
                           <div className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">
@@ -1324,7 +1325,7 @@ export const PersonalViewTab: React.FC = () => {
         }
 
         return (
-          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
@@ -1347,7 +1348,7 @@ export const PersonalViewTab: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+            <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-white/[0.04] p-1 rounded-2xl border border-zinc-200/70 dark:border-white/10 overflow-x-auto no-scrollbar">
               {portalCards.map((sc) => {
                 const ScIcon = sc.icon;
                 const isCurr = sc.id === activeModule;
@@ -1356,10 +1357,10 @@ export const PersonalViewTab: React.FC = () => {
                     key={sc.id}
                     type="button"
                     onClick={() => setActiveModule(sc.id)}
-                    className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                       isCurr
-                        ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                        ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                     title={sc.title}
                   >
@@ -1379,7 +1380,7 @@ export const PersonalViewTab: React.FC = () => {
       {activeModule === 'asignaciones' && (
         <div className="space-y-4">
           {/* BARRA MAESTRA: HOJA UNIFICADA DE MIS ASIGNACIONES DEL MES */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3.5">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3.5">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -1465,10 +1466,10 @@ export const PersonalViewTab: React.FC = () => {
                     key={cat.id}
                     type="button"
                     onClick={() => setUnifiedCategoryFilter(cat.id as any)}
-                    className={`px-2.5 py-1 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-full font-bold whitespace-nowrap transition-all cursor-pointer border ${
                       unifiedCategoryFilter === cat.id
-                        ? 'bg-purple-600 text-white shadow-2xs'
-                        : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] text-zinc-600 dark:text-[#D4D4D8]'
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-zinc-100/80 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border-zinc-200/80 dark:border-white/10 text-zinc-600 dark:text-[#D4D4D8]'
                     }`}
                   >
                     {cat.label}
@@ -1495,8 +1496,8 @@ export const PersonalViewTab: React.FC = () => {
           </div>
 
           {myAssignments.length === 0 ? (
-            <div className="p-8 sm:p-12 text-center bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
-              <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-8 sm:p-12 text-center rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
+              <div className="kg-glow-badge w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <h3 className="text-base font-bold text-zinc-900 dark:text-white">
@@ -1526,7 +1527,7 @@ export const PersonalViewTab: React.FC = () => {
                   return (
                     <div
                       key={item.id}
-                      className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
+                      className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm transition-all flex flex-col justify-between gap-3 sm:gap-4"
                     >
                       <div className="space-y-2">
                         {/* Cabecera de la tarjeta */}
@@ -1712,7 +1713,7 @@ export const PersonalViewTab: React.FC = () => {
         <div className="w-full space-y-4 sm:space-y-5">
           {/* 1. CABECERA Y META ANUAL DEL AÑO DE SERVICIO (SEPTIEMBRE - AGOSTO) */}
           {personalS21Summary && (
-            <div className="bg-white dark:bg-[#121216] p-4 sm:p-6 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-zinc-100 dark:border-[#27272A]">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -1837,7 +1838,7 @@ export const PersonalViewTab: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
             {/* IZQUIERDA (7 cols): LISTA INTERACTIVA DE LOS 12 MESES */}
             {personalS21Summary && (
-              <div className="lg:col-span-7 bg-white dark:bg-[#121216] rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3.5">
+              <div className="lg:col-span-7 kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3.5">
                 <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-[#27272A]">
                   <div>
                     <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
@@ -1942,7 +1943,7 @@ export const PersonalViewTab: React.FC = () => {
             )}
 
             {/* DERECHA (5 cols): REGISTRO Y ENVÍO DEL MES SELECCIONADO */}
-            <div className="lg:col-span-5 bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 lg:sticky lg:top-20">
+            <div className="lg:col-span-5 kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 lg:sticky lg:top-20">
               <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                 <div>
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400">
@@ -2146,7 +2147,7 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 3: MIS AUSENCIAS PLANIFICADAS */}
       {activeModule === 'ausencias' && (
         <div className="w-full space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-[#27272A]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full">
@@ -2219,7 +2220,7 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 4: MI GRUPO DE SERVICIO */}
       {activeModule === 'grupo' && (
         <div className="w-full space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full">
                 MINISTERIO DEL CAMPO
@@ -2380,7 +2381,7 @@ export const PersonalViewTab: React.FC = () => {
         <div className="space-y-4">
           {/* Tablero de anuncios */}
           {notices.length > 0 && (
-            <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-6 shadow-sm space-y-4">
               <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-purple-600" />
                 <span>Tablero Oficial de Anuncios</span>
@@ -2406,7 +2407,7 @@ export const PersonalViewTab: React.FC = () => {
 
           {/* Pedidos especiales de literatura */}
           {specialOrders.filter((o) => o.publisherId === selectedPublisherId).length > 0 && (
-            <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-6 shadow-sm space-y-4">
               <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                 <Package className="w-5 h-5 text-blue-600" />
                 <span>Mis Pedidos Especiales de Literatura</span>
@@ -2441,7 +2442,7 @@ export const PersonalViewTab: React.FC = () => {
       {/* MÓDULO 6: SEGURIDAD Y VERIFICACIÓN EN DOS PASOS (2FA) */}
       {activeModule === 'seguridad_2fa' && (
         <div className="space-y-5">
-          <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-6 sm:p-7 shadow-xs space-y-5">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-6 sm:p-7 shadow-sm space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-[#27272A]">
               <div className="flex items-start sm:items-center gap-3.5">
                 <div
@@ -2560,10 +2561,10 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MODAL: NOTIFICAR AUSENCIA */}
       {showAddAbsenceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/75 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="kg-glass-surface kg-sheen-top w-full max-w-md border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
                 <Plane size={20} />
               </div>
               <div>
@@ -2643,10 +2644,10 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MODAL: NO PODRÉ ASISTIR / SOLICITAR SUSTITUTO */}
       {declineModalState.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/75 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="kg-glass-surface kg-sheen-top w-full max-w-md border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950 flex items-center justify-center text-rose-600 dark:text-rose-400">
+              <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/60 dark:border-rose-800/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
                 <AlertCircle size={20} />
               </div>
               <div>

@@ -725,15 +725,15 @@ export const ExportPdfTab: React.FC = () => {
       </style>
 
       {/* Barra de Navegación de Exportación y Plantillas (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
         {/* Tab switch between Monthly Program, S-89 Slips, Local Official Forms, and WhatsApp Center */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-[#27272A]/80 p-1 rounded-xl text-xs font-semibold w-full lg:w-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:flex items-center gap-1 bg-zinc-100/80 dark:bg-white/[0.04] border border-zinc-200/70 dark:border-white/10 p-1 rounded-2xl text-xs font-semibold w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab('programa')}
-            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'programa'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10 font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -744,9 +744,9 @@ export const ExportPdfTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('s89')}
-            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's89'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10 font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -757,9 +757,9 @@ export const ExportPdfTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('s21')}
-            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's21'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10 font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -770,7 +770,7 @@ export const ExportPdfTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('formatos_oficiales')}
-            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'formatos_oficiales'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                 : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
@@ -784,7 +784,7 @@ export const ExportPdfTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('whatsapp')}
-            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'whatsapp'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
@@ -811,7 +811,7 @@ export const ExportPdfTab: React.FC = () => {
       {activeTab === 'programa' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Controls Column */}
-          <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5 no-print self-start">
             <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
               <Sliders className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               <span>Configuración del Documento</span>
@@ -1043,7 +1043,7 @@ export const ExportPdfTab: React.FC = () => {
           {/* Interactive Live Preview Area */}
           <div className="lg:col-span-2 space-y-3">
             {/* Preview Toolbar */}
-            <div className="bg-white dark:bg-[#121216] p-3 sm:px-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-2xs">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3 sm:px-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-sm">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
@@ -1054,14 +1054,14 @@ export const ExportPdfTab: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-2">
                 {/* Switch between Interactive Paper Sheet and Real PDF Document */}
-                <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] p-0.5 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
+                <div className="flex items-center bg-zinc-100/80 dark:bg-white/[0.04] p-1 rounded-xl border border-zinc-200/70 dark:border-white/10">
                   <button
                     type="button"
                     onClick={() => setPreviewMode('sheet')}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       previewMode === 'sheet'
-                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
+                        ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     Hoja Interactiva
@@ -1071,8 +1071,8 @@ export const ExportPdfTab: React.FC = () => {
                     onClick={() => setPreviewMode('pdf')}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       previewMode === 'pdf'
-                        ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900'
+                        ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     Documento PDF Real
@@ -1385,7 +1385,7 @@ export const ExportPdfTab: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* S-89 Controls & Selection Column */}
-            <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5 no-print self-start">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                   <FileCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1561,7 +1561,7 @@ export const ExportPdfTab: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* S-21 Controls & Publisher Selector Column */}
-            <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-5 no-print self-start">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5 no-print self-start">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                   <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1716,7 +1716,7 @@ export const ExportPdfTab: React.FC = () => {
 
       {/* TAB 3: CENTRO WHATSAPP */}
       {activeTab === 'whatsapp' && (
-        <div className="bg-white dark:bg-[#121216] p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-8 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
@@ -2010,17 +2010,17 @@ export const ExportPdfTab: React.FC = () => {
          ========================================================================= */}
       {isPreviewModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-3 sm:p-5 animate-fade-in no-print"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/75 backdrop-blur-md p-3 sm:p-5 animate-fade-in no-print"
           onClick={() => setIsPreviewModalOpen(false)}
         >
           <div
-            className="w-full max-w-6xl h-[90dvh] rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xl flex flex-col overflow-hidden"
+            className="kg-glass-surface kg-sheen-top w-full max-w-6xl h-[90dvh] rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header with Live Orientation & Page Size Controls */}
-            <div className="px-5 py-3.5 sm:px-6 border-b border-zinc-200 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-3 bg-zinc-50 dark:bg-[#121216] shrink-0">
+            <div className="px-5 py-3.5 sm:px-6 border-b border-zinc-200/80 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/80 dark:bg-white/[0.02] shrink-0">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                <div className="kg-glow-badge w-9 h-9 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                   <Eye className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">

@@ -248,7 +248,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
   const currentHoverPoint = hoveredIdx !== null ? hourPoints[hoveredIdx] : null;
 
   return (
-    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between">
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
@@ -257,7 +257,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
               Actividad de Servicio del Campo
             </h3>
             {stats.totalHours > 0 && (
-              <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-md font-mono tabular-nums">
+              <span className="kg-glow-badge text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-full font-mono tabular-nums">
                 {stats.totalHours} hrs totales
               </span>
             )}
@@ -270,13 +270,13 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
         {/* CONTROLS: METRICS & RANGE */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Metric Selector */}
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs font-semibold">
+          <div className="flex items-center p-1 bg-zinc-100/90 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 rounded-xl text-xs font-semibold">
             <button
               type="button"
               onClick={() => setActiveMetric('ambos')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 activeMetric === 'ambos'
-                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
                   : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
@@ -285,9 +285,9 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setActiveMetric('horas')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 activeMetric === 'horas'
-                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
                   : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
@@ -296,9 +296,9 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setActiveMetric('estudios')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 activeMetric === 'estudios'
-                  ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
                   : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
@@ -307,13 +307,13 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
           </div>
 
           {/* Range Selector */}
-          <div className="flex items-center p-1 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-lg text-xs font-semibold">
+          <div className="flex items-center p-1 bg-zinc-100/90 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/10 rounded-xl text-xs font-semibold">
             <button
               type="button"
               onClick={() => setRange('6')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 range === '6'
-                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >
@@ -322,9 +322,9 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <button
               type="button"
               onClick={() => setRange('12')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 range === '12'
-                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-white'
               }`}
             >

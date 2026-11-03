@@ -454,11 +454,11 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
-                      className="group relative p-5 rounded-2xl text-left bg-white dark:bg-[#121216] border border-zinc-200/90 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/80 dark:hover:bg-[#18181F] shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer flex items-center gap-4.5"
+                      className="kg-card-bento kg-glass-surface kg-sheen-top group relative p-5 rounded-3xl text-left border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 shadow-sm hover:shadow-md transition-all duration-150 cursor-pointer flex items-center gap-4.5 active:scale-[0.98]"
                     >
                       {/* Icono Outline Espacioso Estilo JW Library */}
                       <div
-                        className={`w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${dept.accentBg} ${dept.accentText} group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 shadow-2xs`}
+                        className={`w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-150 group-hover:scale-105 ${dept.accentBg} ${dept.accentText} group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-500 dark:group-hover:bg-indigo-500 dark:group-hover:text-white shadow-2xs`}
                       >
                         <ItemIcon className="w-6 h-6 stroke-[1.8]" />
                       </div>
@@ -466,13 +466,13 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                       {/* Texto y Título */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1.5">
-                          <h3 className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 group-hover:text-zinc-900 dark:group-hover:text-white leading-snug truncate transition-colors">
+                          <h3 className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug truncate transition-colors tracking-tight">
                             {item.label}
                           </h3>
                           {item.badge && (
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums shrink-0 ${
-                                item.badgeColor || 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]'
+                              className={`kg-glow-badge px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums shrink-0 ${
+                                item.badgeColor || 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10'
                               }`}
                             >
                               {item.badge}
@@ -484,7 +484,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                         </p>
                       </div>
 
-                      <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0" />
                     </button>
                   );
                 })}

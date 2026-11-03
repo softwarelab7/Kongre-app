@@ -1072,17 +1072,18 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       {/* =========================================================================
           ACCESO RÁPIDO: REGISTRO DE ASISTENCIA A REUNIONES (S-88)
          ========================================================================= */}
-      <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-white to-blue-50/80 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-indigo-600/30">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-3.5 sm:p-4 rounded-3xl bg-gradient-to-r from-indigo-50/80 via-white to-blue-50/80 dark:from-[#121216] dark:via-[#121216] dark:to-indigo-950/30 border border-indigo-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
+        <div className="pointer-events-none absolute -top-10 -left-10 w-32 h-32 rounded-full bg-indigo-500/15 blur-2xl" />
+        <div className="relative flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-indigo-600/30">
             <UserCheck className="w-5 h-5 stroke-[2.2]" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+              <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                 Registro de Asistencia S-88
               </h3>
-              <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+              <span className="kg-glow-badge text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
                 Oficial S-88
               </span>
             </div>
@@ -1095,7 +1096,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         <button
           type="button"
           onClick={() => setActiveTab('asistencia')}
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-xs shadow-xs shadow-indigo-600/25 transition-all cursor-pointer shrink-0 self-stretch sm:self-auto"
+          className="relative inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-bold text-xs shadow-sm shadow-indigo-600/25 transition-all cursor-pointer shrink-0 self-stretch sm:self-auto"
         >
           <UserCheck className="w-3.5 h-3.5 stroke-[2.5]" />
           <span>Registrar Asistencia</span>
@@ -1108,8 +1109,9 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
          ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5 items-stretch">
         {/* TARJETA IZQUIERDA: INFORME */}
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 flex flex-col justify-between">
-          <div>
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-32 h-32 rounded-full bg-purple-500/10 blur-2xl" />
+          <div className="relative">
             {/* Cabecera Informe + Botón "+" */}
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -1130,7 +1132,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 onClick={handleOpenQuickReportModal}
                 aria-label="Registrar o editar informe de predicación"
                 title="Registrar o editar actividad del mes"
-                className="w-8 h-8 rounded-full bg-purple-700 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 text-white flex items-center justify-center transition-transform active:scale-95 cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-purple-700 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 text-white flex items-center justify-center transition-transform active:scale-95 cursor-pointer shrink-0 shadow-xs shadow-purple-600/30"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
               </button>
@@ -1153,7 +1155,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 <button
                   type="button"
                   onClick={() => setActiveTab('inicio')}
-                  className="p-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
+                  className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
                 >
                   <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block">
                     Tiempo
@@ -1171,7 +1173,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 <button
                   type="button"
                   onClick={() => setActiveTab('inicio')}
-                  className="p-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
+                  className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
                 >
                   <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block">
                     Revisitas
@@ -1183,7 +1185,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 <button
                   type="button"
                   onClick={() => setActiveTab('inicio')}
-                  className="p-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
+                  className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
                 >
                   <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] block">
                     Cursos
@@ -1197,7 +1199,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
           </div>
 
           {/* Mes Anterior y Estado Real */}
-          <div className="mt-3.5 pt-3 border-t border-zinc-200/60 dark:border-[#27272A] flex items-center justify-between gap-2">
+          <div className="relative mt-3.5 pt-3 border-t border-zinc-200/60 dark:border-white/10 flex items-center justify-between gap-2">
             <div>
               <p className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] capitalize">
                 Mes de {prevMonthName}
@@ -1213,7 +1215,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
               className={`py-1.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 ${
                 prevMonthSent
                   ? 'border-purple-700/70 dark:border-purple-400/60 bg-purple-50/70 dark:bg-purple-950/40 text-purple-950 dark:text-purple-200 hover:bg-purple-100/70 dark:hover:bg-purple-900/50'
-                  : 'border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] hover:border-purple-400 dark:hover:border-purple-500'
+                  : 'border-zinc-300 dark:border-white/10 bg-white dark:bg-white/[0.04] text-zinc-700 dark:text-[#F4F4F5] hover:border-purple-400 dark:hover:border-purple-500'
               }`}
             >
               {prevMonthSent ? (
@@ -1232,9 +1234,10 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         </div>
 
         {/* TARJETA DERECHA: PRÓXIMOS */}
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-32 h-32 rounded-full bg-emerald-500/10 blur-2xl" />
           {/* Cabecera Próximos + Contador */}
-          <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="relative flex items-center justify-between gap-2 mb-2">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                 Próximos
@@ -1243,23 +1246,23 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 {activePublisher ? `Asignaciones de ${activePublisher.name}` : 'Tus próximos privilegios'}
               </p>
             </div>
-            <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-400">
+            <span className="kg-glow-badge font-mono tabular-nums text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
               {upcomingItems.length} {upcomingItems.length === 1 ? 'asignación' : 'asignaciones'}
             </span>
           </div>
 
           {/* Lista de próximos deberes / partes o Estado Vacío real */}
           {upcomingItems.length > 0 ? (
-            <div className="divide-y divide-zinc-100 dark:divide-[#27272A] flex-1 flex flex-col justify-center">
+            <div className="relative divide-y divide-zinc-100 dark:divide-white/10 flex-1 flex flex-col justify-center">
               {upcomingItems.slice(0, 4).map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setActiveTab(item.targetTab)}
-                  className="w-full py-2 first:pt-1 last:pb-1 flex items-center justify-between gap-2.5 text-left hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-lg px-1.5 transition-colors cursor-pointer group"
+                  className="w-full py-2 first:pt-1 last:pb-1 flex items-center justify-between gap-2.5 text-left hover:bg-zinc-50/80 dark:hover:bg-white/[0.04] rounded-xl px-1.5 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
                       {item.type === 'duty' ? (
                         <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
                       ) : item.type === 'cleaning' ? (
@@ -1284,7 +1287,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
               ))}
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center py-4 px-2">
+            <div className="relative flex-1 flex flex-col items-center justify-center text-center py-4 px-2">
               <p className="text-xs font-semibold text-zinc-600 dark:text-[#F4F4F5]">
                 No tienes asignaciones ni deberes próximos registrados
               </p>
@@ -1295,14 +1298,14 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 <button
                   type="button"
                   onClick={() => setActiveTab('programacion')}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
                 >
                   Ver programa
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('limpieza_deberes')}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:border-emerald-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 hover:border-emerald-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
                 >
                   Deberes y aseo
                 </button>
@@ -1316,7 +1319,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
           2 & 3. SECCIÓN MEDIA: TABLERO DE ANUNCIOS & EVENTOS (2 COLUMNAS EN PC)
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-5 items-stretch">
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
@@ -1336,15 +1339,15 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             </button>
           </div>
 
-          <div className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+          <div className="divide-y divide-zinc-100 dark:divide-white/10">
             {/* Fila 1: Anuncios */}
             <button
               type="button"
               onClick={() => setActiveTab('tablero_anuncios')}
-              className="w-full py-3 px-2 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-xl transition-colors cursor-pointer group text-left"
+              className="w-full py-3 px-2 flex items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-white/[0.04] rounded-2xl transition-colors cursor-pointer group text-left"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0">
                   <Volume2 className="w-4.5 h-4.5 group-hover:scale-105 transition-transform" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -1370,10 +1373,10 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             <button
               type="button"
               onClick={() => setActiveTab('tablero_anuncios')}
-              className="w-full py-3 px-2 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-xl transition-colors cursor-pointer group text-left"
+              className="w-full py-3 px-2 flex items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-white/[0.04] rounded-2xl transition-colors cursor-pointer group text-left"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0">
                   <FileText className="w-4.5 h-4.5 group-hover:scale-105 transition-transform" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -1400,7 +1403,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         {/* =========================================================================
             3. SECCIÓN: EVENTOS TEOCRÁTICOS (Solo eventos reales o Demo en modo Demo)
            ========================================================================= */}
-        <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
@@ -1421,16 +1424,16 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
           </div>
 
           {eventsList.length > 0 ? (
-            <div className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+            <div className="divide-y divide-zinc-100 dark:divide-white/10">
               {eventsList.map((ev) => (
                 <button
                   key={ev.id}
                   type="button"
                   onClick={() => setActiveTab(ev.targetTab)}
-                  className="w-full py-3 px-2 flex items-center justify-between gap-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-xl transition-colors cursor-pointer group text-left"
+                  className="w-full py-3 px-2 flex items-center justify-between gap-3.5 hover:bg-zinc-50/80 dark:hover:bg-white/[0.04] rounded-2xl transition-colors cursor-pointer group text-left"
                 >
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/20 flex items-center justify-center shrink-0">
                       {ev.kind === 'asamblea' ? (
                         <Building2 className="w-5 h-5 stroke-[2]" />
                       ) : ev.kind === 'visita_sc' ? (
@@ -1458,14 +1461,14 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                     </div>
                   </div>
 
-                  <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+                  <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
                     <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </button>
               ))}
             </div>
           ) : (
-            <div className="py-5 px-3 text-center rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-dashed border-zinc-200 dark:border-[#27272A]">
+            <div className="py-5 px-3 text-center rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-dashed border-zinc-200 dark:border-white/10">
               <p className="text-xs sm:text-sm font-semibold text-zinc-700 dark:text-[#F4F4F5]">
                 No hay eventos especiales ni asambleas registradas en este momento
               </p>
@@ -1476,21 +1479,21 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 <button
                   type="button"
                   onClick={() => setActiveTab('calendario')}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
                 >
                   Ir al Calendario
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('memorial_asambleas')}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
                 >
                   Asambleas y Conmemoración
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('visita_sc')}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 hover:border-indigo-400 text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
                 >
                   Visita del SC
                 </button>
@@ -1503,7 +1506,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       {/* =========================================================================
           4. DIRECTORIO RÁPIDO DE SECCIONES DE LA CONGREGACIÓN
          ========================================================================= */}
-      <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm">
         <div className="flex items-center justify-between gap-2 mb-3">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
@@ -1523,11 +1526,11 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 key={sec.id}
                 type="button"
                 onClick={() => setActiveTab(sec.targetTab)}
-                className="p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#202029] transition-all text-left flex flex-col justify-between gap-2 cursor-pointer group"
+                className="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] hover:shadow-xs transition-all text-left flex flex-col justify-between gap-2 cursor-pointer group active:scale-[0.98]"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-zinc-100 dark:bg-[#121216] text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-[#27272A]"
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-white/10 ${sec.accent}`}
                   >
                     <IconComponent className="w-4 h-4 stroke-[2.2]" />
                   </div>
@@ -1576,10 +1579,10 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
           role="dialog"
           aria-modal="true"
           aria-label={`Actualizar informe de ${currentMonthName}`}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in"
         >
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-[#27272A] pb-3">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-white/10 pb-3">
               <div>
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
@@ -1593,7 +1596,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                 type="button"
                 onClick={() => setIsQuickReportModalOpen(false)}
                 aria-label="Cerrar ventana de informe rápido"
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1610,7 +1613,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                     min={0}
                     value={quickHours}
                     onChange={(e) => setQuickHours(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div>
@@ -1622,7 +1625,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                     min={0}
                     value={quickRv}
                     onChange={(e) => setQuickRv(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div>
@@ -1634,12 +1637,12 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                     min={0}
                     value={quickStudies}
                     onChange={(e) => setQuickStudies(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-white/[0.04] text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-2">
+              <div className="p-3 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] capitalize">
                   Estado de {prevMonthName}:
                 </span>
@@ -1652,7 +1655,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                       localStorage.setItem(`kongre_report_sent_${prevMonthKey}`, String(next));
                     } catch {}
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium cursor-pointer transition-colors bg-zinc-100 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#3E3E42]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors bg-zinc-100 dark:bg-white/[0.06] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10"
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${prevMonthSent ? 'bg-emerald-500' : 'bg-amber-500'} shrink-0`} />
                   <span>{prevMonthSent ? 'Enviado' : 'Pendiente'}</span>
@@ -1675,7 +1678,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                   <button
                     type="button"
                     onClick={() => setIsQuickReportModalOpen(false)}
-                    className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer transition-colors"
+                    className="px-4 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-white/[0.06] cursor-pointer transition-colors"
                   >
                     Cancelar
                   </button>

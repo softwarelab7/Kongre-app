@@ -481,18 +481,19 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
   }, [roleId, setActiveTab, onOpenTimerModal, onOpenKioskModal, onOpenPinsModal, publisherPinsCount]);
 
   return (
-    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs">
-      <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm">
+      <div className="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-indigo-500/10 blur-3xl" />
+      <div className="relative flex items-center justify-between gap-2 mb-3.5 flex-wrap">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs">
             <Zap className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                 Acceso Rápido Táctil
               </h3>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+              <span className="kg-glow-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
                 <ShieldCheck className="w-3 h-3" />
                 {roleName}
               </span>
@@ -508,7 +509,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
             <button
               type="button"
               onClick={onOpenTimerModal}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100/90 dark:bg-white/[0.04] hover:bg-zinc-200/70 dark:hover:bg-white/[0.08] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
               title="Abrir Cronómetro de Atril"
             >
               <Timer className="w-3.5 h-3.5 text-indigo-500" />
@@ -519,7 +520,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
             <button
               type="button"
               onClick={onOpenKioskModal}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200/70 dark:hover:bg-[#27272A] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100/90 dark:bg-white/[0.04] hover:bg-zinc-200/70 dark:hover:bg-white/[0.08] text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
               title="Abrir Modo Pantalla del Salón"
             >
               <Tv className="w-3.5 h-3.5 text-sky-500" />
@@ -529,7 +530,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         {tools.map((tool) => {
           const IconComponent = tool.icon;
           return (
@@ -537,7 +538,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
               key={tool.id}
               type="button"
               onClick={tool.onClick}
-              className={`group relative flex flex-col justify-between text-left p-3.5 sm:p-4 min-h-[96px] rounded-xl bg-zinc-50/80 dark:bg-[#18181F] hover:bg-white dark:hover:bg-[#1F1F28] border border-zinc-200/90 dark:border-[#27272A] ${tool.accentClass} shadow-2xs hover:shadow-md transition-all duration-150 cursor-pointer active:scale-[0.97] touch-manipulation`}
+              className={`group relative flex flex-col justify-between text-left p-3.5 sm:p-4 min-h-[96px] rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] border border-zinc-200/80 dark:border-white/10 ${tool.accentClass} shadow-2xs hover:shadow-md transition-all duration-150 cursor-pointer active:scale-[0.97] touch-manipulation`}
             >
               <div className="flex items-start justify-between gap-2 w-full">
                 <div
@@ -547,7 +548,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
                 </div>
 
                 {tool.badge && (
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-zinc-200/70 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border border-zinc-300/60 dark:border-white/10 font-mono">
                     {tool.badge}
                   </span>
                 )}
@@ -735,20 +736,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 1: TOTAL */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-3.5 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
+          className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-3.5 sm:p-5 shadow-sm hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all cursor-pointer group active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-indigo-500/15 blur-2xl" />
+          <div className="relative flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               TOTAL
             </span>
-            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
+          <div className="relative text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.total}
           </div>
-          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2 flex items-center gap-1 font-mono tabular-nums">
+          <div className="relative text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2 flex items-center gap-1 font-mono tabular-nums">
             <span>{publisherStats.activityPct}% Actividad</span>
           </div>
         </div>
@@ -756,20 +758,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 2: ANCIANOS */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
+          className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all cursor-pointer group active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-violet-500/15 blur-2xl" />
+          <div className="relative flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               ANCIANOS
             </span>
-            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
+          <div className="relative text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.elders}
           </div>
-          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
+          <div className="relative text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             Cuerpo
           </div>
         </div>
@@ -777,20 +780,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 3: PRECURSORES */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
+          className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:border-emerald-500/40 dark:hover:border-emerald-400/40 transition-all cursor-pointer group active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/15 blur-2xl" />
+          <div className="relative flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               PRECURSORES
             </span>
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <Heart className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
+          <div className="relative text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {publisherStats.regularPioneers}
           </div>
-          <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="relative text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
             Regulares
           </div>
         </div>
@@ -798,20 +802,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 4: ASISTENCIA */}
         <div
           onClick={() => setActiveTab('asistencia')}
-          className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
+          className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:border-teal-500/40 dark:hover:border-teal-400/40 transition-all cursor-pointer group active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-teal-500/15 blur-2xl" />
+          <div className="relative flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               ASISTENCIA
             </span>
-            <div className="w-9 h-9 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
+          <div className="relative text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {attendanceStats.midweek}
           </div>
-          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
+          <div className="relative text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             Media
           </div>
         </div>
@@ -819,20 +824,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 5: INFORMES */}
         <div
           onClick={() => setActiveTab('informes_servicio')}
-          className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group active:scale-[0.98]"
+          className="col-span-2 sm:col-span-1 kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:border-amber-500/40 dark:hover:border-amber-400/40 transition-all cursor-pointer group active:scale-[0.98]"
         >
-          <div className="flex items-center justify-between">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl" />
+          <div className="relative flex items-center justify-between">
             <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] tracking-wider uppercase">
               INFORMES
             </span>
-            <div className="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
+          <div className="relative text-2xl sm:text-3xl font-mono font-extrabold tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1.5">
             {monthlyReports.length}
           </div>
-          <div className="text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
+          <div className="relative text-xs font-semibold text-zinc-500 dark:text-[#A1A1AA] mt-2">
             S-4 del Mes
           </div>
         </div>
@@ -863,14 +869,14 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Card 1: Resumen de Publicadores */}
-        <div className="lg:col-span-8 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs">
+        <div className="lg:col-span-8 kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
                 <Users className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                   Resumen de Publicadores
                 </h3>
                 <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
@@ -890,7 +896,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+            <div className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Ancianos
               </span>
@@ -900,7 +906,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Cuerpo activo</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+            <div className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Siervos
               </span>
@@ -910,7 +916,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Ministeriales</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+            <div className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Precursores
               </span>
@@ -920,7 +926,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA]">Regulares</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+            <div className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block">
                 Total
               </span>
@@ -935,15 +941,15 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         </div>
 
         {/* Card 2: Estado de Territorios y Accesos Complementarios */}
-        <div className="lg:col-span-4 bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-4 kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
                     Territorios S-13
                   </h3>
                   <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
@@ -962,7 +968,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+              <div className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 text-center">
                 <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-[#A1A1AA] block">
                   Total
                 </span>
@@ -970,7 +976,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
                   {territoriesStats.total}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+              <div className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 text-center">
                 <span className="text-[10px] font-bold uppercase text-teal-600 dark:text-teal-400 block">
                   Asignados
                 </span>
@@ -978,7 +984,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
                   {territoriesStats.assigned}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] text-center">
+              <div className="p-2.5 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 text-center">
                 <span className="text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400 block">
                   Vencidos
                 </span>
@@ -992,7 +998,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           <button
             type="button"
             onClick={handleOpenPins}
-            className="mt-3 w-full flex items-center justify-between gap-2 p-2.5 rounded-lg bg-amber-500/10 dark:bg-amber-950/30 hover:bg-amber-500/15 dark:hover:bg-amber-900/40 border border-amber-500/25 text-xs font-bold text-amber-800 dark:text-amber-300 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+            className="mt-3 w-full flex items-center justify-between gap-2 p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 hover:bg-amber-500/15 dark:hover:bg-amber-900/40 border border-amber-500/25 text-xs font-bold text-amber-800 dark:text-amber-300 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
           >
             <span className="flex items-center gap-2 truncate">
               <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />

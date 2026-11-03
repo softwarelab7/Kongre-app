@@ -851,7 +851,8 @@ export const UserProfileSettingsView: React.FC = () => {
       {/* ========================================================================= */}
       {/* 1. COMPACT IDENTITY HEADER                                                */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-500/10 via-zinc-50/60 to-white dark:from-indigo-950/30 dark:via-zinc-900/60 dark:to-zinc-900 border border-zinc-200/80 dark:border-[#27272A] p-5 sm:p-7 shadow-sm">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-500/10 via-zinc-50/60 to-white dark:from-indigo-950/30 dark:via-[#121216] dark:to-[#121216] border border-zinc-200/80 dark:border-white/10 p-5 sm:p-7 shadow-sm">
+        <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-indigo-500/15 blur-3xl" />
         <div className="relative flex flex-col md:flex-row items-center justify-between gap-5">
           {/* Avatar + Identity Summary */}
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
@@ -1064,7 +1065,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   key={card.id}
                   type="button"
                   onClick={() => setActiveSection(card.id)}
-                  className="group text-left bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#18181F] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-600 transition-all cursor-pointer flex flex-col justify-between active:scale-[0.98] shadow-xs hover:shadow-md"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top group text-left rounded-3xl p-5 sm:p-6 border border-zinc-200/80 dark:border-white/10 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all cursor-pointer flex flex-col justify-between active:scale-[0.98] shadow-sm hover:shadow-md"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-3">
@@ -1073,19 +1074,19 @@ export const UserProfileSettingsView: React.FC = () => {
                       >
                         <Icon className="w-5 h-5" />
                       </div>
-                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200 dark:border-[#27272A]">
+                      <span className="kg-glow-badge px-2.5 py-1 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-[#D4D4D8] border border-zinc-200/80 dark:border-white/10">
                         {card.badgeText}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight">
                       {card.title}
                     </h3>
                     <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 line-clamp-2 leading-relaxed">
                       {card.subtitle}
                     </p>
 
-                    <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
+                    <div className="mt-4 p-3 rounded-2xl bg-zinc-50/80 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/10 space-y-1.5 text-xs text-zinc-600 dark:text-[#D4D4D8]">
                       {card.details.map((item, idx) => (
                         <div key={idx} className="flex justify-between gap-2">
                           <span className="text-zinc-400 dark:text-[#71717A] shrink-0">
@@ -1099,7 +1100,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-all">
+                  <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-all">
                     <span>{card.statusText}</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -1123,13 +1124,13 @@ export const UserProfileSettingsView: React.FC = () => {
           className="space-y-5"
         >
           {/* Navigation Bar to return to Cards Hub or switch sections quickly */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-[#27272A] flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
                 data-mobile-back-btn="true"
                 onClick={() => setActiveSection(null)}
-                className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0 border border-zinc-200/80 dark:border-white/10"
               >
                 <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Todas las tarjetas</span>
@@ -1137,7 +1138,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
               {currentSectionMeta && (
                 <div className="min-w-0">
-                  <h2 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate">
+                  <h2 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white truncate tracking-tight">
                     {currentSectionMeta.title}
                   </h2>
                   <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate hidden sm:block">
@@ -1157,10 +1158,10 @@ export const UserProfileSettingsView: React.FC = () => {
                     key={sc.id}
                     type="button"
                     onClick={() => setActiveSection(sc.id)}
-                    className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                       isCurr
                         ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-zinc-50 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                        : 'bg-zinc-50 dark:bg-white/[0.04] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white border border-zinc-200/70 dark:border-white/10'
                     }`}
                     title={sc.title}
                   >
@@ -1177,10 +1178,10 @@ export const UserProfileSettingsView: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tarjeta: Identidad Personal y Cuenta */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs space-y-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
                   <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/50 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4" />
                       </div>
                       <div>
@@ -1227,10 +1228,10 @@ export const UserProfileSettingsView: React.FC = () => {
                 </div>
 
                 {/* Tarjeta: Medios Directos de Contacto */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs space-y-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
                   <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 flex items-center justify-center shrink-0">
                         <Phone className="w-4 h-4" />
                       </div>
                       <div>
@@ -1301,10 +1302,10 @@ export const UserProfileSettingsView: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tarjeta Interactiva 1: Cambio de Contraseña de Cuenta */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs flex flex-col justify-between gap-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-center shrink-0">
                         <Lock className="w-5 h-5" />
                       </div>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
@@ -1441,10 +1442,10 @@ export const UserProfileSettingsView: React.FC = () => {
                 </div>
 
                 {/* Tarjeta Interactiva 2: Solicitud de Cambio de PIN a los Ancianos */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs flex flex-col justify-between gap-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50 flex items-center justify-center shrink-0">
                         <KeyRound className="w-5 h-5" />
                       </div>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
@@ -1488,10 +1489,10 @@ export const UserProfileSettingsView: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Tarjeta Interactiva 1: Microsoft Authenticator (2FA) */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs flex flex-col justify-between gap-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 flex items-center justify-center shrink-0">
                         <Smartphone className="w-5 h-5" />
                       </div>
                       <span
@@ -1545,10 +1546,10 @@ export const UserProfileSettingsView: React.FC = () => {
                 </div>
 
                 {/* Tarjeta Interactiva 2: Bloqueo Rápido de Pantalla con PIN */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs flex flex-col justify-between gap-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-center shrink-0">
                         <Lock className="w-5 h-5" />
                       </div>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
@@ -1579,10 +1580,10 @@ export const UserProfileSettingsView: React.FC = () => {
                 </div>
 
                 {/* Tarjeta Interactiva 3: Cerrar Sesión y Revocación Rápida */}
-                <div className="bg-white dark:bg-[#121216] p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-xs flex flex-col justify-between gap-4">
+                <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                      <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/50 flex items-center justify-center shrink-0">
                         <LogOut className="w-5 h-5" />
                       </div>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
@@ -1667,7 +1668,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
           {/* SECTION 5: FOTO E INSIGNIA TEOCRÁTICA */}
           {activeSection === 'avatar' && (
-            <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-6">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
               <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
@@ -1803,7 +1804,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
           {/* SECTION 6: CANALES DE CONTACTO Y HORARIOS */}
           {activeSection === 'preferencias_contacto' && (
-            <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-5">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
               <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                 <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
@@ -1980,7 +1981,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
           {/* SECTION 7: AVISOS PUSH Y RECORDATORIOS */}
           {activeSection === 'notificaciones' && (
-            <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-5">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
               <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-3">
                 <div>
                   <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">

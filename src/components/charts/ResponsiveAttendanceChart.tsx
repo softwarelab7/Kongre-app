@@ -180,16 +180,16 @@ export const ResponsiveAttendanceChart: React.FC<ResponsiveAttendanceChartProps>
   const currentHover = hoveredIdx !== null ? attendanceData[hoveredIdx] : null;
 
   return (
-    <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs flex flex-col justify-between">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] tracking-tight">
               Asistencia
             </h3>
             {stats.avgWeekend > 0 && (
-              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-mono tabular-nums">
+              <span className="kg-glow-badge text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono tabular-nums">
                 ~{stats.avgWeekend} prom.
               </span>
             )}

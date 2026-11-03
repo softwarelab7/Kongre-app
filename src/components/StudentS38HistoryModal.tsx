@@ -302,36 +302,41 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label={`Registro oficial S-38 e historial de ${publisher.full_name || publisher.name}`}
     >
-      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden">
-        {/* CABECERA */}
-        <div className="px-6 py-5 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/60 flex items-start justify-between gap-4">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden text-zinc-900 dark:text-zinc-100">
+        {/* CABECERA BENTO */}
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 backdrop-blur-md flex items-start justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center font-bold text-lg border border-indigo-200 dark:border-indigo-800 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-blue-600/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg border border-indigo-500/20 dark:border-indigo-500/30 shadow-xs shrink-0 font-mono">
               {publisher.name.charAt(0).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
-                  Registro Oficial S-38 / Folleto Maestros
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-500/20">
+                  Registro Oficial S-38 • Folleto Maestros
                 </span>
-                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
-                  {publisher.gender === 'hermana' ? 'Hermana' : 'Hermano'} •{' '}
-                  {publisher.privilege || 'Publicador'}
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {publisher.gender === 'hermana' ? 'Hermana' : 'Hermano'} • {publisher.privilege || 'Publicador'}
                 </span>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mt-0.5">
                 {publisher.full_name || publisher.name}
               </h3>
-              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 flex items-center gap-2 flex-wrap">
-                {publisher.phone && <span>📞 {publisher.phone}</span>}
-                {publisher.groupNumber && <span>👥 Grupo {publisher.groupNumber}</span>}
-                <span className="text-indigo-600 dark:text-indigo-400 font-medium">
-                  Lección Actual: <strong>#{currentLessonNum} - {currentLessonObj?.title}</strong>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-2.5 flex-wrap">
+                {publisher.phone && (
+                  <span className="font-mono tabular-nums">📞 {publisher.phone}</span>
+                )}
+                {publisher.groupNumber && (
+                  <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 font-mono tabular-nums">
+                    👥 Grupo {publisher.groupNumber}
+                  </span>
+                )}
+                <span className="text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
+                  Lección Activa: <strong className="font-mono tabular-nums">#{currentLessonNum}</strong> — {currentLessonObj?.title}
                 </span>
               </p>
             </div>
@@ -340,137 +345,149 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
             aria-label="Cerrar modal"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* TARJETAS DE ESTADÍSTICAS RÁPIDAS */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 sm:px-6 bg-zinc-100/60 dark:bg-[#18181F]/30 border-b border-zinc-200 dark:border-white/[0.06]">
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
-              <BookOpen size={13} className="text-indigo-500" />
+        {/* TARJETAS DE ESTADÍSTICAS RÁPIDAS (BENTO MINI-KPIS) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 sm:px-6 bg-zinc-100/50 dark:bg-[#18181F]/30 border-b border-zinc-200/60 dark:border-white/[0.06]">
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20">
+                <BookOpen size={12} />
+              </span>
               Lección Activa
             </span>
-            <div className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-1">
+            <div className="text-base sm:text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5">
               #{currentLessonNum} <span className="text-xs font-normal text-zinc-400">/ 20</span>
             </div>
-            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
               {currentLessonObj?.title}
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
-              <Award size={13} className="text-emerald-500" />
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20">
+                <Award size={12} />
+              </span>
               Aprobadas (S-38)
             </span>
-            <div className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+            <div className="text-base sm:text-lg font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 mt-1.5">
               {stats.completedCount} <span className="text-xs font-normal text-zinc-400">({stats.progressPercent}%)</span>
             </div>
-            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
-              {20 - stats.completedCount} pendientes
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+              {20 - stats.completedCount} lecciones pendientes
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
-              <History size={13} className="text-blue-500" />
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-blue-500/10 text-blue-500 dark:bg-blue-500/20">
+                <History size={12} />
+              </span>
               Intervenciones
             </span>
-            <div className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white mt-1">
+            <div className="text-base sm:text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-white mt-1.5">
               {stats.totalAll}
             </div>
-            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5 font-mono tabular-nums">
               {stats.totalMain} titular • {stats.totalAssistant} ayudante
             </p>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#18181F] border border-zinc-200/80 dark:border-white/5 shadow-2xs">
-            <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
-              <Clock size={13} className="text-amber-500" />
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/[0.08] shadow-2xs">
+            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-amber-500/10 text-amber-500 dark:bg-amber-500/20">
+                <Clock size={12} />
+              </span>
               Rotación / Última
             </span>
-            <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white mt-1.5 truncate">
+            <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white mt-2 truncate">
               {stats.weeksAgoText}
             </div>
-            <p className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5 font-mono tabular-nums">
               {stats.lastAssignment ? `📅 ${stats.lastAssignment.date}` : 'Sin datos'}
             </p>
           </div>
         </div>
 
-        {/* NAVEGACIÓN DE PESTAÑAS */}
-        <div className="px-6 border-b border-zinc-200 dark:border-white/10 flex items-center justify-between gap-2 overflow-x-auto">
-          <div className="flex items-center gap-2">
+        {/* NAVEGACIÓN EN CÁPSULAS SEGMENTADAS (APPLE STYLE) */}
+        <div className="px-6 py-3 border-b border-zinc-200/60 dark:border-white/[0.06] bg-zinc-50/50 dark:bg-[#141418] flex items-center justify-between gap-2 overflow-x-auto">
+          <div className="bg-zinc-200/60 dark:bg-white/[0.06] p-1 rounded-2xl border border-zinc-300/40 dark:border-white/[0.08] inline-flex gap-1 shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('s38')}
-              className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+              className={`py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 's38'
-                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-white/15 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
-              <Award size={15} />
+              <Award size={14} />
               <span>Tarjeta S-38 (20 Lecciones)</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('history')}
-              className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+              className={`py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'history'
-                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-white/15 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
-              <History size={15} />
-              <span>Historial de Asignaciones ({assignmentHistory.length})</span>
+              <History size={14} />
+              <span>Historial ({assignmentHistory.length})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('print')}
-              className={`py-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+              className={`py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'print'
-                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                  : 'border-transparent text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                  ? 'bg-white dark:bg-white/15 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
-              <Printer size={15} />
+              <Printer size={14} />
               <span>Ficha Imprimible S-38</span>
             </button>
+          </div>
+
+          <div className="text-xs text-zinc-400 hidden sm:block font-mono tabular-nums">
+            Progreso: {stats.progressPercent}%
           </div>
         </div>
 
         {/* CONTENIDO PRINCIPAL SCROLLEABLE */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* ═══════════ PESTAÑA 1: TARJETA S-38 (20 LECCIONES) ═══════════ */}
           {activeTab === 's38' && (
             <div className="space-y-6">
-              {/* Barra de progreso visual */}
-              <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-semibold text-zinc-700 dark:text-[#D4D4D8]">
+              {/* Barra de progreso visual con gradiente Apple */}
+              <div className="p-4 rounded-2xl bg-zinc-50/70 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                     Progreso general del folleto
                   </span>
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                  <span className="font-bold font-mono tabular-nums text-indigo-600 dark:text-indigo-400">
                     {stats.completedCount} de 20 lecciones completadas ({stats.progressPercent}%)
                   </span>
                 </div>
-                <div className="w-full bg-zinc-200 dark:bg-zinc-700/60 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-zinc-200 dark:bg-zinc-700/50 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2.5 rounded-full transition-all duration-500 shadow-xs"
                     style={{ width: `${stats.progressPercent}%` }}
                   />
                 </div>
               </div>
 
               {/* Matriz interactiva de las 20 Lecciones Oficiales */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {OFFICIAL_STUDENT_LESSONS.map((lesson) => {
                   const isCurrent = currentLessonNum === lesson.number;
                   const completedRecord = (publisher.lessonsHistory || []).find(
@@ -484,100 +501,102 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                   return (
                     <div
                       key={lesson.number}
-                      className={`p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-3 ${
+                      className={`kg-card-bento p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-3 ${
                         isCurrent
-                          ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700 shadow-xs'
+                          ? 'bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/40 dark:border-indigo-500/50 shadow-sm ring-1 ring-indigo-500/30'
                           : isCompleted
-                          ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
-                          : 'bg-white dark:bg-[#18181F]/60 border-zinc-200 dark:border-white/[0.06] hover:border-zinc-300 dark:hover:border-white/20'
+                          ? 'bg-emerald-500/[0.07] dark:bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/30'
+                          : 'bg-white/80 dark:bg-[#18181F]/70 border-zinc-200/80 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/20'
                       }`}
                     >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shrink-0 ${
-                              isCurrent
-                                ? 'bg-indigo-600 text-white'
-                                : isCompleted
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-[#D4D4D8]'
-                            }`}
-                          >
-                            {lesson.number}
-                          </span>
-                          <h4
-                            className={`text-xs sm:text-sm font-bold truncate ${
-                              isCurrent
-                                ? 'text-indigo-900 dark:text-indigo-200'
-                                : isCompleted
-                                ? 'text-emerald-900 dark:text-emerald-200'
-                                : 'text-zinc-800 dark:text-[#E4E4E7]'
-                            }`}
-                          >
-                            {lesson.title}
-                          </h4>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className={`w-7 h-7 rounded-xl text-xs font-mono font-bold flex items-center justify-center shrink-0 border ${
+                                isCurrent
+                                  ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs'
+                                  : isCompleted
+                                  ? 'bg-emerald-600 text-white border-emerald-700 shadow-xs'
+                                  : 'bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/10'
+                              }`}
+                            >
+                              {lesson.number}
+                            </span>
+                            <h4
+                              className={`text-xs sm:text-sm font-bold truncate ${
+                                isCurrent
+                                  ? 'text-indigo-950 dark:text-indigo-200'
+                                  : isCompleted
+                                  ? 'text-emerald-950 dark:text-emerald-200'
+                                  : 'text-zinc-800 dark:text-zinc-200'
+                              }`}
+                            >
+                              {lesson.title}
+                            </h4>
+                          </div>
+
+                          {/* Estado y fechas */}
+                          <div className="mt-2.5 flex items-center gap-2 flex-wrap text-[11px]">
+                            {isCurrent && (
+                              <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-800 dark:text-indigo-200 font-bold flex items-center gap-1 border border-indigo-500/30">
+                                <Sparkles size={11} /> Lección Activa
+                              </span>
+                            )}
+
+                            {isCompleted ? (
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-bold flex items-center gap-1 border border-emerald-500/30 font-mono tabular-nums">
+                                <CheckCircle2 size={11} /> Aprobada ({completedRecord.date})
+                              </span>
+                            ) : repeatRecord ? (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold flex items-center gap-1 border border-amber-500/30">
+                                <RotateCcw size={11} /> Practicar de nuevo
+                              </span>
+                            ) : !isCurrent ? (
+                              <span className="text-zinc-400 dark:text-zinc-500 text-[10px]">
+                                Pendiente
+                              </span>
+                            ) : null}
+
+                            {completedRecord?.notes && (
+                              <span className="text-zinc-500 dark:text-zinc-400 italic text-[10px] truncate max-w-[200px]">
+                                «{completedRecord.notes}»
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Estado y fechas */}
-                        <div className="mt-2 flex items-center gap-2 flex-wrap text-[11px]">
-                          {isCurrent && (
-                            <span className="px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-200 font-bold flex items-center gap-1">
-                              <Sparkles size={11} /> Lección Activa
-                            </span>
+                        {/* Botones de acción para esta lección */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          {!isCurrent && (
+                            <button
+                              type="button"
+                              onClick={() => handleSelectCurrentLesson(lesson.number)}
+                              className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
+                              title="Fijar como lección activa"
+                            >
+                              Fijar activa
+                            </button>
                           )}
 
-                          {isCompleted ? (
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold flex items-center gap-1">
-                              <CheckCircle2 size={11} /> Aprobada ({completedRecord.date})
-                            </span>
-                          ) : repeatRecord ? (
-                            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 font-bold flex items-center gap-1">
-                              <RotateCcw size={11} /> Practicar de nuevo
-                            </span>
-                          ) : !isCurrent ? (
-                            <span className="text-zinc-400 dark:text-[#71717A]">
-                              Pendiente
-                            </span>
-                          ) : null}
-
-                          {completedRecord?.notes && (
-                            <span className="text-zinc-500 dark:text-[#A1A1AA] italic text-[10px]">
-                              «{completedRecord.notes}»
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Botones de acción para esta lección */}
-                      <div className="flex flex-col gap-1 shrink-0">
-                        {!isCurrent && (
                           <button
                             type="button"
-                            onClick={() => handleSelectCurrentLesson(lesson.number)}
-                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
-                            title="Fijar como lección activa"
+                            onClick={() =>
+                              setSelectedLessonForDetail(
+                                selectedLessonForDetail === lesson.number ? null : lesson.number
+                              )
+                            }
+                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-900/80 transition-colors cursor-pointer"
                           >
-                            Fijar activa
+                            {selectedLessonForDetail === lesson.number ? 'Ocultar' : 'Evaluar'}
                           </button>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setSelectedLessonForDetail(
-                              selectedLessonForDetail === lesson.number ? null : lesson.number
-                            )
-                          }
-                          className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-900/80 transition-colors cursor-pointer"
-                        >
-                          {selectedLessonForDetail === lesson.number ? 'Ocultar' : 'Evaluar'}
-                        </button>
+                        </div>
                       </div>
 
                       {/* Panel de evaluación inline si está seleccionado */}
                       {selectedLessonForDetail === lesson.number && (
-                        <div className="col-span-full w-full mt-2 pt-2 border-t border-zinc-200 dark:border-white/10">
-                          <label className="text-[10px] font-bold text-zinc-500 uppercase block mb-1">
+                        <div className="w-full mt-2 pt-3 border-t border-zinc-200/80 dark:border-white/10 animate-fade-in">
+                          <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
                             Comentario del Consejero (opcional):
                           </label>
                           <input
@@ -585,23 +604,23 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                             value={customNote}
                             onChange={(e) => setCustomNote(e.target.value)}
                             placeholder="Ej. Buen contacto visual y lectura clara..."
-                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#121216] text-zinc-900 dark:text-white mb-2"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#121216] text-zinc-900 dark:text-white mb-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                           />
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleMarkLessonComplete(lesson.number)}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
                             >
-                              <Check size={12} />
+                              <Check size={13} />
                               <span>Aprobar Lección</span>
                             </button>
                             <button
                               type="button"
                               onClick={() => handleMarkLessonRepeat(lesson.number)}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
                             >
-                              <RotateCcw size={12} />
+                              <RotateCcw size={13} />
                               <span>Repetir (Practicar)</span>
                             </button>
                           </div>
@@ -618,17 +637,17 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           {activeTab === 'history' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Todas las participaciones registradas en el programa de Vida y Ministerio Cristianos.
                 </p>
-                <span className="text-xs font-bold text-zinc-700 dark:text-[#D4D4D8]">
+                <span className="text-xs font-bold font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
                   Total: {assignmentHistory.length}
                 </span>
               </div>
 
               {assignmentHistory.length === 0 ? (
-                <div className="py-16 text-center text-zinc-400 dark:text-[#71717A]">
-                  <BookOpen size={36} className="mx-auto text-zinc-300 dark:text-[#71717A] mb-2" />
+                <div className="py-16 text-center text-zinc-400 dark:text-zinc-500">
+                  <BookOpen size={36} className="mx-auto text-zinc-300 dark:text-zinc-600 mb-2" />
                   <p className="text-sm font-semibold">No hay intervenciones registradas todavía</p>
                   <p className="text-xs mt-1">
                     Las asignaciones futuras y pasadas se recopilan automáticamente de las semanas guardadas.
@@ -639,11 +658,11 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                   {assignmentHistory.map((item) => (
                     <div
                       key={item.id}
-                      className="p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-[#18181F]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-white/20 transition-all"
+                      className="kg-card-bento p-4 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-[#18181F]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-300 dark:hover:border-white/20 transition-all shadow-2xs"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] font-bold text-zinc-900 dark:text-white flex items-center gap-1">
+                          <span className="text-[11px] font-bold font-mono tabular-nums text-zinc-900 dark:text-white flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10">
                             <Calendar size={12} className="text-indigo-500" />
                             {item.date}
                           </span>
@@ -651,8 +670,8 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                           <span
                             className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                               item.role === 'titular'
-                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
-                                : 'bg-zinc-200 text-zinc-700 dark:bg-white/10 dark:text-zinc-300'
+                                ? 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20'
+                                : 'bg-zinc-200/70 text-zinc-700 dark:bg-white/10 dark:text-zinc-300 border border-zinc-300/40 dark:border-white/10'
                             }`}
                           >
                             {item.role === 'titular' ? '👤 Titular' : '🤝 Ayudante'}
@@ -661,28 +680,28 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                               item.room === 'auxiliar'
-                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                                : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20'
+                                : 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/20'
                             }`}
                           >
                             {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
                           </span>
                         </div>
 
-                        <h4 className="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100 mt-1">
+                        <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-1.5">
                           {item.title}
                         </h4>
 
-                        <div className="mt-1 flex items-center gap-3 text-xs text-zinc-500 dark:text-[#A1A1AA] flex-wrap">
+                        <div className="mt-1 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 flex-wrap">
                           {item.partnerName && (
                             <span>
                               {item.role === 'titular' ? 'Ayudante: ' : 'Titular: '}
-                              <strong className="text-zinc-700 dark:text-[#D4D4D8]">{item.partnerName}</strong>
+                              <strong className="text-zinc-700 dark:text-zinc-200">{item.partnerName}</strong>
                             </span>
                           )}
 
                           {item.lessonNumber && (
-                            <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
+                            <span className="text-indigo-600 dark:text-indigo-400 font-semibold font-mono tabular-nums">
                               📖 Lección #{item.lessonNumber}: {item.lessonTitle || ''}
                             </span>
                           )}
@@ -691,15 +710,15 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
 
                       <div className="shrink-0 flex items-center gap-2">
                         {item.lessonStatus === 'completada' ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1 font-mono">
                             <CheckCircle2 size={12} /> Aprobada
                           </span>
                         ) : item.lessonStatus === 'continuar' ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
                             <RotateCcw size={12} /> Continuar
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-[#A1A1AA]">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-white/10">
                             Realizada
                           </span>
                         )}
@@ -715,15 +734,15 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
           {activeTab === 'print' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   Formato oficial S-38 para archivo teocrático del superintendente de reunión.
                 </span>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
                 >
-                  <Printer size={13} />
+                  <Printer size={14} />
                   <span>Imprimir Registro S-38</span>
                 </button>
               </div>
@@ -751,7 +770,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                 <table className="w-full text-xs border-collapse">
                   <thead>
                     <tr className="bg-zinc-100 border-b border-zinc-300">
-                      <th className="p-2 text-left w-12 font-bold">Nº</th>
+                      <th className="p-2 text-left w-12 font-bold font-mono">Nº</th>
                       <th className="p-2 text-left font-bold">Punto de Consejo (Lección)</th>
                       <th className="p-2 text-center w-28 font-bold">Fecha Asignada</th>
                       <th className="p-2 text-center w-28 font-bold">Fecha Aprobada</th>
@@ -767,7 +786,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
 
                       return (
                         <tr key={l.number} className="border-b border-zinc-200 hover:bg-zinc-50">
-                          <td className="p-2 font-bold">{l.number}</td>
+                          <td className="p-2 font-bold font-mono">{l.number}</td>
                           <td className="p-2">
                             <span className="font-medium">{l.title}</span>
                             {isCur && (
@@ -792,7 +811,7 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
                   </tbody>
                 </table>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200 flex items-center justify-between text-[11px] text-zinc-500">
+                <div className="mt-4 pt-3 border-t border-zinc-200 flex items-center justify-between text-[11px] text-zinc-500 font-mono tabular-nums">
                   <span>S-38-S (Registro Teocrático)</span>
                   <span>Generado el: {new Date().toLocaleDateString('es-ES')}</span>
                 </div>
@@ -802,14 +821,14 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
         </div>
 
         {/* PIE DE PÁGINA DEL MODAL */}
-        <div className="px-6 py-3.5 border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/80 flex items-center justify-between">
-          <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+        <div className="px-6 py-3.5 border-t border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/80 backdrop-blur-md flex items-center justify-between">
+          <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono tabular-nums">
             {stats.completedCount} de 20 lecciones completadas • {stats.weeksAgoText}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-xs font-bold transition-all cursor-pointer shadow-xs"
           >
             Cerrar
           </button>
@@ -818,3 +837,4 @@ export const StudentS38HistoryModal: React.FC<StudentHistoryModalProps> = ({
     </div>
   );
 };
+

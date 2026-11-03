@@ -1700,7 +1700,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   const { hrs, mins, secs } = formatTimerHMS(displaySeconds);
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-fade-in select-none">
+    <div className="space-y-4 sm:space-y-5 select-none">
       {/* Toast Notification */}
       {toastMsg && (
         <div className="p-3.5 rounded-2xl bg-emerald-600 text-white text-xs sm:text-sm font-bold flex items-center justify-between gap-3 shadow-lg shadow-emerald-600/20 animate-in fade-in slide-in-from-top-2">
@@ -3301,8 +3301,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           MODAL: AÑADIR SALIDA / TIEMPO MANUALMENTE
          ========================================================================= */}
       {isManualLogOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 border border-zinc-200 dark:border-[#27272A] shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[250] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 border border-zinc-200 dark:border-[#27272A] shadow-2xl space-y-4 my-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
                 Añadir Tiempo de Ministerio
@@ -3413,7 +3413,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           MODAL: NUEVA / EDITAR REVISITA
          ========================================================================= */}
       {isRvModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[250] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full p-6 border border-zinc-200 dark:border-[#27272A] shadow-2xl space-y-4 my-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
@@ -3560,7 +3560,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           MODAL: NUEVO / EDITAR ESTUDIO BÍBLICO
          ========================================================================= */}
       {isStudyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[250] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full p-6 border border-zinc-200 dark:border-[#27272A] shadow-2xl space-y-4 my-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">

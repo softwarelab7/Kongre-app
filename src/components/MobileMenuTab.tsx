@@ -340,15 +340,9 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
         },
         {
           id: 'mantenimiento',
-          label: 'Mantenimiento',
-          description: 'Inspecciones y reparaciones',
+          label: 'Mantenimiento y Panel Eléctrico',
+          description: 'Inspecciones, reparaciones y tablero eléctrico',
           icon: NAV_ICONS.mantenimiento,
-        },
-        {
-          id: 'panel_electrico',
-          label: 'Panel Eléctrico y Clima',
-          description: 'Control de equipos del salón',
-          icon: NAV_ICONS.panel_electrico,
         },
       ],
     },
@@ -575,6 +569,47 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
                     const ItemIcon = item.icon;
                     const isAllowed = isTabAllowedForRole(effectiveRoleInfo.id, item.id);
 
+                    const mobileColorMap: Record<string, string> = {
+                      inicio: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60',
+                      cronometro_ministerio: 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border-sky-200/80 dark:border-sky-800/60',
+                      revisitas: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/60',
+                      estudios_biblicos: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/60',
+                      mi_vista: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200/80 dark:border-purple-800/60',
+                      panorama_general: 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border-cyan-200/80 dark:border-cyan-800/60',
+                      calendario: 'bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 border-violet-200/80 dark:border-violet-800/60',
+                      programacion: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60',
+                      s89: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/60',
+                      discursos: 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border-sky-200/80 dark:border-sky-800/60',
+                      hospitalidad: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/60',
+                      estadisticas_secretaria: 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/60',
+                      publicadores: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/60',
+                      precursores_auxiliares: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/60',
+                      informe_s1: 'bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 border-violet-200/80 dark:border-violet-800/60',
+                      tarjetas_s21: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60',
+                      informes_servicio: 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border-cyan-200/80 dark:border-cyan-800/60',
+                      asistencia: 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border-teal-200/80 dark:border-teal-800/60',
+                      cuentas: 'bg-fuchsia-50 dark:bg-fuchsia-950/60 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-200/80 dark:border-fuchsia-800/60',
+                      territorios: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/60',
+                      grupos_servicio: 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/60',
+                      carritos: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200/80 dark:border-purple-800/60',
+                      literatura: 'bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border-orange-200/80 dark:border-orange-800/60',
+                      limpieza_deberes: 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border-teal-200/80 dark:border-teal-800/60',
+                      tablero_anuncios: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60',
+                      mantenimiento: 'bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border-orange-200/80 dark:border-orange-800/60',
+                      panel_electrico: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/60',
+                      visita_sc: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200/80 dark:border-purple-800/60',
+                      memorial_asambleas: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/60',
+                      conflictos: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/60',
+                      equidad: 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border-teal-200/80 dark:border-teal-800/60',
+                      exportar_pdf: 'bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border-orange-200/80 dark:border-orange-800/60',
+                      perfil: 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border-sky-200/80 dark:border-sky-800/60',
+                      ajustes: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60',
+                      roles: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200/80 dark:border-purple-800/60',
+                    };
+                    const iconColorClasses =
+                      mobileColorMap[item.id] ||
+                      'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200/80 dark:border-indigo-800/60';
+
                     return (
                       <button
                         key={item.id}
@@ -596,10 +631,10 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
                       >
                         <div className="flex items-center justify-between gap-1.5 w-full">
                           <div
-                            className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
+                            className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 border ${
                               isAllowed
-                                ? 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-white/10'
-                                : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-400'
+                                ? iconColorClasses
+                                : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-400 border-zinc-200 dark:border-white/10'
                             }`}
                           >
                             <ItemIcon className="w-3.5 h-3.5" />

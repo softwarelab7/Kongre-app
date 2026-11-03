@@ -1692,29 +1692,14 @@ const AppContent: React.FC = () => {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={activeTab === 'menu' ? `menu-${selectedCategoryHub}` : activeTab}
-                initial={{
-                  opacity: 0,
-                  x: tabTransitionDirection * 18,
-                  y: tabTransitionDirection === 0 ? 10 : 3,
-                  scale: 0.994,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  y: 0,
-                  scale: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  x: tabTransitionDirection * -12,
-                  y: tabTransitionDirection === 0 ? -6 : 0,
-                  scale: 0.996,
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{
-                  duration: 0.22,
-                  ease: [0.22, 1, 0.36, 1],
+                  duration: 0.16,
+                  ease: 'easeOut',
                 }}
-                className="w-full will-change-[transform,opacity]"
+                className="w-full"
               >
                 {(activeTab === 'inicio' ||
                   activeTab === 'cronometro_ministerio' ||
@@ -1773,8 +1758,11 @@ const AppContent: React.FC = () => {
                 {activeTab === 'cuentas' && <CuentasTab />}
                 {activeTab === 'literatura' && <LiteraturaTab />}
                 {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
-                {activeTab === 'panel_electrico' && <PanelElectricoTab />}
-                {activeTab === 'mantenimiento' && <MantenimientoTab />}
+                {(activeTab === 'mantenimiento' || activeTab === 'panel_electrico') && (
+                  <MantenimientoTab
+                    initialSubView={activeTab === 'panel_electrico' ? 'panel_electrico' : 'fichas'}
+                  />
+                )}
                 {activeTab === 'tablero_anuncios' && (
                   <TableroAnunciosTab
                     onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}

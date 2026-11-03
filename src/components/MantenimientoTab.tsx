@@ -1,10 +1,11 @@
 // src/components/MantenimientoTab.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { MaintenanceSheet } from '../types';
 import { SAMPLE_MAINTENANCE_SHEETS_TEMPLATE } from '../utils/sampleData';
 import { MaintenanceSheetCard } from './maintenance/MaintenanceSheetCard';
 import { MaintenanceSheetModal } from './maintenance/MaintenanceSheetModal';
+import { PanelElectricoTab } from './PanelElectricoTab';
 import {
   SERVICE_YEAR_MONTHS,
   computeAnnualMaintenanceCalendar,
@@ -39,7 +40,11 @@ import {
   Flame,
 } from 'lucide-react';
 
-export const MantenimientoTab: React.FC = () => {
+export interface MantenimientoTabProps {
+  initialSubView?: 'fichas' | 'calendario_anual' | 'emergencias' | 'panel_electrico';
+}
+
+export const MantenimientoTab: React.FC<MantenimientoTabProps> = ({ initialSubView }) => {
   const {
     maintenanceSheets,
     addMaintenanceSheet,
@@ -54,10 +59,16 @@ export const MantenimientoTab: React.FC = () => {
     settings,
   } = useCongregation();
 
-  // Sub-navigation: 'fichas' | 'calendario_anual' | 'emergencias'
+  // Sub-navigation: 'fichas' | 'panel_electrico' | 'calendario_anual' | 'emergencias'
   const [activeSubView, setActiveSubView] = useState<
-    'fichas' | 'calendario_anual' | 'emergencias'
-  >('fichas');
+    'fichas' | 'calendario_anual' | 'emergencias' | 'panel_electrico'
+  >(initialSubView || 'fichas');
+
+  useEffect(() => {
+    if (initialSubView) {
+      setActiveSubView(initialSubView);
+    }
+  }, [initialSubView]);
 
   // Search & Filter state for Fichas
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,8 +224,8 @@ export const MantenimientoTab: React.FC = () => {
 
       {/* Top Sub-Navigation & Action Bar (Unified Container) */}
       <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3.5">
-        {/* Subtabs in a 3-column non-clipping mobile grid */}
-        <div className="grid grid-cols-3 gap-1 p-1.5 rounded-2xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200/70 dark:border-white/10">
+        {/* Subtabs in a 4-column responsive grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200/70 dark:border-white/10">
           <button
             onClick={() => setActiveSubView('fichas')}
             className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
@@ -227,6 +238,21 @@ export const MantenimientoTab: React.FC = () => {
             <span className="truncate">Fichas</span>
             <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 font-bold font-mono tabular-nums shrink-0">
               {stats.total}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('panel_electrico')}
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+              activeSubView === 'panel_electrico'
+                ? 'bg-white dark:bg-zinc-800 text-amber-700 dark:text-amber-300 shadow-xs font-bold ring-1 ring-black/5 dark:ring-white/10'
+                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+            <span className="truncate">Panel Eléctrico</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold font-mono tabular-nums shrink-0">
+              {breakers.length}
             </span>
           </button>
 
@@ -773,10 +799,15 @@ export const MantenimientoTab: React.FC = () => {
                     durante las reuniones.
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 text-[11px] font-bold flex items-center gap-1.5 self-start sm:self-auto font-mono tabular-nums">
+                <button
+                  type="button"
+                  onClick={() => setActiveSubView('panel_electrico')}
+                  title="Ir al Panel Eléctrico"
+                  className="px-3 py-1 rounded-full bg-zinc-100 hover:bg-amber-50 dark:bg-zinc-900/70 dark:hover:bg-amber-950/40 text-zinc-700 hover:text-amber-700 dark:text-zinc-300 dark:hover:text-amber-300 border border-zinc-200/80 dark:border-white/10 text-[11px] font-bold flex items-center gap-1.5 self-start sm:self-auto font-mono tabular-nums transition-colors cursor-pointer"
+                >
                   <Zap className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{emergencyPlan.criticalBreakers.length} Breakers Activos en Tablero</span>
-                </span>
+                  <span>{emergencyPlan.criticalBreakers.length} Breakers Activos en Tablero →</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -935,6 +966,11 @@ export const MantenimientoTab: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* ========================================================= */}
+        {/* SUBVIEW 4: PANEL ELÉCTRICO Y CONTROL DE CIRCUITOS         */}
+        {/* ========================================================= */}
+        {activeSubView === 'panel_electrico' && <PanelElectricoTab />}
 
         {/* Safety Guideline Card */}
         <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 flex items-start gap-3.5 shadow-sm">

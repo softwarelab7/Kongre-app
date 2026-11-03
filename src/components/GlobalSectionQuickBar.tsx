@@ -245,17 +245,10 @@ export const APP_DEPARTMENT_GROUPS: QuickDepartmentGroup[] = [
       },
       {
         id: 'mantenimiento',
-        label: 'Mantenimiento Preventivo',
+        label: 'Mantenimiento y Panel Eléctrico',
         shortLabel: 'Mantenimiento',
-        subtitle: 'Programa anual de conservación y seguridad del Salón',
+        subtitle: 'Programa anual de conservación, seguridad y tablero eléctrico del Salón',
         icon: NAV_ICONS.mantenimiento,
-      },
-      {
-        id: 'panel_electrico',
-        label: 'Panel Eléctrico y Clima',
-        shortLabel: 'Eléctrico',
-        subtitle: 'Directorio de pastillas, circuitos e iluminación',
-        icon: NAV_ICONS.panel_electrico,
       },
       {
         id: 'visita_sc',
@@ -339,9 +332,13 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
 }) => {
   const { effectiveRoleInfo } = useAuth();
 
-  // Normalize cronometro_ministerio to inicio for matching
+  // Normalize cronometro_ministerio to inicio and panel_electrico to mantenimiento for matching
   const normalizedTab: ActiveTab =
-    activeTab === 'cronometro_ministerio' ? 'inicio' : activeTab;
+    activeTab === 'cronometro_ministerio'
+      ? 'inicio'
+      : activeTab === 'panel_electrico'
+      ? 'mantenimiento'
+      : activeTab;
 
   const { currentDept, currentItem, siblingItems } = useMemo(() => {
     // Prefer matching inside selectedCategoryHub first if applicable
@@ -397,6 +394,219 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
     }
   };
 
+  const quickBarColorMap: Record<
+    string,
+    { active: string; inactiveIcon: string; inactiveBorder: string; headerText: string }
+  > = {
+    inicio: {
+      active: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30',
+      inactiveIcon: 'text-indigo-600 dark:text-indigo-400',
+      inactiveBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700/60',
+      headerText: 'text-indigo-600 dark:text-indigo-400',
+    },
+    revisitas: {
+      active: 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30',
+      inactiveIcon: 'text-emerald-600 dark:text-emerald-400',
+      inactiveBorder: 'hover:border-emerald-300 dark:hover:border-emerald-700/60',
+      headerText: 'text-emerald-600 dark:text-emerald-400',
+    },
+    estudios_biblicos: {
+      active: 'bg-amber-600 text-white shadow-md shadow-amber-600/30',
+      inactiveIcon: 'text-amber-600 dark:text-amber-400',
+      inactiveBorder: 'hover:border-amber-300 dark:hover:border-amber-700/60',
+      headerText: 'text-amber-600 dark:text-amber-400',
+    },
+    mi_vista: {
+      active: 'bg-purple-600 text-white shadow-md shadow-purple-600/30',
+      inactiveIcon: 'text-purple-600 dark:text-purple-400',
+      inactiveBorder: 'hover:border-purple-300 dark:hover:border-purple-700/60',
+      headerText: 'text-purple-600 dark:text-purple-400',
+    },
+    panorama_general: {
+      active: 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30',
+      inactiveIcon: 'text-cyan-600 dark:text-cyan-400',
+      inactiveBorder: 'hover:border-cyan-300 dark:hover:border-cyan-700/60',
+      headerText: 'text-cyan-600 dark:text-cyan-400',
+    },
+    calendario: {
+      active: 'bg-violet-600 text-white shadow-md shadow-violet-600/30',
+      inactiveIcon: 'text-violet-600 dark:text-violet-400',
+      inactiveBorder: 'hover:border-violet-300 dark:hover:border-violet-700/60',
+      headerText: 'text-violet-600 dark:text-violet-400',
+    },
+    programacion: {
+      active: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30',
+      inactiveIcon: 'text-indigo-600 dark:text-indigo-400',
+      inactiveBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700/60',
+      headerText: 'text-indigo-600 dark:text-indigo-400',
+    },
+    s89: {
+      active: 'bg-rose-600 text-white shadow-md shadow-rose-600/30',
+      inactiveIcon: 'text-rose-600 dark:text-rose-400',
+      inactiveBorder: 'hover:border-rose-300 dark:hover:border-rose-700/60',
+      headerText: 'text-rose-600 dark:text-rose-400',
+    },
+    discursos: {
+      active: 'bg-sky-600 text-white shadow-md shadow-sky-600/30',
+      inactiveIcon: 'text-sky-600 dark:text-sky-400',
+      inactiveBorder: 'hover:border-sky-300 dark:hover:border-sky-700/60',
+      headerText: 'text-sky-600 dark:text-sky-400',
+    },
+    hospitalidad: {
+      active: 'bg-amber-600 text-white shadow-md shadow-amber-600/30',
+      inactiveIcon: 'text-amber-600 dark:text-amber-400',
+      inactiveBorder: 'hover:border-amber-300 dark:hover:border-amber-700/60',
+      headerText: 'text-amber-600 dark:text-amber-400',
+    },
+    estadisticas_secretaria: {
+      active: 'bg-blue-600 text-white shadow-md shadow-blue-600/30',
+      inactiveIcon: 'text-blue-600 dark:text-blue-400',
+      inactiveBorder: 'hover:border-blue-300 dark:hover:border-blue-700/60',
+      headerText: 'text-blue-600 dark:text-blue-400',
+    },
+    publicadores: {
+      active: 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30',
+      inactiveIcon: 'text-emerald-600 dark:text-emerald-400',
+      inactiveBorder: 'hover:border-emerald-300 dark:hover:border-emerald-700/60',
+      headerText: 'text-emerald-600 dark:text-emerald-400',
+    },
+    precursores_auxiliares: {
+      active: 'bg-amber-600 text-white shadow-md shadow-amber-600/30',
+      inactiveIcon: 'text-amber-600 dark:text-amber-400',
+      inactiveBorder: 'hover:border-amber-300 dark:hover:border-amber-700/60',
+      headerText: 'text-amber-600 dark:text-amber-400',
+    },
+    informe_s1: {
+      active: 'bg-violet-600 text-white shadow-md shadow-violet-600/30',
+      inactiveIcon: 'text-violet-600 dark:text-violet-400',
+      inactiveBorder: 'hover:border-violet-300 dark:hover:border-violet-700/60',
+      headerText: 'text-violet-600 dark:text-violet-400',
+    },
+    tarjetas_s21: {
+      active: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30',
+      inactiveIcon: 'text-indigo-600 dark:text-indigo-400',
+      inactiveBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700/60',
+      headerText: 'text-indigo-600 dark:text-indigo-400',
+    },
+    informes_servicio: {
+      active: 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30',
+      inactiveIcon: 'text-cyan-600 dark:text-cyan-400',
+      inactiveBorder: 'hover:border-cyan-300 dark:hover:border-cyan-700/60',
+      headerText: 'text-cyan-600 dark:text-cyan-400',
+    },
+    asistencia: {
+      active: 'bg-teal-600 text-white shadow-md shadow-teal-600/30',
+      inactiveIcon: 'text-teal-600 dark:text-teal-400',
+      inactiveBorder: 'hover:border-teal-300 dark:hover:border-teal-700/60',
+      headerText: 'text-teal-600 dark:text-teal-400',
+    },
+    cuentas: {
+      active: 'bg-fuchsia-600 text-white shadow-md shadow-fuchsia-600/30',
+      inactiveIcon: 'text-fuchsia-600 dark:text-fuchsia-400',
+      inactiveBorder: 'hover:border-fuchsia-300 dark:hover:border-fuchsia-700/60',
+      headerText: 'text-fuchsia-600 dark:text-fuchsia-400',
+    },
+    territorios: {
+      active: 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30',
+      inactiveIcon: 'text-emerald-600 dark:text-emerald-400',
+      inactiveBorder: 'hover:border-emerald-300 dark:hover:border-emerald-700/60',
+      headerText: 'text-emerald-600 dark:text-emerald-400',
+    },
+    grupos_servicio: {
+      active: 'bg-blue-600 text-white shadow-md shadow-blue-600/30',
+      inactiveIcon: 'text-blue-600 dark:text-blue-400',
+      inactiveBorder: 'hover:border-blue-300 dark:hover:border-blue-700/60',
+      headerText: 'text-blue-600 dark:text-blue-400',
+    },
+    carritos: {
+      active: 'bg-purple-600 text-white shadow-md shadow-purple-600/30',
+      inactiveIcon: 'text-purple-600 dark:text-purple-400',
+      inactiveBorder: 'hover:border-purple-300 dark:hover:border-purple-700/60',
+      headerText: 'text-purple-600 dark:text-purple-400',
+    },
+    literatura: {
+      active: 'bg-orange-600 text-white shadow-md shadow-orange-600/30',
+      inactiveIcon: 'text-orange-600 dark:text-orange-400',
+      inactiveBorder: 'hover:border-orange-300 dark:hover:border-orange-700/60',
+      headerText: 'text-orange-600 dark:text-orange-400',
+    },
+    limpieza_deberes: {
+      active: 'bg-teal-600 text-white shadow-md shadow-teal-600/30',
+      inactiveIcon: 'text-teal-600 dark:text-teal-400',
+      inactiveBorder: 'hover:border-teal-300 dark:hover:border-teal-700/60',
+      headerText: 'text-teal-600 dark:text-teal-400',
+    },
+    tablero_anuncios: {
+      active: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30',
+      inactiveIcon: 'text-indigo-600 dark:text-indigo-400',
+      inactiveBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700/60',
+      headerText: 'text-indigo-600 dark:text-indigo-400',
+    },
+    mantenimiento: {
+      active: 'bg-orange-600 text-white shadow-md shadow-orange-600/30',
+      inactiveIcon: 'text-orange-600 dark:text-orange-400',
+      inactiveBorder: 'hover:border-orange-300 dark:hover:border-orange-700/60',
+      headerText: 'text-orange-600 dark:text-orange-400',
+    },
+    panel_electrico: {
+      active: 'bg-amber-600 text-white shadow-md shadow-amber-600/30',
+      inactiveIcon: 'text-amber-600 dark:text-amber-400',
+      inactiveBorder: 'hover:border-amber-300 dark:hover:border-amber-700/60',
+      headerText: 'text-amber-600 dark:text-amber-400',
+    },
+    visita_sc: {
+      active: 'bg-purple-600 text-white shadow-md shadow-purple-600/30',
+      inactiveIcon: 'text-purple-600 dark:text-purple-400',
+      inactiveBorder: 'hover:border-purple-300 dark:hover:border-purple-700/60',
+      headerText: 'text-purple-600 dark:text-purple-400',
+    },
+    memorial_asambleas: {
+      active: 'bg-rose-600 text-white shadow-md shadow-rose-600/30',
+      inactiveIcon: 'text-rose-600 dark:text-rose-400',
+      inactiveBorder: 'hover:border-rose-300 dark:hover:border-rose-700/60',
+      headerText: 'text-rose-600 dark:text-rose-400',
+    },
+    conflictos: {
+      active: 'bg-rose-600 text-white shadow-md shadow-rose-600/30',
+      inactiveIcon: 'text-rose-600 dark:text-rose-400',
+      inactiveBorder: 'hover:border-rose-300 dark:hover:border-rose-700/60',
+      headerText: 'text-rose-600 dark:text-rose-400',
+    },
+    equidad: {
+      active: 'bg-teal-600 text-white shadow-md shadow-teal-600/30',
+      inactiveIcon: 'text-teal-600 dark:text-teal-400',
+      inactiveBorder: 'hover:border-teal-300 dark:hover:border-teal-700/60',
+      headerText: 'text-teal-600 dark:text-teal-400',
+    },
+    exportar_pdf: {
+      active: 'bg-orange-600 text-white shadow-md shadow-orange-600/30',
+      inactiveIcon: 'text-orange-600 dark:text-orange-400',
+      inactiveBorder: 'hover:border-orange-300 dark:hover:border-orange-700/60',
+      headerText: 'text-orange-600 dark:text-orange-400',
+    },
+    perfil: {
+      active: 'bg-sky-600 text-white shadow-md shadow-sky-600/30',
+      inactiveIcon: 'text-sky-600 dark:text-sky-400',
+      inactiveBorder: 'hover:border-sky-300 dark:hover:border-sky-700/60',
+      headerText: 'text-sky-600 dark:text-sky-400',
+    },
+    ajustes: {
+      active: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30',
+      inactiveIcon: 'text-indigo-600 dark:text-indigo-400',
+      inactiveBorder: 'hover:border-indigo-300 dark:hover:border-indigo-700/60',
+      headerText: 'text-indigo-600 dark:text-indigo-400',
+    },
+    roles: {
+      active: 'bg-purple-600 text-white shadow-md shadow-purple-600/30',
+      inactiveIcon: 'text-purple-600 dark:text-purple-400',
+      inactiveBorder: 'hover:border-purple-300 dark:hover:border-purple-700/60',
+      headerText: 'text-purple-600 dark:text-purple-400',
+    },
+  };
+
+  const currColor =
+    (currentItem && quickBarColorMap[currentItem.id]) || quickBarColorMap.inicio;
+
   return (
     <div className="mb-4 kg-glass-surface kg-sheen-top p-3 sm:p-4 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-md">
       {/* Left: Back to Cards Hub button + Current Section Title */}
@@ -408,13 +618,13 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
           className="px-3 sm:px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.09] text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shrink-0 border border-zinc-200/70 dark:border-white/[0.08]"
           title="Volver al tablero de todas las tarjetas"
         >
-          <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+          <ArrowLeft className={`w-4 h-4 ${currColor.inactiveIcon} shrink-0`} />
           <span>Todas las tarjetas</span>
         </button>
 
         {currentItem && (
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+            <div className={`flex items-center gap-1.5 text-[11px] font-bold ${currColor.headerText}`}>
               <LayoutGrid className="w-3 h-3 shrink-0" />
               <span className="truncate">{currentDept.title}</span>
             </div>
@@ -431,6 +641,7 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
           {siblingItems.map((sib) => {
             const SibIcon = sib.icon;
             const isCurr = sib.id === normalizedTab;
+            const sibTheme = quickBarColorMap[sib.id] || quickBarColorMap.inicio;
             return (
               <button
                 key={sib.id}
@@ -443,12 +654,12 @@ export const GlobalSectionQuickBar: React.FC<GlobalSectionQuickBarProps> = ({
                 }}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 active:scale-95 ${
                   isCurr
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-black'
-                    : 'bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-white/[0.06]'
+                    ? `${sibTheme.active} font-black`
+                    : `bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-white/[0.06] ${sibTheme.inactiveBorder}`
                 }`}
                 title={sib.label}
               >
-                <SibIcon className="w-3.5 h-3.5 shrink-0" />
+                <SibIcon className={`w-3.5 h-3.5 shrink-0 ${isCurr ? 'text-white' : sibTheme.inactiveIcon}`} />
                 <span>{sib.shortLabel}</span>
               </button>
             );

@@ -627,15 +627,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           icon: NAV_ICONS.limpieza_deberes,
         },
         {
-          id: 'panel_electrico',
-          label: 'Panel Eléctrico',
-          description: 'Tablero de breakers, circuitos y control de energía',
-          icon: NAV_ICONS.panel_electrico,
-        },
-        {
           id: 'mantenimiento',
-          label: 'Mantenimiento del Salón',
-          description: 'Fichas operativas, plan preventivo y extintores',
+          label: 'Mantenimiento y Panel Eléctrico',
+          description: 'Fichas operativas, plan preventivo, extintores y tablero de breakers',
           icon: NAV_ICONS.mantenimiento,
         },
         {
@@ -794,7 +788,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       shortTitle: 'Salón',
       icon: NAV_ICONS.salon,
       primaryTab: 'limpieza_deberes' as ActiveTab,
-      tabIds: ['limpieza_deberes', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'] as ActiveTab[],
+      tabIds: ['limpieza_deberes', 'mantenimiento', 'panel_electrico', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'] as ActiveTab[],
       badge: pinnedNoticesCount || undefined,
       badgeColor: 'bg-indigo-600 text-white',
       colorClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400',
@@ -890,9 +884,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'limpieza_deberes':
         return 'Servicios de la Congregación';
       case 'panel_electrico':
-        return 'Panel Eléctrico y Seguridad';
       case 'mantenimiento':
-        return 'Mantenimiento del Salón';
+        return 'Mantenimiento y Panel Eléctrico';
       case 'visita_sc':
         return 'Visita del Superintendente';
       case 'memorial_asambleas':

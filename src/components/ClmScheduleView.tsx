@@ -356,7 +356,7 @@ export default function ClmScheduleView({
       id: part.id,
       blockId: part.id,
       noteText: '',
-      tags: [part.seccion.replace('_', ' ')],
+      tags: [(part.seccion || '').replace('_', ' ')],
       updatedAt: new Date().toISOString(),
     };
     openAnnotation(ann);
@@ -2748,13 +2748,17 @@ export default function ClmScheduleView({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                            style={{
-                              backgroundColor: `${SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366F1'}20`,
-                              color: SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366F1',
-                            }}
+                            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                              part.seccion === 'tesoros'
+                                ? 'bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300'
+                                : part.seccion === 'maestros'
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                                : part.seccion === 'vida_cristiana'
+                                ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                                : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
+                            }`}
                           >
-                            {part.seccion.replace('_', ' ')}
+                            {(part.seccion || '').replace('_', ' ')}
                           </span>
                           {part.es_clase_auxiliar && (
                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/40 dark:border-amber-800/40">
@@ -3074,7 +3078,7 @@ export default function ClmScheduleView({
         isOpen={isTimerModalOpen}
         onClose={() => setIsTimerModalOpen(false)}
         initialMeetingType="midweek"
-        initialRoom={currentRoom}
+        initialRoom={activeRoom}
         initialPartId={timerInitialPartId}
       />
 

@@ -33,16 +33,16 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Bienvenida al modo de prueba de Kongre"
     >
-      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg rounded-3xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-xs">
+            <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-xs">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>

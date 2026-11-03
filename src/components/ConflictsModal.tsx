@@ -39,9 +39,9 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Panel de Detección de Conflictos"
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-900/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/60 backdrop-blur-md"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-zinc-100 dark:border-[#27272A] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-zinc-200/80 dark:border-white/10 pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 overflow-hidden">
         {/* Header */}
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 sm:gap-3">
@@ -54,7 +54,7 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
             >
               <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             </button>
-            <div className={`hidden sm:flex w-10 h-10 rounded-xl items-center justify-center ${
+            <div className={`kg-glow-badge hidden sm:flex w-10 h-10 rounded-xl items-center justify-center ${
               currentList.length > 0
                 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
                 : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'

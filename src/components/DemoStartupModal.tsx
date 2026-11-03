@@ -15,14 +15,14 @@ export const DemoStartupModal: React.FC<DemoStartupModalProps> = ({ isOpen }) =>
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-label="Preparando modo de prueba de Kongre"
     >
-      <div className="max-w-md w-full rounded-3xl bg-white dark:bg-[#121216] border border-purple-200 dark:border-purple-900/60 shadow-2xl p-6 sm:p-8 flex items-center gap-5 animate-in zoom-in-95 duration-200">
+      <div className="max-w-md w-full rounded-3xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-purple-200/80 dark:border-white/10 shadow-2xl p-6 sm:p-8 flex items-center gap-5 animate-in zoom-in-95 duration-200">
         <div className="relative flex items-center justify-center shrink-0">
-          <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-inner">
+          <div className="kg-glow-badge w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shadow-inner">
             <Sparkles className="w-7 h-7 animate-pulse" />
           </div>
           <Loader2 className="absolute -inset-1.5 w-17 h-17 text-purple-600 dark:text-purple-400 animate-spin opacity-40" />

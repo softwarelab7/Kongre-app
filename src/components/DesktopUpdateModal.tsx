@@ -80,11 +80,11 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200"
       onClick={isUpdating ? undefined : onClose}
     >
       <div
-        className="relative w-full max-w-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl p-6 sm:p-7 space-y-5"
+        className="relative w-full max-w-lg kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-2xl p-6 sm:p-7 space-y-5"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button (deshabilitado mientras se instala) */}
@@ -101,7 +101,7 @@ export const DesktopUpdateModal: React.FC<DesktopUpdateModalProps> = ({
 
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20 shrink-0">
+          <div className="kg-glow-badge w-12 h-12 rounded-2xl bg-linear-to-tr from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20 shrink-0">
             {isUpdating ? (
               <RefreshCw className="w-6 h-6 animate-spin text-white" />
             ) : (

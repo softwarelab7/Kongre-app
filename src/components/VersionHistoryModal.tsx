@@ -94,7 +94,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     >
       <div className="w-full max-w-4xl xl:max-w-5xl mx-auto pb-10">
         {/* Full-Page Main Card */}
-        <div className="w-full bg-white dark:bg-[#121216] sm:border border-zinc-200 dark:border-[#27272A] sm:rounded-3xl sm:shadow-xl">
+        <div className="w-full kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 sm:border border-zinc-200/80 dark:border-white/10 sm:rounded-3xl sm:shadow-2xl">
           {/* Sticky Page Header with single back button */}
           <div className="sticky top-0 z-20 px-4 sm:px-7 py-3.5 sm:py-5 border-b border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-3 bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md sm:rounded-t-3xl">
             <div className="flex items-center gap-3 min-w-0">
@@ -108,7 +108,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
               >
                 <ArrowLeft className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </button>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/50">
+              <div className="kg-glow-badge w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/50">
                 <ScrollText className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="min-w-0">

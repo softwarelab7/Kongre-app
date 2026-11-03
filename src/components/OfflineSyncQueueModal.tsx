@@ -244,20 +244,20 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Cola de sincronización offline"
     >
       <div
-        className="relative w-full max-w-2xl bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-2xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 flex flex-col max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#121216]/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs">
+            <div className="kg-glow-badge w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs">
               <Database className="w-5 h-5" />
             </div>
             <div>

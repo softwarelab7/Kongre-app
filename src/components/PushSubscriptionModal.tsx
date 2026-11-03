@@ -264,14 +264,14 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Suscripción a recordatorios Push automáticos"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-zinc-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200"
     >
-      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* HEADER */}
         <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-start justify-between gap-4 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10">
           <div className="flex items-center gap-3.5">
             <div
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md shrink-0 ${
+              className={`kg-glow-badge w-12 h-12 rounded-2xl flex items-center justify-center shadow-md shrink-0 ${
                 isSubscribed
                   ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-emerald-500/20'
                   : 'bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-purple-500/20'

@@ -100,16 +100,16 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-label="Vinculación de cuentas Google"
     >
-      <div className="w-full max-w-2xl bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[90vh] overflow-hidden">
+      <div className="w-full max-w-2xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 flex flex-col max-h-[90vh] overflow-hidden">
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/70 dark:bg-[#121216]/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 flex items-center justify-center border border-amber-300 dark:border-amber-700 shadow-2xs">
+            <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 flex items-center justify-center border border-amber-300/60 dark:border-amber-700/60 shadow-2xs">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>

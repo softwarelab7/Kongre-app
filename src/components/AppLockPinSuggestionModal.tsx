@@ -98,15 +98,15 @@ export const AppLockPinSuggestionModal: React.FC<AppLockPinSuggestionModalProps>
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-zinc-950/75 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/75 backdrop-blur-md transition-opacity"
         onClick={handleDismiss}
       />
 
-      <div className="relative w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl p-6 sm:p-7 overflow-hidden animate-fade-in">
+      <div className="relative w-full max-w-md kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-2xl p-6 sm:p-7 overflow-hidden animate-fade-in">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-zinc-100 dark:border-[#27272A] pb-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-xs">
+            <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-xs">
               <Lock className="w-5 h-5" />
             </div>
             <div>

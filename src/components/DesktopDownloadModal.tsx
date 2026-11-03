@@ -105,7 +105,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl p-5 sm:p-7 space-y-6"
+        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-2xl p-5 sm:p-7 space-y-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -120,7 +120,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
 
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
+          <div className="kg-glow-badge w-12 h-12 rounded-2xl bg-linear-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
             <Monitor className="w-6 h-6" />
           </div>
           <div>

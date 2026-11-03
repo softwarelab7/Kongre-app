@@ -48,6 +48,14 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
 
+### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
+- **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.
+- **Superficies Translúcidas de Cristal (`.kg-glass-surface` & `.kg-sheen-top`):** Tarjetas y modales con `backdrop-blur-md` / `backdrop-blur-xl`, reflejos sutiles en el borde superior (*specular sheen*) y elevación fluida sin sombras opacas excesivas.
+- **Jerarquía Bento Asimétrica (`.kg-card-bento`):** Cuadrículas asimétricas de alto impacto en vistas ejecutivas, métricas KPI con resplandor radial suave y microinteracciones de entrada de escala 0.98 a 1.
+- **Insignias Vivas (`.kg-glow-badge`):** Contenedores de iconos con halo difuso de acento que destacan el rol teocrático y el contexto de cada diálogo.
+- **Conmutadores Segmentados Estilo Apple:** Píldoras de selección en una sola pieza táctil para alternar semanas, filtros, roles y modos operativos sin pestañas toscas.
+- **Erradicación Total de Diálogos Nativos:** Cero uso de `window.alert()`, `confirm()` o `prompt()` nativos en favor de una experiencia inmersiva fluida en los 4 temas del sistema (Claro, Oscuro `#09090b`/`#121216`, Sepia `#f4ecd8` y Cabina A/V `#000000`).
+
 ### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
 - **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.
 - **Panel de Auditoría de Códigos y Hardware:** Visualización exhaustiva para ancianos de hardware vinculado (móvil, tablet, PC), navegadores, sistemas operativos y fecha/hora de canje para cada publicador, con historial de revocaciones.
@@ -114,8 +122,8 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 | :--- | :--- |
 | **Frontend Web** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/) |
 | **Escritorio Nativo** | [Rust 2021](https://www.rust-lang.org/), [Tauri v2](https://v2.tauri.app/) (Edge WebView2 en Windows, WebKitGTK en Linux, WebKit nativo en macOS) |
-| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema |
-| **Temas Visuales** | **Claro**, **Oscuro** y modo especial de alto contraste para cabina de audio/video |
+| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema y componentes **Linear + Apple Bento (`.kg-*`)** |
+| **Temas Visuales** | **Claro**, **Oscuro** (`#09090b`/`#121216`), **Sepia** (`#f4ecd8`) y modo especial de alto contraste para **Cabina A/V** (`#000000`) |
 | **Gráficos & Visualización** | [Recharts](https://recharts.org/) |
 | **Cartografía** | [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri World Imagery |
 | **Criptografía** | Web Crypto API nativa: AES-256-GCM, PBKDF2 (hasta 600.000 iteraciones), HMAC-SHA1 TOTP (RFC 6238), CSPRNG |

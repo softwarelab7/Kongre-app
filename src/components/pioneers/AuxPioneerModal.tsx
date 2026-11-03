@@ -127,18 +127,18 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={request ? 'Editar solicitud de precursorado auxiliar' : 'Nueva solicitud de precursor auxiliar S-205'}
-      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+      className="fixed inset-0 bg-black/70 backdrop-blur-md z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-3xl w-full max-w-2xl max-h-[92vh] border border-zinc-200 dark:border-[#27272A] flex flex-col overflow-hidden transition-colors">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl w-full max-w-2xl max-h-[92vh] border border-zinc-200/80 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200/80 dark:border-white/8 bg-white/60 dark:bg-white/4 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-inner">
               <Target size={20} />
             </div>
             <div>
               <h2 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
-                {request ? 'Editar Solicitud de Precursorado' : 'Nueva Solicitud de Precursor Auxiliar (S-205)'}
+                {request ? 'Editar Solicitud de Precursorado' : 'Nueva Solicitud de Precursor Auxiliar (S-205b)'}
               </h2>
               <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
                 Formulario oficial para el Comité de Servicio de la Congregación
@@ -149,7 +149,7 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana de solicitud de precursor auxiliar"
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
+            className="p-2 rounded-2xl text-zinc-400 hover:text-zinc-700 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>

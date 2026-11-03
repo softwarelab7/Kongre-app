@@ -665,32 +665,33 @@ export const GruposServicioTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Conmutador Superior: Grupos de Servicio vs Programa de Salidas al Campo */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div className="grid grid-cols-2 gap-1 p-1 bg-zinc-100 dark:bg-[#18181F] rounded-xl border border-zinc-200/80 dark:border-[#27272A] w-full md:w-auto">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3">
+        {/* Apple segmented control */}
+        <div className="flex gap-1 p-1 bg-zinc-100/80 dark:bg-[#18181F] rounded-2xl border border-zinc-200/60 dark:border-white/5 w-full md:w-auto backdrop-blur-sm">
           <button
             type="button"
             onClick={() => setActiveSubTab('grupos')}
-            className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
               activeSubTab === 'grupos'
-                ? 'bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-[#27272A]'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-sm border border-zinc-200/80 dark:border-white/8'
+                : 'text-zinc-500 dark:text-[#71717A] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
             }`}
           >
-            <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+            <Users className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0" />
             <span className="truncate">Grupos <span className="font-mono tabular-nums">({preachingGroups.length})</span></span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveSubTab('salidas_khs')}
-            className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
               activeSubTab === 'salidas_khs'
-                ? 'bg-indigo-600 text-white'
-                : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                : 'text-zinc-500 dark:text-[#71717A] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
             }`}
           >
             <Compass className="w-4 h-4 shrink-0" />
-            <span className="truncate">Salidas <span className="font-mono tabular-nums">({fieldServiceMeetings.length})</span></span>
+            <span className="truncate">Salidas al Campo <span className="font-mono tabular-nums">({fieldServiceMeetings.length})</span></span>
           </button>
         </div>
 
@@ -698,7 +699,7 @@ export const GruposServicioTab: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenNewGroup}
-            className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer active:scale-95"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all duration-200 cursor-pointer active:scale-[0.97] shadow-sm shadow-indigo-500/30"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Grupo</span>
@@ -708,7 +709,7 @@ export const GruposServicioTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsGeneratorModalOpen(true)}
-              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all cursor-pointer active:scale-95"
+              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all duration-200 cursor-pointer active:scale-[0.97] shadow-sm shadow-indigo-500/30"
             >
               <Sparkles className="w-4 h-4" />
               <span>Auto-Generar Salidas</span>
@@ -717,7 +718,7 @@ export const GruposServicioTab: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenNewFsmModal}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 dark:hover:bg-[#27272A] text-white dark:text-[#F4F4F5] border border-zinc-900 dark:border-[#27272A] text-xs font-bold transition-colors cursor-pointer active:scale-95"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-zinc-900 dark:bg-[#27272A] hover:bg-zinc-800 dark:hover:bg-[#3F3F46] text-white dark:text-[#F4F4F5] border border-zinc-800 dark:border-white/8 text-xs font-bold transition-all duration-200 cursor-pointer active:scale-[0.97]"
             >
               <Plus className="w-4 h-4" />
               <span>Nueva Salida</span>
@@ -727,10 +728,10 @@ export const GruposServicioTab: React.FC = () => {
               type="button"
               onClick={handlePrintFsmSchedule}
               disabled={filteredFieldServiceMeetings.length === 0}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] disabled:opacity-40 text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl border border-zinc-200 dark:border-white/8 bg-white/60 dark:bg-white/4 hover:bg-zinc-50 dark:hover:bg-white/8 disabled:opacity-40 text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-all duration-200 cursor-pointer backdrop-blur-sm"
               title="Imprimir Programa de Salidas para el Tablero del Salón"
             >
-              <Printer className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <Printer className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
               <span>Imprimir</span>
             </button>
 
@@ -738,7 +739,7 @@ export const GruposServicioTab: React.FC = () => {
               type="button"
               onClick={handleSendFullFsmWhatsApp}
               disabled={filteredFieldServiceMeetings.length === 0}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold transition-all duration-200 cursor-pointer active:scale-[0.97] shadow-sm shadow-emerald-500/30"
               title="Enviar cuadrante de salidas por WhatsApp"
             >
               <Share2 className="w-4 h-4" />
@@ -754,15 +755,15 @@ export const GruposServicioTab: React.FC = () => {
       {activeSubTab === 'grupos' && (
         <>
           {/* Filter and Search Bar */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <div className="kg-glass-surface rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               <button
                 type="button"
                 onClick={() => setSelectedGroupNumber('todos')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   selectedGroupNumber === 'todos'
-                    ? 'bg-zinc-900 dark:bg-[#27272A] text-white border border-zinc-900 dark:border-[#3E3E42]'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-sm'
+                    : 'bg-white/60 dark:bg-white/5 text-zinc-600 dark:text-[#A1A1AA] hover:bg-white dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/8'
                 }`}
               >
                 Todos <span className="font-mono tabular-nums">({preachingGroups.length})</span>
@@ -772,10 +773,10 @@ export const GruposServicioTab: React.FC = () => {
                   key={g.number}
                   type="button"
                   onClick={() => setSelectedGroupNumber(g.number)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                     selectedGroupNumber === g.number
-                      ? 'bg-zinc-900 dark:bg-[#27272A] text-white border border-zinc-900 dark:border-[#3E3E42]'
-                      : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
+                      ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-sm'
+                      : 'bg-white/60 dark:bg-white/5 text-zinc-600 dark:text-[#A1A1AA] hover:bg-white dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/8'
                   }`}
                 >
                   {g.name} <span className="font-mono tabular-nums">({groupStats[g.number]?.total || 0})</span>
@@ -784,21 +785,21 @@ export const GruposServicioTab: React.FC = () => {
             </div>
 
             <div className="relative min-w-[220px]">
-              <Search className="w-4 h-4 text-zinc-400 dark:text-[#A1A1AA] absolute left-3 top-2.5 pointer-events-none" />
+              <Search className="w-4 h-4 text-zinc-400 dark:text-[#71717A] absolute left-3 top-2.5 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Buscar por nombre o teléfono..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA] focus:bg-white dark:focus:bg-[#18181F] focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-3 py-2 rounded-2xl border border-zinc-200/60 dark:border-white/8 text-xs bg-white/70 dark:bg-white/5 text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#52525B] focus:bg-white dark:focus:bg-[#1C1C1F] focus:outline-none focus:ring-2 focus:ring-blue-500/40 backdrop-blur-sm transition-all"
               />
             </div>
           </div>
 
           {/* Groups Grid */}
           {filteredGroups.length === 0 ? (
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-8 sm:p-12 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center mx-auto">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-8 sm:p-12 text-center space-y-4 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto shadow-inner">
                 <Users className="w-7 h-7" />
               </div>
               <div className="max-w-md mx-auto space-y-1">
@@ -817,7 +818,7 @@ export const GruposServicioTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleOpenNewGroup}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm shadow-indigo-500/30"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Crear Primer Grupo</span>
@@ -850,31 +851,35 @@ export const GruposServicioTab: React.FC = () => {
                 return (
                   <div
                     key={group.number}
-                    className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] transition-all overflow-hidden flex flex-col justify-between"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20"
                   >
+                    {/* Subtle radial glow behind group number */}
+                    <div className="absolute top-0 left-0 w-32 h-32 rounded-full bg-blue-500/5 dark:bg-blue-400/5 blur-2xl pointer-events-none" />
+
                     {/* Group Card Header */}
-                    <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#18181F]/50">
+                    <div className="p-4 sm:p-5 border-b border-zinc-100/60 dark:border-white/5">
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-7 h-7 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-xs flex items-center justify-center font-mono tabular-nums">
-                              {group.number}
-                            </span>
-                            <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center font-mono tabular-nums shadow-sm shadow-indigo-500/30">
+                            {group.number}
+                          </span>
+                          <div>
+                            <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] leading-tight">
                               {group.name}
                             </h3>
+                            <span className="text-[10px] font-semibold text-zinc-400 dark:text-[#52525B] uppercase tracking-wider">Grupo de Servicio</span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5">
                           <button
                             type="button"
                             onClick={() => handleShareGroupWhatsApp(group)}
-                            className="p-2 rounded-xl text-zinc-500 dark:text-[#A1A1AA] hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                            className="p-2 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all duration-150 cursor-pointer"
                             title="Copiar lista de miembros del grupo para WhatsApp"
                           >
                             {copiedGroupNumber === group.number ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                             ) : (
                               <Share2 className="w-4 h-4" />
                             )}
@@ -882,13 +887,13 @@ export const GruposServicioTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenEditGroup(group)}
-                            className="p-2 rounded-xl text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                            className="p-2 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/8 transition-all duration-150 cursor-pointer"
                             title="Editar nombre y encargados del grupo"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           {confirmDeleteGroupNum === group.number ? (
-                            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#18181F] px-2 py-1 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+                            <div className="flex items-center gap-1 bg-rose-50 dark:bg-rose-950/40 px-2 py-1 rounded-xl border border-rose-200/60 dark:border-rose-900/40">
                               <button
                                 type="button"
                                 onClick={() => handleConfirmDeleteGroup(group.number)}
@@ -908,7 +913,7 @@ export const GruposServicioTab: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => setConfirmDeleteGroupNum(group.number)}
-                              className="p-2 rounded-xl text-zinc-500 dark:text-[#A1A1AA] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                              className="p-2 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all duration-150 cursor-pointer"
                               title="Eliminar grupo"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -917,14 +922,14 @@ export const GruposServicioTab: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Overseer & Assistant Cards */}
+                      {/* Overseer & Assistant — glass cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div className="bg-white dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between">
+                        <div className="bg-white/70 dark:bg-white/4 p-2.5 rounded-2xl border border-zinc-200/60 dark:border-white/6 flex items-center justify-between backdrop-blur-sm">
                           <div>
-                            <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] font-bold block uppercase tracking-wider">
+                            <span className="text-[10px] text-zinc-400 dark:text-[#52525B] font-bold block uppercase tracking-wider mb-0.5">
                               Superintendente
                             </span>
-                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs">
+                            <span className={`font-bold text-xs ${overseer ? 'text-zinc-900 dark:text-[#F4F4F5]' : 'text-zinc-400 dark:text-[#52525B] italic'}`}>
                               {overseer ? overseer.name : 'Sin asignar'}
                             </span>
                           </div>
@@ -933,7 +938,7 @@ export const GruposServicioTab: React.FC = () => {
                               href={`https://wa.me/${overseer.phone.replace(/[^0-9]/g, '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                              className="p-1.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
                               title="Escribir al superintendente de grupo"
                             >
                               <MessageCircle className="w-4 h-4" />
@@ -941,12 +946,12 @@ export const GruposServicioTab: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="bg-white dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between">
+                        <div className="bg-white/70 dark:bg-white/4 p-2.5 rounded-2xl border border-zinc-200/60 dark:border-white/6 flex items-center justify-between backdrop-blur-sm">
                           <div>
-                            <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] font-bold block uppercase tracking-wider">
+                            <span className="text-[10px] text-zinc-400 dark:text-[#52525B] font-bold block uppercase tracking-wider mb-0.5">
                               Auxiliar de Grupo
                             </span>
-                            <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] text-xs">
+                            <span className={`font-bold text-xs ${assistant ? 'text-zinc-900 dark:text-[#F4F4F5]' : 'text-zinc-400 dark:text-[#52525B] italic'}`}>
                               {assistant ? assistant.name : 'Sin asignar'}
                             </span>
                           </div>
@@ -955,7 +960,7 @@ export const GruposServicioTab: React.FC = () => {
                               href={`https://wa.me/${assistant.phone.replace(/[^0-9]/g, '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                              className="p-1.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
                               title="Escribir al auxiliar de grupo"
                             >
                               <MessageCircle className="w-4 h-4" />
@@ -965,24 +970,24 @@ export const GruposServicioTab: React.FC = () => {
                       </div>
 
                       {/* Quick stats pills */}
-                      <div className="flex flex-wrap items-center gap-2 mt-3 pt-2 border-t border-zinc-100 dark:border-[#27272A] text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">
-                        <span className="bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] px-2 py-0.5 rounded-md font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5]">
-                          Total: <strong>{stats.total}</strong>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-2.5 border-t border-zinc-100/60 dark:border-white/5">
+                        <span className="inline-flex items-center gap-1 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-2.5 py-0.5 rounded-full text-[11px] font-black font-mono tabular-nums">
+                          {stats.total} total
                         </span>
                         {stats.pioneers > 0 && (
-                          <span className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-md font-medium font-mono tabular-nums">
+                          <span className="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold font-mono tabular-nums">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                             {stats.pioneers} precursores
                           </span>
                         )}
                         {stats.elders > 0 && (
-                          <span className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono tabular-nums">
+                          <span className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-500/10 border border-blue-200/60 dark:border-blue-500/20 text-blue-800 dark:text-blue-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold font-mono tabular-nums">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                             {stats.elders} ancianos
                           </span>
                         )}
                         {stats.servants > 0 && (
-                          <span className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/60 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono tabular-nums">
+                          <span className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200/60 dark:border-indigo-500/20 text-indigo-800 dark:text-indigo-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold font-mono tabular-nums">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
                             {stats.servants} siervos
                           </span>
@@ -1098,67 +1103,70 @@ export const GruposServicioTab: React.FC = () => {
         <div className="space-y-5">
           {/* KPIs del Programa de Servicio del Campo */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
-                Salidas Programadas
-              </span>
-              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1 font-mono tabular-nums">{fsmStats.total}</div>
-              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
-                Puntos de encuentro en esta vista
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
-                Conductores Asignados
-              </span>
-              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1 font-mono tabular-nums">
-                {fsmStats.withConductor}{' '}
-                <span className="text-xs font-bold text-zinc-400 dark:text-[#A1A1AA]">/ {fsmStats.total}</span>
+            {/* KPI: Salidas Programadas */}
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-indigo-500/8 dark:bg-indigo-400/8 blur-2xl pointer-events-none" />
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/10 border border-indigo-500/20 dark:border-indigo-400/15 flex items-center justify-center mb-2">
+                <Compass className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
-                <span className="font-mono tabular-nums">{fsmStats.conductorsPoolCount}</span> conductores habilitados
-              </p>
+              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{fsmStats.total}</div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block mt-0.5">Salidas Prog.</span>
+              <p className="text-[11px] text-zinc-500 dark:text-[#52525B] mt-1">Puntos de encuentro en esta vista</p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
-                Territorios S-13 Vinculados
-              </span>
-              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] mt-1 font-mono tabular-nums">
-                {fsmStats.withTerritory}
+            {/* KPI: Conductores */}
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-emerald-500/8 dark:bg-emerald-400/8 blur-2xl pointer-events-none" />
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/10 border border-emerald-500/20 dark:border-emerald-400/15 flex items-center justify-center mb-2">
+                <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
-                <span className="font-mono tabular-nums">{fsmStats.availableTerritoriesCount}</span> territorios disponibles en S-13
-              </p>
+              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+                {fsmStats.withConductor}<span className="text-sm font-bold text-zinc-400 dark:text-[#52525B]"> / {fsmStats.total}</span>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mt-0.5">Conductores Asig.</span>
+              <p className="text-[11px] text-zinc-500 dark:text-[#52525B] mt-1"><span className="font-mono tabular-nums">{fsmStats.conductorsPoolCount}</span> habilitados</p>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
-                Acción Rápida
-              </span>
-              <div className="flex items-center gap-2 mt-2">
+            {/* KPI: Territorios S-13 */}
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-blue-500/8 dark:bg-blue-400/8 blur-2xl pointer-events-none" />
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/15 flex items-center justify-center mb-2">
+                <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{fsmStats.withTerritory}</div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block mt-0.5">Territorios S-13</span>
+              <p className="text-[11px] text-zinc-500 dark:text-[#52525B] mt-1"><span className="font-mono tabular-nums">{fsmStats.availableTerritoriesCount}</span> disponibles</p>
+            </div>
+
+            {/* KPI: Acción Rápida */}
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-amber-500/8 dark:bg-amber-400/8 blur-2xl pointer-events-none" />
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 dark:border-amber-400/15 flex items-center justify-center mb-2">
+                <Share2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">Acción Rápida</span>
+              <div className="flex items-center gap-2 mt-auto pt-2">
                 <button
                   type="button"
                   onClick={handleCopyFullFsmSchedule}
                   disabled={filteredFieldServiceMeetings.length === 0}
-                  className="flex-1 py-2 px-3 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A] disabled:opacity-40 text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="flex-1 py-2 px-2.5 rounded-2xl bg-zinc-100 dark:bg-white/6 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200/60 dark:border-white/6 disabled:opacity-40 text-zinc-800 dark:text-[#F4F4F5] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copiedFsmSchedule ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
                       <span>Copiado</span>
                     </>
                   ) : (
                     <>
                       <Share2 className="w-3.5 h-3.5" />
-                      <span>Copiar Resumen</span>
+                      <span>Copiar</span>
                     </>
                   )}
                 </button>
                 {fieldServiceMeetings.length > 0 && (
                   confirmClearAllFsm ? (
-                    <div className="flex items-center gap-1 bg-rose-50 dark:bg-rose-950/40 px-2 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800">
+                    <div className="flex items-center gap-1 bg-rose-50 dark:bg-rose-950/40 px-2 py-1.5 rounded-2xl border border-rose-200/60 dark:border-rose-900/40">
                       <button
                         type="button"
                         onClick={() => {
@@ -1182,7 +1190,7 @@ export const GruposServicioTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setConfirmClearAllFsm(true)}
-                      className="p-2 rounded-xl text-zinc-400 dark:text-[#A1A1AA] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all cursor-pointer"
                       title="Vaciar todas las salidas"
                     >
                       <RotateCcw className="w-4 h-4" />
@@ -1194,16 +1202,16 @@ export const GruposServicioTab: React.FC = () => {
           </div>
 
           {/* Barra de Filtros del Cuadrante de Salidas */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            {/* Filtro por Día */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+          <div className="kg-glass-surface rounded-2xl p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            {/* Filtro por Día — Apple capsule pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0">
               <button
                 type="button"
                 onClick={() => setFsmDayFilter('todos')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   fsmDayFilter === 'todos'
-                    ? 'bg-zinc-900 dark:bg-[#27272A] text-white border border-zinc-900 dark:border-[#3E3E42]'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-sm'
+                    : 'bg-white/60 dark:bg-white/5 text-zinc-600 dark:text-[#A1A1AA] hover:bg-white dark:hover:bg-white/10 border border-zinc-200/60 dark:border-white/8'
                 }`}
               >
                 Todos los días
@@ -1213,10 +1221,10 @@ export const GruposServicioTab: React.FC = () => {
                   key={day}
                   type="button"
                   onClick={() => setFsmDayFilter(day)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                     fsmDayFilter === day
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200/80 dark:border-[#27272A]'
+                      ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                      : 'bg-white/60 dark:bg-white/5 text-zinc-600 dark:text-[#A1A1AA] hover:bg-white dark:hover:bg-white/10 border border-zinc-200/60 dark:border-white/8'
                   }`}
                 >
                   {day}
@@ -1226,12 +1234,12 @@ export const GruposServicioTab: React.FC = () => {
 
             {/* Selectores de Mes y Grupo */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA]" />
+              <div className="flex items-center gap-1.5 bg-white/60 dark:bg-white/5 border border-zinc-200/60 dark:border-white/8 rounded-2xl px-3 py-1.5 backdrop-blur-sm">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400 dark:text-[#52525B] shrink-0" />
                 <select
                   value={fsmMonthFilter}
                   onChange={(e) => setFsmMonthFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-bold bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums cursor-pointer"
+                  className="text-xs font-bold bg-transparent text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums cursor-pointer focus:outline-none"
                 >
                   <option value="todos">Todos los meses</option>
                   {availableFsmMonths.map((mk) => (
@@ -1242,12 +1250,12 @@ export const GruposServicioTab: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-[#A1A1AA]" />
+              <div className="flex items-center gap-1.5 bg-white/60 dark:bg-white/5 border border-zinc-200/60 dark:border-white/8 rounded-2xl px-3 py-1.5 backdrop-blur-sm">
+                <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-[#52525B] shrink-0" />
                 <select
                   value={fsmGroupFilter}
                   onChange={(e) => setFsmGroupFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-xs font-bold bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer"
+                  className="text-xs font-bold bg-transparent text-zinc-800 dark:text-[#F4F4F5] cursor-pointer focus:outline-none"
                 >
                   <option value="todos">Todos los grupos</option>
                   <option value="general">Solo Congregación General</option>
@@ -1263,8 +1271,8 @@ export const GruposServicioTab: React.FC = () => {
 
           {/* Lista / Cuadrante de Salidas al Servicio del Campo */}
           {filteredFieldServiceMeetings.length === 0 ? (
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-8 sm:p-12 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-8 sm:p-12 text-center space-y-4 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto shadow-inner">
                 <Compass className="w-7 h-7" />
               </div>
               <div className="max-w-md mx-auto space-y-1.5">
@@ -1279,7 +1287,7 @@ export const GruposServicioTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsGeneratorModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm shadow-indigo-500/30"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>Auto-Generar Cuadrante de Salidas</span>
@@ -1287,7 +1295,7 @@ export const GruposServicioTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleOpenNewFsmModal}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-[#18181F] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-colors cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Agregar Salida Manual</span>
@@ -1319,31 +1327,34 @@ export const GruposServicioTab: React.FC = () => {
                 return (
                   <div
                     key={fsm.id}
-                    className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] p-4 flex flex-col justify-between space-y-3.5"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20"
                   >
-                    {/* Cabecera de la tarjeta: Día, Fecha, Hora y Grupo */}
-                    <div className="space-y-2">
+                    {/* Radial accent */}
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-indigo-500/5 dark:bg-indigo-400/5 blur-2xl pointer-events-none" />
+
+                    {/* Cabecera: Día, Fecha, Hora */}
+                    <div className="space-y-2.5">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2.5 py-1 rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-bold shadow-xs">
+                          <span className="px-3 py-1 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-extrabold shadow-sm">
                             {fsm.dayOfWeek}
                           </span>
                           {fsm.date && (
-                            <span className="text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums bg-zinc-100 dark:bg-[#18181F] px-2 py-0.5 rounded-md border border-zinc-200/60 dark:border-[#27272A]">
+                            <span className="text-xs font-semibold text-zinc-700 dark:text-[#F4F4F5] font-mono tabular-nums bg-white/70 dark:bg-white/6 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-white/8 backdrop-blur-sm">
                               {fsm.date}
                             </span>
                           )}
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-[#18181F] px-2.5 py-0.5 rounded-md border border-zinc-200/60 dark:border-[#27272A] font-mono tabular-nums">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300 bg-white/70 dark:bg-white/6 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-white/8 font-mono tabular-nums backdrop-blur-sm">
                             <Clock className="w-3 h-3 text-zinc-400" />
                             {fsm.time}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-0.5 shrink-0">
                           <button
                             type="button"
                             onClick={() => handleOpenEditFsmModal(fsm)}
-                            className="p-1.5 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                            className="p-1.5 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/8 transition-all cursor-pointer"
                             title="Editar salida"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -1351,7 +1362,7 @@ export const GruposServicioTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => deleteFieldServiceMeeting(fsm.id)}
-                            className="p-1.5 rounded-lg text-zinc-400 dark:text-[#A1A1AA] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                            className="p-1.5 rounded-xl text-zinc-400 dark:text-[#52525B] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all cursor-pointer"
                             title="Eliminar salida"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1361,11 +1372,12 @@ export const GruposServicioTab: React.FC = () => {
 
                       {/* Badges de Grupo y Modalidad */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-[#27272A]">
-                          👥 {groupLabel}
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/6 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-white/8">
+                          <Users className="w-3 h-3" />
+                          {groupLabel}
                         </span>
                         {fsm.modality && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-[#27272A]">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-500/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                             {MODALITY_SHORT_LABELS[fsm.modality]}
                           </span>
@@ -1373,32 +1385,32 @@ export const GruposServicioTab: React.FC = () => {
                       </div>
 
                       {/* Punto de encuentro */}
-                      <div className="flex items-start gap-2 pt-1 text-xs text-zinc-700 dark:text-[#F4F4F5]">
+                      <div className="flex items-start gap-2 pt-0.5 text-xs">
                         <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
                         <div>
-                          <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
+                          <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#52525B] tracking-wider block">
                             Punto de Encuentro
                           </span>
-                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">{fsm.location}</span>
+                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-xs">{fsm.location}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Conductor y Territorio Sugerido */}
-                    <div className="space-y-2.5 pt-2.5 border-t border-zinc-100 dark:border-[#27272A] text-xs">
-                      {/* Conductor */}
-                      <div className="bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between gap-2">
+                    <div className="space-y-2 pt-3 mt-3 border-t border-zinc-100/60 dark:border-white/5 text-xs">
+                      {/* Conductor — glass card */}
+                      <div className="bg-white/70 dark:bg-white/4 p-2.5 rounded-2xl border border-zinc-200/60 dark:border-white/6 flex items-center justify-between gap-2 backdrop-blur-sm">
                         <div className="min-w-0">
-                          <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#A1A1AA] block">
+                          <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-[#52525B] tracking-wider block">
                             Conductor Asignado
                           </span>
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] truncate">
+                          <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                            <span className={`font-bold text-xs truncate ${conductor ? 'text-zinc-900 dark:text-[#F4F4F5]' : 'text-zinc-400 dark:text-[#52525B] italic'}`}>
                               {conductor ? conductor.name : 'Sin conductor asignado'}
                             </span>
                             {isConductorAbsent && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
-                                ⚠ Ausente
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
+                                <AlertTriangle className="w-3 h-3" /> Ausente
                               </span>
                             )}
                           </div>
@@ -1408,7 +1420,7 @@ export const GruposServicioTab: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleNotifyConductorWhatsApp(fsm)}
-                            className="p-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shrink-0 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shrink-0 transition-all cursor-pointer active:scale-95 shadow-sm shadow-emerald-500/30"
                             title="Enviar recordatorio de salida al conductor por WhatsApp"
                           >
                             <Send className="w-3.5 h-3.5" />
@@ -1416,18 +1428,17 @@ export const GruposServicioTab: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Territorio Sugerido (S-13) */}
-                      <div className="bg-emerald-50/50 dark:bg-[#18181F] p-2.5 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 space-y-1.5">
+                      {/* Territorio Sugerido — glass teal */}
+                      <div className="bg-emerald-50/60 dark:bg-emerald-500/5 p-2.5 rounded-2xl border border-emerald-200/50 dark:border-emerald-500/15 space-y-1.5 backdrop-blur-sm">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400">
-                            Territorio Sugerido (S-13)
+                          <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">
+                            Territorio S-13
                           </span>
                           {linkedTerr && linkedTerr.status === 'disponible' && fsm.conductorId && (
                             <button
                               type="button"
                               onClick={() => handleAssignSuggestedTerritoryS13(fsm)}
-                              className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer"
-                              title="Registrar oficialmente este territorio a nombre del conductor en el registro S-13"
+                              className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white transition-all cursor-pointer"
                             >
                               Asignar en S-13
                             </button>
@@ -1436,25 +1447,23 @@ export const GruposServicioTab: React.FC = () => {
 
                         {fsm.territoryNumber ? (
                           <div>
-                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block font-mono tabular-nums">
+                            <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block font-mono tabular-nums text-xs">
                               📍 #{fsm.territoryNumber}
                             </span>
                             {linkedTerr?.boundsDescription && (
-                              <span className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] line-clamp-1">
+                              <span className="text-[11px] text-zinc-500 dark:text-[#71717A] line-clamp-1 mt-0.5 block">
                                 {linkedTerr.boundsDescription}
                               </span>
                             )}
                             {linkedTerr?.noVisits && linkedTerr.noVisits.length > 0 && (
                               <div className="flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-400 mt-1 font-mono tabular-nums">
                                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                <span>
-                                  {linkedTerr.noVisits.length} casa(s) «No Visitar» en este territorio
-                                </span>
+                                <span>{linkedTerr.noVisits.length} casa(s) «No Visitar»</span>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] italic block">
+                          <span className="text-[11px] text-zinc-400 dark:text-[#52525B] italic block">
                             Según necesidad del grupo / conductor
                           </span>
                         )}
@@ -1472,8 +1481,8 @@ export const GruposServicioTab: React.FC = () => {
       {/* MODAL 1: EDIT / CREATE GROUP                              */}
       {/* ========================================================= */}
       {isGroupModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+          <div className="kg-glass-surface rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1596,8 +1605,8 @@ export const GruposServicioTab: React.FC = () => {
       {/* MODAL 2: MOVE PUBLISHER BETWEEN GROUPS                    */}
       {/* ========================================================= */}
       {movingPublisher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-sm w-full p-5 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md">
+          <div className="kg-glass-surface rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <h3 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <ArrowRightLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -1658,8 +1667,8 @@ export const GruposServicioTab: React.FC = () => {
       {/* MODAL 3: GENERADOR AUTOMÁTICO DE SALIDAS AL CAMPO         */}
       {/* ========================================================= */}
       {isGeneratorModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-4xl w-full p-5 sm:p-7 space-y-5 my-8 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+          <div className="kg-glass-surface rounded-3xl max-w-4xl w-full p-5 sm:p-7 space-y-5 my-8 max-h-[92vh] overflow-y-auto shadow-2xl">
             <div className="flex items-start justify-between gap-3 border-b border-zinc-100 dark:border-[#27272A] pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/40 px-2.5 py-0.5 rounded-full font-mono tabular-nums">
@@ -2032,8 +2041,8 @@ export const GruposServicioTab: React.FC = () => {
       {/* MODAL 4: CREAR / EDITAR SALIDA INDIVIDUAL                 */}
       {/* ========================================================= */}
       {isFsmModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+          <div className="kg-glass-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 my-8 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Compass className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />

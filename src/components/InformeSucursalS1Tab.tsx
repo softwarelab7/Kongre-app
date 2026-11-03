@@ -175,46 +175,47 @@ export const InformeSucursalS1Tab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 pb-16">
       {/* Barra Unificada de Sub-pestañas, Mes y Acciones S-1 */}
-      <div className="print:hidden bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-3.5 sm:p-4 flex flex-col gap-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
-          {/* SUBTABS NAVIGATION - 2-column grid on mobile so nothing clips */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] p-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+      <div className="print:hidden kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-5 flex flex-col gap-3.5 shadow-sm relative overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-indigo-500/8 dark:bg-indigo-400/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          {/* SUBTABS NAVIGATION - Apple Segmented Control */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1 bg-zinc-100/80 dark:bg-[#18181F] p-1.5 rounded-2xl border border-zinc-200/60 dark:border-white/6 backdrop-blur-sm">
             <button
               onClick={() => setActiveSubTab('resumen')}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'resumen'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
               }`}
             >
               <span className="truncate">Formulario S-1</span>
             </button>
             <button
               onClick={() => setActiveSubTab('asistencia')}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'asistencia'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
               }`}
             >
               <span className="truncate">Asistencia (S-88)</span>
             </button>
             <button
               onClick={() => setActiveSubTab('predicacion')}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center cursor-pointer ${
                 activeSubTab === 'predicacion'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
               }`}
             >
               <span className="truncate">Ministerio</span>
             </button>
             <button
               onClick={() => setActiveSubTab('pendientes')}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeSubTab === 'pendientes'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
               }`}
             >
               <span className="truncate">Pendientes</span>
@@ -234,7 +235,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
           <div className="grid grid-cols-3 sm:flex items-center gap-2">
             <button
               onClick={handleCopySummary}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 text-xs font-bold rounded-2xl bg-white/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
               title="Copiar resumen para WhatsApp o Ancianos"
             >
               {copiedSuccess ? (
@@ -252,7 +253,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 text-xs font-bold rounded-2xl bg-white/70 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] transition-all cursor-pointer active:scale-95"
               title="Imprimir Formulario S-1 Oficial"
             >
               <Printer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -261,7 +262,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={openJwHubPortal}
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 text-xs font-bold rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-500/30 transition-all cursor-pointer active:scale-95"
               title="Abrir portal oficial hub.jw.org en nueva pestaña"
             >
               <ExternalLink className="w-3.5 h-3.5 shrink-0" />
@@ -271,11 +272,11 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Month Picker & Submission Status Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-zinc-100 dark:border-[#27272A]">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-zinc-100/80 dark:border-white/6">
           <div className="flex items-center justify-between sm:justify-start gap-2">
             <button
               onClick={handlePrevMonth}
-              className="p-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+              className="p-2 rounded-2xl bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
               title="Mes anterior"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -285,7 +286,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full appearance-none bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono tabular-nums cursor-pointer"
+                className="w-full appearance-none bg-white/80 dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 rounded-2xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500/40 font-mono tabular-nums cursor-pointer"
               >
                 {allMonthsList.map((m) => (
                   <option key={m.monthKey} value={m.monthKey} className="bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]">
@@ -298,7 +299,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <button
               onClick={handleNextMonth}
-              className="p-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
+              className="p-2 rounded-2xl bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer"
               title="Mes siguiente"
             >
               <ChevronRight className="w-4 h-4" />
@@ -311,20 +312,20 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
           <div className="flex items-center justify-between sm:justify-end gap-2">
             {metrics.submissionStatus === 'enviado' ? (
-              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1.5 rounded-xl">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Enviado a Sucursal</span>
+              <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">Enviado a Sucursal</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1.5 rounded-xl">
+              <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 px-3 py-1.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Pendiente de Envío</span>
+                <span className="text-xs font-bold text-amber-700 dark:text-amber-300">Pendiente de Envío</span>
               </div>
             )}
 
             <button
               onClick={handleOpenSubmitModal}
-              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-bold rounded-2xl bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span>{metrics.submissionStatus === 'enviado' ? 'Detalles' : 'Marcar Envío'}</span>
@@ -334,9 +335,10 @@ export const InformeSucursalS1Tab: React.FC = () => {
       </div>
 
       {/* KPI RIBBON CARDS */}
-      <div className="print:hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="print:hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         {/* Card 1: Publicadores que informaron */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-indigo-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Publicadores</span>
             <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -347,7 +349,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
               <span className="text-xs text-zinc-400 dark:text-[#A1A1AA] font-normal font-mono tabular-nums"> / {metrics.totalActivePublishers}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <div className="flex-1 h-1.5 rounded-full bg-zinc-100 dark:bg-[#18181F] overflow-hidden border border-zinc-200/50 dark:border-[#27272A]">
+              <div className="flex-1 h-1.5 rounded-full bg-zinc-200/70 dark:bg-white/6 overflow-hidden border border-zinc-200/50 dark:border-white/6">
                 <div
                   className="h-full bg-indigo-600 rounded-full"
                   style={{ width: `${Math.min(100, metrics.completionPercentage)}%` }}
@@ -359,7 +361,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Card 2: Promedio Entre Semana */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-indigo-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Entre Semana</span>
             <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -375,7 +378,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Card 3: Promedio Fin de Semana */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-emerald-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Fin de Semana</span>
             <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -391,7 +395,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Card 4: Promedio Combinado */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-amber-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Prom. General</span>
             <Sparkles className="w-4 h-4 text-amber-500" />
@@ -407,7 +412,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Card 5: Horas Totales */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-purple-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Horas Totales</span>
             <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
@@ -423,7 +429,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
         </div>
 
         {/* Card 6: Cursos Bíblicos */}
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-xl p-4 flex flex-col justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-teal-500/8 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between text-zinc-500 dark:text-[#A1A1AA] text-xs font-bold">
             <span>Cursos Bíblicos</span>
             <BookOpen className="w-4 h-4 text-teal-600 dark:text-teal-400" />
@@ -441,11 +448,11 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {activeSubTab === 'resumen' && (
         <div className="space-y-6">
           {/* Main S-1 Official Preview Box */}
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl overflow-hidden shadow-2xs">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl overflow-hidden shadow-md">
             {/* JW Official Banner */}
-            <div className="bg-zinc-50 dark:bg-[#18181F] border-b border-zinc-200 dark:border-[#27272A] p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-white/60 dark:bg-white/4 border-b border-zinc-200/80 dark:border-white/8 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-sm">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold tracking-wider uppercase mb-1.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold tracking-wider uppercase mb-1.5">
                   <FileBarChart className="w-3.5 h-3.5" />
                   Formulario Oficial S-1-S
                 </div>
@@ -713,7 +720,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {/* VIEW CONTENT: ASISTENCIA A REUNIONES (S-88) */}
       {activeSubTab === 'asistencia' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">Desglose Semanal de Asistencia • {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span></h3>
@@ -723,14 +730,14 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
             <div className="space-y-3">
               {metrics.meetingSessions.length === 0 ? (
-                <div className="p-8 text-center text-zinc-500 dark:text-[#A1A1AA] bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A]">
+                <div className="p-8 text-center text-zinc-500 dark:text-[#A1A1AA] bg-white/60 dark:bg-white/4 rounded-2xl border border-zinc-200/60 dark:border-white/8">
                   No hay semanas registradas para el mes seleccionado.
                 </div>
               ) : (
                 metrics.meetingSessions.map((session, idx) => (
                   <div
                     key={session.weekId || idx}
-                    className="p-4 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="p-4 rounded-2xl bg-white/70 dark:bg-white/4 border border-zinc-200/70 dark:border-white/8 flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-sm"
                   >
                     <div>
                       <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 block font-mono tabular-nums">Semana {idx + 1}</span>
@@ -740,25 +747,25 @@ export const InformeSucursalS1Tab: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-xl border border-zinc-200/70 dark:border-white/8 text-center">
                         <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Entre Semana Salón</span>
                         <span className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{session.midweekInPerson}</span>
                       </div>
-                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-xl border border-zinc-200/70 dark:border-white/8 text-center">
                         <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Entre Semana Zoom</span>
                         <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">{session.midweekZoom}</span>
                       </div>
-                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-xl border border-zinc-200/70 dark:border-white/8 text-center">
                         <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Fin de Semana Salón</span>
                         <span className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{session.weekendInPerson}</span>
                       </div>
-                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-lg border border-zinc-200/70 dark:border-[#27272A] text-center">
+                      <div className="bg-white dark:bg-[#121216] p-2.5 rounded-xl border border-zinc-200/70 dark:border-white/8 text-center">
                         <span className="text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Fin de Semana Zoom</span>
                         <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">{session.weekendZoom}</span>
                       </div>
                     </div>
 
-                    <div className="text-right flex sm:block items-center justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-200 dark:border-[#27272A]">
+                    <div className="text-right flex sm:block items-center justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-200/60 dark:border-white/8">
                       <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-[#A1A1AA] block">Total Semana</span>
                       <span className="text-base font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums">
                         {session.midweekTotal + session.weekendTotal}
@@ -776,8 +783,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
       {activeSubTab === 'predicacion' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Precursores Auxiliares */}
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100/80 dark:border-white/6 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
                   <Award className="w-4 h-4" />
@@ -785,13 +792,13 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 </h3>
                 <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Solicitudes aprobadas e informe del mes</span>
               </div>
-              <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] px-2.5 py-1 rounded-lg font-mono tabular-nums">
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20 px-3 py-1 rounded-full font-mono tabular-nums">
                 {metrics.auxPioneerHours} hrs totales
               </span>
             </div>
 
             {metrics.auxPioneerList.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
+              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-white/60 dark:bg-white/4 rounded-2xl border border-zinc-200/70 dark:border-white/8">
                 No hay precursores auxiliares registrados para este mes.
               </div>
             ) : (
@@ -799,7 +806,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 {metrics.auxPioneerList.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between text-xs"
+                    className="p-3 rounded-2xl bg-white/70 dark:bg-white/4 border border-zinc-200/70 dark:border-white/8 flex items-center justify-between text-xs backdrop-blur-sm"
                   >
                     <div>
                       <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{p.name}</span>
@@ -816,8 +823,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
           </div>
 
           {/* Precursores Regulares */}
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100/80 dark:border-white/6 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                   <Award className="w-4 h-4" />
@@ -825,13 +832,13 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 </h3>
                 <span className="text-xs text-zinc-500 dark:text-[#A1A1AA]">Asignados en la congregación</span>
               </div>
-              <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5] bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] px-2.5 py-1 rounded-lg font-mono tabular-nums">
+              <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200/60 dark:border-indigo-500/20 px-3 py-1 rounded-full font-mono tabular-nums">
                 {metrics.pioneerHours} hrs totales
               </span>
             </div>
 
             {metrics.pioneerList.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
+              <div className="p-6 text-center text-zinc-500 dark:text-[#A1A1AA] text-xs bg-white/60 dark:bg-white/4 rounded-2xl border border-zinc-200/70 dark:border-white/8">
                 No hay precursores regulares registrados con informe este mes.
               </div>
             ) : (
@@ -839,7 +846,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 {metrics.pioneerList.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between text-xs"
+                    className="p-3 rounded-2xl bg-white/70 dark:bg-white/4 border border-zinc-200/70 dark:border-white/8 flex items-center justify-between text-xs backdrop-blur-sm"
                   >
                     <div>
                       <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{p.name}</span>
@@ -859,8 +866,8 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
       {/* VIEW CONTENT: PENDIENTES DE INFORME */}
       {activeSubTab === 'pendientes' && (
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-[#27272A] pb-3">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100/80 dark:border-white/6 pb-3">
             <div>
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -870,14 +877,14 @@ export const InformeSucursalS1Tab: React.FC = () => {
                 Hermanos activos que aún no han entregado su informe de predicación para {metrics.monthNameFull} <span className="font-mono tabular-nums">{metrics.year}</span>
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] px-3 py-1 rounded-xl self-start sm:self-center">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20 px-3 py-1 rounded-full self-start sm:self-center">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               Faltan por informar antes de cerrar el S-1
             </span>
           </div>
 
           {metrics.missingPublishers.length === 0 ? (
-            <div className="p-8 text-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-2">
+            <div className="p-8 text-center text-zinc-800 dark:text-zinc-200 bg-white/60 dark:bg-white/4 rounded-2xl border border-zinc-200/70 dark:border-white/8 shadow-xs space-y-2">
               <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500" />
               <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5]">¡Todos los publicadores activos han informado!</p>
               <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">El 100% de la congregación está contabilizado para el Formulario S-1.</p>
@@ -887,7 +894,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
               {metrics.missingPublishers.map((pub) => (
                 <div
                   key={pub.id}
-                  className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between text-xs"
+                  className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/4 border border-zinc-200/70 dark:border-white/8 flex items-center justify-between text-xs backdrop-blur-sm"
                 >
                   <div>
                     <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">{pub.name}</span>
@@ -903,7 +910,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors"
+                      className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <MessageCircle className="w-4 h-4" />
@@ -918,11 +925,11 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
       {/* MODAL: SUBMISSION DETAILS / REGISTRAR ENVÍO JW HUB */}
       {showSubmissionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-150">
-            <div className="p-5 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-zinc-50 dark:bg-[#18181F]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-zinc-200/80 dark:border-white/8 flex items-center justify-between bg-white/60 dark:bg-white/4 backdrop-blur-sm">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <Send className="w-5 h-5" />
                 </div>
                 <div>
@@ -934,7 +941,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowSubmissionModal(false)}
-                className="p-1.5 rounded-lg hover:bg-zinc-200/70 dark:hover:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-zinc-200/70 dark:hover:bg-white/10 text-zinc-500 dark:text-[#A1A1AA] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -71,12 +71,16 @@ export function base32Decode(input: string): Uint8Array {
   return new Uint8Array(output);
 }
 
+function getWebCrypto(): any {
+  return (typeof window !== 'undefined' && window.crypto) ? window.crypto : (globalThis as any).crypto;
+}
+
 /**
  * Genera un secreto criptográficamente seguro de 20 bytes (160 bits) en formato Base32.
  * Recomendado por RFC 6238 para HMAC-SHA1.
  */
 export function generateTotpSecret(): string {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+  const cryptoObj = getWebCrypto();
   const randomBytes = new Uint8Array(20);
   cryptoObj.getRandomValues(randomBytes);
   return base32Encode(randomBytes);
@@ -98,7 +102,7 @@ export function generateTotpUri(accountName: string, secret: string, issuer = 'K
  * Calcula el código TOTP de 6 dígitos para un momento dado según RFC 6238 / RFC 4226.
  */
 export async function generateTotpCode(secret: string, timestampMs = Date.now()): Promise<string> {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+  const cryptoObj = getWebCrypto();
   if (!cryptoObj || !cryptoObj.subtle) {
     throw new Error('Web Crypto API no disponible en este entorno.');
   }
@@ -183,7 +187,7 @@ export async function generateBackupCodes(count = 8): Promise<{
   plainCodes: string[];
   hashedCodes: string[];
 }> {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+  const cryptoObj = getWebCrypto();
   const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Base32 Crockford para evitar confusiones
   const plainCodes: string[] = [];
   const hashedCodes: string[] = [];
@@ -210,7 +214,7 @@ export async function generateBackupCodes(count = 8): Promise<{
  * Calcula el hash SHA-256 de un código de respaldo para almacenamiento seguro
  */
 export async function hashBackupCode(code: string): Promise<string> {
-  const cryptoObj = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+  const cryptoObj = getWebCrypto();
   const clean = code.toUpperCase().replace(/[\s-]/g, '');
   const encoder = new TextEncoder();
   const data = encoder.encode(`kgr_backup_code_salt_v1:${clean}`);

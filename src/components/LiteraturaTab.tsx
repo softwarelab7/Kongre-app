@@ -357,14 +357,14 @@ export const LiteraturaTab: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Barra Unificada de Sub-pestañas y Acciones de Literatura */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Sub-tab Navigation - 2-column grid on mobile so nothing clips */}
-        <div className="grid grid-cols-2 sm:flex rounded-xl border border-zinc-200/70 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] p-1.5 gap-1">
+        <div className="grid grid-cols-2 sm:flex rounded-2xl border border-zinc-200/70 dark:border-white/10 bg-zinc-100/90 dark:bg-zinc-900/80 p-1.5 gap-1">
           <button
             onClick={() => setActiveSubTab('inventario')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               activeSubTab === 'inventario'
-                ? 'bg-indigo-600 text-white shadow-2xs'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -372,7 +372,7 @@ export const LiteraturaTab: React.FC = () => {
             <span className="truncate">Catálogo S-14</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold tabular-nums shrink-0 ${
               activeSubTab === 'inventario'
-                ? 'bg-white/20 text-white'
+                ? 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300'
                 : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200'
             }`}>
               {stats.totalItems}
@@ -381,9 +381,9 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('pedidos')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               activeSubTab === 'pedidos'
-                ? 'bg-indigo-600 text-white shadow-2xs'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -392,7 +392,7 @@ export const LiteraturaTab: React.FC = () => {
             {stats.pendingOrdersCount > 0 && (
               <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold tabular-nums shrink-0 ${
                 activeSubTab === 'pedidos'
-                  ? 'bg-white text-indigo-700'
+                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
                   : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200'
               }`}>
                 {stats.pendingOrdersCount}
@@ -402,9 +402,9 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('grupos')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               activeSubTab === 'grupos'
-                ? 'bg-indigo-600 text-white shadow-2xs'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -414,9 +414,9 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('recuento_s14')}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
               activeSubTab === 'recuento_s14'
-                ? 'bg-indigo-600 text-white shadow-2xs'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
@@ -432,7 +432,7 @@ export const LiteraturaTab: React.FC = () => {
               const msg = buildLowStockReportWhatsApp(literatureItems);
               handleOpenWhatsApp(msg);
             }}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs rounded-xl border border-zinc-200/80 dark:border-[#27272A] transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-zinc-100 dark:bg-zinc-900/70 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs rounded-full border border-zinc-200/80 dark:border-white/10 transition-all active:scale-95 cursor-pointer"
             title="Enviar solicitud sugerida de stock bajo por WhatsApp"
           >
             <Share2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -441,7 +441,7 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={handleDownloadOfficialS28}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-full transition-all shadow-xs active:scale-95 cursor-pointer"
             title="Cargar el PDF oficial S-28 de JW Hub para que la app lo rellene y descargue"
           >
             <Upload className="w-3.5 h-3.5 shrink-0" />
@@ -461,46 +461,50 @@ export const LiteraturaTab: React.FC = () => {
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-zinc-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block relative">
             Títulos en Catálogo
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1">{stats.totalItems}</div>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">Biblias, libros y revistas</span>
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] mt-1 relative">{stats.totalItems}</div>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block relative">Biblias, libros y revistas</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block relative">
             Unidades en Existencia
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalUnits}</div>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">En mostrador y almacén</span>
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1 relative">{stats.totalUnits}</div>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block relative">En mostrador y almacén</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-amber-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block relative">
             Stock Bajo / Agotado
           </span>
           <div
-            className={`text-xl sm:text-2xl font-black font-mono tabular-nums mt-1 ${
+            className={`text-xl sm:text-2xl font-black font-mono tabular-nums mt-1 relative ${
               stats.lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
             }`}
           >
             {stats.lowStockCount}
           </div>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block relative">
             {stats.lowStockCount > 0 ? 'Requiere pedido a Betel' : 'Existencias saludables'}
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-purple-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider block relative">
             Pedidos Pendientes
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1">
+          <div className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 mt-1 relative">
             {stats.pendingOrdersCount}
           </div>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">Solicitudes de publicadores</span>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 block relative">Solicitudes de publicadores</span>
         </div>
       </div>
 
@@ -510,17 +514,17 @@ export const LiteraturaTab: React.FC = () => {
       {activeSubTab === 'inventario' && (
         <div className="space-y-4">
           {/* Controls Bar: Search, Category Filter, and Add Button */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 flex-1">
               {/* Search input */}
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Buscar por código, título o estante..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500/40 focus:outline-hidden"
                 />
               </div>
 
@@ -529,7 +533,7 @@ export const LiteraturaTab: React.FC = () => {
                 <select
                   value={categoryFilter}
                   onChange={e => setCategoryFilter(e.target.value)}
-                  className="text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="text-xs px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] font-semibold focus:ring-2 focus:ring-indigo-500/40 focus:outline-hidden"
                 >
                   <option value="todos">Todas las Categorías</option>
                   <option value="biblia">Biblias</option>
@@ -557,7 +561,7 @@ export const LiteraturaTab: React.FC = () => {
 
             <button
               onClick={() => setIsAddItemModalOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span>Nueva Publicación</span>
@@ -565,7 +569,7 @@ export const LiteraturaTab: React.FC = () => {
           </div>
 
           {/* Literature Inventory: Mobile Card List + Desktop Table */}
-          <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs overflow-hidden">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
             {/* Mobile Card List (No horizontal clipping on phones) */}
             <div className="md:hidden divide-y divide-zinc-100 dark:divide-[#27272A]">
               {filteredItems.map(item => {
@@ -774,7 +778,7 @@ export const LiteraturaTab: React.FC = () => {
 
           {/* Asistente de Reposición S-14 / S-28 para Artículos con Stock Bajo */}
           {inventoryAnalysis.suggestedReorderList.length > 0 && (
-            <div className="bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-500/20 rounded-3xl p-4 sm:p-5 space-y-3 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-xs font-extrabold text-amber-950 dark:text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
@@ -793,7 +797,7 @@ export const LiteraturaTab: React.FC = () => {
                     const msg = buildLowStockReportWhatsApp(literatureItems);
                     handleOpenWhatsApp(msg);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer self-start sm:self-auto"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-full shadow-xs cursor-pointer self-start sm:self-auto"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Compartir Lista de Pedido (WhatsApp)</span>
@@ -804,7 +808,7 @@ export const LiteraturaTab: React.FC = () => {
                 {inventoryAnalysis.suggestedReorderList.map(({ item, suggestedOrderQty }) => (
                   <div
                     key={item.id}
-                    className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-amber-200/80 dark:border-amber-900/40 flex items-center justify-between gap-2 shadow-2xs"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 rounded-2xl border border-amber-200/80 dark:border-amber-500/20 flex items-center justify-between gap-2 shadow-2xs"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -822,7 +826,7 @@ export const LiteraturaTab: React.FC = () => {
                     </div>
                     <button
                       onClick={() => handleReceiveSuggestedShipment(item, suggestedOrderQty)}
-                      className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-bold font-mono tabular-nums whitespace-nowrap cursor-pointer transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-bold font-mono tabular-nums whitespace-nowrap cursor-pointer transition-colors"
                       title="Registrar recepción de este envío en el inventario S-28"
                     >
                       +{suggestedOrderQty} Recibir
@@ -840,7 +844,7 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'pedidos' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Truck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -855,7 +859,7 @@ export const LiteraturaTab: React.FC = () => {
               <select
                 value={orderGroupFilter}
                 onChange={e => setOrderGroupFilter(e.target.value)}
-                className="text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5]"
+                className="text-xs px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 font-semibold text-zinc-700 dark:text-[#F4F4F5]"
               >
                 <option value="todos">Todos los Grupos</option>
                 {preachingGroups.map(g => (
@@ -868,7 +872,7 @@ export const LiteraturaTab: React.FC = () => {
               <select
                 value={orderStatusFilter}
                 onChange={e => setOrderStatusFilter(e.target.value)}
-                className="text-xs px-3 py-2 rounded-xl border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] font-semibold text-zinc-700 dark:text-[#F4F4F5]"
+                className="text-xs px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 font-semibold text-zinc-700 dark:text-[#F4F4F5]"
               >
                 <option value="todos">Todos los Estados</option>
                 <option value="solicitado">1. Solicitado</option>
@@ -879,7 +883,7 @@ export const LiteraturaTab: React.FC = () => {
 
               <button
                 onClick={() => setIsAddOrderModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Registrar Pedido</span>
@@ -892,14 +896,14 @@ export const LiteraturaTab: React.FC = () => {
             {inventoryAnalysis.ordersByGroup.map(gSummary => (
               <div
                 key={gSummary.groupNumber}
-                className="bg-white dark:bg-[#121216] p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col justify-between gap-2"
+                className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between gap-2"
               >
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-extrabold text-indigo-900 dark:text-indigo-300">
                       Grupo {gSummary.groupNumber} • {gSummary.groupName}
                     </span>
-                    <span className="text-[10px] font-mono font-bold tabular-nums px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200/50 dark:border-[#27272A]">
+                    <span className="text-[10px] font-mono font-bold tabular-nums px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-[#A1A1AA] border border-zinc-200/50 dark:border-white/10">
                       {gSummary.totalOrders} pedidos
                     </span>
                   </div>
@@ -920,7 +924,7 @@ export const LiteraturaTab: React.FC = () => {
                     const msg = buildGroupSpecialOrdersWhatsApp(gSummary);
                     handleOpenWhatsApp(msg, gSummary.overseerPhone);
                   }}
-                  className="w-full mt-1 py-1.5 px-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full mt-1 py-1.5 px-2.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Send className="w-3 h-3" />
                   <span>Avisar a Sup. de Grupo</span>
@@ -936,13 +940,13 @@ export const LiteraturaTab: React.FC = () => {
               const groupBadge = pub?.groupNumber ? `G${pub.groupNumber}` : null;
               const statusCfg = SPECIAL_ORDER_STATUS_CONFIG[order.status] || {
                 label: order.status,
-                badgeClass: 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]',
+                badgeClass: 'bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-[#A1A1AA] border-zinc-200 dark:border-white/10',
               };
 
               return (
                 <div
                   key={order.id}
-                  className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3 flex flex-col justify-between"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
@@ -978,13 +982,13 @@ export const LiteraturaTab: React.FC = () => {
                     </div>
 
                     {order.notes && (
-                      <p className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-2 rounded-lg border border-zinc-200 dark:border-[#27272A]">
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/70 p-2.5 rounded-xl border border-zinc-200/80 dark:border-white/10">
                         💡 {order.notes}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
+                  <div className="pt-3 border-t border-zinc-100 dark:border-white/10 space-y-2">
                     {/* Status updater */}
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA]">Cambiar Estado:</span>
@@ -993,7 +997,7 @@ export const LiteraturaTab: React.FC = () => {
                         onChange={e =>
                           handleUpdateOrderStatus(order, e.target.value as SpecialOrderStatus)
                         }
-                        className="text-xs p-1.5 rounded-lg border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
+                        className="text-xs px-2.5 py-1.5 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5]"
                       >
                         <option value="solicitado">1. Solicitado</option>
                         <option value="pedido_a_betel">2. Pedido a Sucursal</option>
@@ -1031,7 +1035,7 @@ export const LiteraturaTab: React.FC = () => {
           </div>
 
           {filteredSpecialOrders.length === 0 && (
-            <div className="p-8 text-center text-zinc-400 dark:text-zinc-500 bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] text-xs">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-8 text-center text-zinc-400 dark:text-zinc-500 rounded-3xl border border-zinc-200/80 dark:border-white/10 text-xs">
               No hay pedidos especiales que coincidan con los filtros seleccionados.
             </div>
           )}
@@ -1043,7 +1047,7 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'grupos' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
             <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               <span>Distribución Periódica de Revistas y Tratados a los Grupos</span>
@@ -1069,7 +1073,7 @@ export const LiteraturaTab: React.FC = () => {
               return (
                 <div
                   key={group.number}
-                  className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 flex flex-col justify-between"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1086,7 +1090,7 @@ export const LiteraturaTab: React.FC = () => {
                       </strong>
                     </div>
 
-                    <div className="bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-2 text-xs">
+                    <div className="bg-zinc-50/80 dark:bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-2 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="text-zinc-600 dark:text-[#A1A1AA]">📰 Revistas:</span>
                         <input
@@ -1098,7 +1102,7 @@ export const LiteraturaTab: React.FC = () => {
                               magazinesCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                       <div className="flex items-center justify-between">
@@ -1112,7 +1116,7 @@ export const LiteraturaTab: React.FC = () => {
                               tractsCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                       <div className="flex items-center justify-between">
@@ -1126,13 +1130,13 @@ export const LiteraturaTab: React.FC = () => {
                               brochuresCount: Number(e.target.value),
                             })
                           }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded border border-zinc-300 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5]"
+                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
+                  <div className="pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
                     <button
                       onClick={() => {
                         const msg = buildGroupDistributionWhatsApp(
@@ -1161,7 +1165,7 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'recuento_s14' && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#121216] p-6 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -1175,7 +1179,7 @@ export const LiteraturaTab: React.FC = () => {
 
             <button
               onClick={() => setIsCountModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-full shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Registrar Nuevo Recuento S-14</span>
@@ -1190,7 +1194,7 @@ export const LiteraturaTab: React.FC = () => {
               return (
                 <div
                   key={rec.id}
-                  className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 shadow-xs space-y-3"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-emerald-200/80 dark:border-emerald-500/20 shadow-sm space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono font-bold tabular-nums text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
@@ -1203,7 +1207,7 @@ export const LiteraturaTab: React.FC = () => {
                     {rec.totalItemsCounted} Unidades Recontadas
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-300 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-300 pt-2 border-t border-zinc-100 dark:border-white/10">
                     <div>
                       <span className="text-[10px] text-zinc-400 dark:text-[#71717A] block">Siervo de Literatura</span>
                       <strong className="text-zinc-800 dark:text-zinc-200">{servant?.name || 'Designado'}</strong>
@@ -1215,7 +1219,7 @@ export const LiteraturaTab: React.FC = () => {
                   </div>
 
                   {rec.notes && (
-                    <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] italic">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/70 p-2.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 italic">
                       "{rec.notes}"
                     </p>
                   )}
@@ -1230,8 +1234,8 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: AGREGAR PUBLICACIÓN AL CATÁLOGO                    */}
       {/* ========================================================= */}
       {isAddItemModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1357,8 +1361,8 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: EDITAR PUBLICACIÓN                                 */}
       {/* ========================================================= */}
       {editingItem && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1488,8 +1492,8 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: REGISTRAR PEDIDO ESPECIAL                         */}
       {/* ========================================================= */}
       {isAddOrderModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Truck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1592,8 +1596,8 @@ export const LiteraturaTab: React.FC = () => {
       {/* MODAL: RECUENTO FÍSICO S-14                               */}
       {/* ========================================================= */}
       {isCountModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

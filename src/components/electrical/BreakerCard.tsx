@@ -185,10 +185,10 @@ export const BreakerCard: React.FC<BreakerCardProps> = ({
       draggable={!isReadOnly}
       onDragStart={(e) => onDragStart(e, breaker)}
       onDragEnd={onDragEnd}
-      className={`relative flex flex-col sm:flex-row items-stretch justify-between rounded-2xl border transition-all duration-200 overflow-hidden group select-none ${
+      className={`kg-card-bento kg-sheen-top relative flex flex-col sm:flex-row items-stretch justify-between rounded-2xl border transition-all duration-200 overflow-hidden group select-none shadow-2xs ${
         isOff
-          ? 'bg-zinc-100 dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A] opacity-75'
-          : 'bg-white dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A]'
+          ? 'bg-zinc-100/80 dark:bg-[#18181F]/80 border-zinc-200/80 dark:border-white/10 opacity-75'
+          : 'bg-white/95 dark:bg-[#18181F]/95 border-zinc-200/80 dark:border-white/10'
       } ${
         !isReadOnly
           ? 'cursor-grab active:cursor-grabbing hover:border-indigo-400 dark:hover:border-indigo-500/50'

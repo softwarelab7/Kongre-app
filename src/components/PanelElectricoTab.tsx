@@ -237,9 +237,9 @@ export const PanelElectricoTab: React.FC = () => {
       )}
 
       {/* Barra de Herramientas de Panel Eléctrico (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium tracking-wider uppercase bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+          <span className="kg-glow-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-zinc-100/90 dark:bg-[#18181F]/90 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
             Sistema Eléctrico
           </span>
@@ -310,7 +310,7 @@ export const PanelElectricoTab: React.FC = () => {
 
         {/* Banner cuando no hay circuitos configurados */}
         {breakers.length === 0 && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                 <Zap size={20} />
@@ -343,7 +343,8 @@ export const PanelElectricoTab: React.FC = () => {
         {/* 5 KPI Summary Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
           {/* Total Breakers */}
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between">
+            <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-zinc-500/10 blur-2xl" />
             <div className="flex items-center justify-between text-zinc-400 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 Total Breakers
@@ -362,7 +363,8 @@ export const PanelElectricoTab: React.FC = () => {
           </div>
 
           {/* Normal ON */}
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between">
+            <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-emerald-500/15 blur-2xl" />
             <div className="flex items-center justify-between text-emerald-500 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Normal ON
@@ -379,7 +381,8 @@ export const PanelElectricoTab: React.FC = () => {
           </div>
 
           {/* Modo Reunión */}
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between">
+            <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-indigo-500/15 blur-2xl" />
             <div className="flex items-center justify-between text-indigo-500 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 Modo Reunión
@@ -396,7 +399,8 @@ export const PanelElectricoTab: React.FC = () => {
           </div>
 
           {/* Críticos / Siempre ON */}
-          <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between">
+            <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl" />
             <div className="flex items-center justify-between text-amber-500 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                 Críticos / Siempre ON
@@ -413,7 +417,8 @@ export const PanelElectricoTab: React.FC = () => {
           </div>
 
           {/* Apagados (OFF) */}
-          <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
+          <div className="col-span-2 sm:col-span-1 kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between">
+            <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-zinc-500/10 blur-2xl" />
             <div className="flex items-center justify-between text-zinc-400 mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                 Desconectados
@@ -431,7 +436,7 @@ export const PanelElectricoTab: React.FC = () => {
         </div>
 
         {/* Search, Filter & Quick Options Strip */}
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
             <Search
@@ -443,7 +448,7 @@ export const PanelElectricoTab: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar circuito por nombre, función o tomas..."
-              className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA]/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+              className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-full pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA]/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
             />
             {searchQuery && (
               <button
@@ -468,7 +473,7 @@ export const PanelElectricoTab: React.FC = () => {
               <button
                 key={f.id}
                 onClick={() => setStatusFilter(f.id as any)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   statusFilter === f.id
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                     : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
@@ -490,7 +495,7 @@ export const PanelElectricoTab: React.FC = () => {
               <button
                 key={col.id}
                 onClick={() => setColumnFilter(col.id as any)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   columnFilter === col.id
                     ? 'bg-indigo-600 text-white font-semibold'
                     : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
@@ -503,7 +508,7 @@ export const PanelElectricoTab: React.FC = () => {
         </div>
 
         {/* Electrical Panel Enclosure (Dual Column Board) */}
-        <div className="bg-zinc-100 dark:bg-[#121216] p-3 sm:p-6 rounded-3xl border-2 border-zinc-300 dark:border-[#27272A] relative">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative">
           {/* Metallic Top Header Strip */}
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-300 dark:border-[#27272A] px-2">
             <div className="flex items-center gap-2.5">
@@ -518,7 +523,7 @@ export const PanelElectricoTab: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-medium font-mono uppercase bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium font-mono uppercase bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                 Peligro: Alta Tensión
               </span>
@@ -681,7 +686,7 @@ export const PanelElectricoTab: React.FC = () => {
         </div>
 
         {/* Maintenance / Safety Guideline Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3.5">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl bg-blue-500/5 border border-blue-500/20 flex items-start gap-3.5">
           <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
             <Info size={18} />
           </div>
@@ -712,8 +717,8 @@ export const PanelElectricoTab: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {breakerToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[280] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 max-w-md w-full border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[280] flex items-center justify-center p-4">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl p-6 max-w-md w-full border border-zinc-200/80 dark:border-white/10 shadow-2xl space-y-4">
             <div className="flex items-center gap-3 text-rose-500">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
                 <Trash2 size={20} />
@@ -726,7 +731,7 @@ export const PanelElectricoTab: React.FC = () => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+            <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-3 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
               Circuito: <strong className="text-zinc-900 dark:text-[#F4F4F5]">{breakerToDelete.name}</strong>
               {breakerToDelete.descripcion && (
                 <span className="block text-zinc-400 dark:text-[#A1A1AA] mt-0.5">{breakerToDelete.descripcion}</span>

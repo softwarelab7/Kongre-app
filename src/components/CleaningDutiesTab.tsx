@@ -674,15 +674,15 @@ export const CleaningDutiesTab: React.FC = () => {
       )}
 
       {/* Barra Unificada de Pestañas y Acciones */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-3.5 sm:p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
           {/* Subtab Navigation Pills (Grid on mobile so nothing clips) */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 p-1 bg-zinc-100 dark:bg-[#18181F] rounded-lg border border-zinc-200 dark:border-[#27272A] w-full xl:w-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 p-1 bg-zinc-200/70 dark:bg-zinc-900/90 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-inner w-full xl:w-auto">
             <button
               onClick={() => setActiveSection('turnos')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'turnos'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -697,9 +697,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('matriz_khs')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'matriz_khs'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -709,9 +709,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('limpieza')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'limpieza'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -721,9 +721,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('catalogo')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'catalogo'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -733,9 +733,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('grupos')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'grupos'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -745,9 +745,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSection('salidas')}
-              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer truncate ${
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer truncate ${
                 activeSection === 'salidas'
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+                  ? 'bg-white dark:bg-[#27272A] text-zinc-900 dark:text-[#F4F4F5] shadow-xs'
                   : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
               }`}
             >
@@ -761,7 +761,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleAutoAssignSelectedWeekDuties('both')}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 truncate"
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 truncate"
                 title="Auto-asignar turnos de esta semana evitando choques de plataforma y agrupando familias"
               >
                 <Wand2 className="w-3.5 h-3.5 shrink-0" />
@@ -771,7 +771,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={handleCopyWeeklyDutiesSummary}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
               title="Copiar lista de turnos de la semana para WhatsApp"
             >
               {copiedDutiesSuccess ? (
@@ -789,7 +789,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={handleAutoRotateCleaning}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
               title="Rotar automáticamente los grupos de aseo semana a semana"
             >
               <Brush className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
@@ -798,7 +798,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
             <button
               onClick={openNewDutyModal}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all active:scale-95 cursor-pointer truncate"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all active:scale-95 cursor-pointer truncate"
             >
               <Plus className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
               <span className="truncate">Nuevo Privilegio</span>
@@ -809,8 +809,9 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 flex items-center gap-3">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-indigo-500/15 blur-2xl" />
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -819,8 +820,9 @@ export const CleaningDutiesTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 flex items-center gap-3">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-emerald-500/15 blur-2xl" />
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
@@ -831,8 +833,9 @@ export const CleaningDutiesTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 flex items-center gap-3">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-amber-500/15 blur-2xl" />
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             {activeWeekDutyConflicts.length > 0 ? (
               <AlertTriangle className="w-5 h-5 text-amber-500" />
             ) : (
@@ -851,8 +854,9 @@ export const CleaningDutiesTab: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 flex items-center gap-3">
+          <div className="pointer-events-none absolute -top-12 -right-12 w-28 h-28 rounded-full bg-purple-500/15 blur-2xl" />
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
             <Brush className="w-5 h-5" />
           </div>
           <div>
@@ -872,15 +876,15 @@ export const CleaningDutiesTab: React.FC = () => {
       {activeSection === 'turnos' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Barra de navegación de semanas y acciones rápidas KHS */}
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-wrap">
               {/* Flechas de navegación semanal */}
-              <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] p-1 rounded-lg shrink-0">
+              <div className="flex items-center bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] p-1 rounded-xl shrink-0">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="p-1 rounded-md hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
+                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
                   title="Semana anterior"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -892,7 +896,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   type="button"
                   onClick={goToNextWeek}
                   disabled={currentIndex >= sortedWeeks.length - 1}
-                  className="p-1 rounded-md hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
+                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-[#27272A] disabled:opacity-30 transition-colors text-zinc-700 dark:text-[#F4F4F5] cursor-pointer"
                   title="Semana siguiente"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -903,7 +907,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <select
                 value={selectedWeek?.id || ''}
                 onChange={(e) => setSelectedWeekId(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer"
+                className="text-xs font-semibold px-3 py-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer"
               >
                 {sortedWeeks.map((w, idx) => (
                   <option key={w.id} value={w.id}>
@@ -913,7 +917,7 @@ export const CleaningDutiesTab: React.FC = () => {
               </select>
 
               {settings.conflictRules?.prioritizeFamilySameMeeting !== false && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold">
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
                   <HeartHandshake className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                   <span>Agrupación Familiar Activa</span>
@@ -927,7 +931,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAutoAssignSelectedWeekDuties('both')}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-all cursor-pointer"
                     title="Auto-asignar los deberes vacíos de esta semana sin chocar con partes de plataforma"
                   >
                     <Wand2 className="w-3.5 h-3.5" />
@@ -937,7 +941,7 @@ export const CleaningDutiesTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleAutoAssignAllWeeksDuties}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
                     title="Auto-rotar deberes en todas las semanas programadas con equidad histórica"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
@@ -949,7 +953,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowEquityPanel((prev) => !prev)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                   showEquityPanel
                     ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-sm'
                     : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border-zinc-200 dark:border-[#27272A] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
@@ -963,7 +967,7 @@ export const CleaningDutiesTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleClearAllWeekDuties}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-semibold transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-semibold transition-all cursor-pointer"
                   title="Quitar todos los asignados a turnos en esta semana"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -975,10 +979,10 @@ export const CleaningDutiesTab: React.FC = () => {
 
           {/* RADAR DE CHOQUES EN VIVO (PLATAFORMA / SALIENTES / AUSENCIAS VS DEBERES) */}
           {activeWeekDutyConflicts.length > 0 && selectedWeek && (
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-4 sm:p-5 space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-4 sm:p-5 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                     <AlertTriangle className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
@@ -1002,14 +1006,14 @@ export const CleaningDutiesTab: React.FC = () => {
                   return (
                     <div
                       key={`${c.meetingType}-${c.dutyKey}-${c.publisherId}-${idx}`}
-                      className="p-3 rounded-lg bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3"
+                      className="p-3 rounded-2xl bg-zinc-50/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
                             {c.publisherName}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-200/70 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-300/40 dark:border-zinc-700/60">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-200/70 dark:bg-[#27272A] text-zinc-700 dark:text-zinc-300 border border-zinc-300/40 dark:border-zinc-700/60">
                             {c.dutyName} ({c.meetingType === 'midweek' ? 'Entre Semana' : 'Fin de Semana'})
                           </span>
                         </div>
@@ -1046,7 +1050,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               () => handleToggleDutyPublisher(c.meetingType, c.dutyKey, c.publisherId)
                             )
                           }
-                          className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-semibold shrink-0 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-semibold shrink-0 cursor-pointer transition-colors"
                         >
                           Reemplazar
                         </button>
@@ -1060,7 +1064,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
           {/* PANEL DESPLEGABLE DE EQUIDAD Y ROTACIÓN DE DEBERES */}
           {showEquityPanel && (
-            <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-5 space-y-3 animate-in fade-in duration-150">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-5 space-y-3 animate-in fade-in duration-150">
               <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
                 <div>
                   <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1132,10 +1136,10 @@ export const CleaningDutiesTab: React.FC = () => {
           {selectedWeek && (
             <>
               {/* BLOQUE 1: DEBERES Y TURNOS DE ENTRE SEMANA */}
-              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <Shield className="w-5 h-5" />
                     </div>
                     <div>
@@ -1155,7 +1159,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAutoAssignSelectedWeekDuties('midweek')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                     >
                       <Wand2 className="w-3.5 h-3.5" />
                       <span>Completar Entre Semana</span>
@@ -1171,7 +1175,7 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={duty.id}
-                          className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
+                          className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between shadow-2xs"
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2">
@@ -1224,7 +1228,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                   return (
                                     <div
                                       key={pid}
-                                      className={`p-2 rounded-lg border text-xs transition-all ${
+                                      className={`p-2 rounded-xl border text-xs transition-all ${
                                         liveStatus.hasConflict
                                           ? 'bg-zinc-50 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
                                           : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A]'
@@ -1319,10 +1323,10 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 2: DEBERES Y TURNOS DE FIN DE SEMANA */}
-              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
@@ -1342,7 +1346,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAutoAssignSelectedWeekDuties('weekend')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                     >
                       <Wand2 className="w-3.5 h-3.5" />
                       <span>Completar Fin de Semana</span>
@@ -1358,7 +1362,7 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={duty.id}
-                          className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
+                          className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between shadow-2xs"
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2">
@@ -1411,7 +1415,7 @@ export const CleaningDutiesTab: React.FC = () => {
                                   return (
                                     <div
                                       key={pid}
-                                      className={`p-2 rounded-lg border text-xs transition-all ${
+                                      className={`p-2 rounded-xl border text-xs transition-all ${
                                         liveStatus.hasConflict
                                           ? 'bg-zinc-50 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
                                           : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A]'
@@ -1507,10 +1511,10 @@ export const CleaningDutiesTab: React.FC = () => {
               </div>
 
               {/* BLOQUE 3: ASEO DEL SALÓN DEL REINO S-28 + RECORDATORIO 1-CLIC AL SUPERINTENDENTE DE GRUPO */}
-              <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shrink-0">
                       <Brush className="w-5 h-5" />
                     </div>
                     <div>
@@ -1559,7 +1563,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               }
                               updateWeek({ ...selectedWeek, cleaningGroupNumbers: list });
                             }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                                 : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-200 dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A]'
@@ -1586,7 +1590,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             cleaningType: e.target.value as CleaningProgramType,
                           })
                         }
-                        className="w-full px-2.5 py-2 rounded-lg text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
+                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
                       >
                         <option value="semanal">Semanal Regular</option>
                         <option value="profunda">Limpieza Profunda (S-28)</option>
@@ -1608,7 +1612,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             cleaningSuppliesStatus: e.target.value as CleaningSuppliesStatus,
                           })
                         }
-                        className="w-full px-2.5 py-2 rounded-lg text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
+                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]"
                       >
                         <option value="abastecido">✓ Insumos Completos</option>
                         <option value="reponer_pronto">⚠ Reponer Pronto</option>
@@ -1633,12 +1637,12 @@ export const CleaningDutiesTab: React.FC = () => {
                       return (
                         <div
                           key={grp.number}
-                          className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-[#18181F]/80 border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div>
                             <div className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                               <span>Grupo #{grp.number}: {grp.name}</span>
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border border-zinc-200 dark:border-[#27272A] font-mono tabular-nums">
                                 {grpMembers.length} integrantes
                               </span>
                             </div>
@@ -1653,7 +1657,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'overseer')}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
                               title="Enviar recordatorio y lista S-28 por WhatsApp al Superintendente de Grupo"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
@@ -1663,7 +1667,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'assistant')}
-                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#323238] text-xs font-semibold transition-colors cursor-pointer"
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#27272A] dark:hover:bg-[#323238] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#323238] text-xs font-semibold transition-colors cursor-pointer"
                                 title="Enviar recordatorio por WhatsApp al Auxiliar de Grupo"
                               >
                                 <MessageCircle className="w-3.5 h-3.5" />
@@ -1704,7 +1708,7 @@ export const CleaningDutiesTab: React.FC = () => {
                           key={item.id}
                           type="button"
                           onClick={() => handleToggleCleaningChecklist(selectedWeek, item.id)}
-                          className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-start gap-2 ${
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-2 ${
                             isDone
                               ? 'bg-zinc-100/80 dark:bg-[#18181F] border-zinc-300 dark:border-zinc-700'
                               : 'bg-zinc-50/70 dark:bg-[#18181F]/40 border-zinc-200 dark:border-[#27272A] hover:bg-white dark:hover:bg-[#18181F]'
@@ -1746,7 +1750,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* ── SECCIÓN NUEVA: MATRIZ MENSUAL (TABLERO DE ANUNCIOS IMPRIMIBLE) ── */}
       {activeSection === 'matriz_khs' && (
-        <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5 animate-in fade-in duration-200">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-5 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
             <div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -1968,7 +1972,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 1. SECCIÓN: LIMPIEZA DEL SALÓN DEL REINO S-28 */}
       {activeSection === 'limpieza' && (
-      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-5 animate-in fade-in duration-200">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-5 animate-in fade-in duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
             <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -2008,7 +2012,7 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={w.id}
-                className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 flex flex-col justify-between space-y-3 hover:bg-white dark:hover:bg-[#18181F] transition-all"
+                className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 flex flex-col justify-between space-y-3 hover:bg-white dark:hover:bg-[#18181F] transition-all shadow-2xs"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-[#A1A1AA]">
@@ -2038,7 +2042,7 @@ export const CleaningDutiesTab: React.FC = () => {
                           cleaningType: e.target.value as CleaningProgramType,
                         })
                       }
-                      className="text-[11px] font-bold px-2 py-1 rounded-lg bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 focus:outline-none"
+                      className="text-[11px] font-bold px-2 py-1 rounded-xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 focus:outline-none"
                     >
                       <option value="semanal">Aseo Semanal</option>
                       <option value="profunda">Limpieza Profunda</option>
@@ -2074,7 +2078,7 @@ export const CleaningDutiesTab: React.FC = () => {
                             }
                             updateWeek({ ...w, cleaningGroupNumbers: list });
                           }}
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums ${
+                          className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer font-mono tabular-nums ${
                             isSelected
                               ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                               : 'bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
@@ -2090,7 +2094,7 @@ export const CleaningDutiesTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleSendGroupCleaningWhatsApp(w, firstGroup, 'overseer')}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold transition-colors cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-[11px] font-semibold transition-colors cursor-pointer"
                       title="Enviar recordatorio S-28 por WhatsApp al Superintendente de Grupo"
                     >
                       <MessageCircle className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
@@ -2107,7 +2111,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 2. SECCIÓN: GRUPOS DE PREDICACIÓN */}
       {activeSection === 'grupos' && (
-      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-4 animate-in fade-in duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
             <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -2136,12 +2140,12 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={group.number}
-                className="p-4 sm:p-5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]/40 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all"
+                className="kg-card-bento kg-sheen-top p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-[#18181F]/60 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all shadow-2xs"
               >
                 <div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center font-bold text-xs font-mono tabular-nums">
+                      <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center font-bold text-xs font-mono tabular-nums">
                         #{group.number}
                       </div>
                       <h4 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm">{group.name}</h4>
@@ -2201,7 +2205,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* 3. SECCIÓN: DEBERES Y PERSONALIZADOS */}
       {activeSection === 'catalogo' && (
-      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-4 animate-in fade-in duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
             <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -2225,7 +2229,7 @@ export const CleaningDutiesTab: React.FC = () => {
           {customDuties.map(duty => (
             <div
               key={duty.id}
-              className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F]/40 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all"
+              className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-[#18181F]/60 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-[#3F3F46] transition-all shadow-2xs"
             >
               <div>
                 <div className="flex items-start justify-between">
@@ -2259,16 +2263,16 @@ export const CleaningDutiesTab: React.FC = () => {
 
                 <div className="mt-3 flex flex-wrap gap-1 text-[10px] font-semibold text-zinc-600 dark:text-[#A1A1AA]">
                   {duty.midweek && (
-                    <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                       Entre semana
                     </span>
                   )}
                   {duty.weekend && (
-                    <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
                       Fin de semana
                     </span>
                   )}
-                  <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] font-mono tabular-nums">
+                  <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/60 dark:border-[#27272A] font-mono tabular-nums">
                     Máx: {duty.maxPeople || 1} personas
                   </span>
                 </div>
@@ -2281,7 +2285,7 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* SECTION 4: SALIDAS PARA LA PREDICACIÓN (SERVICIO DEL CAMPO) */}
       {activeSection === 'salidas' && (
-      <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] p-6 space-y-4 animate-in fade-in duration-200">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm p-6 space-y-4 animate-in fade-in duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
           <div>
             <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -2329,11 +2333,11 @@ export const CleaningDutiesTab: React.FC = () => {
             return (
               <div
                 key={fs.id}
-                className="p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F]/40 hover:border-zinc-300 dark:hover:border-[#3F3F46] hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between"
+                className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/60 hover:border-zinc-300 dark:hover:border-[#3F3F46] hover:bg-white dark:hover:bg-[#18181F] transition-all flex flex-col justify-between shadow-2xs"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 font-extrabold text-xs font-mono tabular-nums border border-zinc-200 dark:border-[#27272A]">
+                    <span className="px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 font-extrabold text-xs font-mono tabular-nums border border-zinc-200 dark:border-[#27272A]">
                       {fs.dayOfWeek} • {fs.time}
                     </span>
 
@@ -2385,8 +2389,8 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: GROUP EDIT / CREATE */}
       {isGroupModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-lg w-full p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl max-w-lg w-full p-6 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {editingGroup ? 'Editar Grupo de Predicación' : 'Nuevo Grupo de Predicación'}
@@ -2481,8 +2485,8 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: CUSTOM DUTY EDIT / CREATE */}
       {isDutyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-md w-full p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl max-w-md w-full p-6 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
               <h3 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 {editingDuty ? 'Editar Deber Operativo' : 'Nuevo Deber Operativo'}
@@ -2573,8 +2577,8 @@ export const CleaningDutiesTab: React.FC = () => {
 
       {/* MODAL: FIELD SERVICE MEETING EDIT / CREATE */}
       {isFsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-[#121216] rounded-xl border border-zinc-200 dark:border-[#27272A] max-w-md w-full max-h-[90vh] flex flex-col p-5 sm:p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col p-5 sm:p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3 shrink-0">
               <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                 <Compass className="w-5 h-5 text-zinc-500 dark:text-zinc-400 shrink-0" />

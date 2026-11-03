@@ -131,11 +131,11 @@ export const BreakerModal: React.FC<BreakerModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={breaker ? 'Editar circuito o breaker eléctrico' : 'Nuevo circuito del tablero eléctrico'}
-      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-2xl w-full max-w-4xl max-h-[92vh] border border-zinc-200 dark:border-[#27272A] flex flex-col overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top rounded-3xl w-full max-w-4xl max-h-[92vh] border border-zinc-200/80 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#18181F]/70">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
               <Zap size={20} />

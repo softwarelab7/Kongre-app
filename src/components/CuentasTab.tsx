@@ -366,16 +366,16 @@ export const CuentasTab: React.FC = () => {
       )}
 
       {/* Barra Unificada de Sub-pestañas y Acciones de Cuentas */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs flex flex-col gap-3 no-print">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col gap-3.5 no-print">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
           {/* Sub-tab Navigation - 3 columns on mobile so nothing is cut off */}
-          <div className="grid grid-cols-3 sm:flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181F] p-1.5 rounded-xl border border-zinc-200/70 dark:border-[#27272A]">
+          <div className="grid grid-cols-3 sm:flex items-center gap-1.5 bg-zinc-100/90 dark:bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-200/70 dark:border-white/10">
             <button
               onClick={() => setActiveSubTab('s26')}
-              className={`px-2.5 sm:px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeSubTab === 's26'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
@@ -384,10 +384,10 @@ export const CuentasTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('s30')}
-              className={`px-2.5 sm:px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeSubTab === 's30'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <FileCheck className="w-3.5 h-3.5 shrink-0" />
@@ -396,10 +396,10 @@ export const CuentasTab: React.FC = () => {
 
             <button
               onClick={() => setActiveSubTab('auditorias')}
-              className={`px-2.5 sm:px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeSubTab === 'auditorias'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-[#27272A]'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
@@ -409,7 +409,7 @@ export const CuentasTab: React.FC = () => {
 
           {/* Month Selector & Action Buttons */}
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
-            <div className="flex items-center justify-center gap-1.5 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl px-3 py-2">
+            <div className="flex items-center justify-center gap-1.5 bg-zinc-50 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 rounded-full px-3.5 py-2">
               <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">Mes:</span>
               <input
@@ -426,7 +426,7 @@ export const CuentasTab: React.FC = () => {
                   activeSubTab === 's30' ? 'S-30' : activeSubTab === 'auditorias' ? 'S-25' : 'S-26'
                 )
               }
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 border border-zinc-200/80 dark:border-[#27272A] rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 border border-zinc-200/80 dark:border-white/10 rounded-full bg-zinc-100 dark:bg-zinc-900/70 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition cursor-pointer active:scale-95"
               title="Cargar el PDF oficial (S-26, S-30 o S-25) para que la app lo rellene y descargue"
             >
               <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -437,7 +437,7 @@ export const CuentasTab: React.FC = () => {
 
             <button
               onClick={() => handleOpenAddTx('ingreso')}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">Ingreso</span>
@@ -445,7 +445,7 @@ export const CuentasTab: React.FC = () => {
 
             <button
               onClick={() => handleOpenAddTx('gasto')}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">Gasto</span>
@@ -454,19 +454,19 @@ export const CuentasTab: React.FC = () => {
         </div>
 
         {/* Voucher verification status bar */}
-        <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-[#27272A] text-xs">
+        <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-white/10 text-xs">
           <span className="text-zinc-500 dark:text-[#A1A1AA] font-medium">Estado de comprobantes del mes:</span>
           {s26.unverifiedCount > 0 ? (
             <button
               onClick={handleVerifyAllMonthVouchers}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] border border-zinc-200 dark:border-[#27272A] text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900/70 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-white/10 text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
               title="Marcar todos los recibos y facturas del mes como verificados"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span><span className="font-mono tabular-nums">{s26.unverifiedCount}</span> sin verificar • Verificar todos</span>
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-zinc-300 font-bold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-300 font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
               <span>Al día (<span className="font-mono tabular-nums">{s26.verifiedCount}/{s26.transactions.length}</span>)</span>
             </span>
@@ -476,50 +476,54 @@ export const CuentasTab: React.FC = () => {
 
       {/* KPI Cards (Financial Balance) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 no-print">
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] block uppercase truncate">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-zinc-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 dark:text-[#A1A1AA] block uppercase truncate relative">
             Saldo Inicial ({s26.monthName})
           </span>
-          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5]">
+          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] relative block mt-1">
             {formatCurrency(s26.openingBalance)}
           </span>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block mt-0.5">Al primer día del mes</span>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block mt-0.5 relative">Al primer día del mes</span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase flex items-center justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase flex items-center justify-between relative">
             <span>Ingresos del Mes</span>
             <ArrowUpRight className="w-4 h-4 text-emerald-500" />
           </span>
-          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-emerald-600 dark:text-emerald-400">
+          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-emerald-600 dark:text-emerald-400 relative block mt-1">
             +{formatCurrency(s26.totalIncome)}
           </span>
-          <span className="text-[11px] text-emerald-700 dark:text-emerald-500 block mt-0.5">
+          <span className="text-[11px] text-emerald-700 dark:text-emerald-500 block mt-0.5 relative">
             Cajas y donate.jw.org
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 block uppercase flex items-center justify-between">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-rose-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 uppercase flex items-center justify-between relative">
             <span>Egresos del Mes</span>
             <ArrowDownRight className="w-4 h-4 text-rose-500" />
           </span>
-          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-rose-600 dark:text-rose-400">
+          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-rose-600 dark:text-rose-400 relative block mt-1">
             -{formatCurrency(s26.totalExpenses)}
           </span>
-          <span className="text-[11px] text-rose-700 dark:text-rose-500 block mt-0.5">
+          <span className="text-[11px] text-rose-700 dark:text-rose-500 block mt-0.5 relative">
             Servicios y mantenimiento
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-2xs">
-          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl" />
+          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase relative">
             Saldo Final Disponible
           </span>
-          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400">
+          <span className="text-xl sm:text-2xl font-black font-mono tabular-nums text-indigo-600 dark:text-indigo-400 relative block mt-1">
             {formatCurrency(s26.closingBalance)}
           </span>
-          <span className="text-[11px] text-indigo-700 dark:text-indigo-400 block mt-0.5 font-semibold font-mono tabular-nums">
+          <span className="text-[11px] text-indigo-700 dark:text-indigo-400 block mt-0.5 font-semibold font-mono tabular-nums relative">
             {s26.surplusOrDeficit >= 0
               ? `+${formatCurrency(s26.surplusOrDeficit)} neto`
               : `${formatCurrency(s26.surplusOrDeficit)} déficit`}
@@ -535,7 +539,7 @@ export const CuentasTab: React.FC = () => {
           {/* Fund Breakdown & Surplus Resolution Calculator */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 no-print">
             {/* Breakdown by Fund */}
-            <div className="lg:col-span-2 bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-3">
+            <div className="lg:col-span-2 kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#A1A1AA]">
                   Desglose Mensual por Fondos Teocráticos (S-26)
@@ -552,7 +556,7 @@ export const CuentasTab: React.FC = () => {
                     return (
                       <div
                         key={fundKey}
-                        className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-1.5"
+                        className="p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-white/10 space-y-1.5"
                       >
                         <span className="font-bold text-zinc-800 dark:text-[#F4F4F5] block text-[11px] truncate">
                           {FUND_LABELS[fundKey]}
@@ -573,14 +577,15 @@ export const CuentasTab: React.FC = () => {
             </div>
 
             {/* Surplus & Resolution Calculator */}
-            <div className="bg-indigo-950 dark:bg-indigo-950/70 text-white p-4 rounded-2xl border border-indigo-800 dark:border-indigo-800/80 shadow-xs flex flex-col justify-between space-y-3">
-              <div className="space-y-1">
+            <div className="kg-card-bento kg-sheen-top bg-indigo-950 dark:bg-indigo-950/70 text-white p-4 sm:p-5 rounded-3xl border border-indigo-800 dark:border-indigo-800/80 shadow-sm flex flex-col justify-between space-y-3 relative overflow-hidden">
+              <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-indigo-500/20 blur-2xl" />
+              <div className="space-y-1 relative">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1">
                     <Calculator className="w-3.5 h-3.5" />
                     <span>Reserva y Excedente (S-26)</span>
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-900 text-indigo-200 font-semibold">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-900 text-indigo-200 font-semibold">
                     Reserva 2 meses
                   </span>
                 </div>
@@ -600,7 +605,7 @@ export const CuentasTab: React.FC = () => {
 
               <button
                 onClick={handleOpenSurplusResolutionTx}
-                className="w-full py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer relative active:scale-95"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Registrar Resolución de Excedente</span>
@@ -609,15 +614,15 @@ export const CuentasTab: React.FC = () => {
           </div>
 
           {/* Filters Bar */}
-          <div className="bg-white dark:bg-[#121216] p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 no-print">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 no-print">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Buscar por concepto, factura, proveedor..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-[#18181F] focus:bg-white dark:focus:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-medium"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-900/70 focus:bg-white dark:focus:bg-zinc-900 border border-zinc-200/80 dark:border-white/10 rounded-full text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/40 font-medium"
               />
             </div>
 
@@ -625,7 +630,7 @@ export const CuentasTab: React.FC = () => {
               <select
                 value={filterFund}
                 onChange={(e) => setFilterFund(e.target.value as any)}
-                className="px-2.5 py-1.5 text-xs bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl font-bold text-zinc-700 dark:text-[#F4F4F5] cursor-pointer focus:outline-hidden"
+                className="px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 rounded-full font-bold text-zinc-700 dark:text-[#F4F4F5] cursor-pointer focus:outline-hidden"
               >
                 <option value="todos">Todos los Fondos</option>
                 <option value="gastos_locales">Gastos Locales</option>
@@ -636,7 +641,7 @@ export const CuentasTab: React.FC = () => {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="px-2.5 py-1.5 text-xs bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl font-bold text-zinc-700 dark:text-[#F4F4F5] cursor-pointer focus:outline-hidden"
+                className="px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 rounded-full font-bold text-zinc-700 dark:text-[#F4F4F5] cursor-pointer focus:outline-hidden"
               >
                 <option value="todos">Ingresos y Gastos</option>
                 <option value="ingreso">Solo Ingresos (+)</option>
@@ -646,8 +651,8 @@ export const CuentasTab: React.FC = () => {
           </div>
 
           {/* Transactions Table (Official S-26 Format) */}
-          <div className="bg-white dark:bg-[#121216] border border-zinc-300 dark:border-[#27272A] rounded-2xl overflow-hidden shadow-xs">
-            <div className="p-4 bg-zinc-800 dark:bg-[#18181F] text-white flex items-center justify-between border-b border-zinc-700 dark:border-[#27272A]">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
+            <div className="p-4 sm:p-5 bg-zinc-900 dark:bg-zinc-900/90 text-white flex items-center justify-between border-b border-zinc-800 dark:border-white/10">
               <div>
                 <h3 className="font-bold text-sm tracking-wide uppercase">
                   Hoja de Cuentas S-26 • {s26.monthName}
@@ -813,7 +818,7 @@ export const CuentasTab: React.FC = () => {
           </div>
 
           {/* Bank & Cash Reconciliation Card */}
-          <div className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 no-print">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 no-print">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm flex items-center gap-2">
                 <Landmark className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -825,7 +830,7 @@ export const CuentasTab: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-              <div className="p-3.5 bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1">
+              <div className="p-3.5 bg-zinc-50/80 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-1">
                 <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] uppercase font-bold block">
                   1. Saldo en Libros S-26
                 </span>
@@ -835,7 +840,7 @@ export const CuentasTab: React.FC = () => {
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-500">Calculado según movimientos</p>
               </div>
 
-              <div className="p-3.5 bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1">
+              <div className="p-3.5 bg-zinc-50/80 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-1">
                 <span className="text-[10px] text-zinc-600 dark:text-[#A1A1AA] uppercase font-bold block">
                   2. Extracto Bancario (€):
                 </span>
@@ -846,13 +851,13 @@ export const CuentasTab: React.FC = () => {
                     placeholder="Ej. 3500.00"
                     value={bankStatementBalance}
                     onChange={(e) => setBankStatementBalance(e.target.value)}
-                    className="w-full px-2.5 py-1 bg-white dark:bg-[#121216] border border-zinc-300 dark:border-[#27272A] rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-2.5 py-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-white/10 rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-500">Saldo final cuenta bancaria</p>
               </div>
 
-              <div className="p-3.5 bg-zinc-50 dark:bg-[#18181F] rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1">
+              <div className="p-3.5 bg-zinc-50/80 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-1">
                 <span className="text-[10px] text-zinc-600 dark:text-[#A1A1AA] uppercase font-bold block">
                   3. Efectivo en Caja / Tránsito (€):
                 </span>
@@ -863,16 +868,16 @@ export const CuentasTab: React.FC = () => {
                     placeholder="0.00"
                     value={cashInBoxBalance}
                     onChange={(e) => setCashInBoxBalance(e.target.value)}
-                    className="w-full px-2.5 py-1 bg-white dark:bg-[#121216] border border-zinc-300 dark:border-[#27272A] rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-2.5 py-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-white/10 rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-900 dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-500">Depósitos en tránsito o caja</p>
               </div>
 
               <div
-                className={`p-3.5 rounded-xl border space-y-1 ${
+                className={`p-3.5 rounded-2xl border space-y-1 ${
                   reconciliationDiff === null
-                    ? 'bg-zinc-50 dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A] text-zinc-500 dark:text-[#A1A1AA]'
+                    ? 'bg-zinc-50/80 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-white/10 text-zinc-500 dark:text-[#A1A1AA]'
                     : Math.abs(reconciliationDiff) < 0.01
                     ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-300'
                     : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800/50 text-rose-900 dark:text-rose-300'
@@ -912,7 +917,7 @@ export const CuentasTab: React.FC = () => {
       {/* ============================================================== */}
       {activeSubTab === 's30' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between no-print flex-wrap gap-2">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex items-center justify-between no-print flex-wrap gap-2">
             <div>
               <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5]">
                 Informe Mensual de Cuentas para la Congregación (S-30)
@@ -922,10 +927,10 @@ export const CuentasTab: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={handleCopyS30}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-900 dark:bg-[#18181F] hover:bg-zinc-800 dark:hover:bg-[#27272A] text-white rounded-xl text-xs font-bold border border-transparent dark:border-[#27272A] shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-zinc-900 dark:bg-zinc-900/80 hover:bg-zinc-800 dark:hover:bg-zinc-800 text-white rounded-full text-xs font-bold border border-transparent dark:border-white/10 shadow-xs transition cursor-pointer"
               >
                 {copiedS30 ? (
                   <>
@@ -942,7 +947,7 @@ export const CuentasTab: React.FC = () => {
 
               <button
                 onClick={handleShareWhatsAppS30}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold shadow-xs transition cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Enviar por WhatsApp</span>
@@ -950,7 +955,7 @@ export const CuentasTab: React.FC = () => {
 
               <button
                 onClick={() => handleDownloadOfficialAccountsPdf('S-30')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-bold transition cursor-pointer"
               >
                 <Upload className="w-4 h-4" />
                 <span>Cargar / Rellenar S-30 Oficial (PDF)</span>
@@ -959,8 +964,8 @@ export const CuentasTab: React.FC = () => {
           </div>
 
           {/* S-30 Printable Formal Card */}
-          <div className="bg-white dark:bg-[#121216] border-2 border-zinc-800 dark:border-[#27272A] print:bg-white print:border-zinc-800 p-6 sm:p-8 rounded-2xl shadow-lg max-w-3xl mx-auto space-y-6">
-            <div className="border-b-2 border-zinc-800 dark:border-[#27272A] print:border-zinc-800 pb-4 text-center space-y-1">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top border-2 border-zinc-800 dark:border-white/15 print:bg-white print:border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-lg max-w-3xl mx-auto space-y-6">
+            <div className="border-b-2 border-zinc-800 dark:border-white/15 print:border-zinc-800 pb-4 text-center space-y-1">
               <span className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-[#A1A1AA] font-bold block">
                 Formulario Oficial S-30
               </span>
@@ -978,32 +983,32 @@ export const CuentasTab: React.FC = () => {
                 (Nota para el hermano que lee el informe: Lea este anuncio durante la reunión de entre semana en el tiempo asignado para anuncios locales y luego fíjelo en el tablero de anuncios).
               </p>
 
-              <div className="p-4 bg-zinc-50 dark:bg-[#18181F] border border-zinc-300 dark:border-[#27272A] print:bg-zinc-50 print:border-zinc-300 rounded-xl space-y-3 font-serif text-sm text-zinc-900 dark:text-[#F4F4F5] print:text-zinc-900">
+              <div className="p-4 sm:p-5 bg-zinc-50/90 dark:bg-zinc-900/70 border border-zinc-300 dark:border-white/10 print:bg-zinc-50 print:border-zinc-300 rounded-2xl space-y-3 font-serif text-sm text-zinc-900 dark:text-[#F4F4F5] print:text-zinc-900">
                 <p>
                   Queridos hermanos: Nos complace presentarles el informe de las cuentas de la congregación correspondiente al mes de <strong>{s26.monthName}</strong>:
                 </p>
 
                 <div className="space-y-2 border-l-2 border-zinc-400 dark:border-[#3F3F46] print:border-zinc-400 pl-4 my-3 text-xs font-sans">
-                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-[#27272A] print:border-zinc-200">
+                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-white/10 print:border-zinc-200">
                     <span className="text-zinc-600 dark:text-[#A1A1AA] print:text-zinc-600">1. Saldo al inicio del mes:</span>
                     <strong className="text-zinc-900 dark:text-[#F4F4F5] print:text-zinc-900 font-mono tabular-nums">{formatCurrency(s26.openingBalance)}</strong>
                   </div>
 
-                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-[#27272A] print:border-zinc-200">
+                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-white/10 print:border-zinc-200">
                     <span className="text-zinc-600 dark:text-[#A1A1AA] print:text-zinc-600">
                       2. Contribuciones recibidas (Cajas y en línea):
                     </span>
                     <strong className="text-emerald-700 dark:text-emerald-400 print:text-emerald-700 font-mono tabular-nums">+{formatCurrency(s26.totalIncome)}</strong>
                   </div>
 
-                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-[#27272A] print:border-zinc-200">
+                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-white/10 print:border-zinc-200">
                     <span className="text-zinc-600 dark:text-[#A1A1AA] print:text-zinc-600">
                       3. Gastos efectuados (Servicios, mantenimiento y resoluciones):
                     </span>
                     <strong className="text-rose-700 dark:text-rose-400 print:text-rose-700 font-mono tabular-nums">-{formatCurrency(s26.totalExpenses)}</strong>
                   </div>
 
-                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-[#27272A] print:border-zinc-200">
+                  <div className="flex justify-between py-1 border-b border-zinc-200 dark:border-white/10 print:border-zinc-200">
                     <span className="text-zinc-600 dark:text-[#A1A1AA] print:text-zinc-600">4. Balance neto del período:</span>
                     <strong
                       className={`font-mono tabular-nums ${
@@ -1015,7 +1020,7 @@ export const CuentasTab: React.FC = () => {
                     </strong>
                   </div>
 
-                  <div className="flex justify-between py-1.5 pt-2 text-sm font-bold bg-zinc-100 dark:bg-[#27272A] print:bg-zinc-100 px-2 rounded">
+                  <div className="flex justify-between py-1.5 pt-2 text-sm font-bold bg-zinc-100 dark:bg-zinc-800 print:bg-zinc-100 px-2 rounded-lg">
                     <span className="text-zinc-900 dark:text-[#F4F4F5] print:text-zinc-900">5. Saldo disponible al cierre del mes:</span>
                     <span className="text-indigo-800 dark:text-indigo-300 print:text-indigo-800 font-mono tabular-nums">{formatCurrency(s26.closingBalance)}</span>
                   </div>
@@ -1026,7 +1031,7 @@ export const CuentasTab: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-zinc-300 dark:border-[#27272A] print:border-zinc-300 grid grid-cols-2 gap-8 text-center text-xs">
+              <div className="pt-4 border-t border-zinc-300 dark:border-white/10 print:border-zinc-300 grid grid-cols-2 gap-8 text-center text-xs">
                 <div className="border-t border-zinc-400 dark:border-[#3F3F46] print:border-zinc-400 pt-2 space-y-0.5">
                   <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold block">
                     Preparado por:
@@ -1052,7 +1057,7 @@ export const CuentasTab: React.FC = () => {
       {/* ============================================================== */}
       {activeSubTab === 'auditorias' && (
         <div className="space-y-6 no-print">
-          <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 p-4 rounded-2xl space-y-1">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-500/20 p-4 sm:p-5 rounded-3xl space-y-1 shadow-sm">
             <h3 className="font-bold text-indigo-900 dark:text-indigo-200 text-sm flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
               <span>Asistente de Auditoría Trimestral de Cuentas (Formulario S-25)</span>
@@ -1073,12 +1078,12 @@ export const CuentasTab: React.FC = () => {
               return (
                 <div
                   key={audit.id}
-                  className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-4 flex flex-col justify-between"
+                  className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 rounded-lg font-mono font-black text-xs bg-zinc-900 dark:bg-[#27272A] text-white">
+                        <span className="px-2.5 py-1 rounded-xl font-mono font-black text-xs bg-zinc-900 dark:bg-zinc-800 text-white">
                           {audit.quarter}
                         </span>
                         <div>
@@ -1091,14 +1096,14 @@ export const CuentasTab: React.FC = () => {
                         </div>
                       </div>
 
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A]">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10">
                         <span className={`w-1.5 h-1.5 rounded-full ${audit.isCompleted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                         {audit.isCompleted ? 'Firmada y Completada' : 'En Revisión'}
                       </span>
                     </div>
 
                     {/* Auditor Info */}
-                    <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+                    <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50/80 dark:bg-zinc-900/60 p-3 rounded-2xl border border-zinc-200/80 dark:border-white/10">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-500 block">
                           Hermano Auditor:
@@ -1116,8 +1121,8 @@ export const CuentasTab: React.FC = () => {
                     </div>
 
                     {/* Automatic Quarter S-26 Financial Cross-Check */}
-                    <div className="border border-zinc-200 dark:border-[#27272A] rounded-xl overflow-hidden text-[11px]">
-                      <div className="bg-zinc-100 dark:bg-[#18181F] px-3 py-1.5 font-bold text-zinc-700 dark:text-[#A1A1AA] flex items-center justify-between border-b border-zinc-200 dark:border-[#27272A]">
+                    <div className="border border-zinc-200/80 dark:border-white/10 rounded-2xl overflow-hidden text-[11px]">
+                      <div className="bg-zinc-100 dark:bg-zinc-900/70 px-3 py-1.5 font-bold text-zinc-700 dark:text-[#A1A1AA] flex items-center justify-between border-b border-zinc-200/80 dark:border-white/10">
                         <span>Consolidado Contable del Trimestre (S-26)</span>
                         <span className="text-[10px] text-zinc-500 dark:text-zinc-500 font-mono tabular-nums">
                           {metrics.verifiedTransactions}/{metrics.totalTransactions} comprobantes verif.
@@ -1125,16 +1130,16 @@ export const CuentasTab: React.FC = () => {
                       </div>
                       <table className="w-full text-left border-collapse">
                         <thead>
-                          <tr className="border-b border-zinc-200 dark:border-[#27272A] text-[10px] text-zinc-500 dark:text-zinc-500 uppercase">
+                          <tr className="border-b border-zinc-200/80 dark:border-white/10 text-[10px] text-zinc-500 dark:text-zinc-500 uppercase">
                             <th className="py-1.5 px-2.5">Mes</th>
                             <th className="py-1.5 px-2 text-right">Ingresos</th>
                             <th className="py-1.5 px-2 text-right">Egresos</th>
                             <th className="py-1.5 px-2.5 text-right">Cierre</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A]">
+                        <tbody className="divide-y divide-zinc-100 dark:divide-white/10">
                           {metrics.monthlyBreakdown.map((m) => (
-                            <tr key={m.monthKey} className="hover:bg-zinc-50/50 dark:hover:bg-[#18181F]/50">
+                            <tr key={m.monthKey} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50">
                               <td className="py-1.5 px-2.5 font-medium text-zinc-700 dark:text-zinc-300">
                                 {m.monthName}
                               </td>
@@ -1190,17 +1195,17 @@ export const CuentasTab: React.FC = () => {
                     </div>
 
                     {audit.findingsNotes && (
-                      <div className="p-2.5 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-100 dark:border-indigo-900/40 text-[11px] text-indigo-900 dark:text-indigo-200 italic">
+                      <div className="p-2.5 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-xl border border-indigo-100 dark:border-indigo-900/40 text-[11px] text-indigo-900 dark:text-indigo-200 italic">
                         "{audit.findingsNotes}"
                       </div>
                     )}
                   </div>
 
                   {/* Card Footer Actions */}
-                  <div className="pt-3 border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between gap-2">
                     <button
                       onClick={() => setEditingAudit(audit)}
-                      className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs border border-zinc-200/80 dark:border-[#27272A] transition inline-flex items-center gap-1.5 cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900/70 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs border border-zinc-200/80 dark:border-white/10 transition inline-flex items-center gap-1.5 cursor-pointer"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                       <span>Editar / Firmar S-25</span>
@@ -1218,7 +1223,7 @@ export const CuentasTab: React.FC = () => {
                             });
                             showToast(`Auditoría ${audit.quarter} marcada como completada.`);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition inline-flex items-center gap-1 cursor-pointer"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Cerrar S-25</span>
@@ -1227,7 +1232,7 @@ export const CuentasTab: React.FC = () => {
 
                       <button
                         onClick={() => handleDownloadOfficialAccountsPdf('S-25')}
-                        className="px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition inline-flex items-center gap-1.5 cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition inline-flex items-center gap-1.5 cursor-pointer"
                         title="Cargar el PDF oficial S-25 para que la app lo rellene y descargue"
                       >
                         <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -1246,9 +1251,9 @@ export const CuentasTab: React.FC = () => {
       {/* AUDIT EDIT / SIGN MODAL (FORMULARIO S-25)                      */}
       {/* ============================================================== */}
       {editingAudit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/10 pb-3">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <span>
@@ -1275,7 +1280,7 @@ export const CuentasTab: React.FC = () => {
                     setEditingAudit({ ...editingAudit, auditorName: e.target.value })
                   }
                   placeholder="Nombre del anciano o siervo ministerial auditor"
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
 
@@ -1290,7 +1295,7 @@ export const CuentasTab: React.FC = () => {
                     onChange={(e) =>
                       setEditingAudit({ ...editingAudit, auditDate: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-semibold font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-semibold font-mono tabular-nums focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   />
                 </div>
 
@@ -1306,7 +1311,7 @@ export const CuentasTab: React.FC = () => {
                         isCompleted: e.target.value === 'completada',
                       })
                     }
-                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] rounded-xl text-xs font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                   >
                     <option value="pendiente">En Revisión / Pendiente</option>
                     <option value="completada">Firmada y Completada</option>
@@ -1325,21 +1330,21 @@ export const CuentasTab: React.FC = () => {
                     setEditingAudit({ ...editingAudit, findingsNotes: e.target.value })
                   }
                   placeholder="Ej. Se revisaron todas las boletas de depósito y facturas sin encontrar discrepancias..."
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full px-3 py-2 border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/70 text-zinc-900 dark:text-[#F4F4F5] placeholder-zinc-400 dark:placeholder-zinc-500 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-[#27272A]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-white/10">
               <button
                 onClick={() => setEditingAudit(null)}
-                className="px-3.5 py-2 text-xs text-zinc-600 dark:text-[#A1A1AA] font-semibold rounded-xl border border-zinc-200 dark:border-[#27272A] hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer transition-colors"
+                className="px-4 py-2 text-xs text-zinc-600 dark:text-[#A1A1AA] font-semibold rounded-full border border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveAuditModal}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
               >
                 Guardar Auditoría S-25
               </button>
@@ -1352,9 +1357,9 @@ export const CuentasTab: React.FC = () => {
       {/* TRANSACTION MODAL (ADD / EDIT)                                 */}
       {/* ============================================================== */}
       {isTxModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-[#27272A] pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200/80 dark:border-white/10 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/10 pb-3">
               <h3 className="font-bold text-zinc-900 dark:text-[#F4F4F5] text-sm flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <span>

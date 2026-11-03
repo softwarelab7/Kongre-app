@@ -212,29 +212,29 @@ export const MantenimientoTab: React.FC = () => {
       )}
 
       {/* Top Sub-Navigation & Action Bar (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3.5">
         {/* Subtabs in a 3-column non-clipping mobile grid */}
-        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+        <div className="grid grid-cols-3 gap-1 p-1.5 rounded-2xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200/70 dark:border-white/10">
           <button
             onClick={() => setActiveSubView('fichas')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
               activeSubView === 'fichas'
-                ? 'bg-white dark:bg-[#27272A] text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
             <Wrench className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Fichas</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold font-mono tabular-nums shrink-0">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 font-bold font-mono tabular-nums shrink-0">
               {stats.total}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubView('calendario_anual')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
               activeSubView === 'calendario_anual'
-                ? 'bg-white dark:bg-[#27272A] text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold'
+                ? 'bg-white dark:bg-zinc-800 text-indigo-700 dark:text-[#F4F4F5] shadow-xs font-bold ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
@@ -244,9 +244,9 @@ export const MantenimientoTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubView('emergencias')}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
               activeSubView === 'emergencias'
-                ? 'bg-white dark:bg-[#27272A] text-rose-700 dark:text-rose-300 shadow-xs font-bold'
+                ? 'bg-white dark:bg-zinc-800 text-rose-700 dark:text-rose-300 shadow-xs font-bold ring-1 ring-black/5 dark:ring-white/10'
                 : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
             }`}
           >
@@ -266,7 +266,7 @@ export const MantenimientoTab: React.FC = () => {
               })
             }
             title="Imprimir el Programa Anual de Mantenimiento Preventivo en formato A4"
-            className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95"
+            className="px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/70 dark:hover:bg-zinc-800 text-zinc-700 dark:text-[#F4F4F5] transition-colors flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95"
           >
             <Printer size={15} />
             <span>Programa A4</span>
@@ -282,7 +282,7 @@ export const MantenimientoTab: React.FC = () => {
               })
             }
             title="Imprimir Plan de Emergencias y Árbol de Contacto por Grupos en formato A4"
-            className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-[#27272A] transition-colors flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95"
+            className="px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900/70 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95"
           >
             <Printer size={15} />
             <span>Emergencias A4</span>
@@ -293,7 +293,7 @@ export const MantenimientoTab: React.FC = () => {
               setEditingSheet(null);
               setIsModalOpen(true);
             }}
-            className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+            className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
           >
             <Plus size={15} />
             <span>Nueva Ficha</span>
@@ -308,91 +308,106 @@ export const MantenimientoTab: React.FC = () => {
           <>
             {/* 5 KPI Metric Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
-              <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-                <div className="flex items-center justify-between text-zinc-400 mb-2">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-zinc-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-zinc-400 mb-2 relative">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA]">
                     Fichas Totales
                   </span>
-                  <Layers size={18} className="text-zinc-400" />
+                  <div className="w-7 h-7 rounded-xl bg-zinc-500/10 border border-zinc-500/20 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+                    <Layers size={15} />
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 relative">
                   <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
                     {stats.total}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">rutinas</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 font-mono tabular-nums">
+                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 font-mono tabular-nums relative">
                   {stats.assignedCount} hermanos asignados
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-                <div className="flex items-center justify-between text-emerald-500 mb-2">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-emerald-500 mb-2 relative">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                     Al Día
                   </span>
-                  <CheckCircle2 size={18} />
+                  <div className="w-7 h-7 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 size={15} />
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 relative">
                   <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
                     {stats.alDia}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">al día</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Inspecciones vigentes</div>
+                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 relative">Inspecciones vigentes</div>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-                <div className="flex items-center justify-between text-indigo-500 mb-2">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-indigo-500 mb-2 relative">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Próximas
                   </span>
-                  <Calendar size={18} />
+                  <div className="w-7 h-7 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <Calendar size={15} />
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 relative">
                   <span className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono tabular-nums">
                     {stats.proximas}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">a vencer</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Próximos 15-30 días</div>
+                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 relative">Próximos 15-30 días</div>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-                <div className="flex items-center justify-between text-amber-500 mb-2">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-amber-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-amber-500 mb-2 relative">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                     Pendientes
                   </span>
-                  <Clock size={18} />
+                  <div className="w-7 h-7 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <Clock size={15} />
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 relative">
                   <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 font-mono tabular-nums">
                     {stats.pendientes}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">por realizar</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Programadas este ciclo</div>
+                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 relative">Programadas este ciclo</div>
               </div>
 
-              <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col justify-between">
-                <div className="flex items-center justify-between text-rose-500 mb-2">
+              <div className="col-span-2 sm:col-span-1 kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 w-28 h-28 rounded-full bg-rose-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-rose-500 mb-2 relative">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
                     Vencidas
                   </span>
-                  <AlertTriangle size={18} />
+                  <div className="w-7 h-7 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    <AlertTriangle size={15} />
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 relative">
                   <span className="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 font-mono tabular-nums">
                     {stats.vencidas}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">requieren atención</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1">Prioridad inmediata</div>
+                <div className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] mt-1 relative">Prioridad inmediata</div>
               </div>
             </div>
 
             {/* Search & Filter Strip */}
-            <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] space-y-3">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
               <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 <div className="relative flex-1 min-w-[240px]">
                   <Search
@@ -404,7 +419,7 @@ export const MantenimientoTab: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar ficha por tarea, descripción o notas..."
-                    className="w-full bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA]/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 rounded-full pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 dark:placeholder:text-[#A1A1AA]/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                   />
                   {searchQuery && (
                     <button
@@ -430,10 +445,10 @@ export const MantenimientoTab: React.FC = () => {
                     <button
                       key={st.id}
                       onClick={() => setSelectedStatus(st.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                         selectedStatus === st.id
                           ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                          : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                          : 'bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-white/10'
                       }`}
                     >
                       {st.label}
@@ -442,10 +457,10 @@ export const MantenimientoTab: React.FC = () => {
 
                   <button
                     onClick={() => setShowOnlyActive(!showOnlyActive)}
-                    className={`ml-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border whitespace-nowrap cursor-pointer ${
+                    className={`ml-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all border whitespace-nowrap cursor-pointer ${
                       showOnlyActive
-                        ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-500 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
+                        ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30'
+                        : 'bg-zinc-100 dark:bg-zinc-900/70 text-zinc-500 dark:text-[#A1A1AA] border-zinc-200/80 dark:border-white/10'
                     }`}
                   >
                     {showOnlyActive ? 'Activas' : 'Todas'}
@@ -453,7 +468,7 @@ export const MantenimientoTab: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 scrollbar-none border-t border-zinc-100 dark:border-[#27272A]">
+              <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 scrollbar-none border-t border-zinc-100 dark:border-white/10">
                 {[
                   { id: 'all', label: 'Todas las Categorías' },
                   { id: 'seguridad', label: 'Seguridad' },
@@ -468,10 +483,10 @@ export const MantenimientoTab: React.FC = () => {
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
                       selectedCategory === cat.id
                         ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                        : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                        : 'bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-white/10'
                     }`}
                   >
                     {cat.label}
@@ -482,8 +497,8 @@ export const MantenimientoTab: React.FC = () => {
 
             {/* Grid of Maintenance Sheets */}
             {filteredSheets.length === 0 ? (
-              <div className="p-12 text-center bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-400 flex items-center justify-center mx-auto border border-zinc-200/50 dark:border-[#27272A]">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-12 text-center rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-3">
+                <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-900/70 text-zinc-400 flex items-center justify-center mx-auto border border-zinc-200/50 dark:border-white/10">
                   <Wrench size={32} />
                 </div>
                 <h3 className="text-base font-bold text-zinc-800 dark:text-[#F4F4F5]">
@@ -499,7 +514,7 @@ export const MantenimientoTab: React.FC = () => {
                       setEditingSheet(null);
                       setIsModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-indigo-500/20 active:scale-95"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-indigo-500/20 active:scale-95"
                   >
                     <Plus size={15} />
                     <span>Crear Nueva Ficha</span>
@@ -512,7 +527,7 @@ export const MantenimientoTab: React.FC = () => {
                           addMaintenanceSheet(sheet)
                         );
                       }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] hover:bg-zinc-200 dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-all border border-zinc-200 dark:border-[#27272A] cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900/70 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-[#F4F4F5] text-xs font-bold transition-all border border-zinc-200/80 dark:border-white/10 cursor-pointer"
                       title="Cargar fichas de mantenimiento recomendadas para Salones del Reino"
                     >
                       <Sparkles size={15} className="text-amber-500" />
@@ -548,7 +563,7 @@ export const MantenimientoTab: React.FC = () => {
         {/* ========================================================= */}
         {activeSubView === 'calendario_anual' && (
           <div className="space-y-5">
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -560,19 +575,19 @@ export const MantenimientoTab: React.FC = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3 text-xs">
-                <div className="px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 font-bold font-mono tabular-nums">
+                <div className="px-3.5 py-2 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 font-bold font-mono tabular-nums">
                   Cumplimiento: {annualCalendar.compliancePercent}% al día
                 </div>
-                <div className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold font-mono tabular-nums">
+                <div className="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5] font-bold font-mono tabular-nums">
                   Carga est.: ~{annualCalendar.totalAnnualEstimatedHours} h/año
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-zinc-900 dark:bg-[#18181F] text-zinc-300 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-[#27272A] uppercase text-[10px] tracking-wider font-semibold">
+                  <thead className="bg-zinc-900 dark:bg-zinc-900/90 text-zinc-300 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-white/10 uppercase text-[10px] tracking-wider font-semibold">
                     <tr>
                       <th className="py-3 px-3">Rutina / Procedimiento Preventivo</th>
                       <th className="py-3 px-2 text-center">Frecuencia</th>
@@ -586,11 +601,11 @@ export const MantenimientoTab: React.FC = () => {
                       <th className="py-3 px-2 text-right">Aviso</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200 dark:divide-[#27272A]">
+                  <tbody className="divide-y divide-zinc-200/70 dark:divide-white/10">
                     {annualCalendar.rows.map((row) => (
                       <tr
                         key={row.sheet.id}
-                        className="hover:bg-zinc-50 dark:hover:bg-[#18181F]/50 transition-colors"
+                        className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors"
                       >
                         <td className="py-2.5 px-3">
                           <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] block">
@@ -674,74 +689,79 @@ export const MantenimientoTab: React.FC = () => {
           <div className="space-y-6">
             {/* Emergency Readiness KPIs */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-                <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 mb-1">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 mb-1 relative">
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Teléfonos Activos
                   </span>
                   <Phone className="w-4 h-4" />
                 </div>
-                <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">
+                <div className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums relative">
                   {emergencyPlan.withPhoneCount} / {emergencyPlan.totalActivePublishers}
                 </div>
-                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">Publicadores localizables</span>
+                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] relative">Publicadores localizables</span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-                <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-1">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-1 relative">
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Contacto Emergencia
                   </span>
                   <Users className="w-4 h-4" />
                 </div>
-                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
+                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums relative">
                   {emergencyPlan.withEmergencyContactCount}
                 </div>
-                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">Con familiar / contacto S-21</span>
+                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] relative">Con familiar / contacto S-21</span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-                <div className="flex items-center justify-between text-rose-600 dark:text-rose-400 mb-1">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-rose-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-rose-600 dark:text-rose-400 mb-1 relative">
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Directriz Médica DPA
                   </span>
                   <HeartPulse className="w-4 h-4" />
                 </div>
-                <div className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">
+                <div className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums relative">
                   {emergencyPlan.withDpaCount}
                 </div>
-                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">Tarjeta médica verificada</span>
+                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] relative">Tarjeta médica verificada</span>
               </div>
 
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-                <div className="flex items-center justify-between text-blue-600 dark:text-blue-400 mb-1">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-blue-600 dark:text-blue-400 mb-1 relative">
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Vehículos Apoyo
                   </span>
                   <Car className="w-4 h-4" />
                 </div>
-                <div className="text-2xl font-black text-blue-600 dark:text-blue-400 font-mono tabular-nums">
+                <div className="text-2xl font-black text-blue-600 dark:text-blue-400 font-mono tabular-nums relative">
                   {emergencyPlan.withVehicleCount}
                 </div>
-                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">Disponibles ante evacuación</span>
+                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] relative">Disponibles ante evacuación</span>
               </div>
 
-              <div className="col-span-2 sm:col-span-1 bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A]">
-                <div className="flex items-center justify-between text-amber-600 dark:text-amber-400 mb-1">
+              <div className="col-span-2 sm:col-span-1 kg-card-bento kg-glass-surface kg-sheen-top p-4 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm relative overflow-hidden">
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl" />
+                <div className="flex items-center justify-between text-amber-600 dark:text-amber-400 mb-1 relative">
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Llaves del Salón
                   </span>
                   <Key className="w-4 h-4" />
                 </div>
-                <div className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums">
+                <div className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono tabular-nums relative">
                   {emergencyPlan.keyHolders.length}
                 </div>
-                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA]">Ancianos y siervos autorizados</span>
+                <span className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] relative">Ancianos y siervos autorizados</span>
               </div>
             </div>
 
             {/* Protocolo Operativo de Seguridad del Salón del Reino */}
-            <div className="bg-white dark:bg-[#121216] p-5 rounded-2xl border border-zinc-200 dark:border-[#27272A] space-y-4">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
@@ -753,7 +773,7 @@ export const MantenimientoTab: React.FC = () => {
                     durante las reuniones.
                   </p>
                 </div>
-                <span className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] text-[11px] font-bold flex items-center gap-1.5 self-start sm:self-auto font-mono tabular-nums">
+                <span className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 text-[11px] font-bold flex items-center gap-1.5 self-start sm:self-auto font-mono tabular-nums">
                   <Zap className="w-3.5 h-3.5 text-amber-500" />
                   <span>{emergencyPlan.criticalBreakers.length} Breakers Activos en Tablero</span>
                 </span>
@@ -763,10 +783,10 @@ export const MantenimientoTab: React.FC = () => {
                 {emergencyPlan.safetyStations.map((st) => (
                   <div
                     key={st.id}
-                    className="p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] space-y-2.5"
+                    className="kg-card-bento kg-sheen-top p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-zinc-900/60 space-y-2.5"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] font-mono text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 font-mono text-[10px] font-bold">
                         {st.code}
                       </span>
                       <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] truncate">
@@ -779,7 +799,7 @@ export const MantenimientoTab: React.FC = () => {
                     <p className="text-xs text-zinc-600 dark:text-[#A1A1AA] leading-relaxed">
                       {st.procedure}
                     </p>
-                    <div className="pt-2 border-t border-zinc-200 dark:border-[#27272A] space-y-1">
+                    <div className="pt-2 border-t border-zinc-200/80 dark:border-white/10 space-y-1">
                       {st.verificationItems.map((item, i) => (
                         <div
                           key={i}
@@ -797,7 +817,7 @@ export const MantenimientoTab: React.FC = () => {
 
             {/* Árbol de Contacto de Emergencia por Grupo de Predicación */}
             <div className="space-y-4">
-              <div className="bg-white dark:bg-[#121216] p-4 rounded-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
                     <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -812,7 +832,7 @@ export const MantenimientoTab: React.FC = () => {
                 <select
                   value={selectedEmergencyGroup}
                   onChange={(e) => setSelectedEmergencyGroup(e.target.value)}
-                  className="text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] font-semibold cursor-pointer"
+                  className="text-xs px-3.5 py-2 rounded-full border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/70 text-zinc-800 dark:text-[#F4F4F5] font-semibold cursor-pointer"
                 >
                   <option value="todos">Todos los Grupos ({emergencyPlan.groupsTree.length})</option>
                   {emergencyPlan.groupsTree.map((g) => (
@@ -827,10 +847,10 @@ export const MantenimientoTab: React.FC = () => {
                 {filteredEmergencyGroups.map((group) => (
                   <div
                     key={group.groupNumber}
-                    className="bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col justify-between"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden flex flex-col justify-between"
                   >
                     <div>
-                      <div className="p-4 bg-zinc-900 dark:bg-[#18181F] text-white flex items-center justify-between gap-2 border-b border-zinc-800 dark:border-[#27272A]">
+                      <div className="p-4 bg-zinc-900 dark:bg-zinc-900/90 text-white flex items-center justify-between gap-2 border-b border-zinc-800 dark:border-white/10">
                         <div>
                           <span className="text-xs font-black uppercase tracking-wider text-indigo-300 block">
                             Grupo {group.groupNumber} • {group.groupName}
@@ -847,7 +867,7 @@ export const MantenimientoTab: React.FC = () => {
                             );
                             sendSafeMaintenanceWhatsApp(msg, group.overseerPhone);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0 active:scale-95 transition-transform"
+                          className="px-3.5 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0 active:scale-95 transition-transform"
                           title="Enviar directorio de emergencia al Superintendente de Grupo por WhatsApp"
                         >
                           <Send className="w-3.5 h-3.5" />
@@ -855,18 +875,18 @@ export const MantenimientoTab: React.FC = () => {
                         </button>
                       </div>
 
-                      <div className="divide-y divide-zinc-100 dark:divide-[#27272A] max-h-80 overflow-y-auto">
+                      <div className="divide-y divide-zinc-100 dark:divide-white/10 max-h-80 overflow-y-auto">
                         {group.members.map((member) => (
                           <div
                             key={member.id}
-                            className="p-3 text-xs flex items-center justify-between gap-2 hover:bg-zinc-50 dark:hover:bg-[#18181F]/50"
+                            className="p-3 text-xs flex items-center justify-between gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
                           >
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-bold text-zinc-900 dark:text-[#F4F4F5]">
                                   {member.name}
                                 </span>
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-[#27272A] text-zinc-600 dark:text-[#A1A1AA] font-semibold">
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-[#A1A1AA] font-semibold">
                                   {member.roleLabel}
                                 </span>
                                 {member.hasDpa && (
@@ -903,7 +923,7 @@ export const MantenimientoTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="p-3 bg-zinc-50 dark:bg-[#18181F] border-t border-zinc-100 dark:border-[#27272A] flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
+                    <div className="p-3 bg-zinc-50/80 dark:bg-zinc-900/60 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between text-[11px] text-zinc-500 dark:text-[#A1A1AA] font-mono tabular-nums">
                       <span>Total grupo: {group.stats.totalMembers} publicadores</span>
                       <span>
                         DPA: {group.stats.withDpa} • Vehículos: {group.stats.withVehicle}
@@ -917,8 +937,8 @@ export const MantenimientoTab: React.FC = () => {
         )}
 
         {/* Safety Guideline Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex items-start gap-3.5 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 flex items-start gap-3.5 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
             <Shield size={18} />
           </div>
           <div className="text-xs space-y-1">
@@ -949,10 +969,10 @@ export const MantenimientoTab: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {sheetToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[280] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121216] rounded-2xl p-6 max-w-md w-full border border-zinc-200 dark:border-[#27272A] space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[280] flex items-center justify-center p-4">
+          <div className="kg-glass-surface kg-sheen-top rounded-3xl p-6 max-w-md w-full border border-zinc-200/80 dark:border-white/10 shadow-2xl space-y-4">
             <div className="flex items-center gap-3 text-zinc-700 dark:text-zinc-300">
-              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-rose-500">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
                 <Trash2 size={20} />
               </div>
               <div>
@@ -963,7 +983,7 @@ export const MantenimientoTab: React.FC = () => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181F] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+            <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/70 p-3 rounded-2xl border border-zinc-200/80 dark:border-white/10">
               Ficha: <strong className="text-zinc-900 dark:text-[#F4F4F5]">{sheetToDelete.label}</strong>
               {sheetToDelete.description && (
                 <span className="block text-zinc-400 dark:text-[#A1A1AA] mt-0.5">{sheetToDelete.description}</span>
@@ -973,13 +993,13 @@ export const MantenimientoTab: React.FC = () => {
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setSheetToDelete(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer"
+                className="px-4 py-2 rounded-full text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs cursor-pointer active:scale-95"
+                className="px-5 py-2 rounded-full bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs cursor-pointer active:scale-95"
               >
                 Confirmar Eliminación
               </button>

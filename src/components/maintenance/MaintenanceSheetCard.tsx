@@ -100,10 +100,10 @@ export const MaintenanceSheetCard: React.FC<MaintenanceSheetCardProps> = ({
 
   return (
     <div
-      className={`rounded-2xl border transition-all duration-200 overflow-hidden group flex flex-col justify-between ${
+      className={`kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border transition-all duration-200 overflow-hidden group flex flex-col justify-between ${
         !sheet.isActive
-          ? 'bg-zinc-100 dark:bg-[#18181F] border-zinc-200 dark:border-[#27272A] opacity-70 grayscale-[40%]'
-          : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-indigo-400/50 dark:hover:border-indigo-500/40'
+          ? 'bg-zinc-100/90 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-white/10 opacity-70 grayscale-[40%]'
+          : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-sm'
       }`}
     >
       {/* Top Header Card */}

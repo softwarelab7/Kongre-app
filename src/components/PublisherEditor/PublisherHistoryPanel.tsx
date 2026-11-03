@@ -261,10 +261,10 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
   if (!publisherNid) return null;
 
   return (
-    <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl shadow-xs overflow-hidden">
-      <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-100 dark:border-[#27272A]">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-100 dark:border-white/10">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="kg-glow-badge p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <History size={20} />
           </div>
           <div>

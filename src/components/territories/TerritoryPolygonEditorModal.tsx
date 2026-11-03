@@ -410,13 +410,13 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
       role="dialog"
       aria-modal="true"
       aria-label={`Delimitar polígono del territorio ${territory.name}`}
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-md animate-fade-in"
     >
-      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121216]/70">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-200/80 dark:border-white/10 bg-zinc-50/70 dark:bg-[#121216]/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg">
+            <div className="kg-glow-badge w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg">
               #{territory.number}
             </div>
             <div>
@@ -656,9 +656,9 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
             role="dialog"
             aria-modal="true"
             aria-label="Importar o exportar coordenadas GeoJSON"
-            className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+            className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in"
           >
-            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-5 max-w-lg w-full shadow-2xl space-y-4">
+            <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-5 max-w-lg w-full shadow-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm">
                   Importar o Exportar GeoJSON

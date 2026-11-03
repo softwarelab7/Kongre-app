@@ -67,10 +67,10 @@ export const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   setNotifPrefs,
 }) => {
   return (
-    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6">
-      <div className="pb-4 border-b border-zinc-100 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
+      <div className="pb-4 border-b border-zinc-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold shrink-0">
+          <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold shrink-0">
             <BellRing className="w-5 h-5" />
           </div>
           <div>

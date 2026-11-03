@@ -123,9 +123,9 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
       role="dialog"
       aria-modal="true"
       aria-label={`Asignar participante: ${title}`}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-zinc-950/60 backdrop-blur-md animate-in fade-in duration-150"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-t-2xl sm:rounded-xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-[#27272A] pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-zinc-200/80 dark:border-white/10 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
         {/* Header */}
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between gap-2.5 shrink-0">
           <button

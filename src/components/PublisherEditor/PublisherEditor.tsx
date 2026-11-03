@@ -897,8 +897,12 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       {/* 1. CABECERA EJECUTIVA DEL PUBLICADOR */}
-      <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 min-w-0">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top relative overflow-hidden bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl"
+        />
+        <div className="relative flex items-center gap-3.5 min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -923,7 +927,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm tracking-wider shrink-0 shadow-xs">
+          <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm tracking-wider shrink-0 shadow-xs">
             {publisherInitials}
           </div>
 
@@ -1055,7 +1059,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
       {/* 2. BARRA DE NAVEGACIÓN DE TARJETAS */}
       <div
         ref={tabsRef}
-        className="p-1.5 bg-zinc-100/90 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1 overflow-x-auto no-scrollbar"
+        className="p-1.5 bg-zinc-200/70 dark:bg-white/[0.06] rounded-2xl border border-zinc-300/60 dark:border-white/10 backdrop-blur-md flex items-center gap-1 overflow-x-auto no-scrollbar"
       >
         {filteredTabs.map((tabKey) => {
           const config = TAB_CONFIG[tabKey];
@@ -1070,7 +1074,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 onClick={() => setActiveTab(tabKey)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-2xs font-bold border border-zinc-200/80 dark:border-[#27272A]'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-700 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-bold'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-[#18181F]/50'
                 }`}
               >
@@ -1116,14 +1120,14 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                   <div
                     key={card.id}
                     onClick={() => setActiveTab(card.id)}
-                    className={`bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-[#27272A] ${card.accentBorderHover} shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group`}
+                    className={`kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl p-5 sm:p-6 border border-zinc-200/80 dark:border-white/10 ${card.accentBorderHover} shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group`}
                   >
                     <div>
                       {/* Encabezado de Tarjeta */}
                       <div className="flex items-center justify-between gap-2 mb-3.5">
                         <div className="flex items-center gap-2.5">
                           <div
-                            className={`w-10 h-10 ${card.accentBg} ${card.accentText} rounded-xl flex items-center justify-center transition-transform group-hover:scale-105`}
+                            className={`kg-glow-badge w-10 h-10 ${card.accentBg} ${card.accentText} rounded-xl flex items-center justify-center transition-transform group-hover:scale-105`}
                           >
                             <Icon size={19} />
                           </div>
@@ -1290,7 +1294,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
             )}
 
             {/* Barra Inferior de Navegación Secuencial entre Tarjetas */}
-            <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 {prevTab ? (
                   <button
@@ -1353,10 +1357,10 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
       {/* MODAL: REGISTRAR AUSENCIA */}
       {showAbsenceModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3.5 mb-5">
-              <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
+              <div className="kg-glow-badge w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
                 <Plane size={20} />
               </div>
               <div>
@@ -1449,10 +1453,10 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
       {/* MODAL: CONTACTO DE EMERGENCIA */}
       {showEmergencyModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 w-full max-w-lg rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3.5 mb-5">
-              <div className="w-11 h-11 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center">
+              <div className="kg-glow-badge w-11 h-11 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center">
                 <Heart size={20} />
               </div>
               <div>

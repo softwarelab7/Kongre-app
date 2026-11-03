@@ -36,10 +36,10 @@ export const InvitacionesSection: React.FC<InvitacionesSectionProps> = ({
   const [copiedCongId, setCopiedCongId] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A] gap-2">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/10 gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold">
+          <div className="kg-glow-badge w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold">
             <QrCode className="w-5 h-5" />
           </div>
           <div>

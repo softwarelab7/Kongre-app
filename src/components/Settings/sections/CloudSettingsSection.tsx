@@ -173,10 +173,10 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#121216] p-6 rounded-3xl border border-zinc-200 dark:border-[#27272A] space-y-6">
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A] flex-wrap gap-2">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/10 flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/50 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold">
+          <div className="kg-glow-badge w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/50 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold">
             <Cloud className="w-5 h-5" />
           </div>
           <div>
@@ -298,10 +298,10 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
       </div>
 
       {/* PANEL FASE 4: SINCRONIZACIÓN GRANULAR COLABORATIVA POR SUBCOLECCIONES */}
-      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-[#27272A] space-y-5">
+      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-white/10 space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+            <div className="kg-glow-badge w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
               <Layers className="w-5 h-5" />
             </div>
             <div>
@@ -498,10 +498,10 @@ export const CloudSettingsSection: React.FC<CloudSettingsSectionProps> = ({
       </div>
 
       {/* PANEL SUPABASE: SINCRONIZACIÓN CIFRADA DE CERO CONOCIMIENTO (AES-256-GCM) */}
-      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-[#27272A] space-y-5">
+      <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-white/10 space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
+            <div className="kg-glow-badge w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>

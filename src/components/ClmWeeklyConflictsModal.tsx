@@ -121,13 +121,13 @@ export const ClmWeeklyConflictsModal: React.FC<ClmWeeklyConflictsModalProps> = (
       role="dialog"
       aria-modal="true"
       aria-label="Panel de conflictos de asignaciones de la semana"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#18181F]/60 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-[#18181F]/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+            <div className="kg-glow-badge w-10 h-10 rounded-2xl flex items-center justify-center bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
               {strictCount > 0 ? (
                 <AlertOctagon size={20} className="text-rose-500" />
               ) : warningCount > 0 ? (

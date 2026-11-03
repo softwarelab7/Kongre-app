@@ -82,19 +82,20 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
 
   return (
     <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-lg bg-white dark:bg-[#121216] rounded-3xl p-6 sm:p-8 shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col items-center text-center">
+      <div className="w-full max-w-lg kg-card-bento kg-glass-surface kg-sheen-top bg-white dark:bg-[#121216] rounded-3xl p-6 sm:p-8 shadow-2xl border border-zinc-200/80 dark:border-white/10 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 rounded-full bg-amber-500/10 blur-3xl" />
         {/* Brand Emblem */}
-        <div className="flex items-center justify-center mb-6">
+        <div className="flex items-center justify-center mb-6 relative z-10">
           <Logo variant="horizontal" className="h-9 w-auto object-contain" />
         </div>
 
         {/* Status Icon */}
         {myRequest?.status === 'rejected' ? (
-          <div className="w-16 h-16 rounded-3xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center mb-4 border border-red-200 dark:border-red-800">
+          <div className="kg-glow-badge w-16 h-16 rounded-3xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center mb-4 border border-red-200 dark:border-red-800 relative z-10">
             <XCircle className="w-9 h-9" />
           </div>
         ) : (
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 border border-amber-200 dark:border-amber-800 animate-pulse">
+          <div className="kg-glow-badge w-16 h-16 rounded-3xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 border border-amber-200 dark:border-amber-800 animate-pulse relative z-10">
             <Clock className="w-9 h-9" />
           </div>
         )}

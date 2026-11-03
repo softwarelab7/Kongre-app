@@ -260,7 +260,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
@@ -269,7 +269,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Centro de Notificaciones y Hoja Unificada por WhatsApp"
-        className="relative w-full max-w-4xl bg-white dark:bg-[#121216] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[92dvh] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
+        className="relative w-full max-w-4xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden flex flex-col max-h-[92dvh] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
       >
         {/* Mobile Bottom Sheet Handle */}
         <div
@@ -282,7 +282,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         {/* Header */}
         <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-zinc-200 dark:border-[#27272A] bg-linear-to-r from-emerald-50 via-teal-50 to-white dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
+            <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>

@@ -71,7 +71,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   return (
     <>
       <footer
-        className={`w-full mt-auto shrink-0 border-t border-zinc-200 dark:border-[#27272A] bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-md select-none transition-colors z-20 ${
+        className={`kg-glass-surface w-full mt-auto shrink-0 border-t border-zinc-200/80 dark:border-white/10 bg-white/95 dark:bg-[#09090B]/95 backdrop-blur-xl select-none transition-colors z-20 ${
           variant === 'app' ? 'pb-20 md:pb-0' : ''
         }`}
       >

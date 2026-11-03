@@ -88,12 +88,12 @@ export const TwoFactorPromptModal: React.FC<TwoFactorPromptModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden">
         {/* Encabezado */}
         <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-850">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25">
+            <div className="kg-glow-badge p-2.5 rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/25">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>

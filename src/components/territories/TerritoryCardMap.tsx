@@ -217,14 +217,14 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
   const area = hasPolygon ? calculateAreaSquareMeters(territory.polygon!) : 0;
 
   return (
-    <div className={`relative w-full ${heightClass} rounded-2xl overflow-hidden border border-zinc-200 dark:border-[#27272A] shadow-md bg-zinc-100 dark:bg-[#121216]`}>
+    <div className={`kg-card-bento relative w-full ${heightClass} rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-white/10 shadow-md bg-zinc-100 dark:bg-[#121216]`}>
       {/* Map Element */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Floating Controls */}
       <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">
         {/* Layer Switcher */}
-        <div className="flex flex-col bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-[#27272A] shadow-md overflow-hidden">
+        <div className="kg-glass-surface flex flex-col bg-white/90 dark:bg-[#121216]/90 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-white/10 shadow-md overflow-hidden">
           <button
             type="button"
             onClick={() => handleChangeTile(activeTile === 'satellite' ? 'positron' : 'satellite')}

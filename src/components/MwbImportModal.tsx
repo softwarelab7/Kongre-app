@@ -113,16 +113,16 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/60 backdrop-blur-md animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label="Importador inteligente de la Guía de Actividades"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-zinc-100 dark:border-[#27272A]">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200/80 dark:border-white/10">
         {/* Header */}
         <div className="px-6 py-4 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shadow-xs">
+            <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-[#27272A] flex items-center justify-center shadow-xs">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>

@@ -167,16 +167,16 @@ export const PinManagementModal: React.FC<PinManagementModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Solicitar cambio de PIN personal"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-3xl max-w-lg w-full shadow-2xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl max-w-lg w-full shadow-2xl border border-zinc-200/80 dark:border-white/10 flex flex-col max-h-[92vh] overflow-hidden">
         {/* Header */}
         <div className="p-5 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0">
+            <div className="kg-glow-badge w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>

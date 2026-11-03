@@ -242,9 +242,9 @@ export const ProfileDevicesAndCodesSection: React.FC<ProfileDevicesAndCodesSecti
   // Privacy guard: If an elder or supervisor is viewing another publisher, block visibility of their devices & location
   if (isViewingOtherPublisher) {
     return (
-      <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
         <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+          <div className="kg-glow-badge w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <EyeOff className="w-5 h-5" />
           </div>
           <div className="space-y-1">
@@ -351,11 +351,11 @@ export const ProfileDevicesAndCodesSection: React.FC<ProfileDevicesAndCodesSecti
       {/* ========================================================================= */}
       {/* 1. SECCIÓN DE SESIONES ACTIVAS (NAVEGADORES Y PLATAFORMAS)                */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-white/10">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="kg-glow-badge w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <Wifi className="w-4 h-4" />
               </div>
               <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
@@ -611,12 +611,12 @@ export const ProfileDevicesAndCodesSection: React.FC<ProfileDevicesAndCodesSecti
       {/* ========================================================================= */}
       {/* 2. HISTORIAL COMPLETO DE DISPOSITIVOS Y REGISTRO DE CONEXIONES            */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-[#121216] p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-[#27272A] shadow-sm space-y-6">
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 sm:p-7 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-[#27272A]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/10">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <div className="kg-glow-badge w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                 <History className="w-4 h-4" />
               </div>
               <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white">
@@ -700,7 +700,7 @@ export const ProfileDevicesAndCodesSection: React.FC<ProfileDevicesAndCodesSecti
             <span>Registro Personal de Conexiones Exitosas ({filteredConnections.length})</span>
           </span>
 
-          <div className="inline-flex p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/70 dark:border-[#27272A] self-start sm:self-auto">
+          <div className="inline-flex p-1 rounded-2xl bg-zinc-200/70 dark:bg-white/[0.06] border border-zinc-300/60 dark:border-white/10 backdrop-blur-md self-start sm:self-auto">
             {[
               { id: 'all' as const, label: `Todas (${allSuccessfulConnections.length})` },
               { id: 'active' as const, label: `Activas (${allActiveSessions.length})` },
@@ -715,9 +715,9 @@ export const ProfileDevicesAndCodesSection: React.FC<ProfileDevicesAndCodesSecti
                 key={tab.id}
                 type="button"
                 onClick={() => setHistoryFilter(tab.id)}
-                className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                   historyFilter === tab.id
-                    ? 'bg-white dark:bg-[#27272A] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
                     : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >

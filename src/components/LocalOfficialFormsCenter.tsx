@@ -551,10 +551,14 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
   return (
     <div className="space-y-6">
       {/* BANNER OFICIAL DE CUMPLIMIENTO DE LA CARTA DE LA SUCURSAL */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/90 to-zinc-900 border border-emerald-500/30 text-white shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="kg-card-bento kg-sheen-top relative overflow-hidden p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/90 to-zinc-900 border border-emerald-500/30 text-white shadow-sm">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl"
+        />
+        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-emerald-300 mt-0.5">
+            <div className="kg-glow-badge w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-emerald-300 mt-0.5">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
@@ -698,7 +702,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
         {/* COLUMNA IZQUIERDA: CARGA DE ARCHIVO Y PARÁMETROS DE RELLENADO */}
         <div className="lg:col-span-5 space-y-5">
           {/* Tarjeta 1: Cargar o Seleccionar Plantilla PDF Oficial */}
-          <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -819,7 +823,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
           </div>
 
           {/* Tarjeta 2: Configuración de Datos para Rellenar */}
-          <div className="bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -831,13 +835,13 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
               </div>
 
               {/* Switch entre Autocompletado y Mapeador/Inspector de Campos */}
-              <div className="inline-flex p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-[11px] font-bold">
+              <div className="inline-flex p-1 rounded-2xl bg-zinc-200/70 dark:bg-white/[0.06] border border-zinc-300/60 dark:border-white/10 backdrop-blur-md text-[11px] font-bold">
                 <button
                   type="button"
                   onClick={() => setActiveSubView('autofill')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer ${
                     activeSubView === 'autofill'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
                       : 'text-zinc-500'
                   }`}
                 >
@@ -846,9 +850,9 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                 <button
                   type="button"
                   onClick={() => setActiveSubView('inspector')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer ${
                     activeSubView === 'inspector'
-                      ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
                       : 'text-zinc-500'
                   }`}
                 >
@@ -1050,8 +1054,8 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
         </div>
 
         {/* COLUMNA DERECHA: VISTA PREVIA DEL PDF OFICIAL RELLENADO O INSPECTOR INTERACTIVO DE CAMPOS */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] p-5 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-[#27272A]">
+        <div className="lg:col-span-7 kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-white/10">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Procesamiento Local en Navegador • Cero Servidores
@@ -1216,11 +1220,11 @@ export const LocalOfficialFormsModal: React.FC<LocalOfficialFormsModalProps> = (
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-zinc-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-[#27272A] rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92dvh] flex flex-col overflow-hidden">
-        <div className="px-5 py-3.5 bg-white dark:bg-[#121216] border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between gap-3 shrink-0">
+    <div className="fixed inset-0 z-50 bg-zinc-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="kg-glass-surface kg-sheen-top bg-zinc-50/95 dark:bg-zinc-950/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92dvh] flex flex-col overflow-hidden">
+        <div className="px-5 py-3.5 bg-white/90 dark:bg-[#121216]/90 border-b border-zinc-200/80 dark:border-white/10 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+            <div className="kg-glow-badge w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>

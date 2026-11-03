@@ -624,7 +624,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-3 pb-6">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
@@ -633,7 +633,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Buscador global de la congregación"
-        className="relative w-full max-w-2xl bg-white dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-2xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
         onKeyDown={handleKeyDown}
       >
         {/* Top Search Bar */}

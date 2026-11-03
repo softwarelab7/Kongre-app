@@ -195,17 +195,21 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-zinc-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-zinc-900/75 backdrop-blur-md animate-fade-in overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-label={`Tarjeta digital del territorio ${territory.number}`}
     >
       <div
-        className="w-full max-w-xl bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden my-auto max-h-[95vh] flex flex-col"
+        className="kg-glass-surface kg-sheen-top w-full max-w-xl bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden my-auto max-h-[95vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Card */}
-        <div className="bg-zinc-900 dark:bg-[#18181F] border-b border-zinc-800 dark:border-[#27272A] p-5 sm:p-6 text-white relative shrink-0">
+        <div className="bg-zinc-900 dark:bg-[#18181F] border-b border-zinc-800 dark:border-white/10 p-5 sm:p-6 text-white relative shrink-0 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-indigo-500/15 blur-3xl"
+          />
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"

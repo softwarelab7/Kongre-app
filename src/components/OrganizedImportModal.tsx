@@ -189,17 +189,18 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-label="Traer bosquejos y programa semanal"
     >
       <div
-        className="w-full max-w-3xl bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden my-auto max-h-[95vh] flex flex-col"
+        className="w-full max-w-3xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden my-auto max-h-[95vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-zinc-900 dark:bg-[#18181F] border-b border-zinc-800 dark:border-[#27272A] p-5 sm:p-6 text-white shrink-0 relative">
+        <div className="bg-zinc-900 dark:bg-[#18181F] border-b border-zinc-800 dark:border-[#27272A] p-5 sm:p-6 text-white shrink-0 relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-20 -right-20 w-56 h-56 rounded-full bg-amber-500/15 blur-3xl" />
           <button
             onClick={onClose}
             aria-label="Cerrar importador de bosquejos y programa semanal"
@@ -208,8 +209,8 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-zinc-800 dark:bg-[#27272A] border border-zinc-700 dark:border-[#3E3E42] flex items-center justify-center text-zinc-200 shadow-md shrink-0">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="kg-glow-badge w-12 h-12 rounded-2xl bg-zinc-800 dark:bg-[#27272A] border border-zinc-700 dark:border-[#3E3E42] flex items-center justify-center text-zinc-200 shadow-md shrink-0">
               <Sparkles className="w-6 h-6 text-amber-500" />
             </div>
             <div>

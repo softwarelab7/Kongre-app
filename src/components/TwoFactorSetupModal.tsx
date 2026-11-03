@@ -150,12 +150,12 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-lg kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Encabezado */}
         <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-[#27272A] flex items-center justify-between bg-zinc-50/60 dark:bg-zinc-850">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-900 dark:text-white border border-zinc-200 dark:border-[#27272A] shadow-xs">
+            <div className="kg-glow-badge p-2.5 rounded-2xl bg-zinc-100 dark:bg-[#18181F] text-zinc-900 dark:text-white border border-zinc-200 dark:border-[#27272A] shadow-xs">
               <ShieldCheck className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
             </div>
             <div>

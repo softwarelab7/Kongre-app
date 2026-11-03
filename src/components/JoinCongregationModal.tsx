@@ -501,13 +501,13 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       aria-label="Unirse a la congregación"
     >
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-zinc-950/70 backdrop-blur-xs transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 bg-zinc-950/70 backdrop-blur-md transition-opacity" onClick={onClose} />
 
-      <div className="relative w-full max-w-md bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl shadow-xl p-6 sm:p-7 overflow-hidden animate-fade-in">
+      <div className="relative w-full max-w-md kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl shadow-2xl p-6 sm:p-7 overflow-hidden animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-200 dark:border-[#27272A] pb-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
+            <div className="kg-glow-badge w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>

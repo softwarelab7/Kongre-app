@@ -223,11 +223,11 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200 dark:border-[#27272A] overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Cabecera */}
         <div className="p-6 pb-4 border-b border-zinc-100 dark:border-[#27272A] flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <div className="kg-glow-badge w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <RefreshCw className={`w-6 h-6 ${isSubmitting ? 'animate-spin' : ''}`} />
             </div>
             <div>

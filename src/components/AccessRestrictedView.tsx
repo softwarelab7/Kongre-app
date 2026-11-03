@@ -20,8 +20,9 @@ export const AccessRestrictedView: React.FC<AccessRestrictedViewProps> = ({
   const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
 
   return (
-    <div className="max-w-xl mx-auto my-12 p-8 bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95">
-      <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+    <div className="max-w-xl mx-auto my-12 p-8 kg-card-bento kg-glass-surface kg-sheen-top bg-white dark:bg-[#121216] rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95 relative overflow-hidden">
+      <div className="pointer-events-none absolute -top-20 -right-20 w-56 h-56 rounded-full bg-amber-500/10 blur-3xl" />
+      <div className="kg-glow-badge w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-inner relative z-10">
         <Lock className="w-8 h-8" />
       </div>
 

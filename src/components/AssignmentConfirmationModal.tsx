@@ -191,7 +191,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-zinc-950/70 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-zinc-950/70 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
@@ -200,7 +200,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
         role="dialog"
         aria-modal="true"
         aria-label="Confirmación de Asignación"
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-zinc-200 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-lg kg-glass-surface kg-sheen-top bg-white dark:bg-[#121216] rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150"
       >
         {/* Top Header Card */}
         <div className="px-6 py-5 bg-linear-to-br from-indigo-700 via-indigo-800 to-zinc-900 text-white relative">
@@ -214,7 +214,7 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
           </button>
 
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center text-white">
+            <div className="kg-glow-badge w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center text-white">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-200">

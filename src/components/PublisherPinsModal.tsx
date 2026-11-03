@@ -308,16 +308,16 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/60 backdrop-blur-md animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label="Directorio de PINs de la congregación"
     >
-      <div className="bg-white dark:bg-[#121216] rounded-2xl max-w-3xl w-full shadow-xl border border-zinc-200 dark:border-[#27272A] flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl max-w-3xl w-full shadow-2xl border border-zinc-200/80 dark:border-white/10 flex flex-col max-h-[92vh] overflow-hidden">
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-[#27272A] flex items-center justify-between bg-amber-500/10 dark:bg-[#18181F]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+            <div className="kg-glow-badge w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>

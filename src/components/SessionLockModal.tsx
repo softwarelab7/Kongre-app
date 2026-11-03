@@ -119,12 +119,12 @@ export const SessionLockModal: React.FC = () => {
       aria-label="Pantalla de bloqueo de seguridad"
     >
       <div
-        className={`w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
+        className={`w-full max-w-sm kg-glass-surface kg-sheen-top bg-zinc-900/95 border border-white/10 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
           shake ? 'animate-shake' : ''
         }`}
       >
         {/* Theocratic Lock Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto mb-4 shadow-inner">
+        <div className="kg-glow-badge w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto mb-4 shadow-inner">
           <Lock className="w-8 h-8" />
         </div>
 

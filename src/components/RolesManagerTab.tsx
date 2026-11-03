@@ -860,28 +860,39 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
   return (
     <div className="w-full space-y-6 animate-fade-in pb-12">
-      {/* Barra de Sesión y Acciones de Roles (Unified Container) */}
-      <div className="bg-white dark:bg-[#121216] p-3.5 sm:p-4 rounded-xl border border-zinc-200 dark:border-[#27272A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-            Seguridad Teocrática
-          </span>
-          <span className="text-xs font-medium text-zinc-500 dark:text-[#A1A1AA] hidden sm:inline">
-            Roles de departamento y claves personales (PINs)
-          </span>
+      {/* Barra de Sesión y Acciones de Roles (Unified Bento Container) */}
+      <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-xs">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                Seguridad Teocrática
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Bóveda Cifrada RBAC
+              </span>
+            </div>
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1">
+              Roles de departamento, credenciales personales y asignación de claves PIN
+            </p>
+          </div>
         </div>
 
         {/* Active Brother Session Capsule */}
-        <div className="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] flex items-center justify-between sm:justify-start gap-3 shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-xs shrink-0">
+        <div className="p-2 sm:px-3 sm:py-2 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between sm:justify-start gap-3 shrink-0 shadow-xs backdrop-blur-md">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm ring-2 ring-indigo-500/20">
             {(currentBrotherName || 'H')[0]?.toUpperCase()}
           </div>
           <div className="min-w-0 pr-1 text-left">
-            <h4 className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate max-w-[150px]">
+            <h4 className="text-xs font-black text-zinc-900 dark:text-white truncate max-w-[150px]">
               {currentBrotherName || 'Usuario'}
             </h4>
-            <div className="flex items-center gap-1">
-              <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${effectiveRoleInfo.badgeColor}`}>
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${effectiveRoleInfo.badgeColor}`}>
                 {effectiveRoleInfo.shortName}
               </span>
             </div>
@@ -890,17 +901,17 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           <button
             type="button"
             onClick={() => setActiveTabMode('mi_sesion')}
-            className="p-1.5 rounded-xl bg-white hover:bg-zinc-100 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] transition-colors cursor-pointer border border-zinc-200/60 dark:border-[#27272A]"
+            className="p-2 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-200 transition-all cursor-pointer border border-zinc-200/80 dark:border-white/10 shadow-xs hover:scale-105 active:scale-95"
             title="Cambiar sesión o ingresar PIN"
           >
-            <KeyRound className="w-3.5 h-3.5" />
+            <KeyRound className="w-3.5 h-3.5 text-amber-500" />
           </button>
         </div>
       </div>
 
       {/* Floating feedback message */}
       {feedback && (
-        <div className="p-3.5 rounded-xl bg-emerald-600 text-white text-xs sm:text-sm font-bold flex items-center justify-between gap-3 shadow-md animate-in fade-in zoom-in-95">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-600 text-white text-xs sm:text-sm font-bold flex items-center justify-between gap-3 shadow-lg shadow-emerald-600/20 animate-in fade-in zoom-in-95">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 shrink-0" />
             <span>{feedback}</span>
@@ -908,7 +919,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="p-1 hover:bg-white/20 rounded-lg cursor-pointer"
+            className="p-1 hover:bg-white/20 rounded-lg cursor-pointer transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -917,41 +928,44 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
       {/* AVISO AUTOMÁTICO A ANCIANOS: SOLICITUDES DE CAMBIO DE PIN (SUPABASE SolicitudesCambioPin) */}
       {isAllowedAccess && pendingPinChangeRequests.length > 0 && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-300/80 dark:border-amber-800/70 space-y-3 shadow-xs">
+        <div className="kg-card-bento kg-glass-surface p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-amber-500/5 dark:bg-amber-950/20 border border-amber-300/80 dark:border-amber-700/60 space-y-3.5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20 ring-4 ring-amber-500/10">
                 <ShieldAlert className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-xs sm:text-sm font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-2">
-                  <span>Solicitudes de Cambio de PIN Recibidas ({pendingPinChangeRequests.length})</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-mono">
+                <h4 className="text-xs sm:text-sm font-black text-amber-950 dark:text-amber-200 flex items-center gap-2">
+                  <span>Solicitudes de Cambio de PIN Recibidas</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-mono tabular-nums">
+                    {pendingPinChangeRequests.length}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-mono hidden sm:inline">
                     SolicitudesCambioPin
                   </span>
                 </h4>
-                <p className="text-[11px] text-amber-800 dark:text-amber-300/90">
-                  Los siguientes publicadores han solicitado un cambio de PIN desde su perfil indicando el motivo.
+                <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5">
+                  Los siguientes publicadores han solicitado un cambio de PIN desde su perfil indicando el motivo teocrático.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {pendingPinChangeRequests.map((req) => (
               <div
                 key={req.id}
-                className="p-3.5 rounded-xl bg-white dark:bg-[#121216] border border-amber-200/90 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-3.5 sm:p-4 rounded-2xl bg-white/90 dark:bg-zinc-900/80 border border-amber-200/90 dark:border-amber-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-amber-400 dark:hover:border-amber-600 transition-all"
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white">
+                    <span className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white">
                       {req.publisher_name}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/60">
                       Motivo: {req.reason_label}
                     </span>
-                    <span className="text-[10px] text-zinc-400">
+                    <span className="text-[10px] text-zinc-400 font-mono tabular-nums">
                       {new Date(req.created_at).toLocaleString('es-MX', {
                         day: '2-digit',
                         month: 'short',
@@ -961,7 +975,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     </span>
                   </div>
                   {req.details && (
-                    <p className="text-xs text-zinc-600 dark:text-[#A1A1AA]">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 bg-amber-50/50 dark:bg-zinc-800/40 p-2 rounded-xl border border-amber-200/40 dark:border-zinc-800 mt-1">
                       Nota del publicador: “{req.details}”
                     </p>
                   )}
@@ -972,13 +986,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     type="button"
                     disabled={resolvingRequestId === req.id}
                     onClick={() => handleResolvePinChangeRequest(req)}
-                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
+                    className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm shadow-indigo-600/20 active:scale-95"
                   >
                     <KeyRound className="w-3.5 h-3.5" />
                     <span>
                       {resolvingRequestId === req.id
                         ? 'Asignando...'
-                        : 'Revocar PIN Anterior y Asignar Nuevo'}
+                        : 'Revocar y Asignar Nuevo'}
                     </span>
                   </button>
                   <button
@@ -992,7 +1006,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                       });
                       setPinChangeRequests(loadLocalPinChangeRequests());
                     }}
-                    className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                     title="Descartar solicitud"
                   >
                     <X className="w-4 h-4" />
@@ -1005,30 +1019,32 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       )}
 
       {/* 2. STATS KPI CARDS (ACTING AS INSTANT FILTERS) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Total Hermanos */}
         <div
           onClick={() => {
             setFilterCategory('todos');
             setActiveTabMode('directorio');
           }}
-          className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
+          className={`kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-0.5 hover:shadow-lg ${
             filterCategory === 'todos' && activeTabMode === 'directorio'
-              ? 'bg-indigo-50/90 dark:bg-indigo-950/50 border-indigo-400 dark:border-indigo-600 ring-2 ring-indigo-500/20'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-indigo-300 dark:hover:border-indigo-700'
+              ? 'bg-indigo-50/90 dark:bg-indigo-950/50 border-indigo-500 dark:border-indigo-500 ring-2 ring-indigo-500/30 shadow-md shadow-indigo-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-700/60'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">
+            <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               Hermanos
             </span>
-            <div className="w-7 h-7 rounded-xl bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <strong className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{stats.total}</strong>
-            <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 group-hover:underline">
+          <div className="mt-3 flex items-baseline justify-between">
+            <strong className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
+              {stats.total}
+            </strong>
+            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
               Ver todos →
             </span>
           </div>
@@ -1040,23 +1056,25 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             setFilterCategory('ancianos');
             setActiveTabMode('directorio');
           }}
-          className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
+          className={`kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-0.5 hover:shadow-lg ${
             filterCategory === 'ancianos' && activeTabMode === 'directorio'
-              ? 'bg-purple-50/90 dark:bg-purple-950/50 border-purple-400 dark:border-purple-600 ring-2 ring-purple-500/20'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-purple-300 dark:hover:border-purple-700'
+              ? 'bg-purple-50/90 dark:bg-purple-950/50 border-purple-500 dark:border-purple-500 ring-2 ring-purple-500/30 shadow-md shadow-purple-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-700/60'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">
+            <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               Ancianos
             </span>
-            <div className="w-7 h-7 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20">
               <Shield className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <strong className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{stats.ancianosCount}</strong>
-            <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400 group-hover:underline">
+          <div className="mt-3 flex items-baseline justify-between">
+            <strong className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
+              {stats.ancianosCount}
+            </strong>
+            <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
               Filtrar →
             </span>
           </div>
@@ -1068,23 +1086,25 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             setFilterCategory('siervos');
             setActiveTabMode('directorio');
           }}
-          className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
+          className={`kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-0.5 hover:shadow-lg ${
             filterCategory === 'siervos' && activeTabMode === 'directorio'
-              ? 'bg-teal-50/90 dark:bg-teal-950/50 border-teal-400 dark:border-teal-600 ring-2 ring-teal-500/20'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-teal-300 dark:hover:border-teal-700'
+              ? 'bg-teal-50/90 dark:bg-teal-950/50 border-teal-500 dark:border-teal-500 ring-2 ring-teal-500/30 shadow-md shadow-teal-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-teal-300 dark:hover:border-teal-700/60'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">
+            <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               Siervos Min.
             </span>
-            <div className="w-7 h-7 rounded-xl bg-teal-100 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-teal-500/10 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20">
               <MapPin className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <strong className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{stats.siervosCount}</strong>
-            <span className="text-[10px] font-semibold text-teal-600 dark:text-teal-400 group-hover:underline">
+          <div className="mt-3 flex items-baseline justify-between">
+            <strong className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
+              {stats.siervosCount}
+            </strong>
+            <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
               Filtrar →
             </span>
           </div>
@@ -1096,23 +1116,25 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             setFilterCategory('con_pin');
             setActiveTabMode('directorio');
           }}
-          className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
+          className={`kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-0.5 hover:shadow-lg ${
             filterCategory === 'con_pin' && activeTabMode === 'directorio'
-              ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-400 dark:border-emerald-600 ring-2 ring-emerald-500/20'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A] hover:border-emerald-300 dark:hover:border-emerald-700'
+              ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500 dark:border-emerald-500 ring-2 ring-emerald-500/30 shadow-md shadow-emerald-500/10'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-700/60'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-[#A1A1AA] uppercase tracking-wider">
+            <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               Con PIN Activo
             </span>
-            <div className="w-7 h-7 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
               <Check className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <strong className="text-2xl font-black text-zinc-900 dark:text-[#F4F4F5] font-mono tabular-nums">{stats.withPin}</strong>
-            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 group-hover:underline">
+          <div className="mt-3 flex items-baseline justify-between">
+            <strong className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-mono tabular-nums tracking-tight">
+              {stats.withPin}
+            </strong>
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
               Filtrar →
             </span>
           </div>
@@ -1124,27 +1146,27 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             setFilterCategory('sin_pin');
             setActiveTabMode('directorio');
           }}
-          className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group col-span-2 sm:col-span-1 ${
+          className={`kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between group col-span-2 sm:col-span-1 hover:-translate-y-0.5 hover:shadow-lg ${
             filterCategory === 'sin_pin' && activeTabMode === 'directorio'
-              ? 'bg-amber-50/90 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 ring-2 ring-amber-500/20'
+              ? 'bg-amber-50/90 dark:bg-amber-950/50 border-amber-500 dark:border-amber-500 ring-2 ring-amber-500/30 shadow-md shadow-amber-500/10'
               : stats.withoutPin > 0
-              ? 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/60'
-              : 'bg-white dark:bg-[#121216] border-zinc-200 dark:border-[#27272A]'
+              ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300/80 dark:border-amber-800/60'
+              : 'border-zinc-200/80 dark:border-white/10 hover:border-amber-300 dark:hover:border-amber-700/60'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+            <span className="text-[11px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-wider">
               Sin PIN
             </span>
-            <div className="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20">
               <KeyRound className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <strong className={`text-2xl font-black font-mono tabular-nums ${stats.withoutPin > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-[#F4F4F5]'}`}>
+          <div className="mt-3 flex items-baseline justify-between">
+            <strong className={`text-2xl sm:text-3xl font-black font-mono tabular-nums tracking-tight ${stats.withoutPin > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`}>
               {stats.withoutPin}
             </strong>
-            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 group-hover:underline">
+            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
               {stats.withoutPin > 0 ? 'Asignar PINs →' : 'Completado ✓'}
             </span>
           </div>
@@ -1153,44 +1175,45 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
       {/* 3. MAIN SECTION TABS NAVIGATION + «← Todas las tarjetas» */}
       {activeTabMode !== 'tarjetas' && (
-        <div className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl p-3 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
             <button
               type="button"
               onClick={() => setActiveTabMode('tarjetas')}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-extrabold transition-all cursor-pointer shrink-0 shadow-xs bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#1C1C24] dark:hover:bg-[#272732] border-zinc-200/80 dark:border-[#2E2E3A] text-zinc-800 dark:text-[#F4F4F5]"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 border-zinc-200/80 dark:border-white/10 text-zinc-800 dark:text-zinc-100 active:scale-95"
             >
               <span>← Todas las tarjetas</span>
             </button>
 
-            <div className="hidden sm:block h-5 w-px bg-zinc-200 dark:bg-[#27272A]" />
+            <div className="hidden sm:block h-5 w-px bg-zinc-200 dark:bg-white/10" />
 
-            <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] w-full sm:w-auto">
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/90 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-white/10 w-full sm:w-auto backdrop-blur-md">
               {isAllowedAccess && (
                 <button
                   type="button"
                   onClick={() => setActiveTabMode('directorio')}
-                  className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
                     activeTabMode === 'directorio'
-                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-black'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300 shrink-0" />
-                  <span className="truncate">Directorio ({stats.total})</span>
+                  <span className="truncate">Directorio</span>
+                  <span className="font-mono tabular-nums text-[10px] opacity-80">({stats.total})</span>
                 </button>
               )}
 
               <button
                 type="button"
                 onClick={() => setActiveTabMode('mi_sesion')}
-                className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
                   activeTabMode === 'mi_sesion'
-                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-black'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <KeyRound className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span className="truncate">Mi Sesión</span>
               </button>
 
@@ -1198,16 +1221,16 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 <button
                   type="button"
                   onClick={() => setActiveTabMode('nube_qr')}
-                  className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
                     activeTabMode === 'nube_qr'
-                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-black'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <Globe className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                   <span className="truncate">Cuentas Nube</span>
                   {pendingRequestsCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-extrabold animate-pulse shrink-0 font-mono tabular-nums">
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black animate-pulse shrink-0 font-mono tabular-nums">
                       {pendingRequestsCount}
                     </span>
                   )}
@@ -1217,13 +1240,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
               <button
                 type="button"
                 onClick={() => setActiveTabMode('matriz')}
-                className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
                   activeTabMode === 'matriz'
-                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-xs'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-black'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                 <span className="truncate">Permisos</span>
               </button>
             </div>
@@ -1231,12 +1254,12 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
           {/* Action Header Button */}
           {activeTabMode === 'directorio' && isAllowedAccess && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               {stats.withoutPin > 0 && (
                 <button
                   type="button"
                   onClick={handleAutoAssignAllMissingPins}
-                  className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all font-mono tabular-nums"
+                  className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition-all font-mono tabular-nums active:scale-95"
                   title="Generar PIN personal a todos los hermanos que no tienen"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -1248,7 +1271,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
               <button
                 type="button"
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 cursor-pointer transition-all"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer transition-all active:scale-95"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>+ Asignar Hermano</span>
@@ -1259,7 +1282,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       )}
 
       {/* ========================================================================= */}
-      {/* SECTION 0: VISTA DE TODAS LAS TARJETAS (HUB INTERACTIVO) */}
+      {/* SECTION 0: VISTA DE TODAS LAS TARJETAS (HUB INTERACTIVO BENTO) */}
       {/* ========================================================================= */}
       {activeTabMode === 'tarjetas' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1267,28 +1290,28 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             <button
               type="button"
               onClick={() => setActiveTabMode('directorio')}
-              className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+              className="group text-left kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-500/60 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer"
             >
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-xs">
                     <Users className="w-5 h-5" />
                   </div>
-                  <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/50">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-black bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/50 font-mono tabular-nums">
                     {stats.total} hermanos · {stats.withPin} con PIN
                   </span>
                 </div>
                 <div>
-                  <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <h4 className="text-base font-black text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     Directorio de Responsabilidades y PINs
                   </h4>
-                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                     Administra los privilegios teocráticos, códigos de acceso personal y solicitudes de cambio de PIN de cada hermano.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
-                <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+              <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                   Entrar a esta sección →
                 </span>
               </div>
@@ -1298,28 +1321,28 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           <button
             type="button"
             onClick={() => setActiveTabMode('mi_sesion')}
-            className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-amber-400 dark:hover:border-amber-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+            className="group text-left kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/60 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer"
           >
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               <div className="flex items-start justify-between gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-xs">
                   <KeyRound className="w-5 h-5" />
                 </div>
-                <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
+                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
                   {effectiveRoleInfo.shortName}
                 </span>
               </div>
               <div>
-                <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                <h4 className="text-base font-black text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   Mi Sesión y Simulador de Vistas
                 </h4>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                   Verifica tu perfil activo, solicita cambio de PIN o simula cómo ve la aplicación otro rol teocrático.
                 </p>
               </div>
             </div>
-            <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
-              <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+            <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+              <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                 Entrar a esta sección →
               </span>
             </div>
@@ -1329,28 +1352,28 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             <button
               type="button"
               onClick={() => setActiveTabMode('nube_qr')}
-              className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-sky-400 dark:hover:border-sky-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+              className="group text-left kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-500/60 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer"
             >
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-900/50 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-xs">
                     <Globe className="w-5 h-5" />
                   </div>
-                  <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-black bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50 font-mono tabular-nums">
                     {pendingRequestsCount > 0 ? `${pendingRequestsCount} pendientes` : 'Sincronizado'}
                   </span>
                 </div>
                 <div>
-                  <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                  <h4 className="text-base font-black text-zinc-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                     Cuentas en la Nube y Códigos QR
                   </h4>
-                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                     Aprueba vinculaciones de cuentas y genera invitaciones QR rápidas para conectar dispositivos.
                   </p>
                 </div>
               </div>
-              <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
-                <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400">
+              <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                   Entrar a esta sección →
                 </span>
               </div>
@@ -1360,28 +1383,28 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           <button
             type="button"
             onClick={() => setActiveTabMode('matriz')}
-            className="group text-left bg-white dark:bg-[#121216] border border-zinc-200/80 dark:border-[#27272A] hover:border-emerald-400 dark:hover:border-emerald-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 cursor-pointer"
+            className="group text-left kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-500/60 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer"
           >
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               <div className="flex items-start justify-between gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-xs">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
-                <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+                <span className="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
                   16 Roles Oficiales
                 </span>
               </div>
               <div>
-                <h4 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <h4 className="text-base font-black text-zinc-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                   Matriz de Permisos Teocráticos
                 </h4>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-1 leading-relaxed">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                   Consulta los permisos detallados de lectura, edición y administración asignados a cada responsabilidad.
                 </p>
               </div>
             </div>
-            <div className="pt-3 border-t border-zinc-100 dark:border-[#1E1E24] flex items-center justify-between">
-              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                 Entrar a esta sección →
               </span>
             </div>
@@ -1395,7 +1418,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {activeTabMode === 'directorio' && isAllowedAccess && (
         <div className="space-y-4">
           {/* Search Bar & Filter Chips */}
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl kg-card-bento kg-glass-surface border border-zinc-200/80 dark:border-white/10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -1403,74 +1426,74 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar hermano por nombre, cargo teocrático o privilegio..."
-                className="w-full pl-10 pr-9 py-2 text-xs sm:text-sm rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
               />
               {searchTerm && (
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-white p-1"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto text-xs font-semibold py-0.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto text-xs font-semibold py-0.5 p-1 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setFilterCategory('todos')}
-                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-all ${
                   filterCategory === 'todos'
-                    ? 'bg-indigo-600 text-white font-bold'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                    ? 'bg-indigo-600 text-white font-black shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Todos <span className="font-mono tabular-nums">({combinedPublishersList.length})</span>
+                Todos <span className="font-mono tabular-nums text-[10px] opacity-80">({combinedPublishersList.length})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFilterCategory('ancianos')}
-                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-all ${
                   filterCategory === 'ancianos'
-                    ? 'bg-purple-600 text-white font-bold'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                    ? 'bg-purple-600 text-white font-black shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Ancianos <span className="font-mono tabular-nums">({stats.ancianosCount})</span>
+                Ancianos <span className="font-mono tabular-nums text-[10px] opacity-80">({stats.ancianosCount})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFilterCategory('siervos')}
-                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-all ${
                   filterCategory === 'siervos'
-                    ? 'bg-teal-600 text-white font-bold'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                    ? 'bg-teal-600 text-white font-black shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Siervos Min. <span className="font-mono tabular-nums">({stats.siervosCount})</span>
+                Siervos Min. <span className="font-mono tabular-nums text-[10px] opacity-80">({stats.siervosCount})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFilterCategory('con_pin')}
-                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-all ${
                   filterCategory === 'con_pin'
-                    ? 'bg-emerald-600 text-white font-bold'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                    ? 'bg-emerald-600 text-white font-black shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Con PIN <span className="font-mono tabular-nums">({stats.withPin})</span>
+                Con PIN <span className="font-mono tabular-nums text-[10px] opacity-80">({stats.withPin})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFilterCategory('sin_pin')}
-                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-colors ${
+                className={`px-3 py-1.5 rounded-xl shrink-0 cursor-pointer transition-all ${
                   filterCategory === 'sin_pin'
-                    ? 'bg-amber-600 text-white font-bold'
-                    : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                    ? 'bg-amber-600 text-white font-black shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Sin PIN <span className="font-mono tabular-nums">({stats.withoutPin})</span>
+                Sin PIN <span className="font-mono tabular-nums text-[10px] opacity-80">({stats.withoutPin})</span>
               </button>
             </div>
           </div>
@@ -1478,13 +1501,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           {/* Publishers Cards List */}
           <div className="space-y-3">
             {filteredPublishers.length === 0 ? (
-              <div className="p-12 text-center rounded-3xl bg-white dark:bg-[#121216] border border-dashed border-zinc-200 dark:border-[#27272A] text-zinc-400 space-y-3">
-                <Users className="w-12 h-12 mx-auto text-zinc-300 dark:text-[#27272A]" />
-                <h4 className="text-base font-bold text-zinc-800 dark:text-[#F4F4F5]">
+              <div className="p-12 text-center rounded-3xl kg-card-bento kg-glass-surface border border-dashed border-zinc-200 dark:border-white/10 text-zinc-400 space-y-3">
+                <Users className="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-600" />
+                <h4 className="text-base font-black text-zinc-800 dark:text-white">
                   No se encontraron hermanos
                 </h4>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] max-w-sm mx-auto">
-                  No hay hermanos que coincidan con el término de búsqueda o filtro seleccionado.
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+                  No hay hermanos que coincidan con el término de búsqueda o filtro teocrático seleccionado.
                 </p>
                 <button
                   type="button"
@@ -1492,7 +1515,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     setSearchTerm('');
                     setFilterCategory('todos');
                   }}
-                  className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-xs cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-950"
+                  className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-xs cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                 >
                   Limpiar Filtros
                 </button>
@@ -1505,23 +1528,23 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 return (
                   <div
                     key={item.publisherId}
-                    className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] hover:border-indigo-300 dark:hover:border-indigo-800/80 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                    className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-500/60 transition-all duration-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xs hover:shadow-md"
                   >
                     {/* 1. Identity & Ecclesiastical Info */}
                     <div className="flex items-center gap-3.5 min-w-0 lg:w-[28%]">
-                      <div className="w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-sm shrink-0">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                         {item.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-extrabold text-sm sm:text-base text-zinc-900 dark:text-[#F4F4F5] truncate">
+                        <h4 className="font-black text-sm sm:text-base text-zinc-900 dark:text-white truncate">
                           {item.name}
                         </h4>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] capitalize">
+                          <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 capitalize">
                             {item.privilege?.replace('_', ' ') || 'Publicador'}
                           </span>
                           {item.email && (
-                            <span className="text-[11px] text-zinc-400 dark:text-[#71717A] truncate hidden sm:inline">
+                            <span className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate hidden sm:inline">
                               • {item.email}
                             </span>
                           )}
@@ -1531,7 +1554,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
                     {/* 2. Theocratic Role Selector (Wide & Clear) */}
                     <div className="lg:w-[32%] space-y-1">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-[#A1A1AA] flex items-center gap-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-400 flex items-center gap-1.5">
                         <Award className="w-3.5 h-3.5 text-indigo-500" />
                         <span>Responsabilidad Asignada:</span>
                       </label>
@@ -1539,7 +1562,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         <select
                           value={item.role}
                           onChange={(e) => handleChangePublisherRole(item.publisherId, e.target.value as TheocraticRole)}
-                          className="w-full pl-3 pr-8 py-2 text-xs sm:text-sm font-bold rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+                          className="w-full pl-3 pr-8 py-2 text-xs sm:text-sm font-bold rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
                         >
                           {roleOptionsFor(item).map((rKey) => (
                             <option key={rKey} value={rKey}>
@@ -1553,7 +1576,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     {/* 3. Personal PIN Capsule */}
                     <div className="lg:w-[20%] flex items-center gap-2">
                       {hasPin ? (
-                        <div className="w-full flex items-center justify-between bg-zinc-50 dark:bg-[#18181F] px-3 py-2 rounded-xl border border-zinc-200 dark:border-[#27272A]">
+                        <div className="w-full flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-900/60 px-3 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10">
                           <div className="flex items-center gap-2">
                             <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                             <span className="font-mono tabular-nums font-black text-sm text-indigo-600 dark:text-indigo-400 tracking-widest">
@@ -1566,7 +1589,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                               <button
                                 type="button"
                                 onClick={() => togglePinVisibility(item.publisherId)}
-                                className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
+                                className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-white cursor-pointer transition-colors"
                                 title={isVisible ? 'Ocultar PIN' : 'Ver PIN'}
                               >
                                 {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -1575,7 +1598,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                             <button
                               type="button"
                               onClick={() => handleGeneratePinForPublisher(item.publisherId)}
-                              className="p-1 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
+                              className="p-1 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
                               title="Generar otro PIN aleatorio"
                             >
                               <RefreshCw className="w-3.5 h-3.5" />
@@ -1594,7 +1617,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         <button
                           type="button"
                           onClick={() => handleGeneratePinForPublisher(item.publisherId)}
-                          className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-xs active:scale-95"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>+ Generar PIN</span>
@@ -1603,13 +1626,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     </div>
 
                     {/* 4. Action Buttons (WhatsApp, Link, Edit) */}
-                    <div className="flex items-center justify-end gap-2 lg:w-[20%] pt-2 lg:pt-0 border-t lg:border-t-0 border-zinc-100 dark:border-[#27272A]">
+                    <div className="flex items-center justify-end gap-2 lg:w-[20%] pt-2 lg:pt-0 border-t lg:border-t-0 border-zinc-100 dark:border-white/10">
                       {item.pin && (
                         <>
                           <button
                             type="button"
                             onClick={() => handleCopyDirectLink(item.name, item.role, item.pin, item.publisherId)}
-                            className="px-2.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all border border-zinc-200 dark:border-[#27272A]"
+                            className="px-2.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all border border-zinc-200/80 dark:border-white/10 active:scale-95"
                             title="Copiar enlace directo de publicador (un solo toque)"
                           >
                             {copiedId === `link_${item.publisherId}` ? (
@@ -1623,7 +1646,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                           <button
                             type="button"
                             onClick={() => handleShareWhatsApp(item.name, item.role, item.pin, item.publisherId)}
-                            className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                            className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
                             title="Compartir credenciales por WhatsApp"
                           >
                             {copiedId === item.publisherId ? (
@@ -1643,7 +1666,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                           setCustomPinInput(item.pin || generateUniquePublisherPin());
                           setEditError(null);
                         }}
-                        className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-[#18181F] dark:hover:text-indigo-400 cursor-pointer"
+                        className="p-2 rounded-xl text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400 cursor-pointer transition-colors"
                         title="Personalizar datos o PIN"
                       >
                         <Edit3 className="w-4 h-4" />
@@ -1663,35 +1686,35 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {activeTabMode === 'mi_sesion' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Card 1: Perfil Activo Actual */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-lg">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm relative overflow-hidden">
+            <div className="flex items-center gap-3.5">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-indigo-500/20 ring-4 ring-indigo-500/10 shrink-0">
                 {(currentBrotherName || 'U')[0]?.toUpperCase()}
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-[#A1A1AA] uppercase tracking-wider block">
+              <div className="min-w-0">
+                <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
                   Identidad Reconocida
                 </span>
-                <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white truncate">
                   {currentBrotherName || 'Usuario sin nombre'}
                 </h3>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] space-y-2">
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-white/10 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500 dark:text-[#A1A1AA]">Rol Activo:</span>
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">Rol Activo:</span>
                 <span className={`font-bold px-2.5 py-0.5 rounded-md ${effectiveRoleInfo.badgeColor}`}>
                   {effectiveRoleInfo.name}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500 dark:text-[#A1A1AA]">Privilegio:</span>
-                <span className="font-semibold text-zinc-700 dark:text-[#F4F4F5]">
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">Privilegio:</span>
+                <span className="font-bold text-zinc-700 dark:text-zinc-200">
                   {isCoordinator ? 'Coordinador del Cuerpo de Ancianos' : effectiveRoleInfo.shortName}
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] pt-1 leading-relaxed">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
                 {effectiveRoleInfo.description}
               </p>
             </div>
@@ -1703,7 +1726,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 onClick={() => {
                   lockSession();
                 }}
-                className="flex-1 py-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs hover:bg-zinc-100 dark:hover:bg-[#18181F] cursor-pointer flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 py-2.5 rounded-xl border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 font-bold text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800/80 cursor-pointer flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xs"
               >
                 <Lock className="w-4 h-4 text-amber-500" />
                 <span>Bloquear Pantalla</span>
@@ -1715,7 +1738,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   await signOutUser();
                   window.location.reload();
                 }}
-                className="py-2.5 px-4 rounded-xl text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors"
+                className="py-2.5 px-4 rounded-xl text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer transition-colors active:scale-95"
               >
                 Cerrar Sesión
               </button>
@@ -1723,38 +1746,38 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           </div>
 
           {/* Card 2: Ingresar con otro PIN Personal */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm relative overflow-hidden">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/50 dark:border-amber-800/50 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shadow-xs shrink-0">
                 <KeyRound className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                   Cambiar de Hermano con PIN
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Ingresa tu PIN personal para asumir tu cargo de inmediato.
                 </p>
               </div>
             </div>
 
             {pinError && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
                 <span>{pinError}</span>
               </div>
             )}
 
             {pinSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-bold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
                 <span>{pinSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleVerifySessionPin} className="space-y-3.5">
+            <form onSubmit={handleVerifySessionPin} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1.5">
                   Tu PIN Personal Único:
                 </label>
                 <input
@@ -1766,14 +1789,14 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     setPinError(null);
                   }}
                   placeholder="Ej: 3829"
-                  className="w-full p-3 text-center text-lg font-mono tabular-nums font-bold tracking-widest rounded-2xl border border-zinc-300 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full p-3.5 text-center text-xl font-mono tabular-nums font-black tracking-[0.3em] rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-inner"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={!enteredPin.trim()}
-                className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 active:scale-[0.98] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-all shadow-sm shadow-indigo-600/20"
               >
                 <KeyRound className="w-4 h-4" />
                 <span>Verificar y Activar Rol</span>
@@ -1789,33 +1812,33 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {activeTabMode === 'nube_qr' && isAllowedAccess && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Col 1: Solicitudes de Vinculación de Cuentas Google */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm relative overflow-hidden">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-2xl bg-sky-500/10 dark:bg-sky-500/20 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 shadow-xs">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                  <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                     Solicitudes de Vinculación Google
                   </h3>
-                  <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Aprobación requerida por ancianos para vincular correos de Google.
                   </p>
                 </div>
               </div>
 
               {pendingRequestsCount > 0 && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-bold font-mono tabular-nums bg-rose-500 text-white">
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold font-mono tabular-nums bg-rose-500 text-white shadow-xs animate-pulse">
                   {pendingRequestsCount} pendientes
                 </span>
               )}
             </div>
 
             {(!accountLinkRequests || accountLinkRequests.length === 0) ? (
-              <div className="p-8 text-center rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-dashed border-zinc-200 dark:border-[#27272A] text-zinc-400">
-                <Globe className="w-8 h-8 mx-auto mb-2 text-zinc-300 dark:text-[#27272A]" />
-                <p className="text-xs font-semibold text-zinc-600 dark:text-[#A1A1AA]">
+              <div className="p-8 text-center rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/40 border border-dashed border-zinc-200 dark:border-white/10 text-zinc-400">
+                <Globe className="w-8 h-8 mx-auto mb-2 text-zinc-300 dark:text-zinc-600" />
+                <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
                   No hay solicitudes de vinculación pendientes.
                 </p>
               </div>
@@ -1824,14 +1847,14 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 {accountLinkRequests.map((req) => (
                   <div
                     key={req.id}
-                    className="p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F] flex items-center justify-between gap-3"
+                    className="p-3.5 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-zinc-900/60 flex items-center justify-between gap-3 shadow-xs"
                   >
                     <div className="min-w-0">
-                      <h5 className="font-bold text-xs text-zinc-900 dark:text-[#F4F4F5] truncate">
+                      <h5 className="font-black text-xs text-zinc-900 dark:text-white truncate">
                         {req.brotherName || req.email}
                       </h5>
-                      <span className="text-[11px] text-zinc-400 dark:text-[#71717A] block truncate">{req.email}</span>
-                      <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                      <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block truncate">{req.email}</span>
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
                         {req.status === 'pending' ? 'Pendiente de aprobación' : req.status}
                       </span>
                     </div>
@@ -1849,14 +1872,14 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                             }
                             approveAccountLinkRequest(req.id, currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar');
                           }}
-                          className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-xs cursor-pointer transition-all shadow-xs active:scale-95"
                         >
                           Aprobar
                         </button>
                         <button
                           type="button"
                           onClick={() => rejectAccountLinkRequest(req.id, currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar')}
-                          className="px-2.5 py-1.5 rounded-xl bg-zinc-200 dark:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs cursor-pointer hover:bg-zinc-300 dark:hover:bg-[#3F3F46] transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors active:scale-95"
                         >
                           Rechazar
                         </button>
@@ -1869,25 +1892,25 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
           </div>
 
           {/* Col 2: Generador de Invitaciones Portátiles & Códigos QR */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-4">
+          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-4 shadow-sm relative overflow-hidden">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <div className="w-11 h-11 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-xs">
                 <QrCode className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                   Invitaciones Portátiles & Códigos QR
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Crea enlaces temporales o códigos QR para escanear con la cámara.
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleCreateInvitation} className="space-y-3 p-4 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A]">
+            <form onSubmit={handleCreateInvitation} className="space-y-3 p-4 sm:p-5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-white/10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                     Hermano Destinatario:
                   </label>
                   <input
@@ -1896,18 +1919,18 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     value={invBrotherName}
                     onChange={(e) => setInvBrotherName(e.target.value)}
                     placeholder="Ej: Samuel Morales"
-                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                     Rol Asignado:
                   </label>
                   <select
                     value={invRole}
                     onChange={(e) => setInvRole(e.target.value as TheocraticRole)}
-                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-zinc-900 dark:text-[#F4F4F5] font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                   >
                     {roleOptionsGeneric.map((rKey) => (
                       <option key={rKey} value={rKey}>
@@ -1920,7 +1943,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>Generar Invitación E2EE</span>
@@ -1930,23 +1953,23 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             {/* Active Invitations List */}
             <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
               {invitations.length === 0 ? (
-                <p className="text-xs text-zinc-400 dark:text-[#71717A] text-center py-4 italic">No hay invitaciones activas aún.</p>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 text-center py-4 italic">No hay invitaciones activas aún.</p>
               ) : (
                 invitations.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3.5 rounded-2xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#18181F] flex items-center justify-between gap-3"
+                    className="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50/80 dark:bg-zinc-900/60 flex items-center justify-between gap-3 shadow-xs"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <strong className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5] truncate">
+                        <strong className="text-xs font-black text-zinc-900 dark:text-white truncate">
                           {inv.targetName || 'Hermano'}
                         </strong>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">
                           {THEOCRATIC_ROLES[inv.role as TheocraticRole]?.shortName || inv.role}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA] block mt-0.5 truncate">
+                      <span className="text-[10px] font-mono tabular-nums text-zinc-500 dark:text-zinc-400 block mt-0.5 truncate">
                         Código: {inv.code}
                       </span>
                     </div>
@@ -1954,7 +1977,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     <button
                       type="button"
                       onClick={() => revokeInvitation(inv.id)}
-                      className="p-1.5 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg cursor-pointer transition-colors"
+                      className="p-1.5 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg cursor-pointer transition-colors active:scale-95"
                       title="Revocar"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -1971,24 +1994,24 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {/* SECTION 4: MATRIZ DE PERMISOS TEOCRÁTICOS */}
       {/* ========================================================================= */}
       {activeTabMode === 'matriz' && (
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-6 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 space-y-5 shadow-sm relative overflow-hidden">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-[#F4F4F5]">
+              <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">
                 Matriz Oficial de Permisos Teocráticos
               </h3>
-              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Detalle transparente de accesos y facultades de edición por cada cargo ministerial.
               </p>
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-[#27272A]">
+          <div className="overflow-x-auto rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-xs">
             <table className="w-full text-left text-xs">
-              <thead className="bg-zinc-50 dark:bg-[#18181F] text-[11px] font-extrabold uppercase tracking-wider text-zinc-600 dark:text-[#A1A1AA] border-b border-zinc-200 dark:border-[#27272A]">
+              <thead className="bg-zinc-100/90 dark:bg-zinc-800/80 text-[11px] font-black uppercase tracking-wider text-zinc-600 dark:text-zinc-400 border-b border-zinc-200/80 dark:border-white/10 backdrop-blur-md">
                 <tr>
                   <th className="p-3.5">Cargo Teocrático</th>
                   <th className="p-3.5 text-center">Reuniones</th>
@@ -1999,17 +2022,17 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   <th className="p-3.5 text-center">Ajustes & PINs</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-[#27272A] font-medium">
+              <tbody className="divide-y divide-zinc-100 dark:divide-white/5 font-medium">
                 {allTheocraticRoles.map((rKey) => {
                   const r = THEOCRATIC_ROLES[rKey];
                   return (
-                    <tr key={rKey} className="hover:bg-zinc-50/50 dark:hover:bg-[#18181F]/40 transition-colors">
+                    <tr key={rKey} className="hover:bg-zinc-50/50 dark:hover:bg-white/5 transition-colors">
                       <td className="p-3.5">
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${r.badgeColor}`}>
                             {r.shortName}
                           </span>
-                          <span className="font-bold text-zinc-900 dark:text-[#F4F4F5] hidden sm:inline">
+                          <span className="font-bold text-zinc-900 dark:text-white hidden sm:inline">
                             {r.name}
                           </span>
                         </div>
@@ -2020,7 +2043,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         ) : r.allowedTabs.includes('programacion') ? (
                           <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Lectura</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                       <td className="p-3.5 text-center">
@@ -2029,7 +2052,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         ) : r.canViewS21 ? (
                           <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Lectura S-21</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                       <td className="p-3.5 text-center">
@@ -2038,28 +2061,28 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         ) : r.allowedTabs.includes('territorios') ? (
                           <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Lectura</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                       <td className="p-3.5 text-center">
                         {r.canManageAccounts ? (
                           <span className="text-emerald-600 dark:text-emerald-400 font-bold">Cuentas S-26</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                       <td className="p-3.5 text-center">
                         {r.canManageLiterature ? (
                           <span className="text-emerald-600 dark:text-emerald-400 font-bold">Literatura S-14</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                       <td className="p-3.5 text-center">
                         {r.canManageAccess ? (
                           <span className="text-purple-600 dark:text-purple-400 font-bold">Control Total</span>
                         ) : (
-                          <span className="text-zinc-300 dark:text-[#3F3F46]">—</span>
+                          <span className="text-zinc-300 dark:text-zinc-600">—</span>
                         )}
                       </td>
                     </tr>
@@ -2075,20 +2098,22 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {/* MODAL 1: ASIGNAR NUEVO HERMANO CON ROL Y PIN */}
       {/* ========================================================================= */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div className="fixed inset-0" onClick={() => setShowAddModal(false)} />
-          <div className="relative w-full max-w-md bg-white dark:bg-[#121216] rounded-3xl p-6 border border-zinc-200 dark:border-[#27272A] z-10 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
-              <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <h4 className="font-extrabold text-sm text-zinc-900 dark:text-[#F4F4F5]">
+          <div className="relative w-full max-w-md kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-white/10 z-10 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 overflow-hidden">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <h4 className="font-black text-sm sm:text-base text-zinc-900 dark:text-white">
                   Asignar Rol y PIN a un Hermano
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-white cursor-pointer p-1 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2102,7 +2127,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
             <form onSubmit={handleCreateNewPublisherPin} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                   Elegir de la lista de publicadores:
                 </label>
                 {publishers.length > 0 ? (
@@ -2118,7 +2143,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                         }
                       }
                     }}
-                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-medium cursor-pointer"
+                    className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white font-medium cursor-pointer"
                   >
                     <option value="">-- Seleccionar hermano --</option>
                     {publishers.map((p) => (
@@ -2133,7 +2158,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
               </div>
 
               <div>
-                <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                   O escribir nombre completo:
                 </label>
                 <input
@@ -2141,18 +2166,18 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   placeholder="Ej: David Gómez"
                   value={newCustomName}
                   onChange={(e) => setNewCustomName(e.target.value)}
-                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-medium"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white font-medium"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                   Responsabilidad a Asignar:
                 </label>
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as TheocraticRole)}
-                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-semibold cursor-pointer"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white font-semibold cursor-pointer"
                 >
                   {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
@@ -2164,7 +2189,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                     PIN Personal Único:
                   </label>
                   <button
@@ -2185,21 +2210,21 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     setNewPin(e.target.value.replace(/\D/g, ''));
                     setAddError(null);
                   }}
-                  className="w-full p-2.5 text-xs font-mono tabular-nums font-bold tracking-widest text-center rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
+                  className="w-full p-2.5 text-xs font-mono tabular-nums font-bold tracking-widest text-center rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white"
                 />
               </div>
 
               <div className="flex items-center gap-2 pt-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs transition-all cursor-pointer shadow-xs active:scale-95"
                 >
                   Asignar PIN al Hermano
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] font-semibold text-xs cursor-pointer transition-colors"
+                  className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 font-semibold text-xs cursor-pointer transition-colors active:scale-95"
                 >
                   Cancelar
                 </button>
@@ -2213,20 +2238,22 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       {/* MODAL 2: EDITAR CREDENCIALES DE UN HERMANO */}
       {/* ========================================================================= */}
       {editingPublisher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div className="fixed inset-0" onClick={() => setEditingPublisher(null)} />
-          <div className="relative w-full max-w-md bg-white dark:bg-[#121216] rounded-3xl p-6 border border-zinc-200 dark:border-[#27272A] z-10 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-[#27272A]">
-              <div className="flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <h4 className="font-extrabold text-sm text-zinc-900 dark:text-[#F4F4F5]">
+          <div className="relative w-full max-w-md kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-white/10 z-10 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 overflow-hidden">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <h4 className="font-black text-sm sm:text-base text-zinc-900 dark:text-white">
                   Editar Credenciales de {editingPublisher.name}
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingPublisher(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-[#F4F4F5] cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-white cursor-pointer p-1 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2240,7 +2267,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
             <form onSubmit={handleSaveCustomEdit} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA] block mb-1">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1">
                   Responsabilidad Teocrática:
                 </label>
                 <select
@@ -2248,7 +2275,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   onChange={(e) =>
                     setEditingPublisher({ ...editingPublisher, role: e.target.value as TheocraticRole })
                   }
-                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] font-semibold cursor-pointer"
+                  className="w-full p-2.5 text-xs rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white font-semibold cursor-pointer"
                 >
                   {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
@@ -2260,7 +2287,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-[#A1A1AA]">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                     PIN Personal Único:
                   </label>
                   <button
@@ -2281,21 +2308,21 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     setEditError(null);
                   }}
                   placeholder="Ej: 2048"
-                  className="w-full p-2.5 text-xs font-mono tabular-nums font-bold tracking-widest text-center rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5]"
+                  className="w-full p-2.5 text-xs font-mono tabular-nums font-bold tracking-widest text-center rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-900 dark:text-white"
                 />
               </div>
 
               <div className="flex items-center gap-2 pt-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs transition-all cursor-pointer shadow-xs active:scale-95"
                 >
                   Guardar Cambios
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingPublisher(null)}
-                  className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A] font-semibold text-xs cursor-pointer transition-colors"
+                  className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 font-semibold text-xs cursor-pointer transition-colors active:scale-95"
                 >
                   Cancelar
                 </button>

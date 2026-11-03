@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
+  Building2,
 } from 'lucide-react';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
@@ -541,43 +543,65 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const tabKeys = Object.keys(SETTINGS_TABS_CONFIG) as SettingsCategoryTab[];
 
   return (
-    <div className="w-full space-y-6 animate-in fade-in duration-300 pb-12">
-      {/* 1. Barra de Herramientas y Navegación de Ajustes */}
-      <div className="space-y-3">
+    <div className="w-full space-y-6 animate-in fade-in duration-300 pb-12 kg-ambient-mesh">
+      {/* 1. Barra de Herramientas y Navegación de Ajustes (Bento Glass Surface) */}
+      <div className="space-y-4">
         {/* Fila Superior: Título, Estado de Sincronización y Acciones */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
-              Ajustes de la Congregación
-            </h2>
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
-                isFormDirty
-                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                  : 'bg-zinc-100 dark:bg-[#121216] text-zinc-600 dark:text-[#A1A1AA] border-zinc-200 dark:border-[#27272A]'
-              }`}
-              title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isFormDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
-                }`}
-              />
-              <span>
-                {isFormDirty ? 'Cambios pendientes' : user ? 'Google Sincronizado' : 'Modo Seguro'}
-              </span>
+        <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0 shadow-xs">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white leading-tight">
+                  Ajustes de la Congregación
+                </h2>
+                <div
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border font-mono tabular-nums ${
+                    isFormDirty
+                      ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30'
+                      : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                  }`}
+                  title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isFormDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
+                    }`}
+                  />
+                  <span>
+                    {isFormDirty ? 'Cambios pendientes' : user ? 'Google Sincronizado' : 'Modo Seguro'}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5 font-medium">
+                Parámetros teocráticos, motor anticolisión, horarios y bóveda de seguridad
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            {onNavigateToRoles && (
+              <button
+                type="button"
+                onClick={onNavigateToRoles}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 hover:bg-zinc-100 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/10 text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
+                title="Administrar responsabilidades, privilegios y claves de acceso PIN"
+              >
+                <ShieldCheck className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                <span>Roles y Permisos</span>
+              </button>
+            )}
+
             {onNavigateToProfile && (
               <button
                 type="button"
                 onClick={onNavigateToProfile}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-[#121216] dark:hover:bg-[#18181F] text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/90 hover:bg-zinc-100 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/10 text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
                 title="Configurar foto, teléfono y contacto personal"
               >
-                <User size={13} className="text-zinc-500 dark:text-[#A1A1AA]" />
+                <User size={14} className="text-zinc-500 dark:text-[#A1A1AA]" />
                 <span>Mi Perfil</span>
               </button>
             )}
@@ -586,26 +610,26 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               type="button"
               onClick={() => handleSaveSettings()}
               disabled={isSaving}
-              className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-xl text-white text-xs font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-white text-xs font-extrabold transition-all shadow-sm hover:shadow-indigo-500/25 active:scale-95 disabled:opacity-50 cursor-pointer ${
                 savedFeedback
-                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
-                  : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-600/20'
+                  : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-600/20'
               }`}
               title="Guardar todos los cambios de configuración"
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Guardando...</span>
                 </>
               ) : savedFeedback ? (
                 <>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-4 h-4" />
                   <span>¡Guardado!</span>
                 </>
               ) : (
                 <>
-                  <Save className="w-3.5 h-3.5" />
+                  <Save className="w-4 h-4" />
                   <span>Guardar Ajustes</span>
                 </>
               )}
@@ -620,25 +644,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             <button
               type="button"
               onClick={() => scrollTabs('left')}
-              className="absolute left-1 z-20 w-7 h-7 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
+              className="absolute left-1 z-20 w-8 h-8 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200/80 dark:border-white/10 flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
               title="Desplazar a la izquierda"
               aria-label="Desplazar a la izquierda"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={16} />
             </button>
           )}
 
           {/* Fade Izquierdo */}
           {canScrollLeft && (
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-zinc-100 dark:from-[#121216] to-transparent z-10 rounded-l-2xl" />
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-zinc-100 dark:from-[#09090b] to-transparent z-10 rounded-l-2xl" />
           )}
 
-          {/* Contenedor de Pestañas con soporte wheel y scroll suave */}
+          {/* Contenedor de Pestañas con soporte wheel y scroll suave (Capsule Container) */}
           <div
             ref={tabsRef}
             onScroll={checkTabsScroll}
             onWheel={handleTabsWheel}
-            className="p-1.5 bg-zinc-100 dark:bg-[#121216] rounded-2xl border border-zinc-200 dark:border-[#27272A] flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth w-full"
+            className="p-1.5 bg-zinc-100/90 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200/80 dark:border-white/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth w-full backdrop-blur-md shadow-2xs"
           >
             {tabKeys.map((tabKey) => {
               const config = SETTINGS_TABS_CONFIG[tabKey];
@@ -651,10 +675,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   type="button"
                   data-active={isActive}
                   onClick={() => setActiveTab(tabKey)}
-                  className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer active:scale-95 select-none ${
                     isActive
-                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-[#F4F4F5] font-bold border border-zinc-200 dark:border-[#27272A] shadow-xs'
-                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-zinc-200/50 dark:hover:bg-[#18181F]'
+                      ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-sm border border-zinc-200/80 dark:border-white/10'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/50 dark:hover:bg-white/5'
                   }`}
                 >
                   <Icon
@@ -664,10 +688,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   <span>{config.label}</span>
                   {tabKey === 'all' && (
                     <span
-                      className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                      className={`px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider font-mono ${
                         isActive
-                          ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300'
-                          : 'bg-zinc-200 text-zinc-600 dark:bg-[#27272A] dark:text-[#A1A1AA]'
+                          ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30'
+                          : 'bg-zinc-200/70 text-zinc-600 dark:bg-[#27272A] dark:text-[#A1A1AA]'
                       }`}
                     >
                       HUB
@@ -680,7 +704,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
           {/* Fade Derecho */}
           {canScrollRight && (
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-zinc-100 dark:from-[#121216] to-transparent z-10 rounded-r-2xl" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-zinc-100 dark:from-[#09090b] to-transparent z-10 rounded-r-2xl" />
           )}
 
           {/* Botón Scroll Derecho */}
@@ -688,11 +712,11 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             <button
               type="button"
               onClick={() => scrollTabs('right')}
-              className="absolute right-1 z-20 w-7 h-7 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200 dark:border-[#27272A] flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
+              className="absolute right-1 z-20 w-8 h-8 rounded-full bg-white dark:bg-[#18181F] shadow-md border border-zinc-200/80 dark:border-white/10 flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition cursor-pointer"
               title="Desplazar a la derecha"
               aria-label="Desplazar a la derecha"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           )}
         </div>

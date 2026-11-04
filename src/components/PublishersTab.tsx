@@ -34,12 +34,31 @@ import { usePermissions } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useModal } from '../context/ModalContext';
 import { exportPublishersToCsv, parsePublishersCsv } from '../utils/publisherExportImport';
+import { decryptSensitiveFieldAtRest } from '../utils/theocraticSecurity';
 import {
   areNamesEquivalent,
   mergePublisherData,
   deduplicatePublishersList,
   ensureImmutablePublisherCode,
 } from '../utils/publisherDeduplication';
+
+const getDisplayPhone = (raw?: string | null): string => {
+  if (!raw) return '';
+  const decrypted = decryptSensitiveFieldAtRest(raw);
+  if (typeof decrypted === 'string' && (decrypted.startsWith('kgr_sec') || decrypted.startsWith('kgr_v'))) {
+    return '';
+  }
+  return typeof decrypted === 'string' ? decrypted : String(decrypted || '');
+};
+
+const getDisplayAddress = (raw?: string | null): string => {
+  if (!raw) return '';
+  const decrypted = decryptSensitiveFieldAtRest(raw);
+  if (typeof decrypted === 'string' && (decrypted.startsWith('kgr_sec') || decrypted.startsWith('kgr_v'))) {
+    return '';
+  }
+  return typeof decrypted === 'string' ? decrypted : String(decrypted || '');
+};
 
 type ViewMode = 'list' | 'editor';
 type DisplayLayout = 'cards' | 'table';
@@ -1249,7 +1268,9 @@ export const PublishersTab: React.FC = () => {
                 .filter(([_, val]) => !!val)
                 .map(([k]) => k);
 
-              const cleanPhone = (p.phone || '').replace(/\D/g, '');
+              const displayPhone = getDisplayPhone(p.phone);
+              const displayAddress = getDisplayAddress(p.address);
+              const cleanPhone = (displayPhone || '').replace(/\D/g, '');
 
               return (
                 <div
@@ -1409,25 +1430,25 @@ export const PublishersTab: React.FC = () => {
                         </div>
                       </div>
 
-                      {p.phone && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Teléfono:</span>
-                          <span className="font-mono tabular-nums font-semibold text-zinc-800 dark:text-zinc-200">{p.phone}</span>
+                      {displayPhone && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400 shrink-0">Teléfono:</span>
+                          <span className="font-mono tabular-nums font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-[170px] text-right">{displayPhone}</span>
                         </div>
                       )}
 
                       {p.email && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Correo:</span>
-                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 font-medium">{p.email}</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400 shrink-0">Correo:</span>
+                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 font-medium text-right">{p.email}</span>
                         </div>
                       )}
 
-                      {(p.address || p.city) && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400">Domicilio:</span>
-                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 text-[11px]">
-                            {[p.address, p.neighborhood, p.city].filter(Boolean).join(', ')}
+                      {(displayAddress || p.city) && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400 shrink-0">Domicilio:</span>
+                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 text-[11px] text-right">
+                            {[displayAddress, p.neighborhood, p.city].filter(Boolean).join(', ')}
                           </span>
                         </div>
                       )}
@@ -1496,7 +1517,7 @@ export const PublishersTab: React.FC = () => {
                     className="flex items-center justify-between gap-1 pt-3.5 mt-3.5 border-t border-zinc-200/60 dark:border-white/10"
                   >
                     <div className="flex items-center gap-1.5">
-                      {cleanPhone && (
+                      {cleanPhone && cleanPhone.length >= 7 && (
                         <>
                           <a
                             href={`tel:${cleanPhone}`}
@@ -1644,7 +1665,8 @@ export const PublishersTab: React.FC = () => {
                     const isActive = p.status === 'active' || (p.active && !isDeleted);
                     const isAbsent = isPublisherCurrentlyAbsent(p);
                     const gid = getPublisherGroupId(p);
-                    const cleanPhone = (p.phone || '').replace(/\D/g, '');
+                    const displayPhone = getDisplayPhone(p.phone);
+                    const cleanPhone = (displayPhone || '').replace(/\D/g, '');
 
                     const assignmentKeys = Object.entries(p.assignments || {})
                       .filter(([_, val]) => !!val)
@@ -1757,8 +1779,8 @@ export const PublishersTab: React.FC = () => {
 
                         <td onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono tabular-nums text-zinc-700 dark:text-[#F4F4F5]">{p.phone || '—'}</span>
-                            {cleanPhone && (
+                            <span className="text-xs font-mono tabular-nums text-zinc-700 dark:text-[#F4F4F5] truncate max-w-[150px]">{displayPhone || '—'}</span>
+                            {cleanPhone && cleanPhone.length >= 7 && (
                               <div className="flex items-center gap-1">
                                 <a
                                   href={`tel:${cleanPhone}`}

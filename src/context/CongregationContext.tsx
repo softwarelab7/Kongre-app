@@ -447,7 +447,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const [publishers, setPublishers] = useState<Publisher[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_publishers`);
-    return saved !== null ? JSON.parse(saved) : INITIAL_PUBLISHERS;
+    if (saved !== null) {
+      try {
+        const parsed = JSON.parse(saved);
+        return restorePublishersFromLocalStorage(parsed);
+      } catch {
+        return INITIAL_PUBLISHERS;
+      }
+    }
+    return INITIAL_PUBLISHERS;
   });
 
   const [weeks, setWeeks] = useState<WeekSchedule[]>(() => {
@@ -1041,6 +1049,36 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       `${LOCAL_STORAGE_KEY}_publishers`,
       JSON.stringify(sanitizePublishersForLocalStorage(publishers))
     );
+  }, [publishers]);
+
+  // Autodescifrado reactivo en memoria: si algún publicador cargó con campos cifrados residuales (kgr_sec),
+  // se descifra transparentemente en cuanto la clave o bóveda esté disponible.
+  useEffect(() => {
+    if (!Array.isArray(publishers) || publishers.length === 0) return;
+    const hasEncrypted = publishers.some(
+      (p) =>
+        p &&
+        typeof p === 'object' &&
+        ((typeof p.phone === 'string' && p.phone.startsWith('kgr_sec')) ||
+          (typeof p.address === 'string' && p.address.startsWith('kgr_sec')) ||
+          (typeof p.notes === 'string' && p.notes.startsWith('kgr_sec')) ||
+          (typeof p.spiritual_notes === 'string' && p.spiritual_notes.startsWith('kgr_sec')))
+    );
+
+    if (hasEncrypted) {
+      const restored = restorePublishersFromLocalStorage(publishers);
+      const changed = restored.some((rp, idx) => {
+        const op = publishers[idx];
+        return (
+          (typeof op?.phone === 'string' && op.phone.startsWith('kgr_sec') && typeof rp?.phone === 'string' && !rp.phone.startsWith('kgr_sec')) ||
+          (typeof op?.address === 'string' && op.address.startsWith('kgr_sec') && typeof rp?.address === 'string' && !rp.address.startsWith('kgr_sec')) ||
+          (typeof op?.notes === 'string' && op.notes.startsWith('kgr_sec') && typeof rp?.notes === 'string' && !rp.notes.startsWith('kgr_sec'))
+        );
+      });
+      if (changed) {
+        setPublishers(restored);
+      }
+    }
   }, [publishers]);
 
   useEffect(() => {

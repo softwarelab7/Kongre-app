@@ -460,3 +460,44 @@ test('Token de rol de servidor: parseServerRoleToken y verifyRoleSessionSignatur
   assert.equal(verifyRoleSessionSignature('publicador', ['publicador'], '1001DEMO'), false);
 });
 
+test('Bóveda Local: descifrado resiliente de campos sensibles ante cambios de PIN de sesión o congId', () => {
+  const store: Record<string, string> = {
+    kongre_session_pin_v2: '1234',
+    kongre_congregation_number: '1001-DEMO',
+  };
+  const mockStorage = {
+    getItem: (k: string) => store[k] ?? null,
+    setItem: (k: string, v: string) => { store[k] = v; },
+    removeItem: (k: string) => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+  (globalThis as any).window = {};
+  (globalThis as any).localStorage = mockStorage;
+
+  setVaultSessionEntropyForTesting('a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00');
+
+  const pub = [
+    {
+      id: 'pub_test_resilience',
+      name: 'Hno Daniel Vega',
+      phone: '+52 55 9988 7766',
+      address: 'Calle Luna 123, Centro',
+      notes: 'Disponibilidad para fines de semana',
+    },
+  ];
+
+  const sanitized = sanitizePublishersForLocalStorage(pub);
+  assert.ok(sanitized[0].phone.startsWith('kgr_sec4:'));
+
+  // Simular cambio o borrado de sesión (ej. recarga de página antes de autenticar o cambio de rol)
+  delete store.kongre_session_pin_v2;
+  delete store.kongre_congregation_number;
+
+  const restored = restorePublishersFromLocalStorage(sanitized);
+  assert.equal(restored[0].phone, '+52 55 9988 7766', 'Debe descifrar el teléfono incluso si sessionPin se limpió');
+  assert.equal(restored[0].address, 'Calle Luna 123, Centro', 'Debe descifrar la dirección');
+  assert.equal(restored[0].notes, 'Disponibilidad para fines de semana', 'Debe descifrar las notas');
+
+  setVaultSessionEntropyForTesting(null);
+});
+

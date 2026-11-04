@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Publisher, MonthlyServiceReport, PreachingGroup } from '../../../types';
 import { ensureImmutablePublisherCode } from '../../../utils/publisherDeduplication';
 import { useCongregation } from '../../../context/CongregationContext';
+import { decryptSensitiveFieldAtRest } from '../../../utils/theocraticSecurity';
 
 const deterministicStringify = (obj: any): string => {
   if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
@@ -332,6 +333,15 @@ const normalizePublisher = (
     monthlyReports
   );
 
+  const cleanPhone = decryptSensitiveFieldAtRest(initial.phone || '');
+  const resolvedPhone = typeof cleanPhone === 'string' && (cleanPhone.startsWith('kgr_sec') || cleanPhone.startsWith('kgr_v')) ? '' : cleanPhone;
+  const cleanAddress = decryptSensitiveFieldAtRest(initial.address || '');
+  const resolvedAddress = typeof cleanAddress === 'string' && (cleanAddress.startsWith('kgr_sec') || cleanAddress.startsWith('kgr_v')) ? '' : cleanAddress;
+  const cleanNotes = decryptSensitiveFieldAtRest(initial.notes || '');
+  const resolvedNotes = typeof cleanNotes === 'string' && cleanNotes.startsWith('kgr_sec') ? '' : cleanNotes;
+  const cleanSpiritualNotes = decryptSensitiveFieldAtRest(initial.spiritual_notes || '');
+  const resolvedSpiritualNotes = typeof cleanSpiritualNotes === 'string' && cleanSpiritualNotes.startsWith('kgr_sec') ? '' : cleanSpiritualNotes;
+
   return {
     ...initial,
     id: resolvedId,
@@ -343,6 +353,8 @@ const normalizePublisher = (
     middle_name: middleName,
     last_name: lastName,
     second_last_name: secondLastName,
+    phone: resolvedPhone,
+    address: resolvedAddress,
     gender: normalizedGender,
     role: resolvedRole,
     privilege: resolvedPrivilege,
@@ -375,8 +387,8 @@ const normalizePublisher = (
     is_disfellowshipped: !!initial.is_disfellowshipped,
     is_reinstated: !!initial.is_reinstated,
     is_reproved: !!initial.is_reproved,
-    spiritual_notes: initial.spiritual_notes || initial.notes || '',
-    notes: initial.notes || initial.spiritual_notes || '',
+    spiritual_notes: resolvedSpiritualNotes || resolvedNotes || '',
+    notes: resolvedNotes || resolvedSpiritualNotes || '',
     marital_status: initial.marital_status || 'soltero',
     languages: Array.isArray(initial.languages) ? initial.languages : [],
     skills: Array.isArray(initial.skills) ? initial.skills : [],

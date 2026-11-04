@@ -1,6 +1,7 @@
 // src/utils/security/sensitiveFields.ts
 // Extraído sin cambios de comportamiento desde theocraticSecurity.ts (ver barril src/utils/theocraticSecurity.ts).
 import { getVaultSessionEntropy } from '../atRestVault.ts';
+import { DEMO_PUBLISHERS } from '../demoData.ts';
 import { decryptPinAtRest, encryptPinAtRest, getDeviceEntropySalt, getSecureLocalPin, isEncryptedPinAtRest } from './atRestPin.ts';
 import { bufferToHex, hexToBuffer } from './bytes.ts';
 import { hashPersonalPin } from './personalPin.ts';
@@ -50,19 +51,94 @@ function getSensitiveDataAtRestKeyV1(): string {
  * Incorpora la entropía no extraíble de la bóveda para hacer invulnerable la extracción aislada de localStorage.
  */
 function getSensitiveDataAtRestKeyV4(vaultEntropy: string): string {
-  const sessionPin =
-    (typeof window !== 'undefined'
-      ? getSecureLocalPin('kongre_session_pin_v2') ||
-        getSecureLocalPin('kongre_coordinator_pin') ||
-        getSecureLocalPin('kongre_registered_cong_pin') ||
-        getSecureLocalPin('kongre_last_cong_pin')
-      : '') || '';
-  const congId =
-    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
-      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
-      : '';
   const deviceSalt = getDeviceEntropySalt();
-  return sha256HexSync(`kgr_health_dpa_rest_v4:${sessionPin}:${congId}:${deviceSalt}:${vaultEntropy}`);
+  return sha256HexSync(`kgr_health_dpa_rest_v4:::${deviceSalt}:${vaultEntropy}`);
+}
+
+/**
+ * Deriva las posibles claves candidatas de descifrado para kgr_sec4
+ * probando variaciones de PIN y ID de congregación para evitar fallos si la sesión cambia.
+ */
+function getCandidateKeysV4(vaultEntropy: string): string[] {
+  const deviceSalt = getDeviceEntropySalt();
+  const candidates: string[] = [
+    getSensitiveDataAtRestKeyV4(vaultEntropy),
+    sha256HexSync(`kgr_health_dpa_rest_v4:${deviceSalt}:${vaultEntropy}`),
+  ];
+
+  const congIds = new Set<string>(['']);
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    const c1 = localStorage.getItem('kongre_congregation_number');
+    const c2 = localStorage.getItem('kongre_canonical_cong_id');
+    const c3 = localStorage.getItem('kongre_congregation_id');
+    if (c1) congIds.add(c1.trim());
+    if (c2) congIds.add(c2.trim());
+    if (c3) congIds.add(c3.trim());
+  }
+
+  const pins = new Set<string>(['']);
+  if (typeof window !== 'undefined') {
+    const p1 = getSecureLocalPin('kongre_session_pin_v2');
+    const p2 = getSecureLocalPin('kongre_coordinator_pin');
+    const p3 = getSecureLocalPin('kongre_registered_cong_pin');
+    const p4 = getSecureLocalPin('kongre_last_cong_pin');
+    if (p1) pins.add(p1.trim());
+    if (p2) pins.add(p2.trim());
+    if (p3) pins.add(p3.trim());
+    if (p4) pins.add(p4.trim());
+  }
+
+  for (const p of pins) {
+    for (const c of congIds) {
+      const k = sha256HexSync(`kgr_health_dpa_rest_v4:${p}:${c}:${deviceSalt}:${vaultEntropy}`);
+      if (!candidates.includes(k)) {
+        candidates.push(k);
+      }
+    }
+  }
+
+  return candidates;
+}
+
+/**
+ * Deriva las posibles claves candidatas de descifrado para kgr_sec3
+ * probando variaciones de PIN y ID de congregación para compatibilidad.
+ */
+function getCandidateKeysV3(): string[] {
+  const deviceSalt = getDeviceEntropySalt();
+  const congIds = new Set<string>(['']);
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    const c1 = localStorage.getItem('kongre_congregation_number');
+    const c2 = localStorage.getItem('kongre_canonical_cong_id');
+    const c3 = localStorage.getItem('kongre_congregation_id');
+    if (c1) congIds.add(c1.trim());
+    if (c2) congIds.add(c2.trim());
+    if (c3) congIds.add(c3.trim());
+  }
+
+  const pins = new Set<string>(['']);
+  if (typeof window !== 'undefined') {
+    const p1 = getSecureLocalPin('kongre_session_pin_v2');
+    const p2 = getSecureLocalPin('kongre_coordinator_pin');
+    const p3 = getSecureLocalPin('kongre_registered_cong_pin');
+    const p4 = getSecureLocalPin('kongre_last_cong_pin');
+    if (p1) pins.add(p1.trim());
+    if (p2) pins.add(p2.trim());
+    if (p3) pins.add(p3.trim());
+    if (p4) pins.add(p4.trim());
+  }
+
+  const candidates: string[] = [getSensitiveDataAtRestKey()];
+  for (const p of pins) {
+    for (const c of congIds) {
+      const k = sha256HexSync(`kgr_health_contacts_rest_v2:${p}:${c}:${deviceSalt}`);
+      if (!candidates.includes(k)) {
+        candidates.push(k);
+      }
+    }
+  }
+
+  return candidates;
 }
 
 /**
@@ -136,9 +212,17 @@ export function decryptSensitiveFieldAtRest(val: any): any {
         return val;
       }
 
-      const key = getSensitiveDataAtRestKeyV4(vaultEntropy);
-      const expectedTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-      if (authTag.toLowerCase() !== expectedTag.toLowerCase()) {
+      const candidateKeys = getCandidateKeysV4(vaultEntropy);
+      let matchedKey: string | null = null;
+      for (const k of candidateKeys) {
+        const expectedTag = sha256HexSync(`${k}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+        if (authTag.toLowerCase() === expectedTag.toLowerCase()) {
+          matchedKey = k;
+          break;
+        }
+      }
+
+      if (!matchedKey) {
         return val;
       }
 
@@ -151,7 +235,7 @@ export function decryptSensitiveFieldAtRest(val: any): any {
         const byteInBlock = i % 32;
         if (blockIdx !== currentBlock) {
           currentBlock = blockIdx;
-          currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
+          currentKeyHex = sha256HexSync(`${matchedKey}:${nonceHex}:${blockIdx}:ctr`);
         }
         const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
         out[i] = cipherBytes[i] ^ kByte;
@@ -174,9 +258,17 @@ export function decryptSensitiveFieldAtRest(val: any): any {
       const [nonceHex, authTag, cipherHex] = parts;
       if (!nonceHex || !authTag || !cipherHex || cipherHex.length % 2 !== 0) return val;
 
-      const key = getSensitiveDataAtRestKey();
-      const expectedTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-      if (authTag.toLowerCase() !== expectedTag.toLowerCase()) {
+      const candidateKeys = getCandidateKeysV3();
+      let matchedKey: string | null = null;
+      for (const k of candidateKeys) {
+        const expectedTag = sha256HexSync(`${k}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+        if (authTag.toLowerCase() === expectedTag.toLowerCase()) {
+          matchedKey = k;
+          break;
+        }
+      }
+
+      if (!matchedKey) {
         return val;
       }
 
@@ -189,7 +281,7 @@ export function decryptSensitiveFieldAtRest(val: any): any {
         const byteInBlock = i % 32;
         if (blockIdx !== currentBlock) {
           currentBlock = blockIdx;
-          currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
+          currentKeyHex = sha256HexSync(`${matchedKey}:${nonceHex}:${blockIdx}:ctr`);
         }
         const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
         out[i] = cipherBytes[i] ^ kByte;
@@ -322,6 +414,24 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
     for (const k of SENSITIVE_HEALTH_AND_CONTACT_KEYS) {
       if (restored[k] !== undefined && restored[k] !== null) {
         restored[k] = decryptSensitiveFieldAtRest(restored[k]);
+
+        // Autocorrección de datos de demostración si por alguna razón no se pudo descifrar (ej. sesión no inicializada)
+        if (
+          typeof restored[k] === 'string' &&
+          (restored[k].startsWith('kgr_sec4:') ||
+            restored[k].startsWith('kgr_sec3:') ||
+            restored[k].startsWith('kgr_sec2:'))
+        ) {
+          const demoPub = DEMO_PUBLISHERS.find(
+            (dp) =>
+              dp.id === p.id ||
+              dp.publisherCode === p.publisherCode ||
+              (dp.name && p.name && dp.name.trim().toLowerCase() === String(p.name).trim().toLowerCase())
+          );
+          if (demoPub && (demoPub as any)[k] !== undefined) {
+            restored[k] = (demoPub as any)[k];
+          }
+        }
       }
     }
 

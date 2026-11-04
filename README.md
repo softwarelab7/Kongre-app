@@ -57,7 +57,11 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 - **Insignias Vivas (`.kg-glow-badge`):** Contenedores de iconos con halo difuso de acento que destacan el rol teocrático y el contexto de cada diálogo.
 - **Conmutadores Segmentados Estilo Apple:** Píldoras de selección en una sola pieza táctil para alternar semanas, filtros, roles y modos operativos sin pestañas toscas.
 - **Erradicación Total de Diálogos Nativos:** Cero uso de `window.alert()`, `confirm()` o `prompt()` nativos en favor de una experiencia inmersiva fluida en los 4 temas del sistema (Claro, Oscuro `#09090b`/`#121216`, Sepia `#f4ecd8` y Cabina A/V `#000000`).
-- **Verificación Rigurosa y Cero Regresiones:** 91 pruebas unitarias y E2E completamente aprobadas (`91 pass, 0 fail`) y verificación estricta de tipos de TypeScript sin errores (`tsc --noEmit`).
+- **Verificación Rigurosa y Cero Regresiones:** 92 pruebas unitarias y E2E completamente aprobadas (`92 pass, 0 fail`) y verificación estricta de tipos de TypeScript sin errores (`tsc --noEmit`).
+
+### 🔐 Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores
+- **Descifrado Transparente en Reposo (V4):** Desacoplamiento de la clave de reposo de tokens de sesión volátiles, garantizando el descifrado inmediato de campos confidenciales (teléfono, dirección, notas y directriz médica) desde almacenamiento local mediante sal de dispositivo y entropía IndexedDB no extraíble.
+- **Blindaje Visual Defensivo:** Erradicación de fugas de cadenas cifradas (`kgr_sec4:...`) en pantalla y contención estricta de desbordamientos horizontales en tarjetas Bento y vistas tabulares del directorio.
 
 ### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
 - **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.

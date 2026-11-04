@@ -9,6 +9,12 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 ### [v0.1.0-alpha.42] — 4 de Noviembre, 2026
 **Elevación Completa al Sistema Linear + Apple Bento (Editor de Publicadores, Modales y Vistas Teocráticas), Consolidación del Panel Eléctrico en Mantenimiento, Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB y Visor Interactivo PDF**
 
+- 🔐 **Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores (`sensitiveFields.ts`, `CongregationContext.tsx`, `PublishersTab.tsx`, `usePublisherForm.ts`):**
+  - Desacoplamiento de la clave canónica de reposo V4 de tokens volátiles de sesión (`sessionPin`), garantizando descifrado determinista e inmediato a partir de la sal de dispositivo y la entropía no extraíble de IndexedDB.
+  - Implementación de evaluación de claves candidatas (`getCandidateKeysV4` y `getCandidateKeysV3`) para descifrado retrocompatible transparente de registros previos ante el tag MAC.
+  - Autocorrección reactiva en el contexto de congregación que detecta y descifra automáticamente campos huérfanos en memoria y restaura registros demo si falta la sesión.
+  - Blindaje visual defensivo en las tarjetas y tablas de publicadores (`getDisplayPhone`, `getDisplayAddress`) impidiendo la renderización de cadenas crudas `kgr_sec4:...` y previniendo colisiones visuales de columnas mediante `truncate max-w-[170px]` y `gap-2`.
+
 - 🍱 **Elevación Integral de las 10 Subsecciones del Editor de Publicadores (`PublisherEditor/sections/*`):**
   - Migración sistemática de todas las tarjetas y subpaneles internos al sistema Bento (`.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, bordes translúcidos `border-zinc-200/80 dark:border-white/10` y esquinas suaves `rounded-3xl`).
   - **Identidad Básica (`BasicInfoSection.tsx`):** Tarjetas Bento para cabecera demográfica con insignia de género `.kg-glow-badge`, núcleo familiar para coincidencia de noches de reunión y matriz de habilidades de mantenimiento del salón.

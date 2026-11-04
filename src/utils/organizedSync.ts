@@ -657,12 +657,18 @@ export function applyOrganizedToWeek(
       }
     }
 
-    // Seamos mejores lectores y maestros (preservando asignaciones si existen)
+    // Seamos mejores lectores y maestros (preservando asignaciones si existen y garantizando IDs únicos)
     const existingDemos = updated.midweek.maestros?.items || [];
+    const usedDemoIds = new Set<string>();
     updated.midweek.maestros.items = organizedSchedule.midweek.demonstrations.map((d, idx) => {
       const existing = existingDemos[idx];
+      let resolvedId = existing?.id || `mwb-demo-${currentWeek.id}-${idx}`;
+      if (usedDemoIds.has(resolvedId)) {
+        resolvedId = `mwb-demo-${currentWeek.id}-${idx}`;
+      }
+      usedDemoIds.add(resolvedId);
       return {
-        id: existing?.id || `mwb-demo-${currentWeek.id}-${idx}`,
+        id: resolvedId,
         title: d.title,
         type: 'vym_maestros_titular',
         timeMinutes: d.timeMinutes,

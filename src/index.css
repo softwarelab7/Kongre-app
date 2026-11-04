@@ -701,9 +701,9 @@
    POP-UPS & MODALS: Garantizar cobertura total del viewport (100vw x 100dvh)
    sin quedar atrapados dentro del contenedor de pestañas ni debajo del Navbar
    ============================================================================ */
-#root:has(.fixed.inset-0),
-main:has(.fixed.inset-0),
-main *:has(.fixed.inset-0):not(.fixed) {
+#root:has(.fixed.inset-0:not(.sm\:absolute):not(.md\:absolute)),
+main:has(.fixed.inset-0:not(.sm\:absolute):not(.md\:absolute)),
+main *:has(.fixed.inset-0:not(.sm\:absolute):not(.md\:absolute)):not(.fixed) {
   transform: none !important;
   will-change: auto !important;
   filter: none !important;
@@ -718,7 +718,7 @@ main *:has(.fixed.inset-0):not(.fixed) {
   z-index: auto !important;
 }
 
-.fixed.inset-0:not(.fixed.inset-0 *) {
+.fixed.inset-0:not(.fixed.inset-0 *):not(.sm\:absolute):not(.md\:absolute) {
   position: fixed !important;
   top: 0 !important;
   right: 0 !important;
@@ -730,7 +730,7 @@ main *:has(.fixed.inset-0):not(.fixed) {
 }
 
 @media (min-width: 768px) {
-  body:has(.fixed.inset-0) {
+  body:has(.fixed.inset-0:not(.sm\:absolute):not(.md\:absolute)) {
     overflow: hidden !important;
   }
 }

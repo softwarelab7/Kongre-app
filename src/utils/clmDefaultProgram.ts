@@ -136,10 +136,14 @@ export function createDefaultPrograma(
   );
 
   if (studentItems.length > 0) {
+    const usedIds = new Set<string>(partes.map((p) => p.id));
     studentItems.forEach((item, index) => {
       const isAux = item.room === 'auxiliar';
+      const fallbackId = `part-mae-${index + 1}-${semanaFecha}${isAux ? '-aux' : ''}`;
+      const candidateId = item.id && !usedIds.has(item.id) ? item.id : fallbackId;
+      usedIds.add(candidateId);
       partes.push({
-        id: item.id || `part-mae-${index + 1}-${semanaFecha}`,
+        id: candidateId,
         tipo: (item.type as any) || 'empiece_conversaciones',
         titulo: item.title || `Asignación ${index + 1} (${item.timeMinutes || 3} min)`,
         duracion_min: item.timeMinutes || 3,

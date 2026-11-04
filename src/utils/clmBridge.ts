@@ -79,22 +79,32 @@ export function bridgeClmToWeek(
   const studentParts = clm.partes.filter(p => p.seccion === 'maestros');
   if (studentParts.length > 0 && updated.midweek.maestros) {
     const newItems: AssignmentItem[] = [];
+    const usedIds = new Set<string>();
     studentParts.forEach((sp, idx) => {
       const room = sp.es_clase_auxiliar ? 'auxiliar' : 'principal';
-      // Intentar preservar item existente
-      const existing = updated.midweek.maestros.items?.find(
-        it => it.room === room && (it.type === sp.tipo || it.title === sp.titulo)
-      ) || updated.midweek.maestros.items?.[idx];
+      const existingById = updated.midweek.maestros.items?.find(
+        it => it.id === sp.id && !usedIds.has(it.id)
+      );
+      const existingByIdx = updated.midweek.maestros.items?.[idx];
+      const existing =
+        existingById ||
+        (existingByIdx && !usedIds.has(existingByIdx.id) ? existingByIdx : undefined);
+
+      let resolvedId = sp.id || existing?.id || `part-mae-${idx + 1}-${week.weekStartDate}`;
+      if (usedIds.has(resolvedId)) {
+        resolvedId = `part-mae-${idx + 1}-${week.weekStartDate}${room === 'auxiliar' ? '-aux' : ''}`;
+      }
+      usedIds.add(resolvedId);
 
       newItems.push({
-        id: existing?.id || sp.id,
+        id: resolvedId,
         title: sp.titulo,
         type: sp.tipo,
         timeMinutes: sp.duracion_min,
         publisherId: sp.asignado_nid || undefined,
         assistantId: sp.asignado_auxiliar_nid || undefined,
         room,
-        lessonNumber: existing?.lessonNumber,
+        lessonNumber: sp.leccion_numero || existing?.lessonNumber,
         status: sp.asignado_nid ? 'confirmada' : 'pendiente',
         notes: sp.notas || existing?.notes,
       });
@@ -204,28 +214,38 @@ export function bridgeWeekToClm(
     }
   }
 
-  // Deduplicación estricta de partes (evita doble lectura de la biblia y doble estudio bíblico)
+  // Deduplicación estricta de partes (evita doble lectura de la biblia, doble estudio bíblico y claves React duplicadas)
   let foundMainReading = false;
   let foundCbsGroup = false;
-  const deduplicatedPartes = partes.filter(p => {
-    // Excluir cualquier lectura de la biblia colocada por error en maestros
-    if (p.seccion === 'maestros' && (p.tipo === 'lectura_biblica' || p.titulo.toLowerCase().includes('lectura de la biblia'))) {
-      return false;
-    }
-    // Asegurar exactamente una sola lectura principal
-    if (!p.es_clase_auxiliar && (p.tipo === 'lectura_biblica' || (p.seccion === 'tesoros' && p.titulo.toLowerCase().includes('lectura de la biblia')))) {
-      if (foundMainReading) return false;
-      foundMainReading = true;
-    }
-    // Deduplicar estudio bíblico de la congregación
-    if (p.seccion === 'vida_cristiana' && (p.tipo === 'estudio_biblico_grupo' || p.id.includes('cbs') || p.titulo.toLowerCase().includes('estudio bíblico') || p.titulo.toLowerCase().includes('estudio biblico'))) {
-      if (p.tipo !== 'lector_estudio') {
-        if (foundCbsGroup) return false;
-        foundCbsGroup = true;
+  const seenPartIds = new Set<string>();
+  const deduplicatedPartes = partes
+    .filter(p => {
+      // Excluir cualquier lectura de la biblia colocada por error en maestros
+      if (p.seccion === 'maestros' && (p.tipo === 'lectura_biblica' || p.titulo.toLowerCase().includes('lectura de la biblia'))) {
+        return false;
       }
-    }
-    return true;
-  });
+      // Asegurar exactamente una sola lectura principal
+      if (!p.es_clase_auxiliar && (p.tipo === 'lectura_biblica' || (p.seccion === 'tesoros' && p.titulo.toLowerCase().includes('lectura de la biblia')))) {
+        if (foundMainReading) return false;
+        foundMainReading = true;
+      }
+      // Deduplicar estudio bíblico de la congregación
+      if (p.seccion === 'vida_cristiana' && (p.tipo === 'estudio_biblico_grupo' || p.id.includes('cbs') || p.titulo.toLowerCase().includes('estudio bíblico') || p.titulo.toLowerCase().includes('estudio biblico'))) {
+        if (p.tipo !== 'lector_estudio') {
+          if (foundCbsGroup) return false;
+          foundCbsGroup = true;
+        }
+      }
+      return true;
+    })
+    .map((p, idx) => {
+      let cleanId = p.id || `part-${p.seccion || 'item'}-${idx + 1}-${semanaFecha}`;
+      if (seenPartIds.has(cleanId)) {
+        cleanId = `part-${p.seccion || 'item'}-${idx + 1}-${semanaFecha}${p.es_clase_auxiliar ? '-aux' : ''}`;
+      }
+      seenPartIds.add(cleanId);
+      return cleanId === p.id ? p : { ...p, id: cleanId };
+    });
 
   // Marco
   helperSet('presidente', week.midweek.presidentId, false);

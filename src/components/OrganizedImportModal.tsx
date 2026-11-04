@@ -44,23 +44,19 @@ interface OrganizedImportModalProps {
 export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
   isOpen,
   onClose,
-  initialTab = 'catalogo',
-  initialFocus = 'all',
+  initialTab = 'bosquejos',
 }) => {
   const {
     currentWeek,
     updateWeek,
-    syncAllWeeksWithOrganized,
     updateClmPrograma,
     publishers,
     settings,
   } = useCongregation();
 
-  const [activeTab, setActiveTab] = useState<'catalogo' | 'importar' | 'bosquejos'>(initialTab);
-  const [selectedScheduleKey, setSelectedScheduleKey] = useState<string>(() => {
-    const matched = getOrganizedScheduleForWeek(currentWeek?.id, currentWeek?.midweek.date);
-    return matched?.weekKey || ORGANIZED_OFFICIAL_SCHEDULES[1]?.weekKey || '2026-W41';
-  });
+  const [activeTab, setActiveTab] = useState<'importar' | 'bosquejos'>(
+    initialTab === 'importar' ? 'importar' : 'bosquejos'
+  );
 
   // Custom text / JSON input
   const [rawInput, setRawInput] = useState('');
@@ -69,42 +65,16 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
   // Outline search
   const [outlineQuery, setOutlineQuery] = useState('');
-  const [selectedOutline, setSelectedOutline] = useState<PublicTalkOutline | null>(() => {
-    if (currentWeek?.weekend.publicTalkOutlineNumber) {
-      return findOutlineByNumber(currentWeek.weekend.publicTalkOutlineNumber) || null;
-    }
-    return null;
-  });
-
   const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
 
   // Reset tab when reopened with different initialTab
   React.useEffect(() => {
     if (isOpen) {
-      setActiveTab(initialTab);
-      // Auto select matching schedule for current week if found
-      const match = getOrganizedScheduleForWeek(currentWeek?.id, currentWeek?.midweek.date);
-      if (match) {
-        setSelectedScheduleKey(match.weekKey);
-      }
+      setActiveTab(initialTab === 'importar' ? 'importar' : 'bosquejos');
     }
-  }, [isOpen, initialTab, currentWeek?.id, currentWeek?.midweek.date]);
+  }, [isOpen, initialTab]);
 
   if (!isOpen || !currentWeek) return null;
-
-  const handleApplyToAllWeeks = () => {
-    syncAllWeeksWithOrganized();
-    setFeedbackSuccess('¡Todas las semanas de la congregación han sido sincronizadas con el catálogo oficial!');
-    setTimeout(() => {
-      setFeedbackSuccess(null);
-      onClose();
-    }, 1500);
-  };
-
-  // Selected schedule from catalog
-  const selectedSchedule =
-    ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey === selectedScheduleKey) ||
-    ORGANIZED_OFFICIAL_SCHEDULES[0];
 
   const handleApplySchedule = (
     scheduleToApply: OrganizedWeekSchedule,
@@ -182,7 +152,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
     }, 1200);
   };
 
-  // Filtered outlines for tab 3
+  // Filtered outlines
   const filteredOutlines = outlineQuery.trim()
     ? searchOutlines(outlineQuery)
     : OFFICIAL_PUBLIC_TALK_OUTLINES;
@@ -192,7 +162,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-fade-in overflow-y-auto"
       role="dialog"
       aria-modal="true"
-      aria-label="Traer bosquejos y programa semanal"
+      aria-label="Catálogo de bosquejos públicos"
     >
       <div
         className="w-full max-w-3xl kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-white/10 overflow-hidden my-auto max-h-[95vh] flex flex-col"
@@ -203,7 +173,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
           <div className="pointer-events-none absolute -top-20 -right-20 w-56 h-56 rounded-full bg-amber-500/15 blur-3xl" />
           <button
             onClick={onClose}
-            aria-label="Cerrar importador de bosquejos y programa semanal"
+            aria-label="Cerrar catálogo de bosquejos"
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -211,37 +181,30 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
           <div className="flex items-center gap-3 relative z-10">
             <div className="kg-glow-badge w-12 h-12 rounded-2xl bg-zinc-800 dark:bg-[#27272A] border border-zinc-700 dark:border-[#3E3E42] flex items-center justify-center text-zinc-200 shadow-md shrink-0">
-              <Sparkles className="w-6 h-6 text-amber-500" />
+              <Mic className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                  Catálogo Teocrático
-                </span>
-                <span className="text-xs text-zinc-400">Sincronizador Oficial</span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-white mt-1">
-                Traer Bosquejos y Programa Semanal
+              <h2 className="text-lg sm:text-xl font-bold text-white">
+                Bosquejos Públicos e Importación
               </h2>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Carga los temas oficiales para la Reunión Entre Semana (MWB) y Fin de Semana (Discurso Público + Atalaya)
+                Selecciona uno de los 194 bosquejos de discursos públicos o importa un archivo de programa
               </p>
             </div>
           </div>
 
           {/* Tab Selector */}
-          <div className="flex items-center gap-2 mt-5 bg-zinc-800/80 dark:bg-[#121216] border border-zinc-700 dark:border-[#27272A] p-1 rounded-2xl text-xs font-semibold">
+          <div className="flex items-center gap-2 mt-4 bg-zinc-800/80 dark:bg-[#121216] border border-zinc-700 dark:border-[#27272A] p-1 rounded-2xl text-xs font-semibold">
             <button
-              onClick={() => setActiveTab('catalogo')}
+              onClick={() => setActiveTab('bosquejos')}
               className={`flex-1 py-2 px-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
-                activeTab === 'catalogo'
+                activeTab === 'bosquejos'
                   ? 'bg-zinc-100 text-zinc-900 dark:bg-[#27272A] dark:text-white shadow-xs'
                   : 'text-zinc-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Calendar className="w-4 h-4 text-zinc-400" />
-              <span>Catálogo Semanal</span>
+              <Mic className="w-4 h-4 text-indigo-500" />
+              <span>194 Bosquejos Públicos</span>
             </button>
             <button
               onClick={() => setActiveTab('importar')}
@@ -253,17 +216,6 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
             >
               <Upload className="w-4 h-4 text-zinc-400" />
               <span>Importar Archivo / Texto</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('bosquejos')}
-              className={`flex-1 py-2 px-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
-                activeTab === 'bosquejos'
-                  ? 'bg-zinc-100 text-zinc-900 dark:bg-[#27272A] dark:text-white shadow-xs'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Mic className="w-4 h-4 text-indigo-600" />
-              <span>194 Bosquejos Públicos</span>
             </button>
           </div>
         </div>
@@ -278,209 +230,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
-          {/* TAB 1: CATÁLOGO SEMANAL DE ORGANIZED */}
-          {activeTab === 'catalogo' && (
-            <div className="space-y-5">
-              {/* Week selector carousel / select */}
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] block mb-2">
-                  Selecciona la semana del programa oficial:
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                  {ORGANIZED_OFFICIAL_SCHEDULES.map((s) => {
-                    const isSelected = s.weekKey === selectedScheduleKey;
-                    return (
-                      <button
-                        key={s.weekKey}
-                        onClick={() => setSelectedScheduleKey(s.weekKey)}
-                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-600 dark:border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
-                            : 'bg-white dark:bg-[#18181F]/60 border-zinc-200 dark:border-[#27272A] hover:border-zinc-300'
-                        }`}
-                      >
-                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 block">
-                          Semana {s.weekKey}
-                        </span>
-                        <h4 className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                          {s.bibleReading}
-                        </h4>
-                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">
-                          {s.weekDateRange}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Preview of the Selected Week from Organized */}
-              <div className="space-y-4">
-                {/* 1. Reunión Entre Semana (MWB) */}
-                <div className="bg-zinc-50 dark:bg-[#18181F]/50 rounded-2xl p-4 border border-zinc-200 dark:border-[#27272A] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-[#27272A]">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-800 dark:text-[#E4E4E7] flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      <span>Entre Semana: Guía de Actividades ({selectedSchedule.bibleReading})</span>
-                    </span>
-                    <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1">
-                      <Music className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>Canciones: {selectedSchedule.midweek.songFirst}, {selectedSchedule.midweek.songMiddle}, {selectedSchedule.midweek.songConclude}</span>
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    {/* Tesoros */}
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1.5">
-                      <span className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 block">
-                        Tesoros de la Biblia
-                      </span>
-                      <p className="font-bold text-zinc-800 dark:text-[#E4E4E7]">
-                        {selectedSchedule.midweek.tesoros.discursoTitle}
-                      </p>
-                      <p className="text-zinc-600 dark:text-[#A1A1AA]">
-                        {selectedSchedule.midweek.tesoros.perlasTitle}
-                      </p>
-                      <p className="text-zinc-600 dark:text-[#A1A1AA]">
-                        {selectedSchedule.midweek.tesoros.lecturaTitle}
-                      </p>
-                    </div>
-
-                    {/* Maestros */}
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1.5">
-                      <span className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 block">
-                        Seamos Mejores Lectores y Maestros
-                      </span>
-                      {selectedSchedule.midweek.demonstrations.map((d, i) => (
-                        <div key={i} className="flex items-center justify-between text-zinc-700 dark:text-[#D4D4D8]">
-                          <span className="truncate">{d.title}</span>
-                          {d.lessonNumber && (
-                            <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 shrink-0 ml-1">
-                              Lección #{d.lessonNumber}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Vida Cristiana */}
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1.5 md:col-span-2">
-                      <span className="text-[10px] font-bold uppercase text-rose-700 dark:text-rose-400 block">
-                        Nuestra Vida Cristiana & Estudio Bíblico
-                      </span>
-                      {selectedSchedule.midweek.vidaCristiana.map((v, i) => (
-                        <p key={i} className="text-zinc-700 dark:text-[#D4D4D8]">
-                          • {v.title}
-                        </p>
-                      ))}
-                      <p className="font-semibold text-zinc-800 dark:text-[#E4E4E7] pt-1 border-t border-zinc-100 dark:border-[#27272A]">
-                        📖 {selectedSchedule.midweek.estudioBiblicoTitle}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Reunión Fin de Semana */}
-                <div className="bg-zinc-50 dark:bg-[#18181F]/50 rounded-2xl p-4 border border-zinc-200 dark:border-[#27272A] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-[#27272A]">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-800 dark:text-[#E4E4E7] flex items-center gap-2">
-                      <Mic className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>Fin de Semana: Discurso Público & Estudio de La Atalaya</span>
-                    </span>
-                    <span className="text-[11px] font-medium text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1">
-                      <Music className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>Canciones: {selectedSchedule.weekend.openingSong}, {selectedSchedule.weekend.middleSong}, {selectedSchedule.weekend.closingSong}</span>
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    {/* Discurso */}
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1">
-                      <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 block">
-                        Bosquejo Oficial de Discurso Público
-                      </span>
-                      <p className="font-bold text-zinc-900 dark:text-white text-sm">
-                        Bosquejo #{selectedSchedule.weekend.outlineNumber}: {selectedSchedule.weekend.outlineTitle}
-                      </p>
-                      <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
-                        Sugerido en el catálogo oficial para este ciclo
-                      </p>
-                    </div>
-
-                    {/* Atalaya */}
-                    <div className="bg-white dark:bg-[#121216] p-3 rounded-xl border border-zinc-200 dark:border-[#27272A] space-y-1">
-                      <span className="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-400 block">
-                        Estudio de La Atalaya
-                      </span>
-                      <p className="font-bold text-zinc-900 dark:text-white text-sm">
-                        «{selectedSchedule.weekend.watchtowerTheme}»
-                      </p>
-                      {selectedSchedule.weekend.watchtowerScripture && (
-                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
-                          Texto temático: {selectedSchedule.weekend.watchtowerScripture}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Apply Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-zinc-200 dark:border-[#27272A]">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#27272A] text-xs font-semibold cursor-pointer order-last sm:order-first"
-                >
-                  Cancelar
-                </button>
-
-                <div className="flex flex-wrap items-center gap-2 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleApplySchedule(selectedSchedule, 'midweek')}
-                    className="px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                    title="Aplica solo los bosquejos de la reunión entre semana (Tesoros, Maestros, Vida Cristiana)"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Solo Entre Semana</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleApplySchedule(selectedSchedule, 'weekend')}
-                    className="px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-[#27272A] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                    title="Aplica solo el bosquejo público y estudio de La Atalaya para el fin de semana"
-                  >
-                    <Mic className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Solo Fin de Semana</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleApplySchedule(selectedSchedule, 'all')}
-                    className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                    title="Aplica todo el programa a esta semana"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>Aplicar a esta semana (Ambas reuniones)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleApplyToAllWeeks}
-                    className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border border-zinc-700"
-                    title="Aplica automáticamente los programas oficiales del catálogo a todas las semanas de la congregación"
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-300" />
-                    <span>Sincronizar Todas las Semanas</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: IMPORTAR ARCHIVO O TEXTO DE ORGANIZED */}
+          {/* IMPORTAR ARCHIVO O TEXTO */}
           {activeTab === 'importar' && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 flex items-start gap-3">

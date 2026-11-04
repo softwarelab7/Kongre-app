@@ -429,10 +429,31 @@ export function unifyWeeksDuties(weekList: WeekSchedule[]): WeekSchedule[] {
       delete endDuties.deber_video;
       modified = true;
     }
+
+    let cleanMaestrosItems = w.midweek?.maestros?.items;
+    if (Array.isArray(cleanMaestrosItems) && cleanMaestrosItems.length > 1) {
+      const seenMaestros = new Set<string>();
+      cleanMaestrosItems = cleanMaestrosItems.map((it, idx) => {
+        let id = it.id || `maes-${idx + 1}-${w.weekStartDate}`;
+        if (seenMaestros.has(id)) {
+          modified = true;
+          id = `maes-${idx + 1}-${w.weekStartDate}${it.room === 'auxiliar' ? '-aux' : ''}`;
+        }
+        seenMaestros.add(id);
+        return id === it.id ? it : { ...it, id };
+      });
+    }
+
     if (modified) {
       return {
         ...w,
-        midweek: { ...w.midweek, duties: midDuties },
+        midweek: {
+          ...w.midweek,
+          duties: midDuties,
+          maestros: w.midweek?.maestros
+            ? { ...w.midweek.maestros, items: cleanMaestrosItems || [] }
+            : w.midweek?.maestros,
+        },
         weekend: { ...w.weekend, duties: endDuties },
       };
     }

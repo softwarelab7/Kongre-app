@@ -511,6 +511,21 @@ export const ScheduleTab: React.FC = () => {
   const [isWeekPickerOpen, setIsWeekPickerOpen] = useState(false);
   const [weekPickerMonthFilter, setWeekPickerMonthFilter] = useState<string>('all');
   const [customJumpDate, setCustomJumpDate] = useState<string>('');
+  const weekPickerRef = useRef<HTMLDivElement>(null);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (weekPickerRef.current && !weekPickerRef.current.contains(e.target as Node)) {
+        setIsWeekPickerOpen(false);
+      }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+        setIsMoreMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const availableMonths = useMemo(() => {
     const set = new Set<string>();
@@ -707,29 +722,23 @@ export const ScheduleTab: React.FC = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Barra de Herramientas de Programa de Reuniones (Swipeable en Móvil, sin superposición) */}
+      {/* Barra de Herramientas Simplificada del Programa de Reuniones */}
       <div
         onTouchStart={handleWeekTouchStart}
         onTouchEnd={handleWeekTouchEnd}
-        className="relative z-20 kg-card-bento kg-glass-surface kg-sheen-top rounded-3xl border border-zinc-200/80 dark:border-white/10 p-3.5 sm:p-5 shadow-xl backdrop-blur-xl space-y-3 sm:space-y-4"
+        className="relative z-30 kg-glass-surface kg-sheen-top rounded-2xl border border-zinc-200/80 dark:border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 shadow-md backdrop-blur-xl"
       >
-        {/* Fila 1: Navegación de Semana y Selector de Modalidad (Apilados limpiamente en móvil, en línea en desktop) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3">
-          {/* Bloque 1A: Contador (desktop) + Cápsula de Semana + Botón Hoy */}
-          <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto min-w-0">
-            <span className="hidden lg:inline-block text-xs font-semibold font-mono tabular-nums text-zinc-500 dark:text-[#A1A1AA] mr-1 shrink-0">
-              Semana {currentIndex + 1} de {sortedWeeks.length}
-            </span>
-
-            {/* Cápsula de navegación de semana interactiva con selector rápido */}
-            <div className="relative flex items-center gap-1.5 flex-1 md:flex-initial min-w-0">
-              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-zinc-100/80 dark:bg-zinc-800/60 backdrop-blur-md border border-zinc-200/80 dark:border-white/10 p-1 rounded-2xl shadow-inner">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          {/* Izquierda: Selector de Semana + Hoy */}
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <div ref={weekPickerRef} className="relative flex items-center gap-1.5 flex-1 sm:flex-initial min-w-0">
+              <div className="flex items-center justify-between flex-1 sm:flex-initial min-w-0 bg-zinc-100/80 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-white/10 p-0.5 rounded-xl">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-white/10 disabled:opacity-20 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
-                  title="Semana anterior (o desliza a la derecha)"
+                  className="p-1.5 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 disabled:opacity-25 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
+                  title="Semana anterior"
                   aria-label="Semana anterior"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -738,15 +747,15 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsWeekPickerOpen((prev) => !prev)}
-                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] hover:bg-white dark:hover:bg-white/10 transition-all cursor-pointer select-none shadow-2xs"
-                  title="Clic para abrir selector de semanas, meses y calendario"
+                  className="flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold font-mono tabular-nums text-zinc-800 dark:text-[#F4F4F5] hover:bg-white dark:hover:bg-white/10 transition-all cursor-pointer select-none"
+                  title="Seleccionar semana"
                 >
                   <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                   <span className="truncate">
                     {formatTheocraticWeekRangeShort(currentWeek.weekStartDate, currentWeek.weekEndDate)}
                   </span>
                   {isCurrentWeekToday && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse inline-block shrink-0" title="Semana en curso (Hoy)" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" title="Semana actual" />
                   )}
                   <ChevronDown
                     className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0 ${
@@ -758,514 +767,423 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={goToNextWeek}
-                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-white/10 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
-                  title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente (o desliza a la izquierda)' : 'Crear siguiente semana'}
+                  className="p-1.5 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 transition-all text-zinc-700 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
+                  title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
                   aria-label="Semana siguiente"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Botón rápido "Hoy" cuando el usuario navega a otra semana */}
               {!isCurrentWeekToday && (
                 <button
                   type="button"
                   onClick={goToToday}
-                  className="min-h-[38px] sm:min-h-0 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 text-indigo-700 dark:text-indigo-300 border border-indigo-400/40 text-xs font-extrabold transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs hover:shadow-indigo-500/20"
-                  title="Volver a la semana actual (Hoy)"
+                  className="px-2.5 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30 text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95"
+                  title="Volver a la semana actual"
                 >
                   Hoy
                 </button>
               )}
 
-              {/* Selector de semanas y fechas (Página completa en móvil, popover en desktop) */}
+              {/* Popover selector de semanas */}
               {isWeekPickerOpen && (
-                <>
-                  <div
-                    className="hidden sm:block fixed inset-0 z-40"
-                    onClick={() => setIsWeekPickerOpen(false)}
-                  />
-
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] kg-glass-surface bg-white/95 dark:bg-[#121216]/95 border-0 sm:border border-zinc-200/80 dark:border-white/10 rounded-none sm:rounded-2xl shadow-2xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150 backdrop-blur-xl">
-                    <div className="flex items-center justify-between pb-2.5 sm:pb-2 border-b border-zinc-100 dark:border-[#27272A]">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          data-mobile-back-btn="true"
-                          onClick={() => setIsWeekPickerOpen(false)}
-                          className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
-                          aria-label="Volver al programa"
-                        >
-                          <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        </button>
-                        <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-sm sm:text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
-                          Selector de Semanas
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={goToToday}
-                          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-2xs border ${
-                            isCurrentWeekToday
-                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                              : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
-                          }`}
-                          title="Ir directamente a la semana en curso de hoy"
-                        >
-                          <CalendarCheck className="w-3.5 h-3.5" />
-                          <span>{isCurrentWeekToday ? 'Semana de Hoy' : 'Ir a Hoy'}</span>
-                        </button>
-                      </div>
+                <div className="absolute top-full left-0 mt-2 z-50 w-[calc(100vw-2rem)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#141419] border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span className="text-xs font-bold text-zinc-900 dark:text-[#F4F4F5]">
+                        Semanas ({sortedWeeks.length})
+                      </span>
                     </div>
+                    <button
+                      type="button"
+                      onClick={goToToday}
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border ${
+                        isCurrentWeekToday
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                          : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                      }`}
+                    >
+                      <CalendarCheck className="w-3.5 h-3.5" />
+                      <span>{isCurrentWeekToday ? 'Semana actual' : 'Ir a Hoy'}</span>
+                    </button>
+                  </div>
 
-                    {availableMonths.length > 1 && (
-                      <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[11px]">
+                  {availableMonths.length > 1 && (
+                    <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => setWeekPickerMonthFilter('all')}
+                        className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
+                          weekPickerMonthFilter === 'all'
+                            ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
+                            : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
+                        }`}
+                      >
+                        Todas
+                      </button>
+                      {availableMonths.map((mKey) => (
                         <button
+                          key={mKey}
                           type="button"
-                          onClick={() => setWeekPickerMonthFilter('all')}
+                          onClick={() => setWeekPickerMonthFilter(mKey)}
                           className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
-                            weekPickerMonthFilter === 'all'
+                            weekPickerMonthFilter === mKey
                               ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
                               : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
                           }`}
                         >
-                          Todas
+                          {formatMonthYearKey(mKey)}
                         </button>
-                        {availableMonths.map((mKey) => (
-                          <button
-                            key={mKey}
-                            type="button"
-                            onClick={() => setWeekPickerMonthFilter(mKey)}
-                            className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
-                              weekPickerMonthFilter === mKey
-                                ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
-                                : 'bg-zinc-100 dark:bg-[#18181F] text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-200 dark:hover:bg-[#27272A]'
-                            }`}
-                          >
-                            {formatMonthYearKey(mKey)}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-                      {filteredPickerWeeks.map((w, idx) => {
-                        const isSelected = w.id === currentWeek.id;
-                        const isToday = isCurrentCalendarWeek(w.weekStartDate);
-                        const hasEvent = Boolean(w.specialEvent?.isSpecial);
-
-                        return (
-                          <button
-                            key={w.id}
-                            type="button"
-                            onClick={() => {
-                              setCurrentWeekId(w.id);
-                              setIsWeekPickerOpen(false);
-                            }}
-                            className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2 text-xs cursor-pointer border ${
-                              isSelected
-                                ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200 shadow-2xs font-semibold'
-                                : 'bg-white dark:bg-[#18181F] border-zinc-200/60 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-indigo-500/40 text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F]/80'
-                            }`}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className={`font-bold font-mono tabular-nums ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-800 dark:text-white'}`}>
-                                  {formatTheocraticWeekRange(w.weekStartDate, w.weekEndDate)}
-                                </span>
-                                {isToday && (
-                                  <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
-                                    Hoy
-                                  </span>
-                                )}
-                                {hasEvent && (
-                                  <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
-                                    Especial
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">
-                                {w.midweek.bibleReading || w.specialEvent?.title || `Semana ${idx + 1}`}
-                              </p>
-                            </div>
-
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
+                      ))}
                     </div>
+                  )}
 
-                    <div className="pt-2 border-t border-zinc-100 dark:border-[#27272A] space-y-2">
-                      <label className="text-[11px] font-semibold text-zinc-500 dark:text-[#A1A1AA] block">
-                        Saltar o crear fecha exacta:
-                      </label>
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="date"
-                          value={customJumpDate}
-                          onChange={(e) => setCustomJumpDate(e.target.value)}
-                          className="flex-1 text-xs px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
-                        />
+                  <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                    {filteredPickerWeeks.map((w, idx) => {
+                      const isSelected = w.id === currentWeek.id;
+                      const isToday = isCurrentCalendarWeek(w.weekStartDate);
+                      const hasEvent = Boolean(w.specialEvent?.isSpecial);
+
+                      return (
                         <button
+                          key={w.id}
                           type="button"
-                          onClick={handleJumpToCustomDate}
-                          disabled={!customJumpDate}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold transition cursor-pointer shadow-2xs whitespace-nowrap"
+                          onClick={() => {
+                            setCurrentWeekId(w.id);
+                            setIsWeekPickerOpen(false);
+                          }}
+                          className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2 text-xs cursor-pointer border ${
+                            isSelected
+                              ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200 font-semibold'
+                              : 'bg-white dark:bg-[#18181F] border-zinc-200/60 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-indigo-500/40 text-zinc-700 dark:text-[#F4F4F5]'
+                          }`}
                         >
-                          Ir a Fecha
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`font-bold font-mono tabular-nums ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-800 dark:text-white'}`}>
+                                {formatTheocraticWeekRange(w.weekStartDate, w.weekEndDate)}
+                              </span>
+                              {isToday && (
+                                <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
+                                  Hoy
+                                </span>
+                              )}
+                              {hasEvent && (
+                                <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">
+                                  Especial
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-zinc-400 dark:text-[#A1A1AA] truncate mt-0.5">
+                              {w.midweek.bibleReading || w.specialEvent?.title || `Semana ${idx + 1}`}
+                            </p>
+                          </div>
+
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                          )}
                         </button>
-                      </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="date"
+                        value={customJumpDate}
+                        onChange={(e) => setCustomJumpDate(e.target.value)}
+                        className="flex-1 text-xs px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-zinc-50 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] font-mono tabular-nums"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleJumpToCustomDate}
+                        disabled={!customJumpDate}
+                        className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold transition cursor-pointer whitespace-nowrap"
+                      >
+                        Ir a Fecha
+                      </button>
                     </div>
+                  </div>
+
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addNextWeek();
+                        setIsWeekPickerOpen(false);
+                        setToastNotification('Siguiente semana agregada al programa.');
+                        setTimeout(() => setToastNotification(null), 3000);
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs transition cursor-pointer border border-transparent dark:border-[#27272A]"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Agregar Siguiente Semana</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Centro: Selector de Vista (Todo / Entre Semana / Fin de Semana) */}
+          <div className="grid grid-cols-3 sm:inline-flex items-center bg-zinc-100/80 dark:bg-zinc-800/60 p-0.5 rounded-xl border border-zinc-200/80 dark:border-white/10 gap-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode('all')}
+              className={`px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer text-center whitespace-nowrap ${
+                viewMode === 'all'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+              }`}
+            >
+              Todo
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('midweek')}
+              className={`px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer text-center whitespace-nowrap ${
+                viewMode === 'midweek'
+                  ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+              }`}
+            >
+              Entre Semana
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('weekend')}
+              className={`px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer text-center whitespace-nowrap ${
+                viewMode === 'weekend'
+                  ? 'bg-white dark:bg-[#121216] text-emerald-600 dark:text-emerald-400 shadow-2xs font-bold'
+                  : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
+              }`}
+            >
+              Fin de Semana
+            </button>
+          </div>
+
+          {/* Derecha: Acciones Principales Compactas */}
+          <div className="flex items-center justify-between sm:justify-end gap-1 sm:gap-1.5 text-[11px] sm:text-xs min-w-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+              {!isReadOnly ? (
+                <button
+                  onClick={
+                    viewMode === 'weekend'
+                      ? handleAutoAssignWeekendOnly
+                      : handleAutoAssignAllMeetings
+                  }
+                  className="flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
+                  title="Autoasignar semana respetando rotación y sin cruces"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                  <span>Autoasignar</span>
+                </button>
+              ) : (
+                <span className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] font-medium px-2.5 py-1 bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 rounded-xl truncate">
+                  Solo lectura
+                </span>
+              )}
+
+              <button
+                onClick={() => setIsBatchWhatsAppOpen(true)}
+                className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-semibold transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                title="Enviar recordatorios de la semana por WhatsApp"
+              >
+                <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>WhatsApp</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              {/* Indicador de Cruces */}
+              <button
+                type="button"
+                onClick={() => setIsConflictsModalOpen(true)}
+                className={`flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap ${
+                  weekConflictsCount > 0
+                    ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/35 font-mono tabular-nums'
+                    : 'text-zinc-600 dark:text-[#A1A1AA] border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100/80 dark:hover:bg-white/10'
+                }`}
+                title="Auditoría de cruces de esta semana"
+              >
+                {weekConflictsCount > 0 ? (
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                ) : (
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                )}
+                <span className="font-mono tabular-nums">
+                  {weekConflictsCount > 0 ? (
+                    <>
+                      {weekConflictsCount}
+                      <span className="hidden xs:inline"> Cruces</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="sm:hidden">OK</span>
+                      <span className="hidden sm:inline">Sin Cruces</span>
+                    </>
+                  )}
+                </span>
+              </button>
+
+              {/* Menú Desplegable "Más Herramientas" */}
+              <div ref={moreMenuRef} className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsMoreMenuOpen((prev) => !prev)}
+                  className={`flex items-center justify-center w-8 h-8 rounded-xl border transition-all cursor-pointer active:scale-95 ${
+                    isMoreMenuOpen
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-700'
+                      : 'text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border-zinc-200 dark:border-[#27272A]'
+                  }`}
+                  title="Herramientas, S-89, S-38, Modo Atril y más"
+                  aria-label="Más herramientas y opciones"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+
+                {isMoreMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141419] border border-zinc-200/90 dark:border-zinc-800 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                      Documentos y Atril
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        handlePrintS89();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                        <FileText className="w-3.5 h-3.5" />
+                      </span>
+                      <span>Descargar Hojas S-89</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        handleOpenS38();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <Award className="w-3.5 h-3.5" />
+                      </span>
+                      <span>Registro de Estudiantes (S-38)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsTimerModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <Timer className="w-3.5 h-3.5" />
+                      </span>
+                      <span>Modo Atril / Cronómetro</span>
+                    </button>
+
+                    <div className="my-1 border-t border-zinc-100 dark:border-zinc-800/80" />
+                    <div className="px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                      Programa y Cartelera
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsMwbModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-3.5 h-3.5" />
+                      </span>
+                      <span>Importar Guía (MWB)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsMonthlyBillboardModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <CalendarDays className="w-3.5 h-3.5" />
+                      </span>
+                      <span>Cartelera Mensual del Salón</span>
+                    </button>
 
                     {!isReadOnly && (
-                      <div className="pt-1">
+                      <>
                         <button
                           type="button"
                           onClick={() => {
-                            addNextWeek();
-                            setIsWeekPickerOpen(false);
-                            setToastNotification('Siguiente semana agregada al programa.');
-                            setTimeout(() => setToastNotification(null), 3000);
+                            setIsMoreMenuOpen(false);
+                            setEventTitle(currentWeek.specialEvent?.title || '');
+                            setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
+                            setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
+                            setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
+                            setEventNotes(currentWeek.specialEvent?.notes || '');
+                            setIsSpecialEventModalOpen(true);
                           }}
-                          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#18181F] dark:hover:bg-[#27272A] text-zinc-700 dark:text-[#F4F4F5] font-bold text-xs transition cursor-pointer border border-transparent dark:border-[#27272A]"
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
                         >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Agregar Siguiente Semana (+7 días)</span>
+                          <span className="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                            <Sparkle className="w-3.5 h-3.5" />
+                          </span>
+                          <span>
+                            {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Configurar Evento Especial'}
+                          </span>
                         </button>
-                      </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            setSourceWeekId(sortedWeeks[0]?.id || '');
+                            setIsCopyModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
+                        >
+                          <span className="w-7 h-7 rounded-lg bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                            <Copy className="w-3.5 h-3.5" />
+                          </span>
+                          <span>Copiar Estructura de Semana</span>
+                        </button>
+
+                        <div className="my-1 border-t border-zinc-100 dark:border-zinc-800/80" />
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            setIsClearWeekAssignmentsModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer text-left"
+                        >
+                          <span className="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                            <UserMinus className="w-3.5 h-3.5" />
+                          </span>
+                          <span>Quitar Asignados de la Semana</span>
+                        </button>
+                      </>
                     )}
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Bloque 1B: Selector de tipo de reunión con indicadores de progreso */}
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-zinc-100/80 dark:bg-zinc-800/60 p-1 rounded-2xl border border-zinc-200/80 dark:border-white/10 gap-1 backdrop-blur-md">
-              <button
-                type="button"
-                onClick={() => setViewMode('all')}
-                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
-                  viewMode === 'all'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-                }`}
-              >
-                <span>Todo</span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300">
-                  {meetingProgress.midweekAssigned + meetingProgress.weekendAssigned}/
-                  {meetingProgress.midweekTotal + meetingProgress.weekendTotal}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('midweek')}
-                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
-                  viewMode === 'midweek'
-                    ? 'bg-white dark:bg-[#121216] text-indigo-600 dark:text-indigo-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-                }`}
-              >
-                <span className="truncate">Entre Semana</span>
-                <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
-                    meetingProgress.midweekAssigned >= meetingProgress.midweekTotal && meetingProgress.midweekTotal > 0
-                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
-                      : 'bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300'
-                  }`}
-                >
-                  {meetingProgress.midweekAssigned}/{meetingProgress.midweekTotal}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('weekend')}
-                className={`min-h-[36px] md:min-h-0 px-2.5 sm:px-3.5 py-1.5 md:py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 truncate ${
-                  viewMode === 'weekend'
-                    ? 'bg-white dark:bg-[#121216] text-emerald-600 dark:text-emerald-400 border border-zinc-200/80 dark:border-white/10 shadow-sm font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-[#F4F4F5]'
-                }`}
-              >
-                <span className="truncate">Fin de Semana</span>
-                <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums shrink-0 ${
-                    meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
-                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
-                      : 'bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300'
-                  }`}
-                >
-                  {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal}
-                </span>
-              </button>
-            </div>
-
-            {/* Botón Nueva Semana sutil (solo en desktop md+) */}
-            <button
-              onClick={addNextWeek}
-              className="hidden md:flex p-2.5 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 transition-all cursor-pointer shrink-0 active:scale-95"
-              title="Añadir nueva semana"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* ── BARRA DE HERRAMIENTAS DE ACCIONES ── */}
-        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-3 border-t border-zinc-200/80 dark:border-white/10 w-full text-xs">
-          {/* Lado izquierdo: Acciones clave con diseño limpio */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            {!isReadOnly ? (
-              <button
-                onClick={
-                  viewMode === 'weekend'
-                    ? handleAutoAssignWeekendOnly
-                    : handleAutoAssignAllMeetings
-                }
-                className="min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold transition-all shadow-md shadow-indigo-500/20 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
-                title="Autoasignar toda esta semana respetando rotación y sin cruces"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                <span>Autoasignar</span>
-              </button>
-            ) : (
-              <span className="text-zinc-500 dark:text-[#A1A1AA] text-[11px] sm:text-xs font-medium px-2.5 py-1 bg-zinc-100/80 dark:bg-white/5 border border-zinc-200/60 dark:border-white/10 rounded-xl truncate">
-                Solo lectura ({effectiveRoleInfo.shortName})
-              </span>
-            )}
-
-            <button
-              onClick={() => setIsBatchWhatsAppOpen(true)}
-              className="min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-semibold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0 shadow-xs"
-              title="Enviar recordatorios de la semana por WhatsApp"
-            >
-              <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>WhatsApp</span>
-            </button>
-          </div>
-
-          {/* Lado derecho: Documentos, Cruces y Menú Más */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
-            {/* S-89 oficial (en escritorio visible directo, en móvil dentro de Más Opciones) */}
-            <button
-              type="button"
-              onClick={handlePrintS89}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-medium transition-all cursor-pointer active:scale-95 shadow-xs"
-              title="Descargar hojas oficiales de asignación S-89 en PDF"
-            >
-              <FileText className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-              <span>S-89</span>
-            </button>
-
-            {/* Fichas S-38 */}
-            <button
-              type="button"
-              onClick={handleOpenS38}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100/80 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 font-medium transition-all cursor-pointer active:scale-95 shadow-xs"
-              title="Registros S-38 y folleto de oratoria"
-            >
-              <Award className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-              <span>S-38</span>
-            </button>
-
-            {/* Modo Atril y Cronómetro de Presidencia */}
-            <button
-              type="button"
-              onClick={() => setIsTimerModalOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 font-semibold transition-all cursor-pointer active:scale-95 shadow-xs"
-              title="Abrir Modo Atril y Cronómetro de Presidencia"
-            >
-              <Timer className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <span>Modo Atril</span>
-            </button>
-
-            {/* Cruces */}
-            <button
-              type="button"
-              onClick={() => setIsConflictsModalOpen(true)}
-              className={`min-h-[34px] sm:min-h-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap shrink-0 shadow-xs ${
-                weekConflictsCount > 0
-                  ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/40 font-mono tabular-nums shadow-[0_0_10px_rgba(244,63,94,0.2)]'
-                  : 'text-zinc-600 dark:text-[#A1A1AA] border-zinc-200/80 dark:border-white/10 hover:bg-zinc-100/80 dark:hover:bg-white/10'
-              }`}
-              title="Auditoría de cruces de esta semana"
-            >
-              {weekConflictsCount > 0 ? (
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0 animate-bounce" />
-              ) : (
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              )}
-              <span className="font-mono tabular-nums">{weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}</span>
-            </button>
-
-            {/* Menú Desplegable "Más Opciones" */}
-            <div className="relative shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-                className="min-h-[34px] min-w-[34px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer active:scale-95"
-                title="Más herramientas, S-89, S-38 y opciones"
-                aria-label="Más herramientas y opciones"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-
-              {isMoreMenuOpen && (
-                <>
-                  <div
-                    className="hidden sm:block fixed inset-0 z-40"
-                    onClick={() => setIsMoreMenuOpen(false)}
-                  />
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-[#121216] border-0 sm:border border-zinc-200 dark:border-[#27272A] rounded-none sm:rounded-2xl shadow-xl z-50 p-3 sm:py-1.5 sm:px-0 animate-in fade-in duration-100 flex flex-col justify-start">
-                    <div className="flex sm:hidden items-center gap-3 px-3 py-2.5 mb-3 rounded-2xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200 dark:border-[#27272A] shadow-2xs shrink-0">
-                      <button
-                        type="button"
-                        data-mobile-back-btn="true"
-                        onClick={() => setIsMoreMenuOpen(false)}
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-100 dark:bg-[#18181F] text-zinc-800 dark:text-[#F4F4F5] cursor-pointer active:scale-95 shrink-0"
-                        aria-label="Atrás"
-                      >
-                        <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                      </button>
-                      <span className="text-sm font-extrabold text-zinc-800 dark:text-[#F4F4F5] truncate">
-                        Herramientas del Programa
-                      </span>
-                    </div>
-
-                    <div className="bg-white dark:bg-[#121216] sm:bg-transparent sm:dark:bg-transparent rounded-2xl sm:rounded-none border border-zinc-200 dark:border-[#27272A] sm:border-0 divide-y divide-zinc-100 dark:divide-[#27272A] sm:divide-y-0 overflow-hidden shadow-2xs sm:shadow-none">
-                      {/* Mobile quick access to S-89 and S-38 */}
-                      <div className="sm:hidden divide-y divide-zinc-100 dark:divide-[#27272A]">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsMoreMenuOpen(false);
-                            handlePrintS89();
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                        >
-                          <FileText className="w-4 h-4 text-rose-500 shrink-0" />
-                          <span>Descargar Hojas S-89 (PDF)</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsMoreMenuOpen(false);
-                            handleOpenS38();
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-zinc-800 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                        >
-                          <Award className="w-4 h-4 text-indigo-500 shrink-0" />
-                          <span>Registro de Estudiantes (S-38)</span>
-                        </button>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMoreMenuOpen(false);
-                          setIsMwbModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                      >
-                        <BookOpen className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span>Importar Guía de Actividades (MWB)</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMoreMenuOpen(false);
-                          setOrganizedModalTab('catalogo');
-                          setIsOrganizedModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                      >
-                        <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
-                        <span>Catálogo de Semanas Organized</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMoreMenuOpen(false);
-                          setIsMonthlyBillboardModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                      >
-                        <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        <span>Cartelera Mensual del Salón</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMoreMenuOpen(false);
-                          setIsTimerModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                      >
-                        <Timer className="w-4 h-4 text-amber-500 shrink-0" />
-                        <span>Modo Atril / Cronómetro</span>
-                      </button>
-
-                      {!isReadOnly && (
-                        <>
-                          <div className="hidden sm:block my-1 border-t border-zinc-100 dark:border-[#27272A]" />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsMoreMenuOpen(false);
-                              setEventTitle(currentWeek.specialEvent?.title || '');
-                              setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
-                              setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
-                              setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
-                              setEventNotes(currentWeek.specialEvent?.notes || '');
-                              setIsSpecialEventModalOpen(true);
-                            }}
-                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                          >
-                            <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
-                            <span>
-                              {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Configurar Evento Especial'}
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsMoreMenuOpen(false);
-                              setSourceWeekId(sortedWeeks[0]?.id || '');
-                              setIsCopyModalOpen(true);
-                            }}
-                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-zinc-800 sm:text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-50 dark:hover:bg-[#18181F] cursor-pointer text-left"
-                          >
-                            <Copy className="w-4 h-4 text-zinc-500 shrink-0" />
-                            <span>Copiar Estructura de Semana</span>
-                          </button>
-
-                          <div className="hidden sm:block my-1 border-t border-zinc-100 dark:border-[#27272A]" />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsMoreMenuOpen(false);
-                              setIsClearWeekAssignmentsModalOpen(true);
-                            }}
-                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer text-left"
-                          >
-                            <UserMinus className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-                            <span>Quitar Asignados de la Semana</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1340,25 +1258,25 @@ export const ScheduleTab: React.FC = () => {
             }`}
           >
             {/* ── ENCABEZADO FDS REDISEÑADO CON IDENTIDAD VISUAL, PROGRESO Y SALTO RÁPIDO ── */}
-            <div className="border-t-4 border-t-emerald-600 dark:border-t-emerald-500 px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-b from-emerald-50/60 via-zinc-50/70 to-white dark:from-emerald-950/30 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-white/10 flex flex-col gap-3.5 text-xs">
+            <div className="border-t-4 border-t-emerald-600 dark:border-t-emerald-500 px-3.5 sm:px-6 py-3 sm:py-5 bg-gradient-to-b from-emerald-50/60 via-zinc-50/70 to-white dark:from-emerald-950/30 dark:via-[#18181F] dark:to-[#121216] border-b border-zinc-200/80 dark:border-white/10 flex flex-col gap-2.5 sm:gap-3.5 text-xs">
               {/* Fila 1: Identidad visual, Fecha/Hora completa y Barra de Progreso */}
-              <div className="flex items-start sm:items-center justify-between gap-3">
-                <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/25">
-                    <CalendarCheck className="w-5 h-5" />
+              <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/25">
+                    <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight">
+                      <h3 className="font-extrabold text-zinc-900 dark:text-[#F4F4F5] text-sm sm:text-base tracking-tight truncate">
                         Reunión del Fin de Semana
                       </h3>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                      <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
                         Pública y La Atalaya
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-0.5 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px] sm:text-xs">
-                      <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      <span className="capitalize">
+                    <div className="flex items-center gap-1.5 mt-0.5 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px] sm:text-xs min-w-0">
+                      <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                      <span className="capitalize truncate">
                         {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)}
                         {settings.weekendMeetingTime ? ` • ${settings.weekendMeetingTime}` : ''}
                       </span>
@@ -1368,16 +1286,16 @@ export const ScheduleTab: React.FC = () => {
 
                 {/* Indicador de progreso de 6 segmentos */}
                 <div
-                  className={`flex flex-col items-end px-3 py-1.5 rounded-2xl border shrink-0 backdrop-blur-md ${
+                  className={`flex flex-col items-end px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl sm:rounded-2xl border shrink-0 backdrop-blur-md ${
                     meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
                       ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
                       : 'bg-zinc-100/80 dark:bg-white/5 border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-[#F4F4F5]'
                   }`}
                   title="Progreso de asignaciones de Fin de Semana"
                 >
-                  <div className="flex items-center gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
+                  <div className="flex items-center gap-1 sm:gap-1.5 font-mono tabular-nums text-[11px] font-extrabold">
                     <CheckCircle2
-                      size={13}
+                      size={12}
                       className={
                         meetingProgress.weekendAssigned >= meetingProgress.weekendTotal
                           ? 'text-emerald-600 dark:text-emerald-400'
@@ -1385,10 +1303,11 @@ export const ScheduleTab: React.FC = () => {
                       }
                     />
                     <span>
-                      {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal} asignados
+                      {meetingProgress.weekendAssigned}/{meetingProgress.weekendTotal}
+                      <span className="hidden sm:inline"> asignados</span>
                     </span>
                   </div>
-                  <div className="grid grid-cols-6 gap-0.5 w-24 h-1.5 mt-1.5">
+                  <div className="grid grid-cols-6 gap-0.5 w-16 sm:w-24 h-1 sm:h-1.5 mt-1 sm:mt-1.5">
                     {[1, 2, 3, 4, 5, 6].map((step) => (
                       <span
                         key={step}
@@ -1404,15 +1323,15 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* Fila 2: Resumen de Bosquejo y Cánticos + Botones de Acción Rápida */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-zinc-200/80 dark:border-white/10">
-                <div className="flex items-center gap-2 flex-wrap min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 sm:pt-3 border-t border-zinc-200/80 dark:border-white/10">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
                   <button
                     type="button"
                     onClick={() => {
                       setWeekendEditTab('discurso');
                       setIsWeekendEditModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 dark:bg-sky-500/15 dark:hover:bg-sky-500/25 text-sky-800 dark:text-sky-300 border border-sky-500/30 text-[11px] font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 dark:bg-sky-500/15 dark:hover:bg-sky-500/25 text-sky-800 dark:text-sky-300 border border-sky-500/30 text-[11px] font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
                     title="Clic para editar bosquejo u orador"
                   >
                     <Mic size={12} className="shrink-0" />
@@ -1429,7 +1348,7 @@ export const ScheduleTab: React.FC = () => {
                       setWeekendEditTab('canciones');
                       setIsWeekendEditModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-[11px] font-semibold text-zinc-700 dark:text-[#A1A1AA] font-mono tabular-nums transition-all cursor-pointer active:scale-95 shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-[11px] font-semibold text-zinc-700 dark:text-[#A1A1AA] font-mono tabular-nums transition-all cursor-pointer active:scale-95 shadow-2xs"
                     title="Clic para editar los cánticos del fin de semana"
                   >
                     <Music size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1440,16 +1359,17 @@ export const ScheduleTab: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar sm:flex-wrap shrink-0">
                   {!isReadOnly && (
                     <button
                       type="button"
                       onClick={handleAutoAssignWeekendOnly}
-                      className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95"
+                      className="min-h-[30px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[11px] sm:text-xs transition-all shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95 whitespace-nowrap"
                       title="Autoasignar presidente, oraciones, conductor y lector del fin de semana"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
-                      <span>Autoasignar FDS</span>
+                      <span className="sm:hidden">Auto FDS</span>
+                      <span className="hidden sm:inline">Autoasignar FDS</span>
                     </button>
                   )}
 
@@ -1457,11 +1377,12 @@ export const ScheduleTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleQuickSyncOrganized('weekend')}
-                      className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+                      className="min-h-[30px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-[11px] sm:text-xs transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                       title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                     >
                       <RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                      <span>Sincronizar Bosquejo</span>
+                      <span className="sm:hidden">Sincronizar</span>
+                      <span className="hidden sm:inline">Sincronizar Bosquejo</span>
                     </button>
                   )}
 
@@ -1471,17 +1392,18 @@ export const ScheduleTab: React.FC = () => {
                       setOrganizedModalTab('bosquejos');
                       setIsOrganizedModalOpen(true);
                     }}
-                    className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[30px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-[11px] sm:text-xs transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                     title="Ver catálogo oficial de 194 bosquejos"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>Catálogo (#1-194)</span>
+                    <span className="sm:hidden">Catálogo</span>
+                    <span className="hidden sm:inline">Catálogo (#1-194)</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setIsTimerModalOpen(true)}
-                    className="min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-[#F4F4F5] border border-transparent dark:border-white/10 font-semibold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[30px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-[#F4F4F5] border border-transparent dark:border-white/10 font-semibold text-[11px] sm:text-xs transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                     title="Abrir cronómetro de atril para Discurso Público y Estudio de La Atalaya"
                   >
                     <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -1491,11 +1413,12 @@ export const ScheduleTab: React.FC = () => {
               </div>
 
               {/* Fila 3: Barra de salto rápido a secciones de Fin de Semana */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2.5 border-t border-zinc-200/80 dark:border-white/10">
+              <div className="grid grid-cols-2 sm:flex items-center gap-1.5 sm:gap-2 pt-2 sm:pt-2.5 border-t border-zinc-200/80 dark:border-white/10">
                 {[
                   {
                     id: 'fds-sec-apertura',
                     label: 'Apertura',
+                    shortLabel: 'Apertura',
                     assigned:
                       (currentWeek.weekend.presidentId ? 1 : 0) + (currentWeek.weekend.initialPrayerId ? 1 : 0),
                     total: 2,
@@ -1506,6 +1429,7 @@ export const ScheduleTab: React.FC = () => {
                   {
                     id: 'fds-sec-discurso',
                     label: 'Discurso Público',
+                    shortLabel: 'Discurso',
                     assigned: currentWeek.weekend.publicTalkSpeaker ? 1 : 0,
                     total: 1,
                     pillClass:
@@ -1515,6 +1439,7 @@ export const ScheduleTab: React.FC = () => {
                   {
                     id: 'fds-sec-atalaya',
                     label: 'La Atalaya',
+                    shortLabel: 'La Atalaya',
                     assigned:
                       (currentWeek.weekend.atalayaConductorId ? 1 : 0) +
                       (currentWeek.weekend.atalayaLectorId ? 1 : 0),
@@ -1526,6 +1451,7 @@ export const ScheduleTab: React.FC = () => {
                   {
                     id: 'fds-sec-conclusion',
                     label: 'Conclusión',
+                    shortLabel: 'Conclusión',
                     assigned: currentWeek.weekend.finalPrayerId ? 1 : 0,
                     total: 1,
                     pillClass:
@@ -1540,10 +1466,11 @@ export const ScheduleTab: React.FC = () => {
                       const el = document.getElementById(sec.id);
                       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 ${sec.pillClass}`}
+                    className={`inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 ${sec.pillClass}`}
                   >
-                    <span className={`w-2 h-2 rounded-full ${sec.dotClass}`} />
-                    <span>{sec.label}</span>
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${sec.dotClass}`} />
+                    <span className="sm:hidden truncate">{sec.shortLabel}</span>
+                    <span className="hidden sm:inline">{sec.label}</span>
                     <span className="font-mono text-[10px] opacity-80">
                       ({sec.assigned}/{sec.total})
                     </span>

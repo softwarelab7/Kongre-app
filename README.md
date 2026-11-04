@@ -50,11 +50,14 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 ### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
 - **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.
+- **Editor de Publicadores 100% Bento (10 Subsecciones):** Transformación integral de las 10 subsecciones de `PublisherEditor/sections/*` (`BasicInfoSection`, `ContactSection`, `EmergencyContactsSection`, `PrivilegesSection`, `AssignmentsSection`, `S21RecordsSection`, `MedicalDpaSection`, `SpecialConditionsSection`, `AccessCredentialsSection`, `AbsenceAndNotesSection`) a contenedores `.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, insignias con halo `.kg-glow-badge` y bordes de cristal `rounded-3xl`.
+- **Consolidación del Panel Eléctrico en Mantenimiento:** Integración como submódulo y modal especializado (`ElectricalPanelModal`) dentro del módulo de Mantenimiento del Salón del Reino, optimizando el espacio en la barra superior global.
 - **Superficies Translúcidas de Cristal (`.kg-glass-surface` & `.kg-sheen-top`):** Tarjetas y modales con `backdrop-blur-md` / `backdrop-blur-xl`, reflejos sutiles en el borde superior (*specular sheen*) y elevación fluida sin sombras opacas excesivas.
 - **Jerarquía Bento Asimétrica (`.kg-card-bento`):** Cuadrículas asimétricas de alto impacto en vistas ejecutivas, métricas KPI con resplandor radial suave y microinteracciones de entrada de escala 0.98 a 1.
 - **Insignias Vivas (`.kg-glow-badge`):** Contenedores de iconos con halo difuso de acento que destacan el rol teocrático y el contexto de cada diálogo.
 - **Conmutadores Segmentados Estilo Apple:** Píldoras de selección en una sola pieza táctil para alternar semanas, filtros, roles y modos operativos sin pestañas toscas.
 - **Erradicación Total de Diálogos Nativos:** Cero uso de `window.alert()`, `confirm()` o `prompt()` nativos en favor de una experiencia inmersiva fluida en los 4 temas del sistema (Claro, Oscuro `#09090b`/`#121216`, Sepia `#f4ecd8` y Cabina A/V `#000000`).
+- **Verificación Rigurosa y Cero Regresiones:** 91 pruebas unitarias y E2E completamente aprobadas (`91 pass, 0 fail`) y verificación estricta de tipos de TypeScript sin errores (`tsc --noEmit`).
 
 ### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
 - **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.

@@ -6,8 +6,27 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0-alpha.42] — 31 de Octubre, 2026
-**Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB, Visor Interactivo PDF, Autoasignación de Fin de Semana, Botón de Retorno Rápido y Anillo Reactivo de Sincronización**
+### [v0.1.0-alpha.42] — 4 de Noviembre, 2026
+**Elevación Completa al Sistema Linear + Apple Bento (Editor de Publicadores, Modales y Vistas Teocráticas), Consolidación del Panel Eléctrico en Mantenimiento, Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB y Visor Interactivo PDF**
+
+- 🍱 **Elevación Integral de las 10 Subsecciones del Editor de Publicadores (`PublisherEditor/sections/*`):**
+  - Migración sistemática de todas las tarjetas y subpaneles internos al sistema Bento (`.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, bordes translúcidos `border-zinc-200/80 dark:border-white/10` y esquinas suaves `rounded-3xl`).
+  - **Identidad Básica (`BasicInfoSection.tsx`):** Tarjetas Bento para cabecera demográfica con insignia de género `.kg-glow-badge`, núcleo familiar para coincidencia de noches de reunión y matriz de habilidades de mantenimiento del salón.
+  - **Contacto y Movilidad (`ContactSection.tsx`):** Tarjetas Bento para canales de pastoreo, integración GPS con enlaces directos a mapas y logística de vehículos/transporte para contingencias.
+  - **Contactos de Emergencia (`EmergencyContactsSection.tsx`):** Tarjeta Bento con badge de urgencia `.kg-glow-badge` y buscador congregacional para importación rápida.
+  - **Privilegios Teocráticos y Nombramiento S-21 (`PrivilegesSection.tsx`):** Contenedores Bento para clasificación eclesiástica S-21, línea de tiempo espiritual, servicio de precursor, pastoreo pastoral y departamentos de congregación.
+  - **Asignaciones Teocráticas y Tareas Operativas S-89 (`AssignmentsSection.tsx`):** Tarjeta Bento para parámetros de estudiante S-38 / orador público y catálogo de habilitaciones teocráticas por áreas.
+  - **Registro de Publicador S-21 (`S21RecordsSection.tsx`):** Tarjeta Bento con visualización SVG integrada de curva de actividad anual (horas, cursos bíblicos y horas acreditadas).
+  - **Directriz Médica Anticipada DPA (`MedicalDpaSection.tsx`):** Tarjeta Bento con cinta de vigencia, representantes de salud designados y consideraciones de emergencia para el CLH.
+  - **Condiciones Especiales y Accesibilidad (`SpecialConditionsSection.tsx`):** Tarjeta Bento con indicadores de salud, acomodación en el salón y control de traslado de congregación.
+  - **Credenciales de Acceso y PIN Personal (`AccessCredentialsSection.tsx`):** Tarjeta Bento con badge de llave `.kg-glow-badge`, copiado rápido y compartición segura por WhatsApp.
+  - **Ausencias y Notas Administrativas (`AbsenceAndNotesSection.tsx`):** Tarjetas Bento en cuadrícula de dos columnas para calendario preventivo de ausencias y bloc de notas de secretaría.
+- ⚡ **Consolidación del Panel de Disyuntores Eléctricos en Mantenimiento (`ElectricalPanelModal.tsx`, `MantenimientoTab.tsx`, `GlobalSectionQuickBar.tsx`):**
+  - Desacoplamiento del panel de disyuntores de la barra de navegación rápida global para integrarlo de forma natural y cohesionada dentro de la pestaña de **Mantenimiento del Salón del Reino**.
+  - Nueva tarjeta Bento lanzadora con métricas de circuitos activos y modal flotante de alta resolución (`ElectricalPanelModal`) para la inspección y maniobra de disyuntores de cabina.
+- 🎨 **Elevación Arquitectónica al Sistema Linear + Apple Bento en Modales y Pestañas Auxiliares (`src/components/*`):**
+  - Unificación visual de más de 35 modales y pantallas departamentales con `.kg-card-bento`, `.kg-glass-surface` y `.kg-sheen-top` en los 4 temas del sistema (Claro, Oscuro, Sepia y Cabina A/V).
+  - Cobertura completa en modales de asignaciones estudiantiles S-89, historial pedagógico S-38, sustituciones, carritos de predicación pública, grupos de servicio, informes S-4, precursores S-205b, informe mensual a la sucursal S-1, hospitalidad, oradores visitantes, visitas del superintendente de circuito y asambleas.
 
 - 🚫 **Erradicación Total de Diálogos Nativos del Navegador (`ModalContext.tsx`, `StudyInspectorPanel.tsx`, `PersonalViewTab.tsx`, `TerritoriosTab.tsx`, `CleaningDutiesTab.tsx`, `InformeSucursalS1Tab.tsx`, `ErrorBoundary.tsx`):**
   - Eliminación definitiva de todos los cuadros de diálogo intrusivos del navegador (`window.confirm`, `window.alert`, avisos de "localhost dice...") que interrumpían la experiencia de usuario.

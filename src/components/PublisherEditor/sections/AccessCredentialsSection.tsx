@@ -308,11 +308,11 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
   }, [showSlipModal, currentPin, settings, publisherId, publisherName, currentRole]);
 
   return (
-    <section className="bg-white dark:bg-[#121216] p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs space-y-6 animate-in fade-in duration-300">
+    <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 md:p-8 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xs space-y-6 animate-in fade-in duration-300">
       {/* 1. Cabecera Unificada de Credenciales */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.05]">
         <div className="flex items-start gap-3.5">
-          <div className="w-11 h-11 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200/50 dark:border-purple-500/20">
+          <div className="w-11 h-11 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200/50 dark:border-purple-500/20 kg-glow-badge shadow-xs">
             <KeyRound size={20} />
           </div>
           <div>

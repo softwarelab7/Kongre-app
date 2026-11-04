@@ -66,11 +66,11 @@ export const EmergencyContactsSection: React.FC<EmergencyContactsSectionProps> =
     .slice(0, 6);
 
   return (
-    <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-6 animate-in fade-in duration-300">
+    <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-xs space-y-6 animate-in fade-in duration-300">
       {/* CABECERA EDITORIAL */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.05]">
         <div className="flex items-start gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200/50 dark:border-rose-500/20">
+          <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200/50 dark:border-rose-500/20 kg-glow-badge shadow-xs">
             <PhoneCall size={20} />
           </div>
           <div>

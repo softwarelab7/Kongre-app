@@ -360,11 +360,11 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-6">
       {/* BLOQUE 1: MATRIZ DE NOMBRAMIENTO TEOCRÁTICO Y RESUMEN S-21 */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl overflow-hidden shadow-xs">
         {/* Cabecera Ejecutiva */}
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/60 dark:border-emerald-500/20">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/60 dark:border-emerald-500/20 kg-glow-badge shadow-xs">
               <Shield size={20} />
             </div>
             <div>
@@ -549,7 +549,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
       </section>
 
       {/* BLOQUE 2: LÍNEA DE TIEMPO TEOCRÁTICA (HITOS CRONOLÓGICOS) */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div className="flex items-center gap-2.5">
             <Clock size={18} className="text-sky-500" />
@@ -710,7 +710,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
       {/* BLOQUE 3: DOS COLUMNAS OPERATIVAS (MINISTERIO Y GRUPO vs PASTOREO Y ESTADO) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Columna Izquierda (6 cols): Precursorado y Grupo de Servicio del Campo */}
-        <section className="lg:col-span-6 bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-7 shadow-xs flex flex-col justify-between space-y-6">
+        <section className="lg:col-span-6 kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-7 shadow-xs flex flex-col justify-between space-y-6">
           {/* Sub-bloque: Modalidad de Precursorado */}
           <div className="space-y-3.5">
             <div className="flex items-center justify-between">
@@ -917,7 +917,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
         </section>
 
         {/* Columna Derecha (6 cols): Pastoreo, Estado de Actividad y Registro Confidencial */}
-        <section className="lg:col-span-6 bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-7 shadow-xs flex flex-col justify-between space-y-6">
+        <section className="lg:col-span-6 kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-7 shadow-xs flex flex-col justify-between space-y-6">
           {/* Sub-bloque: Seguimiento de Visitas de Pastoreo */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -1130,7 +1130,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
       </div>
 
       {/* BLOQUE 4: MATRIZ DE RESPONSABILIDADES Y DEPARTAMENTOS DE LA CONGREGACIÓN */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div>
             <div className="flex items-center gap-2 flex-wrap">

@@ -184,11 +184,11 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
       )}
 
       {/* CONTENEDOR PRINCIPAL S-21 */}
-      <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs overflow-hidden">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xs overflow-hidden">
         {/* Cabecera Editorial */}
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/50 dark:border-amber-500/20">
+            <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/50 dark:border-amber-500/20 kg-glow-badge shadow-xs">
               <FileSpreadsheet size={20} />
             </div>
             <div>
@@ -530,7 +530,7 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
       </section>
 
       {/* GRÁFICO DE TENDENCIA ANUAL */}
-      <section className="bg-white dark:bg-[#121216] p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] shadow-xs">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 p-6 md:p-8 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div className="flex items-center gap-2.5">
             <BarChart3 size={18} className="text-amber-500" />

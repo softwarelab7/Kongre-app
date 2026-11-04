@@ -94,10 +94,10 @@ export const AbsenceAndNotesSection: React.FC<AbsenceAndNotesSectionProps> = ({
       {/* ===================================================================== */}
       {/* BLOQUE 1: CABECERA EJECUTIVA + CINTA DE KPIs DE DISPONIBILIDAD        */}
       {/* ===================================================================== */}
-      <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-[#27272A] overflow-hidden shadow-xs">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl border border-zinc-200/80 dark:border-white/10 overflow-hidden shadow-xs">
         <div className="p-6 md:p-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm kg-glow-badge">
               <CalendarDays size={22} />
             </div>
             <div>
@@ -190,7 +190,7 @@ export const AbsenceAndNotesSection: React.FC<AbsenceAndNotesSectionProps> = ({
       {/* ===================================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bloque 2: Agenda de Periodos de Ausencia */}
-        <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-6 md:p-8 border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col space-y-5">
+        <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl p-6 md:p-8 border border-zinc-200/80 dark:border-white/10 shadow-xs flex flex-col space-y-5">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.05] pb-4">
             <div className="flex items-center gap-2.5">
               <span className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-mono text-xs font-black flex items-center justify-center">
@@ -276,7 +276,7 @@ export const AbsenceAndNotesSection: React.FC<AbsenceAndNotesSectionProps> = ({
         </section>
 
         {/* Bloque 3: Notas Administrativas y Observaciones */}
-        <section className="bg-white dark:bg-[#121216] rounded-2xl sm:rounded-3xl p-6 md:p-8 border border-zinc-200 dark:border-[#27272A] shadow-xs flex flex-col space-y-4">
+        <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 rounded-3xl p-6 md:p-8 border border-zinc-200/80 dark:border-white/10 shadow-xs flex flex-col space-y-4">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.05] pb-4">
             <div className="flex items-center gap-2.5">
               <span className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono text-xs font-black flex items-center justify-center">

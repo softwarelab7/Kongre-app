@@ -78,10 +78,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-6">
       {/* BLOQUE 1: CABECERA, ACCIONES RÁPIDAS Y CINTA DE LOCALIZACIÓN */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl overflow-hidden shadow-xs">
         <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200/50 dark:border-cyan-500/20">
+            <div className="w-11 h-11 bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200/50 dark:border-cyan-500/20 kg-glow-badge shadow-xs">
               <Contact size={20} />
             </div>
             <div>
@@ -310,7 +310,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
       </section>
 
       {/* BLOQUE 2: DOMICILIO, REFERENCIAS DE PASTOREO Y COORDENADAS GPS */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-zinc-100 dark:border-white/[0.05]">
           <div className="flex items-center gap-2">
             <MapPin size={17} className="text-cyan-500" />
@@ -450,7 +450,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ formData, handle
       </section>
 
       {/* BLOQUE 3: TRANSPORTE Y PUBLICACIONES IMPRESAS */}
-      <section className="bg-white dark:bg-[#121216] border border-zinc-200 dark:border-[#27272A] rounded-2xl sm:rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
+      <section className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/95 border border-zinc-200/80 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-xs space-y-5">
         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">
           3. Apoyo de Transporte, Evacuación y Literatura Impresa
         </span>

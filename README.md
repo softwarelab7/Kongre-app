@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.42-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.42" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.43-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.43" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,9 +44,14 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.42`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.43`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
+
+### ⚡ Optimización de Agenda Teocrática y Sanitización de Asignaciones
+- **Barra de Herramientas Despejada:** Rediseño minimalista de la barra de control en la agenda teocrática (`ScheduleTab.tsx`, `ClmScheduleView.tsx`) con controladores de clic exterior (*click-outside handlers*) para selectores flotantes.
+- **Deduplicación Estricta de Partes de Reunión:** Resolución determinista de claves únicas en partes de reunión en `clmBridge.ts` y `CongregationContext.tsx`, eliminando advertencias de claves duplicadas en React y colisiones de estado.
+- **Aislamiento del Modal de Bosquejos Organized:** Interfaz enfocada en la consulta rápida de bosquejos públicos y programas con aislamiento de capas CSS en `OrganizedImportModal.tsx`.
 
 ### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
 - **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.

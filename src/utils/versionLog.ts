@@ -25,19 +25,50 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.42';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.43';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.31.8042';
-export const BUILD_DATE = '31 de Octubre, 2026';
+export const CURRENT_BUILD_CODE = '2026.11.04.8043';
+export const BUILD_DATE = '4 de Noviembre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0-alpha.43',
+    buildCode: '2026.11.04.8043',
+    date: '4 de Noviembre, 2026',
+    title: 'Optimización de Agenda Teocrática, Deduplicación de Asignaciones, Cifrado en Reposo Resiliente y Blindaje del Directorio',
+    isCurrent: true,
+    highlight: 'Barra de herramientas despejada y simplificada en Agenda y Asignaciones con controladores de clic exterior, deduplicación estricta de IDs en partes de reunión para evitar colisiones en React, modal enfocado de importación de bosquejos Organized, clave de cifrado en reposo V4 desacoplada de tokens volátiles de sesión y blindaje total contra fugas de texto cifrado en tarjetas del directorio.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Optimización de la Barra de Herramientas de Agenda Teocrática (ScheduleTab.tsx, ClmScheduleView.tsx): Interfaz despejada y fluida para alternar reuniones, modos y filtros con controladores de cierre al hacer clic fuera (click-outside handlers).',
+      },
+      {
+        category: 'security',
+        text: 'Cifrado en Reposo Resiliente V4 (sensitiveFields.ts, CongregationContext.tsx): Derivación de la clave de reposo basada en la sal del dispositivo y entropía no extraíble de IndexedDB, evaluador multi-clave retrocompatible y descifrado garantizado independientemente del estado de inicio de sesión.',
+      },
+      {
+        category: 'fix',
+        text: 'Blindaje Visual del Directorio de Publicadores (PublishersTab.tsx, usePublisherForm.ts): Erradicación de cadenas crudas de cifrado (kgr_sec4:...) en pantalla, protección contra desbordamientos con truncamiento estricto y descifrado automático en el formulario de edición.',
+      },
+      {
+        category: 'improvement',
+        text: 'Deduplicación de Partes y Sanitización de Datos (clmBridge.ts, clmDefaultProgram.ts, CongregationContext.tsx): Eliminación de IDs duplicados en partes de reunión y prevención de advertencias de claves repetidas en React al sincronizar reuniones.',
+      },
+      {
+        category: 'improvement',
+        text: 'Aislamiento de Modal de Bosquejos e Importación Organized (OrganizedImportModal.tsx, organizedSync.ts): Pestañas reorganizadas y aislamiento CSS para garantizar una visualización impecable sin interferencias de superposición.',
+      },
+    ],
+  },
   {
     version: '0.1.0-alpha.42',
     buildCode: '2026.10.31.8042',
     date: '31 de Octubre, 2026',
     title: 'Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB, Visor PDF y Autoasignación de Fin de Semana',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Modal teocrático de revocación y reemplazo asistido de credenciales con trazabilidad, panel de auditoría de canjes y hardware para ancianos, centro OfflineDashboard sobre IndexedDB, previsualizador interactivo PDF con react-pdf, autoasignación integral de reuniones y anillo reactivo de sincronización en cabecera.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

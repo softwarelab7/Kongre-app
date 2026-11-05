@@ -1618,7 +1618,11 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.presidentId = pid;
                               updateWeek(u);
                             },
-                            () => {}
+                            () => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.presidentId = undefined;
+                              updateWeek(u);
+                            }
                           )
                         }
                         className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
@@ -1803,7 +1807,11 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.initialPrayerId = pid;
                               updateWeek(u);
                             },
-                            () => {}
+                            () => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.initialPrayerId = undefined;
+                              updateWeek(u);
+                            }
                           )
                         }
                         className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
@@ -2157,7 +2165,11 @@ export const ScheduleTab: React.FC = () => {
                                 u.weekend.atalayaConductorId = pid;
                                 updateWeek(u);
                               },
-                              () => {}
+                              () => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaConductorId = undefined;
+                                updateWeek(u);
+                              }
                             )
                           }
                           className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
@@ -2302,7 +2314,11 @@ export const ScheduleTab: React.FC = () => {
                                 u.weekend.atalayaLectorId = pid;
                                 updateWeek(u);
                               },
-                              () => {}
+                              () => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaLectorId = undefined;
+                                updateWeek(u);
+                              }
                             )
                           }
                           className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"
@@ -2489,7 +2505,11 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.finalPrayerId = pid;
                               updateWeek(u);
                             },
-                            () => {}
+                            () => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.finalPrayerId = undefined;
+                              updateWeek(u);
+                            }
                           )
                         }
                         className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-700 border border-dashed border-zinc-300 dark:border-[#27272A] dark:text-[#A1A1AA] dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-all cursor-pointer active:scale-95"

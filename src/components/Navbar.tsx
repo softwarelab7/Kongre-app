@@ -199,6 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     settings,
     updateSettings,
     conflicts,
+    theocraticReminders,
     notices,
     territories,
     accountLinkRequests,
@@ -223,6 +224,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const syncToastTimeoutRef = useRef<number | null>(null);
 
   const pendingOfflineCount = offlineQueueStats?.pendingCount ?? 0;
+  const totalNotificationsCount =
+    (conflicts?.length || 0) + (theocraticReminders?.totalAttentionCount || 0);
   const isActivelySyncing =
     isForcingSync ||
     isSupabaseSyncing ||
@@ -1321,23 +1324,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
-              {/* Bell Notifications / Conflicts */}
+              {/* Bell Notifications / Conflicts & Reminders */}
               <button
                 type="button"
                 onClick={onOpenConflictsModal}
-                aria-label={`Notificaciones y cruces de horario${conflicts.length > 0 ? ` (${conflicts.length} alertas)` : ''}`}
+                aria-label={`Centro de notificaciones y recordatorios${totalNotificationsCount > 0 ? ` (${totalNotificationsCount} alertas)` : ''}`}
                 className={`relative w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'conflictos'
-                    ? 'bg-white dark:bg-[#18181F] text-amber-600 dark:text-amber-400 shadow-2xs font-bold'
-                    : conflicts.length > 0
-                    ? 'text-amber-600 dark:text-amber-400 hover:bg-white dark:hover:bg-[#18181F]'
-                    : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-[#18181F]'
+                    ? 'bg-white dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                    : totalNotificationsCount > 0
+                    ? theocraticReminders?.hasUrgentItems
+                      ? 'text-rose-600 dark:text-rose-400 hover:bg-white dark:hover:bg-[#18181F]'
+                      : 'text-amber-600 dark:text-amber-400 hover:bg-white dark:hover:bg-[#18181F]'
+                    : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F]'
                 }`}
-                title={conflicts.length > 0 ? `Notificaciones y Cruces (${conflicts.length} alertas)` : 'Notificaciones y Cruces'}
+                title={totalNotificationsCount > 0 ? `Centro de Notificaciones (${totalNotificationsCount} alertas)` : 'Centro de Notificaciones'}
               >
                 <Bell className="w-3.5 h-3.5" />
-                {conflicts.length > 0 && (
-                  <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500 ring-1 ring-white dark:ring-[#121216] animate-pulse" />
+                {totalNotificationsCount > 0 && (
+                  <span
+                    className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ring-1 ring-white dark:ring-[#121216] ${
+                      theocraticReminders?.hasUrgentItems
+                        ? 'bg-rose-500 animate-ping'
+                        : 'bg-amber-500 animate-pulse'
+                    }`}
+                  />
                 )}
               </button>
 

@@ -24,9 +24,12 @@ export function generateConfirmationUrl(
   assignmentPath: string,
   publisherId: string
 ): string {
-  if (typeof window === 'undefined') return '';
-  const origin = window.location.origin;
-  const pathname = window.location.pathname;
+  if (typeof window === 'undefined' || !window.location) {
+    const sig = computeAssignmentConfirmSignature(weekId, meetingType, assignmentPath, publisherId);
+    return `https://kongre-app.com/?confirmar=1&semana=${encodeURIComponent(weekId)}&tipo=${encodeURIComponent(meetingType)}&path=${encodeURIComponent(assignmentPath)}&pub=${encodeURIComponent(publisherId)}&sig=${encodeURIComponent(sig)}`;
+  }
+  const origin = window.location.origin || 'https://kongre-app.com';
+  const pathname = window.location.pathname || '/';
   const sig = computeAssignmentConfirmSignature(weekId, meetingType, assignmentPath, publisherId);
   return `${origin}${pathname}?confirmar=1&semana=${encodeURIComponent(weekId)}&tipo=${encodeURIComponent(meetingType)}&path=${encodeURIComponent(assignmentPath)}&pub=${encodeURIComponent(publisherId)}&sig=${encodeURIComponent(sig)}`;
 }
@@ -290,8 +293,8 @@ export function extractWeekAssignments(
   });
 
   // Estudio Bíblico de la Congregación
-  const ebc = week.midweek.vidaCristiana.estudioBiblico;
-  if (ebc.conductorId && publishersMap.has(ebc.conductorId)) {
+  const ebc = week.midweek.vidaCristiana?.estudioBiblico;
+  if (ebc?.conductorId && publishersMap.has(ebc.conductorId)) {
     list.push({
       id: `${week.id}-ebc-conductor`,
       weekId: week.id,
@@ -305,7 +308,7 @@ export function extractWeekAssignments(
       status: 'confirmada',
     });
   }
-  if (ebc.lectorId && publishersMap.has(ebc.lectorId)) {
+  if (ebc?.lectorId && publishersMap.has(ebc.lectorId)) {
     list.push({
       id: `${week.id}-ebc-lector`,
       weekId: week.id,

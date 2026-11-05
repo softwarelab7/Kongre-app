@@ -83,6 +83,7 @@ import { getDemoCongregationData } from '../utils/demoData';
 import { parseISODateParts, getMeetingDateForWeek, getMondayFromDate } from '../utils/dateUtils';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { detectConflictsInWeek } from '../utils/conflictDetector';
+import { computeTheocraticReminders, TheocraticRemindersSummary } from '../utils/theocraticReminders';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import {
@@ -140,6 +141,7 @@ interface CongregationContextType {
   settings: CongregationSettings;
   conflicts: ConflictAlert[];
   allWeeksConflicts: ConflictAlert[];
+  theocraticReminders: TheocraticRemindersSummary;
   syncStatus: 'synced' | 'saving' | 'offline' | 'error';
   outgoingSpeakers: OutgoingSpeakerAssignment[];
   fieldServiceMeetings: FieldServiceMeeting[];
@@ -2864,6 +2866,29 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
     return list;
   }, [weeks, publishersMap, settings.conflictRules, outgoingSpeakers]);
+
+  // Resumen inteligente de recordatorios teocráticos activos y pendientes
+  const theocraticReminders = useMemo(() => {
+    return computeTheocraticReminders({
+      weeks,
+      currentWeekId,
+      publishers,
+      cartShifts,
+      cartLocations,
+      monthlyReports,
+      transactions,
+      settings,
+    });
+  }, [
+    weeks,
+    currentWeekId,
+    publishers,
+    cartShifts,
+    cartLocations,
+    monthlyReports,
+    transactions,
+    settings,
+  ]);
 
   // PUBLISHER ACTIONS
   const addPublisher = (pubData: Omit<Publisher, 'id'>) => {
@@ -6231,6 +6256,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         settings,
         conflicts,
         allWeeksConflicts,
+        theocraticReminders,
         syncStatus,
         outgoingSpeakers,
         fieldServiceMeetings,
@@ -6411,6 +6437,14 @@ const FALLBACK_CONGREGATION_CONTEXT: CongregationContextType = {
   settings: INITIAL_SETTINGS,
   conflicts: [],
   allWeeksConflicts: [],
+  theocraticReminders: {
+    unconfirmedAssignments: [],
+    uncoveredCartShifts: [],
+    pendingReports: [],
+    pendingAccountsCount: 0,
+    totalAttentionCount: 0,
+    hasUrgentItems: false,
+  },
   syncStatus: 'synced',
   outgoingSpeakers: [],
   fieldServiceMeetings: [],

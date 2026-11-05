@@ -18,6 +18,7 @@ import {
   CheckSquare,
   Square,
   Plus,
+  Minus,
   Send,
   Calendar,
   User,
@@ -28,6 +29,8 @@ import {
   Sparkles,
   Info,
   Phone,
+  FileText,
+  RotateCcw,
 } from 'lucide-react';
 
 interface DigitalTerritoryModalProps {
@@ -48,20 +51,67 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
   const [activeTab, setActiveTab] = useState<'card' | 'qr' | 'novisits'>('card');
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [isCopied, setIsCopied] = useState(false);
-  const [completedBlocks, setCompletedBlocks] = useState<Set<number>>(() => {
+
+  // Dynamic block count
+  const initialBlockCount = useMemo(() => {
+    if (territory.blocks && territory.blocks.length > 0) {
+      return territory.blocks.length;
+    }
     try {
-      const saved = localStorage.getItem(`kongre_terr_blocks_${territory.id}`);
-      return saved ? new Set(JSON.parse(saved)) : new Set<number>();
+      const savedCount = localStorage.getItem(`kongre_terr_count_${territory.id}`);
+      if (savedCount) {
+        const parsed = parseInt(savedCount, 10);
+        if (!isNaN(parsed) && parsed > 0) return parsed;
+      }
+    } catch {}
+    return Math.max(4, Math.min(16, Math.ceil((territory.estimatedHomes || 100) / 25))) || 6;
+  }, [territory.blocks, territory.estimatedHomes, territory.id]);
+
+  const [blockCount, setBlockCount] = useState<number>(initialBlockCount);
+
+  // Three-state block tracker: 'pendiente' | 'trabajando' | 'completado'
+  const [blockStatuses, setBlockStatuses] = useState<Record<number, 'pendiente' | 'trabajando' | 'completado'>>(() => {
+    try {
+      const saved = localStorage.getItem(`kongre_terr_blocks_v2_${territory.id}`);
+      if (saved) return JSON.parse(saved);
+      // Fallback migration from old boolean set
+      const oldSaved = localStorage.getItem(`kongre_terr_blocks_${territory.id}`);
+      if (oldSaved) {
+        const oldArray: number[] = JSON.parse(oldSaved);
+        const res: Record<number, 'pendiente' | 'trabajando' | 'completado'> = {};
+        oldArray.forEach((num) => {
+          res[num] = 'completado';
+        });
+        return res;
+      }
+    } catch {}
+    if (territory.blocks && territory.blocks.length > 0) {
+      const res: Record<number, 'pendiente' | 'trabajando' | 'completado'> = {};
+      territory.blocks.forEach((b) => {
+        res[b.number] = b.status;
+      });
+      return res;
+    }
+    return {};
+  });
+
+  // Ministry NH / Field Notes (Casas no en casa, revisitas)
+  const [nhNotes, setNhNotes] = useState<string>(() => {
+    try {
+      return localStorage.getItem(`kongre_terr_nh_${territory.id}`) || '';
     } catch {
-      return new Set<number>();
+      return '';
     }
   });
+  const [showNhNotesEditor, setShowNhNotesEditor] = useState(false);
 
   // New No-Visit Form
   const [showAddNoVisit, setShowAddNoVisit] = useState(false);
   const [newAddress, setNewAddress] = useState('');
   const [newResident, setNewResident] = useState('');
   const [newReason, setNewReason] = useState('Petición expresa de no tocar ni visitar.');
+  const [newCoordinates, setNewCoordinates] = useState<[number, number] | undefined>(undefined);
+  const [isCapturingGps, setIsCapturingGps] = useState(false);
 
   const assignee = territory.currentAssigneeId
     ? publishersMap.get(territory.currentAssigneeId)
@@ -102,20 +152,38 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
     }
   }, [territoryShareUrl]);
 
-  // Save completed blocks to local storage
-  const toggleBlock = (blockNum: number) => {
-    const updated = new Set(completedBlocks);
-    if (updated.has(blockNum)) {
-      updated.delete(blockNum);
-    } else {
-      updated.add(blockNum);
-    }
-    setCompletedBlocks(updated);
+  // Cycle Block status: pendiente -> trabajando -> completado -> pendiente
+  const cycleBlockStatus = (blockNum: number) => {
+    setBlockStatuses((prev) => {
+      const current = prev[blockNum] || 'pendiente';
+      let next: 'pendiente' | 'trabajando' | 'completado' = 'trabajando';
+      if (current === 'pendiente') next = 'trabajando';
+      else if (current === 'trabajando') next = 'completado';
+      else next = 'pendiente';
+
+      const updated = { ...prev, [blockNum]: next };
+      try {
+        localStorage.setItem(`kongre_terr_blocks_v2_${territory.id}`, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleUpdateBlockCount = (delta: number) => {
+    setBlockCount((prev) => {
+      const next = Math.max(1, Math.min(30, prev + delta));
+      try {
+        localStorage.setItem(`kongre_terr_count_${territory.id}`, next.toString());
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleSaveNhNotes = (notes: string) => {
+    setNhNotes(notes);
     try {
-      localStorage.setItem(`kongre_terr_blocks_${territory.id}`, JSON.stringify(Array.from(updated)));
-    } catch {
-      // ignore
-    }
+      localStorage.setItem(`kongre_terr_nh_${territory.id}`, notes);
+    } catch {}
   };
 
   const handleCopyLink = async () => {
@@ -148,6 +216,59 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
 
     const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(waUrl, '_blank');
+  };
+
+  // Share Progress Report to Overseer or Territory Servant
+  const handleShareProgressWhatsApp = () => {
+    const total = blockCount;
+    let completedCount = 0;
+    let workingCount = 0;
+    for (let i = 1; i <= total; i++) {
+      if (blockStatuses[i] === 'completado') completedCount++;
+      if (blockStatuses[i] === 'trabajando') workingCount++;
+    }
+    const percent = Math.round((completedCount / total) * 100);
+    const pubName = assignee ? assignee.name : 'Publicador';
+
+    let message =
+      `📋 *INFORME DE AVANCE DE PREDICACIÓN*\n` +
+      `🏛 *Territorio #${territory.number} - ${territory.name}*\n` +
+      `📍 *Zona:* ${territory.zone}\n` +
+      `👤 *Publicador:* ${pubName}\n\n` +
+      `📊 *Progreso de Manzanas:* ${completedCount} de ${total} completadas (${percent}%)\n` +
+      (workingCount > 0 ? `⏳ *En curso hoy:* ${workingCount} manzana(s)\n` : '') +
+      `⚪ *Pendientes:* ${total - completedCount - workingCount} manzana(s)\n`;
+
+    if (nhNotes.trim()) {
+      message += `\n🚪 *Casas No en Casa (NH) / Revisitas:*\n${nhNotes.trim()}\n`;
+    }
+
+    const nvCount = territory.noVisits?.length || 0;
+    message += `\n⚠️ *Casas No Visitar:* ${nvCount} respetadas.\n\n` +
+      `🔗 *Tarjeta digital móvil:* ${territoryShareUrl}\n` +
+      `¡Muchas gracias por la asignación! 🙏📖`;
+
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+  };
+
+  const handleCaptureGpsForNoVisit = () => {
+    if (!navigator.geolocation) {
+      alert('Tu dispositivo no soporta geolocalización GPS.');
+      return;
+    }
+    setIsCapturingGps(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsCapturingGps(false);
+        setNewCoordinates([pos.coords.latitude, pos.coords.longitude]);
+      },
+      (err) => {
+        setIsCapturingGps(false);
+        alert(`No se pudo obtener la posición GPS: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const handleNativeShare = async () => {
@@ -183,11 +304,13 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
       residentName: newResident.trim() || undefined,
       dateAdded: new Date().toISOString().slice(0, 10),
       reason: newReason.trim() || 'Petición expresa de no visitar.',
+      coordinates: newCoordinates,
     });
 
     setNewAddress('');
     setNewResident('');
     setNewReason('Petición expresa de no tocar ni visitar.');
+    setNewCoordinates(undefined);
     setShowAddNoVisit(false);
   };
 
@@ -373,45 +496,160 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
                 )}
               </div>
 
-              {/* Ministry Block Progress Checklist */}
-              <div className="bg-zinc-50 dark:bg-[#18181F] rounded-xl p-4 border border-zinc-200 dark:border-[#27272A] space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-[#A1A1AA] flex items-center gap-1.5">
-                    <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>Control de Manzanas Trabajadas</span>
-                  </h4>
-                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
-                    {completedBlocks.size} de 6 manzanas
-                  </span>
-                </div>
-                <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA]">
-                  Pulsa las manzanas que vayas completando en la jornada de predicación:
-                </p>
+              {/* Ministry Dynamic Block Progress Checklist */}
+              {(() => {
+                const total = blockCount;
+                let completedCount = 0;
+                let workingCount = 0;
+                for (let i = 1; i <= total; i++) {
+                  if (blockStatuses[i] === 'completado') completedCount++;
+                  if (blockStatuses[i] === 'trabajando') workingCount++;
+                }
+                const percent = Math.round((completedCount / total) * 100);
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((num) => {
-                    const isChecked = completedBlocks.has(num);
-                    return (
-                      <button
-                        key={num}
-                        onClick={() => toggleBlock(num)}
-                        className={`p-2.5 rounded-lg border text-xs font-semibold flex items-center justify-between transition cursor-pointer ${
-                          isChecked
-                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                            : 'bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#F4F4F5] border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-600'
-                        }`}
-                      >
-                        <span className="font-mono tabular-nums">Manzana {num}</span>
-                        {isChecked ? (
-                          <CheckSquare className="w-4 h-4 text-white" />
-                        ) : (
-                          <Square className="w-4 h-4 text-zinc-400" />
+                return (
+                  <div className="bg-zinc-50 dark:bg-[#18181F] rounded-2xl p-4 border border-zinc-200 dark:border-[#27272A] space-y-3.5 shadow-2xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-[#F4F4F5] flex items-center gap-1.5">
+                          <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span>Control de Manzanas / Cuadras</span>
+                        </h4>
+                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                          Toca una manzana para alternar: <strong>Pendiente</strong> → <strong>En curso</strong> (azul) → <strong>Completada</strong> (verde)
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+                          {completedCount}/{total} ({percent}%)
+                        </span>
+
+                        {/* Adjust block count buttons */}
+                        <div className="flex items-center gap-1 border border-zinc-200 dark:border-[#27272A] rounded-lg p-0.5 bg-white dark:bg-[#121216]">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateBlockCount(-1)}
+                            disabled={blockCount <= 1}
+                            className="p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded text-zinc-600 dark:text-zinc-300 disabled:opacity-30 cursor-pointer"
+                            title="Disminuir total de manzanas"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="text-[10px] font-mono font-bold px-1 text-zinc-700 dark:text-zinc-300">
+                            {blockCount} Mz
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateBlockCount(1)}
+                            disabled={blockCount >= 30}
+                            className="p-1 hover:bg-zinc-100 dark:hover:bg-[#27272A] rounded text-zinc-600 dark:text-zinc-300 disabled:opacity-30 cursor-pointer"
+                            title="Aumentar total de manzanas"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full h-2 rounded-full bg-zinc-200 dark:bg-[#27272A] overflow-hidden flex">
+                      <div
+                        style={{ width: `${(completedCount / total) * 100}%` }}
+                        className="h-full bg-emerald-500 transition-all duration-300"
+                        title={`${completedCount} completadas`}
+                      />
+                      <div
+                        style={{ width: `${(workingCount / total) * 100}%` }}
+                        className="h-full bg-blue-500 transition-all duration-300"
+                        title={`${workingCount} en curso`}
+                      />
+                    </div>
+
+                    {/* Blocks Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {Array.from({ length: total }, (_, i) => i + 1).map((num) => {
+                        const status = blockStatuses[num] || 'pendiente';
+                        const isDone = status === 'completado';
+                        const isWorking = status === 'trabajando';
+
+                        return (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => cycleBlockStatus(num)}
+                            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between transition active:scale-95 cursor-pointer ${
+                              isDone
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                : isWorking
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-400/40'
+                                : 'bg-white dark:bg-[#121216] text-zinc-700 dark:text-[#F4F4F5] border-zinc-200 dark:border-[#27272A] hover:border-zinc-300 dark:hover:border-zinc-600'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-mono tabular-nums font-bold">Manzana {num}</span>
+                            </div>
+
+                            {isDone ? (
+                              <CheckSquare className="w-4 h-4 text-white shrink-0" />
+                            ) : isWorking ? (
+                              <Clock className="w-4 h-4 text-white shrink-0 animate-pulse" />
+                            ) : (
+                              <Square className="w-4 h-4 text-zinc-400 shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Quick Field Notes: Casas no en casa (NH) y revisitas */}
+                    <div className="pt-2 border-t border-zinc-200/80 dark:border-[#27272A]/80">
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => setShowNhNotesEditor((prev) => !prev)}
+                          className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>
+                            {showNhNotesEditor ? 'Ocultar notas de campo (NH)' : 'Notas de campo y casas «No en casa» (NH)'}
+                          </span>
+                        </button>
+                        {nhNotes.trim() && !showNhNotesEditor && (
+                          <span className="text-[10px] text-zinc-500 font-mono">
+                            {nhNotes.trim().length} car. guardados
+                          </span>
                         )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                      </div>
+
+                      {showNhNotesEditor && (
+                        <div className="mt-2 space-y-2 animate-fade-in">
+                          <textarea
+                            rows={3}
+                            placeholder="Anota aquí casas no en casa (NH) o notas de revisitas. Ej: Mz 1: #14, #28 (volver en la tarde) | Mz 3: #08 (interés en revista)"
+                            value={nhNotes}
+                            onChange={(e) => handleSaveNhNotes(e.target.value)}
+                            className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] text-xs text-zinc-900 dark:text-[#F4F4F5] focus:outline-indigo-500 resize-none shadow-2xs"
+                          />
+                          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 italic">
+                            Guardado automáticamente en tu dispositivo para la próxima jornada.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* WhatsApp Progress Report Button */}
+                    <button
+                      type="button"
+                      onClick={handleShareProgressWhatsApp}
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer"
+                    >
+                      <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Enviar informe de avance por WhatsApp al Siervo de Territorios</span>
+                    </button>
+                  </div>
+                );
+              })()}
 
               {/* Assignment Details */}
               <div className="bg-zinc-50 dark:bg-[#18181F] rounded-xl p-4 border border-zinc-200 dark:border-[#27272A] text-xs text-zinc-600 dark:text-[#A1A1AA] space-y-2">
@@ -513,20 +751,41 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-end gap-2 pt-1">
+
+                  {/* GPS Pin Button */}
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-200 dark:border-[#27272A]">
                     <button
                       type="button"
-                      onClick={() => setShowAddNoVisit(false)}
-                      className="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-medium cursor-pointer"
+                      onClick={handleCaptureGpsForNoVisit}
+                      disabled={isCapturingGps}
+                      className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-[#27272A] bg-white dark:bg-[#121216] hover:bg-zinc-50 dark:hover:bg-[#27272A] text-zinc-700 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                     >
-                      Cancelar
+                      <Navigation className={`w-3.5 h-3.5 text-blue-500 ${isCapturingGps ? 'animate-spin' : ''}`} />
+                      <span>
+                        {newCoordinates
+                          ? `📍 GPS Fijado (${newCoordinates[0].toFixed(5)}, ${newCoordinates[1].toFixed(5)})`
+                          : 'Capturar ubicación GPS actual'}
+                      </span>
                     </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 font-bold text-xs shadow-xs cursor-pointer"
-                    >
-                      Guardar en Territorio
-                    </button>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAddNoVisit(false);
+                          setNewCoordinates(undefined);
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-zinc-600 dark:text-[#A1A1AA] hover:bg-zinc-100 dark:hover:bg-[#18181F] text-xs font-medium cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 font-bold text-xs shadow-xs cursor-pointer"
+                      >
+                        Guardar en Territorio
+                      </button>
+                    </div>
                   </div>
                 </form>
               )}
@@ -558,10 +817,25 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
                             «{item.reason}»
                           </p>
                         )}
-                        <p className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] pl-7 flex items-center gap-1 font-mono tabular-nums">
-                          <Calendar className="w-3 h-3" />
-                          <span>Registrado el: {item.dateAdded}</span>
-                        </p>
+                        <div className="text-[10px] text-zinc-400 dark:text-[#A1A1AA] pl-7 flex flex-wrap items-center gap-2.5 pt-0.5">
+                          <span className="flex items-center gap-1 font-mono tabular-nums">
+                            <Calendar className="w-3 h-3" />
+                            <span>Registrado: {item.dateAdded}</span>
+                          </span>
+
+                          {item.coordinates && (
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${item.coordinates[0]},${item.coordinates[1]}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-bold inline-flex items-center gap-1"
+                              title="Abrir punto GPS en Google Maps"
+                            >
+                              <Navigation className="w-3 h-3" />
+                              <span>GPS ({item.coordinates[0].toFixed(4)}, {item.coordinates[1].toFixed(4)})</span>
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

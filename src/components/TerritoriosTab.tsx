@@ -32,6 +32,7 @@ import {
   CalendarPlus,
   X,
   Check,
+  CheckSquare,
   Info,
   QrCode,
 } from 'lucide-react';
@@ -74,7 +75,7 @@ export const TerritoriosTab: React.FC = () => {
   // View state
   const [viewMode, setViewMode] = useState<'cards' | 'table' | 'map' | 's13'>('cards');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'todos' | 'disponible' | 'asignado' | 'vencido' | 'por_vencer'>('todos');
+  const [statusFilter, setStatusFilter] = useState<'todos' | 'disponible' | 'asignado' | 'vencido' | 'por_vencer' | 'desatendido'>('todos');
   const [typeFilter, setTypeFilter] = useState<string>('todos');
   const [zoneFilter, setZoneFilter] = useState<string>('todos');
 
@@ -111,6 +112,7 @@ export const TerritoriosTab: React.FC = () => {
     type: TerritoryType;
     zone: string;
     estimatedHomes: number;
+    blocksCount: number;
     boundsDescription: string;
     mapUrl: string;
     notes: string;
@@ -120,6 +122,7 @@ export const TerritoriosTab: React.FC = () => {
     type: 'residencial',
     zone: 'Zona Central',
     estimatedHomes: 80,
+    blocksCount: 6,
     boundsDescription: '',
     mapUrl: '',
     notes: '',
@@ -260,6 +263,12 @@ export const TerritoriosTab: React.FC = () => {
         if (t.status === 'disponible' || !t.dueDate) return false;
         const d = new Date(t.dueDate);
         if (d < today || d > fifteenDays) return false;
+      }
+      if (statusFilter === 'desatendido') {
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(today.getFullYear() - 1);
+        const isUnworked = !t.lastCompletedDate || new Date(t.lastCompletedDate) < oneYearAgo;
+        if (!isUnworked) return false;
       }
 
       // Type filter
@@ -487,6 +496,7 @@ ${mapLink}${noVisitsText}
       type: 'residencial',
       zone: zones[0] || 'Zona Central',
       estimatedHomes: 80,
+      blocksCount: 6,
       boundsDescription: '',
       mapUrl: '',
       notes: '',
@@ -503,6 +513,7 @@ ${mapLink}${noVisitsText}
       type: t.type,
       zone: t.zone,
       estimatedHomes: t.estimatedHomes,
+      blocksCount: t.blocks?.length || 6,
       boundsDescription: t.boundsDescription || '',
       mapUrl: t.mapUrl || '',
       notes: t.notes || '',
@@ -514,7 +525,15 @@ ${mapLink}${noVisitsText}
     e.preventDefault();
     if (!formData.number.trim() || !formData.name.trim()) return;
 
+    const blockQty = Math.max(1, Math.min(30, Number(formData.blocksCount) || 6));
+
     if (isCreatingNew) {
+      const generatedBlocks = Array.from({ length: blockQty }, (_, idx) => ({
+        id: `blk-${Date.now()}-${idx + 1}`,
+        number: idx + 1,
+        status: 'pendiente' as const,
+      }));
+
       addTerritory({
         number: formData.number.trim(),
         name: formData.name.trim(),
@@ -526,9 +545,22 @@ ${mapLink}${noVisitsText}
         mapUrl: formData.mapUrl.trim() || undefined,
         notes: formData.notes.trim() || undefined,
         noVisits: [],
+        blocks: generatedBlocks,
       });
       showToast(`Territorio #${formData.number} creado con éxito.`);
     } else if (editTerritoryModal) {
+      // Preserve existing blocks or resize
+      const currentBlocks = editTerritoryModal.blocks || [];
+      const updatedBlocks = Array.from({ length: blockQty }, (_, idx) => {
+        const num = idx + 1;
+        const existing = currentBlocks.find((b) => b.number === num);
+        return existing || {
+          id: `blk-${Date.now()}-${num}`,
+          number: num,
+          status: 'pendiente' as const,
+        };
+      });
+
       updateTerritory({
         ...editTerritoryModal,
         number: formData.number.trim(),
@@ -539,6 +571,7 @@ ${mapLink}${noVisitsText}
         boundsDescription: formData.boundsDescription.trim() || undefined,
         mapUrl: formData.mapUrl.trim() || undefined,
         notes: formData.notes.trim() || undefined,
+        blocks: updatedBlocks,
       });
       showToast(`Territorio #${formData.number} actualizado.`);
     }
@@ -716,8 +749,8 @@ ${mapLink}${noVisitsText}
         </div>
       </div>
 
-      {/* Radar S-13: Alertas de Territorios Vencidos (>4 meses) o Por Vencer */}
-      {(s13Radar.overdue.length > 0 || s13Radar.expiringSoon.length > 0) && (
+      {/* Radar S-13: Alertas de Territorios Vencidos (>4 meses), Por Vencer y Desatendidos (>1 año) */}
+      {(s13Radar.overdue.length > 0 || s13Radar.expiringSoon.length > 0 || s13Radar.unworkedOverYear.length > 0) && (
         <div className="kg-glass-surface kg-sheen-top rounded-3xl border border-amber-500/30 dark:border-amber-500/20 p-5 shadow-sm space-y-3.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2.5">
@@ -725,79 +758,131 @@ ${mapLink}${noVisitsText}
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
-                Radar S-13: Control de Plazo de 4 Meses ({s13Radar.overdue.length} vencidos •{' '}
-                {s13Radar.expiringSoon.length} por vencer)
+                Radar S-13: Control de Plazos y Cobertura ({s13Radar.overdue.length} vencidos •{' '}
+                {s13Radar.expiringSoon.length} por vencer •{' '}
+                {s13Radar.unworkedOverYear.length} desatendidos &gt;1 año)
               </h3>
             </div>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">
-              Envía recordatorio amigable por WhatsApp o registra la devolución en 1 clic
+              Envía recordatorio amigable por WhatsApp o asigna territorios prioritarios en 1 clic
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[...s13Radar.overdue, ...s13Radar.expiringSoon].slice(0, 6).map((terr) => {
-              const assignee = terr.currentAssigneeId
-                ? publishersMap.get(terr.currentAssigneeId)
-                : undefined;
-              const isOver = s13Radar.overdue.some((o) => o.id === terr.id);
-              return (
-                <div
-                  key={terr.id}
-                  className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] flex flex-col justify-between gap-3 text-xs shadow-2xs hover:border-amber-500/40 transition-all"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-extrabold text-zinc-900 dark:text-white truncate">
-                        Territorio #{terr.number} — {terr.name}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 inline-flex items-center gap-1.5 shrink-0">
-                        <span className={`w-1.5 h-1.5 rounded-full ${isOver ? 'bg-rose-500 shadow-xs shadow-rose-500/50' : 'bg-amber-500'}`} />
-                        {isOver ? 'Vencido (+4m)' : 'Por vencer'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1.5">
-                      Tenencia: <strong className="text-zinc-800 dark:text-zinc-200">{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
-                      <strong className="font-mono tabular-nums text-zinc-800 dark:text-zinc-200">{terr.dueDate || '—'}</strong>
-                    </p>
-                  </div>
+            {[
+              ...s13Radar.overdue,
+              ...s13Radar.expiringSoon,
+              ...s13Radar.unworkedOverYear.filter((u) => u.status === 'disponible'),
+            ]
+              .slice(0, 6)
+              .map((terr) => {
+                const assignee = terr.currentAssigneeId
+                  ? publishersMap.get(terr.currentAssigneeId)
+                  : undefined;
+                const isOver = s13Radar.overdue.some((o) => o.id === terr.id);
+                const isExp = s13Radar.expiringSoon.some((e) => e.id === terr.id);
+                const isUnworked = terr.status === 'disponible';
 
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const msg = buildOverdueTerritoryWhatsAppReminder(
-                          terr,
-                          assignee,
-                          settings.congregationName
-                        );
-                        openWhatsAppLink(assignee?.phone || '', msg);
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-bold transition-all cursor-pointer shadow-xs active:scale-95"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Recordar S-13</span>
-                    </button>
+                return (
+                  <div
+                    key={terr.id}
+                    className="p-4 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] flex flex-col justify-between gap-3 text-xs shadow-2xs hover:border-amber-500/40 transition-all"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-extrabold text-zinc-900 dark:text-white truncate">
+                          Territorio #{terr.number} — {terr.name}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-white/10 inline-flex items-center gap-1.5 shrink-0">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isOver
+                                ? 'bg-rose-500 shadow-xs shadow-rose-500/50'
+                                : isExp
+                                ? 'bg-amber-500'
+                                : 'bg-orange-500'
+                            }`}
+                          />
+                          {isOver
+                            ? 'Vencido (+4m)'
+                            : isExp
+                            ? 'Por vencer'
+                            : 'Desatendido (>1a)'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1.5">
+                        {isUnworked ? (
+                          <>
+                            Última vez cubierto:{' '}
+                            <strong className="font-mono tabular-nums text-zinc-800 dark:text-zinc-200">
+                              {terr.lastCompletedDate || 'Sin registro histórico'}
+                            </strong>
+                          </>
+                        ) : (
+                          <>
+                            Tenencia:{' '}
+                            <strong className="text-zinc-800 dark:text-zinc-200">
+                              {assignee?.name || 'Por verificar'}
+                            </strong>{' '}
+                            • Vence:{' '}
+                            <strong className="font-mono tabular-nums text-zinc-800 dark:text-zinc-200">
+                              {terr.dueDate || '—'}
+                            </strong>
+                          </>
+                        )}
+                      </p>
+                    </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => openReturnModal(terr)}
-                        className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
-                      >
-                        Recibir
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openExtendModal(terr)}
-                        className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
-                      >
-                        Prorrogar
-                      </button>
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-white/10">
+                      {isUnworked ? (
+                        <button
+                          type="button"
+                          onClick={() => openAssignModal(terr)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-[11px] font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Asignar ahora</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const msg = buildOverdueTerritoryWhatsAppReminder(
+                              terr,
+                              assignee,
+                              settings.congregationName
+                            );
+                            openWhatsAppLink(assignee?.phone || '', msg);
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>Recordar S-13</span>
+                        </button>
+                      )}
+
+                      {!isUnworked && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => openReturnModal(terr)}
+                            className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
+                          >
+                            Recibir
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openExtendModal(terr)}
+                            className="px-2.5 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-zinc-700 dark:text-zinc-200 text-[10px] font-bold hover:bg-zinc-200 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
+                          >
+                            Prorrogar
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       )}
@@ -870,6 +955,16 @@ ${mapLink}${noVisitsText}
             }`}
           >
             Vencidos ({stats.vencidos})
+          </button>
+          <button
+            onClick={() => setStatusFilter('desatendido')}
+            className={`px-3 py-1.5 rounded-2xl font-bold transition-all cursor-pointer active:scale-95 border ${
+              statusFilter === 'desatendido'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white border-white/20 shadow-xs'
+                : 'bg-white/70 dark:bg-white/[0.04] text-amber-700 dark:text-amber-400 border-amber-200/80 dark:border-amber-900/40 hover:bg-amber-50 dark:hover:bg-amber-950/20'
+            }`}
+          >
+            Desatendidos (+1 año) ({s13Radar.unworkedOverYear.length})
           </button>
 
           {/* Type Select */}
@@ -1708,6 +1803,43 @@ ${mapLink}${noVisitsText}
                 <TerritoryCardMap territory={detailModalTerritory} heightClass="h-56" />
               </div>
 
+              {/* Control y Estado de Manzanas */}
+              <div className="bg-zinc-50 dark:bg-[#18181F] p-3.5 rounded-xl border border-zinc-200/80 dark:border-[#27272A] space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    Manzanas / Cuadras ({detailModalTerritory.blocks?.length || 6})
+                  </h4>
+                  <span className="text-[10px] text-zinc-500 font-medium">
+                    Actualizable en la Tarjeta Digital Móvil
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                  {(detailModalTerritory.blocks && detailModalTerritory.blocks.length > 0
+                    ? detailModalTerritory.blocks
+                    : Array.from({ length: 6 }, (_, i) => ({
+                        id: `b-${i + 1}`,
+                        number: i + 1,
+                        status: 'pendiente' as const,
+                      }))
+                  ).map((blk) => (
+                    <div
+                      key={blk.id || blk.number}
+                      className={`p-2 rounded-lg border text-center text-xs font-semibold ${
+                        blk.status === 'completado'
+                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                          : blk.status === 'trabajando'
+                          ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30'
+                          : 'bg-white dark:bg-[#121216] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-[#27272A]'
+                      }`}
+                    >
+                      <div className="font-mono tabular-nums text-[11px]">Mz {blk.number}</div>
+                      <div className="text-[9px] capitalize opacity-80">{blk.status}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {detailModalTerritory.notes && (
                 <div>
                   <h4 className="font-semibold text-zinc-800 dark:text-[#F4F4F5] text-xs uppercase tracking-wider mb-1">
@@ -1742,6 +1874,16 @@ ${mapLink}${noVisitsText}
                         <div className="text-zinc-500 dark:text-[#A1A1AA] mt-0.5 italic">
                           {nv.reason || 'Petición expresa'} (Registrado: {nv.dateAdded})
                         </div>
+                        {nv.coordinates && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${nv.coordinates[0]},${nv.coordinates[1]}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 mt-1 font-bold"
+                          >
+                            <ExternalLink className="w-3 h-3" /> Ver GPS ({nv.coordinates[0].toFixed(4)}, {nv.coordinates[1].toFixed(4)})
+                          </a>
+                        )}
                       </div>
                       <button
                         onClick={() => {
@@ -1962,18 +2104,39 @@ ${mapLink}${noVisitsText}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
-                  Cantidad Estimada de Hogares / Puertas
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={5000}
-                  value={formData.estimatedHomes}
-                  onChange={e => setFormData({ ...formData, estimatedHomes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
+                    Cantidad Estimada de Hogares / Puertas
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={5000}
+                    value={formData.estimatedHomes}
+                    onChange={e => setFormData({ ...formData, estimatedHomes: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-[#A1A1AA] mb-1">
+                    Manzanas / Cuadras Estimadas
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={formData.blocksCount}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        blocksCount: Math.max(1, Math.min(30, Number(e.target.value) || 1)),
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-[#27272A] rounded-xl text-sm bg-zinc-50 dark:bg-[#18181F] text-zinc-900 dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono tabular-nums"
+                  />
+                </div>
               </div>
 
               <div>

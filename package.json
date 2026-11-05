@@ -1,7 +1,7 @@
 {
   "name": "kongre",
   "private": true,
-  "version": "0.1.0-alpha.43",
+  "version": "0.1.0-alpha.44",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
@@ -11,7 +11,7 @@
     "clean": "rm -rf dist dev-dist server.js && cargo clean --manifest-path src-tauri/Cargo.toml 2>/dev/null || true",
     "clean:tauri": "cargo clean --manifest-path src-tauri/Cargo.toml",
     "lint": "tsc --noEmit",
-    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts test/totp.test.ts test/atRestVault.test.ts test/personal-pin-v2.test.ts test/congregation-pin-policy.test.ts test/compartments.test.ts test/theocratic-domain-s21.test.ts test/theocratic-reminders.test.ts test/p2p-transfer.test.ts",
+    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts test/totp.test.ts test/atRestVault.test.ts test/personal-pin-v2.test.ts test/congregation-pin-policy.test.ts test/compartments.test.ts test/theocratic-domain-s21.test.ts test/theocratic-reminders.test.ts test/p2p-transfer.test.ts test/territories-s13.test.ts",
     "verify": "bun scripts/verify-production.ts",
     "tauri": "tauri",
     "desktop:dev": "tauri dev",

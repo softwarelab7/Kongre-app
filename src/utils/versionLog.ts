@@ -25,19 +25,54 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.43';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.44';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.11.04.8043';
+export const CURRENT_BUILD_CODE = '2026.11.04.8044';
 export const BUILD_DATE = '4 de Noviembre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '0.1.0-alpha.44',
+    buildCode: '2026.11.04.8044',
+    date: '4 de Noviembre, 2026',
+    title: 'Territorios y Cartografía S-13: Geocerca GPS en Tiempo Real, Control Dinámico de Manzanas, Registro Georreferenciado y Radar de Cobertura',
+    isCurrent: true,
+    highlight: 'Detección de geocerca en vivo mediante GPS con algoritmo Ray-Casting que indica si el publicador está dentro del polígono o su distancia exacta al límite; control dinámico de manzanas en 3 estados (pendiente, en curso, completada) con notas de campo para casas No en Casa (NH) y reporte por WhatsApp en 1-clic; captura satelital directa para domicilios de No Visitar y Radar S-13 con detección de territorios desatendidos (> 1 año sin predicar).',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Geocerca Satelital GPS en Vivo (TerritoryCardMap.tsx, TerritoryMapUtils.ts): Algoritmo geométrico Ray-Casting y cálculo de distancia euclidiana esferoide en metros que evalúa en tiempo real si el publicador se encuentra dentro del territorio asignado o a qué distancia está de la acera/calle perimetral.',
+      },
+      {
+        category: 'feature',
+        text: 'Gestor Dinámico de Manzanas y Modo Campo (DigitalTerritoryModal.tsx): Reemplazo de la cuadrícula estática por un sistema dinámico configurable (1 a 30 manzanas) con estados progresivos (Pendiente, En curso hoy, Completada), barra porcentual de avance e integración de notas para casas "No en casa" (NH) y revisitas con persistencia local.',
+      },
+      {
+        category: 'improvement',
+        text: 'Informe de Avance de Ministerio en 1-Clic por WhatsApp (DigitalTerritoryModal.tsx): Botón directo para que el publicador envíe un resumen estructurado y amable de su predicación al Siervo de Territorios o conductor de grupo con desglose de manzanas y domicilios de No Visitar respetados.',
+      },
+      {
+        category: 'feature',
+        text: 'Georreferenciación GPS Directa para Casas «No Visitar» (DigitalTerritoryModal.tsx, TerritoriosTab.tsx): Botón "Capturar mi ubicación GPS actual" al reportar un hogar que solicitó no ser visitado, fijando coordenadas exactas en el mapa y permitiendo abrir la ubicación en Google Maps.',
+      },
+      {
+        category: 'improvement',
+        text: 'Radar S-13 y Filtro de Territorios Desatendidos (TerritoriosTab.tsx, khsPublicWitnessingEngine.ts): Detección proactiva de territorios con más de 12 meses sin ser cubiertos en el año de servicio con botón de asignación inmediata, y recordatorio amistoso por WhatsApp para territorios con más de 4 meses de tenencia.',
+      },
+      {
+        category: 'improvement',
+        text: 'Configuración de Manzanas en Creación y Edición (TerritoriosTab.tsx): Campo dedicado para especificar la cantidad estimada de manzanas al crear o editar territorios, con visor resumido en la ficha técnica S-13.',
+      },
+    ],
+  },
+  {
     version: '0.1.0-alpha.43',
     buildCode: '2026.11.04.8043',
     date: '4 de Noviembre, 2026',
     title: 'Optimización de Agenda Teocrática, Deduplicación de Asignaciones, Cifrado en Reposo Resiliente y Blindaje del Directorio',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Barra de herramientas despejada y simplificada en Agenda y Asignaciones con controladores de clic exterior, deduplicación estricta de IDs en partes de reunión para evitar colisiones en React, catálogo enfocado de bosquejos y programas oficiales, clave de cifrado en reposo V4 desacoplada de tokens volátiles de sesión y blindaje total contra fugas de texto cifrado en tarjetas del directorio.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

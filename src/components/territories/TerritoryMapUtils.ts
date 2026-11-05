@@ -368,3 +368,123 @@ export const parseGeoJSONToCoordinates = (
     return null;
   }
 };
+
+/**
+ * Determina si un punto [lat, lng] está dentro de un polígono [lat, lng][] (Ray-Casting Algorithm)
+ */
+export const isPointInPolygon = (
+  point: [number, number],
+  polygon: [number, number][]
+): boolean => {
+  if (!polygon || polygon.length < 3) return false;
+  const [lat, lng] = point;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+    const intersect =
+      yi > lng !== yj > lng && lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+};
+
+/**
+ * Calcula la distancia más corta en metros desde un punto [lat, lng] al borde perimetral del polígono
+ */
+export const getDistanceToPolygonMeters = (
+  point: [number, number],
+  polygon: [number, number][]
+): number => {
+  if (!polygon || polygon.length < 2) return 0;
+  const [latP, lngP] = point;
+  let minDistance = Infinity;
+
+  const latRad = (latP * Math.PI) / 180;
+  const mPerLat = 110574; // metros por grado de latitud
+  const mPerLng = 111320 * Math.cos(latRad); // metros por grado de longitud
+
+  for (let i = 0; i < polygon.length; i++) {
+    const nextIdx = (i + 1) % polygon.length;
+    const [latA, lngA] = polygon[i];
+    const [latB, lngB] = polygon[nextIdx];
+
+    // Convertir a metros locales respecto al punto A
+    const dx = (lngB - lngA) * mPerLng;
+    const dy = (latB - latA) * mPerLat;
+    const px = (lngP - lngA) * mPerLng;
+    const py = (latP - latA) * mPerLat;
+
+    const segmentLenSq = dx * dx + dy * dy;
+    let t = segmentLenSq > 0 ? (px * dx + py * dy) / segmentLenSq : 0;
+    t = Math.max(0, Math.min(1, t)); // clampear al segmento
+
+    const closestX = t * dx;
+    const closestY = t * dy;
+    const dist = Math.sqrt((px - closestX) * (px - closestX) + (py - closestY) * (py - closestY));
+
+    if (dist < minDistance) {
+      minDistance = dist;
+    }
+  }
+
+  return Math.round(minDistance);
+};
+
+export interface GeoFenceEvaluation {
+  isInside: boolean;
+  distanceMeters: number;
+  label: string;
+  badgeClass: string;
+  helperText: string;
+}
+
+/**
+ * Evalúa la posición GPS respecto a un polígono de territorio y devuelve feedback visual enriquecido
+ */
+export const evaluateTerritoryGeoFence = (
+  point: [number, number],
+  polygon?: [number, number][],
+  territoryNumber?: string
+): GeoFenceEvaluation => {
+  if (!polygon || polygon.length < 3) {
+    return {
+      isInside: true,
+      distanceMeters: 0,
+      label: 'Territorio sin límites geométricos',
+      badgeClass: 'bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-white/10',
+      helperText: 'Navega guiándote por la descripción de calles y el mapa base.',
+    };
+  }
+
+  const inside = isPointInPolygon(point, polygon);
+  const distance = getDistanceToPolygonMeters(point, polygon);
+
+  if (inside) {
+    return {
+      isInside: true,
+      distanceMeters: distance,
+      label: `Dentro del Territorio #${territoryNumber || ''}`,
+      badgeClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+      helperText: 'Tu posición actual está dentro de los límites del polígono asignado.',
+    };
+  }
+
+  if (distance <= 60) {
+    return {
+      isInside: false,
+      distanceMeters: distance,
+      label: `En el límite (a ${distance} m)`,
+      badgeClass: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30',
+      helperText: `Te encuentras a unos ${distance} metros del límite del territorio (posiblemente la acera de enfrente).`,
+    };
+  }
+
+  return {
+    isInside: false,
+    distanceMeters: distance,
+    label: `Fuera del Territorio (a ${formatDistance(distance)})`,
+    badgeClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30',
+    helperText: `Estás a ${formatDistance(distance)} de la demarcación oficial.`,
+  };
+};

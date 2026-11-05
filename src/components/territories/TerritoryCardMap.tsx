@@ -12,8 +12,10 @@ import {
   calculateAreaSquareMeters,
   formatDistance,
   formatArea,
+  evaluateTerritoryGeoFence,
+  GeoFenceEvaluation,
 } from './TerritoryMapUtils';
-import { Navigation, Maximize2, Layers, ExternalLink, Compass } from 'lucide-react';
+import { Navigation, Maximize2, Layers, ExternalLink, Compass, CheckCircle2, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
 interface TerritoryCardMapProps {
@@ -99,6 +101,33 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
             `,
           }),
         }).addTo(map);
+      }
+
+      // Draw Blocks if available
+      if (territory.blocks && territory.blocks.length > 0) {
+        territory.blocks.forEach((blk) => {
+          if (blk.coordinates && blk.coordinates.length >= 3) {
+            const blkLatLngs = blk.coordinates.map((p) => L.latLng(p[0], p[1]));
+            const isDone = blk.status === 'completado';
+            const isWorking = blk.status === 'trabajando';
+            const bColor = isDone ? '#10b981' : isWorking ? '#3b82f6' : '#94a3b8';
+
+            const blkPoly = L.polygon(blkLatLngs, {
+              color: bColor,
+              weight: 1.5,
+              dashArray: isDone ? undefined : '4, 4',
+              fillColor: bColor,
+              fillOpacity: isDone ? 0.35 : isWorking ? 0.25 : 0.1,
+            }).addTo(map);
+
+            blkPoly.bindTooltip(`
+              <div class="text-xs font-bold text-zinc-900">
+                Manzana ${blk.number}${blk.name ? `: ${blk.name}` : ''}
+                <div class="text-[10px] font-normal capitalize">Estado: ${blk.status}</div>
+              </div>
+            `);
+          }
+        });
       }
 
       // Draw No-Visit addresses pins
@@ -197,6 +226,15 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
         userGpsMarkerRef.current = marker;
 
         map.setView([latitude, longitude], 17);
+
+        const evaluation = evaluateTerritoryGeoFence([latitude, longitude], territory.polygon, territory.number);
+        if (evaluation.isInside) {
+          showToast(`📍 GPS: Estás dentro del Territorio #${territory.number}`, 'success');
+        } else if (evaluation.distanceMeters <= 60) {
+          showToast(`📍 GPS: En el límite del Territorio (${evaluation.distanceMeters} m)`, 'info');
+        } else {
+          showToast(`📍 GPS: Fuera del Territorio (${formatDistance(evaluation.distanceMeters)})`, 'warning');
+        }
       },
       (err) => {
         setIsLocating(false);
@@ -215,11 +253,39 @@ export const TerritoryCardMap: React.FC<TerritoryCardMapProps> = ({
 
   const perimeter = hasPolygon ? calculatePerimeterMeters(territory.polygon!) : 0;
   const area = hasPolygon ? calculateAreaSquareMeters(territory.polygon!) : 0;
+  const geoFence = userLocation
+    ? evaluateTerritoryGeoFence(userLocation, territory.polygon, territory.number)
+    : null;
 
   return (
     <div className={`kg-card-bento relative w-full ${heightClass} rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-white/10 shadow-md bg-zinc-100 dark:bg-[#121216]`}>
       {/* Map Element */}
       <div ref={mapContainerRef} className="w-full h-full" />
+
+      {/* Floating Geofence Banner (when GPS is located) */}
+      {geoFence && (
+        <div className="absolute top-3 left-3 z-[400] max-w-[calc(100%-80px)] sm:max-w-xs animate-fade-in pointer-events-auto">
+          <div className="kg-glass-surface bg-white/95 dark:bg-[#121216]/95 backdrop-blur-md px-3 py-2 rounded-2xl border border-zinc-200/80 dark:border-white/10 shadow-lg flex items-center gap-2.5">
+            <div
+              className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                geoFence.isInside
+                  ? 'bg-emerald-500 animate-pulse'
+                  : geoFence.distanceMeters <= 60
+                  ? 'bg-amber-500'
+                  : 'bg-rose-500'
+              }`}
+            />
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                {geoFence.label}
+              </div>
+              <div className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+                {geoFence.helperText}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Controls */}
       <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">

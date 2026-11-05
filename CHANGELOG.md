@@ -6,6 +6,39 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.44] — 4 de Noviembre, 2026
+**Territorios y Cartografía (S-13): Geocerca GPS en Tiempo Real, Control Dinámico de Manzanas, Registro Georreferenciado y Radar de Cobertura Anual**
+
+- 🛰️ **Geocerca Satelital GPS en Tiempo Real (`TerritoryCardMap.tsx`, `TerritoryMapUtils.ts`):**
+  - Implementación del algoritmo geométrico *Ray-Casting* y cálculo esferoide en metros para verificar instantáneamente si el publicador se encuentra dentro del polígono oficial del territorio asignado.
+  - Indicador flotante en vivo: 🟢 *«Dentro del Territorio»* o 🟡 *«A X metros del límite»* con notificación auditiva/háptica y cálculo de proximidad para evitar predicar aceras no correspondientes.
+  - Renderizado de manzanas y cuadras poligonales en mapa base con diferenciación por colores según su estado teocrático.
+- 📱 **Gestor Dinámico de Manzanas y Modo Campo Móvil (`DigitalTerritoryModal.tsx`):**
+  - Superación de cuadrículas estáticas por un sistema dinámico y ajustable (1 a 30 manzanas) que refleja la realidad física del sector.
+  - Estados progresivos al pulsar cada manzana: **Pendiente** (neutro) → **En curso hoy** (azul con pulsación) → **Completada** (verde esmeralda con check).
+  - Barra de progreso visual con porcentaje de cobertura en tiempo real y contador de manzanas trabajadas.
+  - **Bloc de notas de campo para casas «No en casa» (NH) y revisitas:** Registro ágil de puertas donde no hubo respuesta o personas interesadas con almacenamiento persistente en el dispositivo del publicador.
+- 💬 **Informe de Avance Teocrático en 1-Clic por WhatsApp (`DigitalTerritoryModal.tsx`):**
+  - Generador de mensaje preformateado para enviar el avance diario de predicación al Siervo de Territorios o al superintendente de grupo con desglose de manzanas cubiertas, casas no en casa y confirmación de casas de «No Visitar» respetadas.
+- 📍 **Georreferenciación GPS Directa para Domicilios «No Visitar» (`DigitalTerritoryModal.tsx`, `TerritoriosTab.tsx`):**
+  - Botón *«Capturar mi ubicación GPS actual»* en el formulario de reporte de casas que han pedido explícitamente no ser visitadas.
+  - Registro de coordenadas satelitales exactas (`[lat, lng]`), visualización de marcador de advertencia en el mapa y enlace directo a Google Maps para verificación de ancianos.
+- 🎯 **Radar S-13 Completo y Filtro de Territorios Desatendidos (`TerritoriosTab.tsx`, `khsPublicWitnessingEngine.ts`):**
+  - Expansión del Radar S-13 para abarcar las 3 prioridades organizacionales:
+    1. **Vencidos (> 4 meses):** Botón directo para enviar recordatorio amigable por WhatsApp o registrar devolución.
+    2. **Por vencer (< 15 días):** Alerta preventiva para prórroga o coordinación con el grupo.
+    3. **Desatendidos (> 1 año sin predicar):** Detección automática en el año de servicio con botón de asignación inmediata en 1-clic.
+  - Nuevo filtro rápido por chip: *«Desatendidos (+1 año)»* en la barra de herramientas de territorios.
+- 📐 **Configuración de Manzanas en Creación y Edición (`TerritoriosTab.tsx`):**
+  - Campo específico para definir la cantidad de manzanas/cuadras estimadas al dar de alta o actualizar un territorio.
+  - Visualización del desglose de manzanas con su estado en la ficha técnica detallada S-13.
+- 🧪 **Suite de Pruebas Automatizadas de Territorios (`test/territories-s13.test.ts`):**
+  - Cobertura de pruebas unitarias para el algoritmo de geocerca (puntos dentro, fuera y en el borde), cálculo métrico de distancias, clasificación del Radar S-13 y exportación a formato GeoJSON estándar.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.43] — 4 de Noviembre, 2026
 **Optimización de Agenda Teocrática, Deduplicación de Asignaciones, Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores**
 

@@ -1175,6 +1175,26 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     const remainingGoalHours = Math.floor(remainingGoalTotalMinutes / 60);
     const remainingGoalMinutes = remainingGoalTotalMinutes % 60;
 
+    // Cálculo del ritmo semanal para cumplir la meta mensual
+    // Días totales del mes actual
+    const now = new Date();
+    const currentYear = Number(currentMonthKey.slice(0, 4)) || now.getFullYear();
+    const currentMonthNum = Number(currentMonthKey.slice(5, 7)) || (now.getMonth() + 1);
+    const totalDaysInMonth = new Date(currentYear, currentMonthNum, 0).getDate();
+    const currentDayOfMonth = Math.min(now.getDate(), totalDaysInMonth);
+    // Días restantes en el mes (incluyendo el día de hoy)
+    const daysRemainingInMonth = Math.max(1, totalDaysInMonth - currentDayOfMonth + 1);
+    const weeksRemainingInMonth = Math.max(0.2, daysRemainingInMonth / 7);
+
+    // Meta semanal base (ej. 50h / ~4.33 semanas en el mes)
+    const baseWeeksInMonth = totalDaysInMonth / 7;
+    const weeklyBaseGoalMinutes = Math.round((hourGoal * 60) / baseWeeksInMonth);
+    const weeklyBaseGoalHours = (weeklyBaseGoalMinutes / 60).toFixed(1).replace(/\.0$/, '');
+
+    // Horas semanales requeridas para cumplir la meta con el tiempo restante
+    const weeklyRemainingMinutesNeeded = Math.round(remainingGoalTotalMinutes / weeksRemainingInMonth);
+    const weeklyRemainingHoursFormatted = (weeklyRemainingMinutesNeeded / 60).toFixed(1).replace(/\.0$/, '');
+
     return {
       logsThisMonth,
       loggedMinutes,
@@ -1188,6 +1208,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       progressPct,
       remainingGoalHours,
       remainingGoalMinutes,
+      remainingGoalTotalMinutes,
+      weeklyBaseGoalHours,
+      weeklyRemainingHoursFormatted,
+      daysRemainingInMonth,
+      weeksRemainingInMonth,
     };
   }, [
     timeLogs,
@@ -2061,16 +2086,42 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   </div>
                 </div>
 
-                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between pt-0.5">
-                  <span>
-                    {monthSummary.totalMinutes >= hourGoal * 60
-                      ? '¡Meta alcanzada! 🎉'
-                      : monthSummary.remainingGoalMinutes > 0
-                        ? `Faltan ${monthSummary.remainingGoalHours}h ${monthSummary.remainingGoalMinutes}m para meta`
-                        : `Faltan ${monthSummary.remainingGoalHours} h para meta`}
-                  </span>
-                  <span className="font-mono tabular-nums font-semibold">{monthSummary.logsThisMonth.length} salidas</span>
-                </p>
+                <div className="pt-0.5 space-y-1.5">
+                  <div className="flex items-center justify-between flex-wrap gap-1 text-[11px]">
+                    <span className="text-zinc-600 dark:text-zinc-300 font-medium">
+                      {monthSummary.totalMinutes >= hourGoal * 60
+                        ? '¡Meta mensual alcanzada! 🎉'
+                        : monthSummary.remainingGoalMinutes > 0
+                          ? `Faltan ${monthSummary.remainingGoalHours}h ${monthSummary.remainingGoalMinutes}m para la meta`
+                          : `Faltan ${monthSummary.remainingGoalHours} h para la meta`}
+                    </span>
+                    <span className="font-mono tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 text-[10px]">
+                      {monthSummary.logsThisMonth.length} salidas
+                    </span>
+                  </div>
+
+                  {/* Indicador de ritmo de horas semanales para cumplir la meta */}
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-500/20 text-[11px]">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 shrink-0" />
+                      <span className="font-semibold text-zinc-700 dark:text-zinc-200 truncate">
+                        Ritmo semanal para la meta:
+                      </span>
+                    </div>
+                    <div className="shrink-0 font-mono tabular-nums">
+                      {monthSummary.totalMinutes >= hourGoal * 60 ? (
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                          Completada ({monthSummary.weeklyBaseGoalHours} h/sem base)
+                        </span>
+                      ) : (
+                        <span className="font-extrabold text-indigo-700 dark:text-indigo-300 text-xs">
+                          {monthSummary.weeklyRemainingHoursFormatted} h / semana
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60 dark:border-white/10 text-[10px]">
                   <span className="font-semibold text-zinc-600 dark:text-zinc-300">
                     Meta Anual ({selectedServiceYear}):{' '}

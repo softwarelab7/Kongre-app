@@ -80,6 +80,7 @@ import {
   RefreshCw,
   WifiOff,
   CloudCheck,
+  ArrowLeftRight,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -130,6 +131,7 @@ interface NavbarProps {
   onToggleSidebar?: () => void;
   onOpenConflictsModal: () => void;
   onOpenQrModal?: () => void;
+  onOpenP2PModal?: () => void;
   onOpenTimerModal?: () => void;
   onOpenKioskModal?: () => void;
   onOpenSearchModal: () => void;
@@ -176,6 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleSidebar,
   onOpenConflictsModal,
   onOpenQrModal,
+  onOpenP2PModal,
   onOpenTimerModal,
   onOpenKioskModal,
   onOpenSearchModal,
@@ -1311,6 +1314,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
 
+              {/* Transferencia Local Salón P2P / QR */}
+              {onOpenP2PModal && (
+                <button
+                  type="button"
+                  onClick={onOpenP2PModal}
+                  aria-label="Transferencia Directa Local Salón (P2P y QR)"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-[#18181F] transition-all cursor-pointer"
+                  title="Transferencia Directa Local Salón (P2P / QR sin internet)"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+
               {/* PINs Directory Quick Access */}
               {onOpenPinsModal && (
                 <button
@@ -1772,6 +1788,25 @@ export const Navbar: React.FC<NavbarProps> = ({
                             <ClipboardList className="w-3.5 h-3.5" />
                           </div>
                           <span className="truncate">Registro de Auditoría</span>
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                      </button>
+                    )}
+
+                    {onOpenP2PModal && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          onOpenP2PModal();
+                        }}
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                      >
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            <ArrowLeftRight className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="truncate">Transferencia Local Salón (P2P / QR)</span>
                         </span>
                         <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                       </button>

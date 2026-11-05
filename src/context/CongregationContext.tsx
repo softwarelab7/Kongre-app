@@ -84,6 +84,11 @@ import { parseISODateParts, getMeetingDateForWeek, getMondayFromDate } from '../
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { computeTheocraticReminders, TheocraticRemindersSummary } from '../utils/theocraticReminders';
+import {
+  TheocraticTransferPackage,
+  CongregationTransferContext,
+  mergeTheocraticTransferPackage,
+} from '../utils/p2pTransferEngine';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import {
@@ -335,6 +340,10 @@ interface CongregationContextType {
   exportBackupJSON: () => void;
   getBackupJSON: () => string;
   importBackupJSON: (jsonString: string) => boolean;
+  applyTheocraticTransferPackage: (
+    pkg: TheocraticTransferPackage,
+    mode?: 'merge' | 'replace'
+  ) => { success: boolean; changesSummary: string[] };
   publishersMap: Map<string, Publisher>;
   cleanSampleData: () => Promise<void> | void;
   clearAllPublishers: () => Promise<void> | void;
@@ -5647,6 +5656,88 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const applyTheocraticTransferPackage = (
+    pkg: TheocraticTransferPackage,
+    mode: 'merge' | 'replace' = 'merge'
+  ): { success: boolean; changesSummary: string[] } => {
+    try {
+      const currentCtx: CongregationTransferContext = {
+        publishers,
+        weeks,
+        territories,
+        monthlyReports,
+        preachingGroups,
+        customDuties,
+        settings,
+        outgoingSpeakers,
+        cartLocations,
+        cartShifts,
+        transactions,
+        quarterlyAudits,
+      };
+
+      const { mergedContext, changesSummary } = mergeTheocraticTransferPackage(pkg, currentCtx, mode);
+
+      if (mergedContext.publishers) {
+        setPublishers(mergedContext.publishers);
+        try {
+          localStorage.setItem(
+            `${LOCAL_STORAGE_KEY}_publishers`,
+            JSON.stringify(sanitizePublishersForLocalStorage(mergedContext.publishers))
+          );
+        } catch {}
+      }
+
+      if (mergedContext.weeks) {
+        const unified = unifyWeeksDuties(mergedContext.weeks);
+        setWeeks(unified);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(unified));
+        } catch {}
+      }
+
+      if (mergedContext.monthlyReports) {
+        setMonthlyReports(mergedContext.monthlyReports);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(mergedContext.monthlyReports));
+        } catch {}
+      }
+
+      if (mergedContext.territories) {
+        setTerritories(mergedContext.territories);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_territories`, JSON.stringify(mergedContext.territories));
+        } catch {}
+      }
+
+      if (mergedContext.preachingGroups) {
+        setPreachingGroups(mergedContext.preachingGroups);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_preaching_groups`, JSON.stringify(mergedContext.preachingGroups));
+        } catch {}
+      }
+
+      if (mergedContext.customDuties) {
+        setCustomDuties(mergedContext.customDuties);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_custom_duties`, JSON.stringify(mergedContext.customDuties));
+        } catch {}
+      }
+
+      insertAuditLog({
+        accion: 'TRANSFERENCIA_P2P_LOCAL_RECIBIDA',
+        modulo: 'p2p_transfer',
+        hermano_nid: 'sistema',
+        detalles: `Transferencia local offline aplicada (${pkg.contentType}, modo=${mode}): ${changesSummary.join('; ')}`,
+      }).catch(() => {});
+
+      return { success: true, changesSummary };
+    } catch (err: any) {
+      console.error('Error applying transfer package:', err);
+      return { success: false, changesSummary: [err.message || 'Error desconocido al aplicar transferencia'] };
+    }
+  };
+
   const cleanSampleData = async () => {
     // 1. Limpiar circuitos y breakers de prueba
     setBreakers([]);
@@ -6385,6 +6476,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         exportBackupJSON,
         getBackupJSON,
         importBackupJSON,
+        applyTheocraticTransferPackage,
         publishersMap,
         cleanSampleData,
         clearAllPublishers,
@@ -6573,6 +6665,7 @@ const FALLBACK_CONGREGATION_CONTEXT: CongregationContextType = {
   exportBackupJSON: () => '',
   getBackupJSON: () => '',
   importBackupJSON: () => false,
+  applyTheocraticTransferPackage: () => ({ success: false, changesSummary: [] }),
   publishersMap: new Map(),
   cleanSampleData: () => {},
   clearAllPublishers: () => {},

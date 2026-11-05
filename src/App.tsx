@@ -42,6 +42,7 @@ import { SettingsTab } from './components/SettingsTab';
 import { UserProfileSettingsView } from './components/UserProfileSettingsView';
 import { ConflictsModal } from './components/ConflictsModal';
 import { QrCodeModal } from './components/QrCodeModal';
+import { LocalP2PTransferModal } from './components/LocalP2PTransferModal';
 import { MeetingTimerModal } from './components/MeetingTimerModal';
 import { TableroSalonModal } from './components/TableroSalonModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
@@ -287,6 +288,7 @@ const AppContent: React.FC = () => {
 
   const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isP2PModalOpen, setIsP2PModalOpen] = useState(false);
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isKioskModalOpen, setIsKioskModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -1606,6 +1608,7 @@ const AppContent: React.FC = () => {
         onToggleSidebar={handleToggleSidebar}
         onOpenConflictsModal={openConflictsView}
         onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+        onOpenP2PModal={() => openModalWithHistory('p2p_transfer', setIsP2PModalOpen)}
         onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
         onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
         onOpenSearchModal={() => openModalWithHistory('buscar', setIsSearchModalOpen)}
@@ -1825,6 +1828,11 @@ const AppContent: React.FC = () => {
       <QrCodeModal
         isOpen={isQrModalOpen}
         onClose={() => closeModalWithHistory('qr', setIsQrModalOpen)}
+      />
+
+      <LocalP2PTransferModal
+        isOpen={isP2PModalOpen}
+        onClose={() => closeModalWithHistory('p2p_transfer', setIsP2PModalOpen)}
       />
 
       <MeetingTimerModal

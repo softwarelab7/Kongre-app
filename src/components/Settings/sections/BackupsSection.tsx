@@ -10,7 +10,9 @@ import {
   Eye,
   EyeOff,
   Unlock,
+  ArrowLeftRight,
 } from 'lucide-react';
+import { LocalP2PTransferModal } from '../../LocalP2PTransferModal';
 import { useCongregation } from '../../../context/CongregationContext';
 import { useAuth } from '../../../context/AuthContext';
 import {
@@ -30,6 +32,7 @@ export const BackupsSection: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [showP2PModal, setShowP2PModal] = useState<boolean>(false);
 
   // Encrypted Backup Export Modal States
   const [showEncryptExportModal, setShowEncryptExportModal] = useState(false);
@@ -229,7 +232,23 @@ export const BackupsSection: React.FC = () => {
           <Upload className="w-4 h-4 text-zinc-500 dark:text-[#A1A1AA]" />
           <span>Restaurar Copia de Seguridad</span>
         </button>
+
+        {/* Local P2P & QR Transfer Button */}
+        <button
+          type="button"
+          onClick={() => setShowP2PModal(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+        >
+          <ArrowLeftRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <span>Transferencia Local Salón (P2P / QR)</span>
+        </button>
       </div>
+
+      {/* MODAL TRANSFERENCIA LOCAL P2P / QR */}
+      <LocalP2PTransferModal
+        isOpen={showP2PModal}
+        onClose={() => setShowP2PModal(false)}
+      />
 
       {/* EXPORT ENCRYPTED BACKUP MODAL */}
       {showEncryptExportModal && (

@@ -66,6 +66,14 @@ export const VERSION_HISTORY: VersionRecord[] = [
         text: 'Generación Resiliente Dual de Documentos Oficiales en 1-Clic (TarjetasS21Tab.tsx, S89SlipsTab.tsx, ClmScheduleView.tsx, ScheduleTab.tsx, pdfGenerator.ts): Descarga inmediata y sin bloqueo de tarjetas S-21 y hojas S-89; si el usuario no tiene cargada la plantilla oficial de JW Hub, el sistema genera automáticamente el PDF vectorial nativo de alta resolución en un solo clic.',
       },
       {
+        category: 'feature',
+        text: 'Centro Inteligente de Avisos y Recordatorios Teocráticos Automatizados (ConflictsModal.tsx, Navbar.tsx, theocraticReminders.ts): Detección en tiempo real de asignaciones sin confirmar (<48h), turnos de carritos sin cubrir, recordatorios de informes S-4 al cierre de mes y comprobantes de cuentas pendientes con acciones en 1-clic por WhatsApp y notificaciones de escritorio del sistema.',
+      },
+      {
+        category: 'feature',
+        text: 'Centro de Transferencia Directa Local Salón P2P & QR Offline-First (LocalP2PTransferModal.tsx, p2pTransferEngine.ts): Intercambio instantáneo de datos sin conexión a internet entre dispositivos en el Salón del Reino mediante compresión Deflate para Código QR de alta densidad, canal P2P WebRTC local, emisión inmediata entre ventanas y fusión diferencial inteligente.',
+      },
+      {
         category: 'fix',
         text: 'Sanitización Defensiva Universal en Directorio (PublishersTab.tsx): Blindaje de correo, domicilio, municipio y colonia contra cadenas crudas de cifrado en reposo para prevenir solapamientos visuales y anomalías en tarjetas Bento.',
       },

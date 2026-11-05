@@ -1,6 +1,6 @@
 // src/utils/pdfGenerator.ts
 import { jsPDF } from 'jspdf';
-import { WeekSchedule, Publisher, CongregationSettings, MonthlyServiceReport } from '../types';
+import { WeekSchedule, Publisher, CongregationSettings, MonthlyServiceReport, S89Slip } from '../types';
 import { buildS21CardForPublisher } from './s21Helper';
 
 export function buildS89PdfDoc(
@@ -152,6 +152,152 @@ export function generateS89PdfBlobUrl(
   orientation: 'portrait' | 'landscape' = 'portrait'
 ): string {
   const doc = buildS89PdfDoc(week, publishersMap, congregationName, pageSize, orientation);
+  const blob = doc.output('blob');
+  return URL.createObjectURL(blob);
+}
+
+export function buildS89PdfDocFromSlips(
+  slips: S89Slip[],
+  congregationName: string = 'Congregación local',
+  fallbackDate: string = '',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): jsPDF {
+  const doc = new jsPDF({
+    orientation,
+    unit: 'mm',
+    format: pageSize === 'letter' ? 'letter' : 'a4',
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // 4 slips per page (2x2 grid) adapted to portrait or landscape dimensions
+  const marginX = 8;
+  const marginY = 8;
+  const gapX = 6;
+  const gapY = 6;
+  const slipW = (pageWidth - marginX * 2 - gapX) / 2;
+  const slipH = (pageHeight - marginY * 2 - gapY) / 2;
+
+  slips.forEach((slip, index) => {
+    if (index > 0 && index % 4 === 0) {
+      doc.addPage(pageSize === 'letter' ? 'letter' : 'a4', orientation);
+    }
+
+    const col = index % 2;
+    const row = Math.floor((index % 4) / 2);
+    const x = marginX + col * (slipW + gapX);
+    const y = marginY + row * (slipH + gapY);
+
+    const student = slip.studentName || 'Estudiante asignado';
+    const assistant = slip.assistantName || '---';
+
+    // Outer border of S-89
+    doc.setDrawColor(76, 58, 237);
+    doc.setLineWidth(0.35);
+    doc.rect(x, y, slipW, slipH);
+
+    // Header box
+    doc.setFillColor(243, 244, 246);
+    doc.rect(x, y, slipW, 13, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.line(x, y + 13, x + slipW, y + 13);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text('ASIGNACIÓN PARA LA REUNIÓN', x + slipW / 2, y + 5.5, { align: 'center' });
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(71, 85, 105);
+    doc.text('VIDA Y MINISTERIO CRISTIANOS (S-89)', x + slipW / 2, y + 10.2, { align: 'center' });
+
+    // Details body
+    const rowStep = orientation === 'landscape' ? 5.8 : 6.8;
+    let curY = y + 19;
+    doc.setFontSize(8.5);
+
+    // Congregation & Date
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Congregación:', x + 4, curY);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text((congregationName || 'Congregación local').substring(0, 34), x + 28, curY);
+
+    curY += rowStep;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Fecha:', x + 4, curY);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text(slip.meetingDateFormatted || slip.date || fallbackDate || '—', x + 28, curY);
+
+    curY += rowStep;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Estudiante:', x + 4, curY);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(76, 58, 237);
+    doc.text(student.substring(0, 34), x + 28, curY);
+
+    curY += rowStep;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Ayudante:', x + 4, curY);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text(assistant.substring(0, 34), x + 28, curY);
+
+    curY += rowStep;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Asignación:', x + 4, curY);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
+    const maxTitleLen = orientation === 'landscape' ? 45 : 32;
+    const titleWithLesson = slip.lessonNumber ? `${slip.partTitle} (Lecc. ${slip.lessonNumber})` : slip.partTitle;
+    doc.text(titleWithLesson.substring(0, maxTitleLen), x + 28, curY);
+
+    curY += rowStep;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    doc.text('Sala:', x + 4, curY);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
+    const roomText = slip.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal';
+    doc.text(roomText, x + 28, curY);
+
+    // Footer note
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Presente esta hoja a su consejero con su libro Guía.', x + slipW / 2, y + slipH - 3.5, { align: 'center' });
+  });
+
+  return doc;
+}
+
+export function generateS89PdfFromSlips(
+  slips: S89Slip[],
+  congregationName: string = 'Congregación local',
+  fallbackDate: string = '',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+) {
+  const doc = buildS89PdfDocFromSlips(slips, congregationName, fallbackDate, pageSize, orientation);
+  const dateStr = fallbackDate || slips[0]?.date || 'VMC';
+  doc.save(`Hojas_S89_${dateStr}.pdf`);
+}
+
+export function generateS89PdfBlobUrlFromSlips(
+  slips: S89Slip[],
+  congregationName: string = 'Congregación local',
+  fallbackDate: string = '',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): string {
+  const doc = buildS89PdfDocFromSlips(slips, congregationName, fallbackDate, pageSize, orientation);
   const blob = doc.output('blob');
   return URL.createObjectURL(blob);
 }

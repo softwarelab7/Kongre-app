@@ -60,6 +60,15 @@ const getDisplayAddress = (raw?: string | null): string => {
   return typeof decrypted === 'string' ? decrypted : String(decrypted || '');
 };
 
+const sanitizeDisplayField = (val?: string | null): string => {
+  if (!val) return '';
+  const str = String(val);
+  if (str.startsWith('kgr_sec') || str.startsWith('kgr_v') || str.includes('kgr_sec4:') || str.includes('kgr_sec3:')) {
+    return '';
+  }
+  return str;
+};
+
 type ViewMode = 'list' | 'editor';
 type DisplayLayout = 'cards' | 'table';
 type RoleFilter = 'all' | 'elder' | 'servant' | 'pioneer' | 'publisher' | 'unbaptized' | 'trash';
@@ -307,12 +316,13 @@ export const PublishersTab: React.FC = () => {
       .filter((p) => {
         const displayName = getPublisherDisplayName(p).toLowerCase();
         const pubCode = ensureImmutablePublisherCode(p).toLowerCase();
+        const dp = getDisplayPhone(p.phone);
         const matchesSearch =
           displayName.includes(searchTerm.toLowerCase()) ||
           pubCode.includes(searchTerm.toLowerCase()) ||
-          (p.phone && p.phone.includes(searchTerm)) ||
-          (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (p.nid && p.nid.toLowerCase().includes(searchTerm.toLowerCase()));
+          (dp && dp.includes(searchTerm)) ||
+          (p.email && !p.email.startsWith('kgr_sec') && p.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (p.nid && !p.nid.startsWith('kgr_sec') && p.nid.toLowerCase().includes(searchTerm.toLowerCase()));
 
         // Manejo de papelera
         const isDeleted = p.status === 'deleted';
@@ -1437,18 +1447,18 @@ export const PublishersTab: React.FC = () => {
                         </div>
                       )}
 
-                      {p.email && (
+                      {sanitizeDisplayField(p.email) && (
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400 shrink-0">Correo:</span>
-                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 font-medium text-right">{p.email}</span>
+                          <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 font-medium text-right">{sanitizeDisplayField(p.email)}</span>
                         </div>
                       )}
 
-                      {(displayAddress || p.city) && (
+                      {(displayAddress || sanitizeDisplayField(p.city)) && (
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-400 shrink-0">Domicilio:</span>
                           <span className="truncate max-w-[170px] text-zinc-600 dark:text-zinc-300 text-[11px] text-right">
-                            {[displayAddress, p.neighborhood, p.city].filter(Boolean).join(', ')}
+                            {[displayAddress, sanitizeDisplayField(p.neighborhood), sanitizeDisplayField(p.city)].filter(Boolean).join(', ')}
                           </span>
                         </div>
                       )}
@@ -1726,8 +1736,8 @@ export const PublishersTab: React.FC = () => {
                                 )}
                               </div>
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                {p.email && (
-                                  <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA]">{p.email}</span>
+                                {sanitizeDisplayField(p.email) && (
+                                  <span className="text-[10px] text-zinc-400 dark:text-[#A1A1AA]">{sanitizeDisplayField(p.email)}</span>
                                 )}
                                 {p.has_dpa !== undefined && (
                                   <span

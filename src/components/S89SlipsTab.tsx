@@ -49,6 +49,7 @@ import {
   fillOfficialS89Pdf,
   downloadPdfBytesLocally,
 } from '../services/localOfficialFormsService';
+import { generateS89PdfFromSlips } from '../utils/pdfGenerator';
 import { useToast } from '../context/ToastContext';
 
 export const S89SlipsTab: React.FC = () => {
@@ -237,32 +238,39 @@ export const S89SlipsTab: React.FC = () => {
     document.body.removeChild(a);
   };
 
-  // Rellenar y descargar el PDF oficial S-89 cargado por el usuario
+  // Rellenar y descargar el PDF oficial S-89 cargado por el usuario (o generar instantáneamente si no tiene plantilla)
   const handleDownloadOfficialS89Pdf = async () => {
-    const stored = await getLocalOfficialFormBytes('S-89');
-    if (!stored) {
-      setPrintLayout('formato_local');
-      showToast(
-        'Carga primero tu archivo oficial S-89.pdf descargado de JW Hub para que la aplicación lo rellene y puedas descargarlo.',
-        'info'
-      );
-      return;
-    }
-
     if (filteredSlips.length === 0) {
-      showToast('No hay asignaciones estudiantiles en la semana seleccionada para rellenar en el S-89.', 'error');
+      showToast('No hay asignaciones estudiantiles en la semana seleccionada para generar las hojas S-89.', 'error');
       return;
     }
 
     try {
-      const filledBytes = await fillOfficialS89Pdf(stored.bytes, filteredSlips);
-      const outFileName = `S-89_Semana_${activeWeek?.weekStartDate || 'VMC'}.pdf`;
-      downloadPdfBytesLocally(filledBytes, outFileName);
-      showToast(`Hojas oficiales "${outFileName}" rellenadas y descargadas.`, 'success');
+      const stored = await getLocalOfficialFormBytes('S-89');
+      if (stored) {
+        const filledBytes = await fillOfficialS89Pdf(stored.bytes, filteredSlips);
+        const outFileName = `S-89_Semana_${activeWeek?.weekStartDate || 'VMC'}.pdf`;
+        downloadPdfBytesLocally(filledBytes, outFileName);
+        showToast(`Hojas oficiales "${outFileName}" rellenadas con plantilla oficial y descargadas.`, 'success');
+        return;
+      }
     } catch (err) {
-      console.error('Error rellenando S-89 oficial:', err);
-      setPrintLayout('formato_local');
-      showToast('Verifica o vuelve a cargar tu plantilla oficial S-89.pdf.', 'error');
+      console.warn('Plantilla S-89 oficial no disponible o incompatible, usando generador nativo:', err);
+    }
+
+    // Fallback instantáneo 1-clic: genera las hojas S-89 con formato idéntico de alta fidelidad sin bloquear al usuario
+    try {
+      generateS89PdfFromSlips(
+        filteredSlips,
+        settings.congregationName || 'Congregación',
+        activeWeek?.weekStartDate || activeWeek?.midweek?.date || 'VMC',
+        settings.pdfPageSize || 'letter',
+        settings.pdfOrientation || 'portrait'
+      );
+      showToast('Hojas S-89 generadas y descargadas con éxito. (Tip: Puedes cargar tu plantilla oficial S-89 en Formatos).', 'success');
+    } catch (genErr) {
+      console.error('Error generando S-89 en PDF:', genErr);
+      showToast('Ocurrió un error al generar las hojas S-89 en PDF.', 'error');
     }
   };
 

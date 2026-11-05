@@ -118,10 +118,10 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 | Módulo | Icono Oficial | Descripción y Funcionalidades |
 | :--- | :---: | :--- |
-| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de plantillas oficiales **S-89** en PDF y control de sustituciones en tiempo real. |
+| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de asignaciones oficiales **S-89** en PDF (con vía dual: AcroForm oficial o generador vectorial nativo en 1 clic) y control de sustituciones en tiempo real. |
 | **Reunión Pública y Fin de Semana** | `discursos.svg` | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
 | **Territorios y Cartografía** | `predicacion.svg` | Cartografía interactiva con Leaflet y OpenStreetMap, polígonos de manzanas, asignaciones **S-13**, códigos QR para publicadores y registro de turnos en carritos públicos. |
-| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA y deduplicación inteligente de registros. |
+| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA, tarjetas **S-21** en PDF con generación nativa resiliente y deduplicación inteligente de registros. |
 | **Asistencia a las Reuniones (S-88)** | `secretaria.svg` | Registro numérico presencial vs. Zoom, cálculo automático de promedios mensuales y gráficas analíticas por año de servicio con Recharts. |
 | **Informes del Servicio del Campo** | `informes_servicio.svg` | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales. |
 | **Cuentas y Mantenimiento del Salón** | — | Libro de transacciones de congregación, arqueo de fondos, inventario físico de publicaciones y diagrama del panel de disyuntores eléctricos de cabina. |

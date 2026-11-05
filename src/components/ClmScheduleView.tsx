@@ -18,6 +18,7 @@ import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
 import { MeetingTimerModal } from './MeetingTimerModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
+import { generateS89PdfFromSlips } from '../utils/pdfGenerator';
 import { useCongregation } from '../context/CongregationContext';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from '../utils/organizedSync';
 import { createDefaultPrograma, getMonday } from '../utils/clmDefaultProgram';
@@ -980,15 +981,9 @@ export default function ClmScheduleView({
     }
   };
 
-  // Rellenar y descargar el formato oficial S-89 cargado por el usuario (o abrir el modal para cargarlo)
+  // Rellenar y descargar el formato oficial S-89 cargado por el usuario (o generar instantáneamente si no tiene plantilla)
   const handleGenerateS89 = async () => {
     if (!programa) return;
-    const stored = await getLocalOfficialFormBytes('S-89');
-    if (!stored) {
-      setOfficialFormModalCode('S-89');
-      showToast('Carga primero el archivo oficial S-89.pdf descargado de JW Hub para rellenarlo.');
-      return;
-    }
 
     const studentParts = (programa.partes || []).filter(
       (p) => (p.seccion === 'maestros' || p.tipo === 'lectura_biblica') && (p.asignado_nid || p.asignado_nombre)
@@ -1014,13 +1009,31 @@ export default function ClmScheduleView({
     }));
 
     try {
-      const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
-      const outName = `S-89_Semana_${programa.semana_fecha}.pdf`;
-      downloadPdfBytesLocally(filledBytes, outName);
-      showToast(`Formato oficial "${outName}" rellenado y descargado.`);
+      const stored = await getLocalOfficialFormBytes('S-89');
+      if (stored) {
+        const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
+        const outName = `S-89_Semana_${programa.semana_fecha}.pdf`;
+        downloadPdfBytesLocally(filledBytes, outName);
+        showToast(`Formato oficial "${outName}" rellenado y descargado.`);
+        return;
+      }
     } catch (err) {
-      console.error('Error rellenando S-89 oficial:', err);
-      setOfficialFormModalCode('S-89');
+      console.warn('Plantilla S-89 oficial no disponible o con formato incompatible, usando generador nativo:', err);
+    }
+
+    // Fallback instantáneo 1-clic: genera las hojas S-89 sin bloquear al usuario
+    try {
+      generateS89PdfFromSlips(
+        slips,
+        settings?.congregationName || 'Congregación local',
+        programa.semana_fecha,
+        settings?.pdfPageSize || 'letter',
+        settings?.pdfOrientation || 'portrait'
+      );
+      showToast('Hojas S-89 generadas y descargadas con éxito. (Tip: Puedes cargar tu plantilla oficial S-89 en Formatos).');
+    } catch (genErr) {
+      console.error('Error generando S-89 en PDF:', genErr);
+      showToast('Ocurrió un error al generar las hojas S-89 en PDF.');
     }
   };
 

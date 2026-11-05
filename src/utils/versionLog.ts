@@ -61,6 +61,14 @@ export const VERSION_HISTORY: VersionRecord[] = [
         category: 'improvement',
         text: 'Aislamiento del Catálogo de Bosquejos y Programas (OrganizedImportModal.tsx, organizedSync.ts): Pestañas reorganizadas y aislamiento CSS para garantizar una visualización impecable sin interferencias de superposición.',
       },
+      {
+        category: 'feature',
+        text: 'Generación Resiliente Dual de Documentos Oficiales en 1-Clic (TarjetasS21Tab.tsx, S89SlipsTab.tsx, ClmScheduleView.tsx, ScheduleTab.tsx, pdfGenerator.ts): Descarga inmediata y sin bloqueo de tarjetas S-21 y hojas S-89; si el usuario no tiene cargada la plantilla oficial de JW Hub, el sistema genera automáticamente el PDF vectorial nativo de alta resolución en un solo clic.',
+      },
+      {
+        category: 'fix',
+        text: 'Sanitización Defensiva Universal en Directorio (PublishersTab.tsx): Blindaje de correo, domicilio, municipio y colonia contra cadenas crudas de cifrado en reposo para prevenir solapamientos visuales y anomalías en tarjetas Bento.',
+      },
     ],
   },
   {

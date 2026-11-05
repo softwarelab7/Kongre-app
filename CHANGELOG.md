@@ -21,7 +21,11 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Desacoplamiento de la clave canónica de reposo V4 de tokens volátiles de sesión (`sessionPin`), garantizando descifrado determinista e inmediato a partir de la sal de dispositivo y la entropía no extraíble de IndexedDB.
   - Implementación de evaluación de claves candidatas (`getCandidateKeysV4` y `getCandidateKeysV3`) para descifrado retrocompatible transparente de registros previos ante el tag MAC.
   - Autocorrección reactiva en el contexto de congregación que detecta y descifra automáticamente campos huérfanos en memoria y restaura registros demo si falta la sesión.
-  - Blindaje visual defensivo en las tarjetas y tablas de publicadores (`getDisplayPhone`, `getDisplayAddress`) impidiendo la renderización de cadenas crudas `kgr_sec4:...` y previniendo colisiones visuales de columnas mediante `truncate max-w-[170px]` y `gap-2`.
+  - Blindaje visual defensivo en las tarjetas y tablas de publicadores (`getDisplayPhone`, `getDisplayAddress`, `sanitizeDisplayField`) impidiendo la renderización de cadenas crudas `kgr_sec4:...` en teléfonos, domicilios, colonias y correos, previniendo colisiones visuales de columnas mediante `truncate max-w-[170px]` y `gap-2`.
+- 📄 **Generación Resiliente Dual de Documentos Oficiales en 1-Clic (`TarjetasS21Tab.tsx`, `S89SlipsTab.tsx`, `ClmScheduleView.tsx`, `ScheduleTab.tsx`, `pdfGenerator.ts`):**
+  - **Experiencia sin bloqueos:** Los hermanos encargados ya no son bloqueados con advertencias o pantallas de carga obligatoria al descargar tarjetas de publicador (S-21) u hojas de asignación estudiantil (S-89).
+  - **Vía Dual Automática:** Si la congregación cargó el archivo oficial de JW Hub en su bóveda IndexedDB, se rellenan los campos AcroForm con fidelidad milimétrica; si no lo cargó (o si la plantilla presenta incompatibilidad), Kongre genera instantáneamente el documento PDF vectorial de alta resolución en un solo clic.
+  - **Generador por lotes S-89:** Nueva función `generateS89PdfFromSlips` y `buildS89PdfDocFromSlips` para estructurar automáticamente asignaciones estudiantiles en cuadrículas de 4 por página.
 
 ---
 

@@ -405,6 +405,8 @@ test('Fase 2 Bóveda Local: Cifrado kgr_sec4 respaldado por IndexedDB para salud
 
   // Restaurar estado
   setVaultSessionEntropyForTesting(null);
+  delete (globalThis as any).window;
+  delete (globalThis as any).localStorage;
 });
 
 test('Token de rol de servidor: parseServerRoleToken y verifyRoleSessionSignature bloquean escalada en DevTools', () => {
@@ -499,5 +501,7 @@ test('Bóveda Local: descifrado resiliente de campos sensibles ante cambios de P
   assert.equal(restored[0].notes, 'Disponibilidad para fines de semana', 'Debe descifrar las notas');
 
   setVaultSessionEntropyForTesting(null);
+  delete (globalThis as any).window;
+  delete (globalThis as any).localStorage;
 });
 

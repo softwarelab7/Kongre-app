@@ -1,12 +1,27 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+
+if (typeof (globalThis as any).window === 'undefined') {
+  (globalThis as any).window = globalThis;
+}
+if (typeof (globalThis as any).window.atob === 'undefined') {
+  (globalThis as any).window.atob = (str: string) => Buffer.from(str, 'base64').toString('binary');
+}
+if (typeof (globalThis as any).window.btoa === 'undefined') {
+  (globalThis as any).window.btoa = (str: string) => Buffer.from(str, 'binary').toString('base64');
+}
+
 import {
   getServiceYearMonths,
   getCurrentServiceYear,
   getAvailableServiceYears,
   buildS21CardForPublisher,
 } from '../src/utils/s21Helper.ts';
-import type { Publisher, MonthlyServiceReport } from '../src/types.ts';
+import {
+  buildS21PdfDoc,
+  buildS89PdfDocFromSlips,
+} from '../src/utils/pdfGenerator.ts';
+import type { Publisher, MonthlyServiceReport, S89Slip } from '../src/types.ts';
 
 test('dominio teocrático S-21: orden y desglose oficial de los 12 meses del año de servicio', () => {
   const serviceYear = '2025-2026';
@@ -109,4 +124,55 @@ test('dominio teocrático S-21: cálculo de tarjeta S-21 para publicador y precu
   const jan = card.months.find((m) => m.monthKey === '2026-01');
   assert.equal(jan?.hasReport, false, 'Enero no debe tener informe registrado aún');
   assert.equal(jan?.participated, false);
+});
+
+test('generador nativo S-21: buildS21PdfDoc genera documento PDF válido sin requerir plantilla externa', () => {
+  const mockPub: Publisher = {
+    id: 'pub-pdf-1',
+    name: 'Ana Morales',
+    privilege: 'publisher',
+    active: true,
+  };
+  const doc = buildS21PdfDoc(mockPub, '2025-2026', [], 'Congregación Central');
+  assert.ok(doc, 'El documento jsPDF debe haberse generado');
+  const pageCount = doc.getNumberOfPages();
+  assert.ok(pageCount >= 1, 'Debe tener al menos una página');
+});
+
+test('generador nativo S-89: buildS89PdfDocFromSlips genera asignaciones estudiantiles en cuadrícula 2x2', () => {
+  const slips: S89Slip[] = [
+    {
+      id: 'slip-1',
+      weekId: '2026-03-02',
+      date: '2026-03-04',
+      studentId: 'st-1',
+      studentName: 'Mateo Gómez',
+      assistantId: 'as-1',
+      assistantName: 'Lucas Pérez',
+      partNumber: 1,
+      partTitle: 'Lectura de la Biblia',
+      room: 'principal',
+      lessonNumber: 4,
+      deliveredStatus: 'pendiente',
+    },
+    {
+      id: 'slip-2',
+      weekId: '2026-03-02',
+      date: '2026-03-04',
+      studentId: 'st-2',
+      studentName: 'Sara Díaz',
+      assistantId: 'as-2',
+      assistantName: 'Elena Ramos',
+      partNumber: 2,
+      partTitle: 'Empiece conversaciones',
+      room: 'auxiliar',
+      lessonNumber: 8,
+      deliveredStatus: 'pendiente',
+    },
+  ];
+
+  const doc = buildS89PdfDocFromSlips(slips, 'Congregación Central', '2026-03-04');
+  assert.ok(doc, 'El documento S-89 debe haberse generado correctamente');
+  const pageCount = doc.getNumberOfPages();
+  assert.equal(pageCount, 1, '2 hojas caben en 1 sola página (cuadrícula de 4)');
 });

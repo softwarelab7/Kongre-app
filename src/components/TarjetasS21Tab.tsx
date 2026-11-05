@@ -48,6 +48,7 @@ import {
   fillOfficialS21Pdf,
   downloadPdfBytesLocally,
 } from '../services/localOfficialFormsService';
+import { generateS21Pdf } from '../utils/pdfGenerator';
 import { useToast } from '../context/ToastContext';
 
 export const TarjetasS21Tab: React.FC = () => {
@@ -298,40 +299,51 @@ export const TarjetasS21Tab: React.FC = () => {
     document.body.removeChild(a);
   };
 
-  // Rellenar y descargar el PDF oficial S-21 cargado por el usuario (o redirigir a cargarlo si aún no está en la bóveda local)
+  // Rellenar y descargar el PDF oficial S-21 cargado por el usuario (o generar instantáneamente si no tiene plantilla)
   const handleDownloadOfficialS21ForPublisher = async (pub?: Publisher) => {
     const targetPub = pub || currentPublisher || publishers[0];
     if (!targetPub) return;
     setSelectedPublisherId(targetPub.id);
 
-    const stored = await getLocalOfficialFormBytes('S-21');
-    if (!stored) {
-      setActiveView('formato_local');
-      showToast(
-        'Carga primero tu archivo oficial S-21.pdf descargado de JW Hub para que la aplicación lo rellene y puedas descargarlo.',
-        'info'
-      );
-      return;
+    try {
+      const stored = await getLocalOfficialFormBytes('S-21');
+      if (stored) {
+        const filledBytes = await fillOfficialS21Pdf(
+          stored.bytes,
+          targetPub,
+          selectedServiceYear,
+          monthlyReports
+        );
+        const cleanName = (targetPub.name || 'Publicador').replace(
+          /[^a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ_-]/g,
+          '_'
+        );
+        const outFileName = `S-21_${cleanName}_${selectedServiceYear}.pdf`;
+        downloadPdfBytesLocally(filledBytes, outFileName);
+        showToast(`Tarjeta oficial "${outFileName}" rellenada con plantilla oficial y descargada.`, 'success');
+        return;
+      }
+    } catch (err: any) {
+      console.warn('Plantilla S-21 oficial no disponible o con formato incompatible, usando generador nativo de alta fidelidad:', err);
     }
 
+    // Fallback instantáneo 1-clic: genera el PDF oficial S-21 con diseño idéntico y alta fidelidad sin bloquear al usuario
     try {
-      const filledBytes = await fillOfficialS21Pdf(
-        stored.bytes,
+      generateS21Pdf(
         targetPub,
         selectedServiceYear,
-        monthlyReports
+        monthlyReports,
+        settings.congregationName || 'Congregación',
+        settings.pdfPageSize || 'letter',
+        settings.pdfOrientation || 'portrait'
       );
-      const cleanName = (targetPub.name || 'Publicador').replace(
-        /[^a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ_-]/g,
-        '_'
+      showToast(
+        `Tarjeta S-21 generada y descargada con éxito. (Tip: Puedes cargar tu archivo oficial S-21 en Formatos para membrete de sucursal).`,
+        'success'
       );
-      const outFileName = `S-21_${cleanName}_${selectedServiceYear}.pdf`;
-      downloadPdfBytesLocally(filledBytes, outFileName);
-      showToast(`Tarjeta oficial "${outFileName}" rellenada y descargada.`, 'success');
-    } catch (err: any) {
-      console.error('Error rellenando S-21 oficial:', err);
-      setActiveView('formato_local');
-      showToast('Verifica o vuelve a cargar tu plantilla oficial S-21.pdf.', 'error');
+    } catch (genErr) {
+      console.error('Error generando S-21:', genErr);
+      showToast('Ocurrió un error al generar la tarjeta S-21 en PDF.', 'error');
     }
   };
 

@@ -31,6 +31,7 @@ import {
   downloadPdfBytesLocally,
   OfficialFormCode,
 } from '../services/localOfficialFormsService';
+import { generateS89PdfFromSlips } from '../utils/pdfGenerator';
 import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
 import {
   formatTheocraticWeekRange,
@@ -238,13 +239,6 @@ export const ScheduleTab: React.FC = () => {
 
   const handlePrintS89 = async () => {
     if (!currentWeek) return;
-    const stored = await getLocalOfficialFormBytes('S-89');
-    if (!stored) {
-      setOfficialFormModalCode('S-89');
-      setToastNotification('Carga primero el archivo oficial S-89.pdf descargado de JW Hub para rellenarlo.');
-      setTimeout(() => setToastNotification(null), 4000);
-      return;
-    }
 
     const slips = getS89SlipsForWeek(currentWeek);
     if (slips.length === 0) {
@@ -254,13 +248,32 @@ export const ScheduleTab: React.FC = () => {
     }
 
     try {
-      const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
-      const outName = `S-89_Semana_${currentWeek.weekStartDate}.pdf`;
-      downloadPdfBytesLocally(filledBytes, outName);
-      setToastNotification(`Formato oficial "${outName}" rellenado y descargado.`);
+      const stored = await getLocalOfficialFormBytes('S-89');
+      if (stored) {
+        const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
+        const outName = `S-89_Semana_${currentWeek.weekStartDate}.pdf`;
+        downloadPdfBytesLocally(filledBytes, outName);
+        setToastNotification(`Formato oficial "${outName}" rellenado y descargado.`);
+        setTimeout(() => setToastNotification(null), 3500);
+        return;
+      }
     } catch (err) {
-      console.error('Error rellenando S-89 oficial:', err);
-      setOfficialFormModalCode('S-89');
+      console.warn('Plantilla S-89 oficial no disponible o incompatible, usando generador nativo:', err);
+    }
+
+    // Fallback instantáneo 1-clic: genera las hojas S-89 sin bloquear al usuario
+    try {
+      generateS89PdfFromSlips(
+        slips,
+        settings.congregationName || 'Congregación local',
+        currentWeek.weekStartDate,
+        settings.pdfPageSize || 'letter',
+        settings.pdfOrientation || 'portrait'
+      );
+      setToastNotification('Hojas S-89 generadas y descargadas con éxito.');
+    } catch (genErr) {
+      console.error('Error generando S-89 en PDF:', genErr);
+      setToastNotification('Ocurrió un error al generar las hojas S-89 en PDF.');
     }
     setTimeout(() => setToastNotification(null), 3500);
   };

@@ -38,7 +38,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '4 de Noviembre, 2026',
     title: 'Optimización de Agenda Teocrática, Deduplicación de Asignaciones, Cifrado en Reposo Resiliente y Blindaje del Directorio',
     isCurrent: true,
-    highlight: 'Barra de herramientas despejada y simplificada en Agenda y Asignaciones con controladores de clic exterior, deduplicación estricta de IDs en partes de reunión para evitar colisiones en React, modal enfocado de importación de bosquejos Organized, clave de cifrado en reposo V4 desacoplada de tokens volátiles de sesión y blindaje total contra fugas de texto cifrado en tarjetas del directorio.',
+    highlight: 'Barra de herramientas despejada y simplificada en Agenda y Asignaciones con controladores de clic exterior, deduplicación estricta de IDs en partes de reunión para evitar colisiones en React, catálogo enfocado de bosquejos y programas oficiales, clave de cifrado en reposo V4 desacoplada de tokens volátiles de sesión y blindaje total contra fugas de texto cifrado en tarjetas del directorio.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [
       {
@@ -59,7 +59,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
       },
       {
         category: 'improvement',
-        text: 'Aislamiento de Modal de Bosquejos e Importación Organized (OrganizedImportModal.tsx, organizedSync.ts): Pestañas reorganizadas y aislamiento CSS para garantizar una visualización impecable sin interferencias de superposición.',
+        text: 'Aislamiento del Catálogo de Bosquejos y Programas (OrganizedImportModal.tsx, organizedSync.ts): Pestañas reorganizadas y aislamiento CSS para garantizar una visualización impecable sin interferencias de superposición.',
       },
     ],
   },

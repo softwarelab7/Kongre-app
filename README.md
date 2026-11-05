@@ -51,7 +51,7 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 ### ⚡ Optimización de Agenda Teocrática y Sanitización de Asignaciones
 - **Barra de Herramientas Despejada:** Rediseño minimalista de la barra de control en la agenda teocrática (`ScheduleTab.tsx`, `ClmScheduleView.tsx`) con controladores de clic exterior (*click-outside handlers*) para selectores flotantes.
 - **Deduplicación Estricta de Partes de Reunión:** Resolución determinista de claves únicas en partes de reunión en `clmBridge.ts` y `CongregationContext.tsx`, eliminando advertencias de claves duplicadas en React y colisiones de estado.
-- **Aislamiento del Modal de Bosquejos Organized:** Interfaz enfocada en la consulta rápida de bosquejos públicos y programas con aislamiento de capas CSS en `OrganizedImportModal.tsx`.
+- **Aislamiento del Catálogo de Bosquejos y Programas:** Interfaz enfocada en la consulta rápida de bosquejos públicos y programas con aislamiento de capas CSS en `OrganizedImportModal.tsx`.
 
 ### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
 - **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.

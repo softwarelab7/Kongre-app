@@ -1096,7 +1096,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   return (
     <div className="min-h-dvh w-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
       {/* =====================================================================
-          TOP NAVIGATION BAR (Inspired by about.organized-app.com & guide.organized-app.com)
+          TOP NAVIGATION BAR
           ===================================================================== */}
       <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top,0px)] bg-white/80 dark:bg-[#0c0c10]/80 backdrop-blur-2xl border-b border-zinc-200/70 dark:border-white/[0.08] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
@@ -1114,7 +1114,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             </span>
           </div>
 
-          {/* Center: Switch between About (about.organized-app.com style) & Guide (guide.organized-app.com style) */}
+          {/* Center: Switch between About & Guide */}
           <nav className="hidden md:flex items-center gap-1 bg-zinc-100/80 dark:bg-white/[0.05] p-1 rounded-xl border border-zinc-200/70 dark:border-white/[0.08] backdrop-blur-md">
             {[
               { id: 'about' as WebsiteSection, label: 'Acerca de Kongre', icon: Compass },
@@ -2299,7 +2299,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
         )}
 
         {/* ===================================================================
-            VIEW 2: USER GUIDE (Modeled after https://guide.organized-app.com/ - Docusaurus 3-Column Layout)
+            VIEW 2: USER GUIDE (Docusaurus 3-Column Layout)
             =================================================================== */}
         {activeSection === 'guide' && (
           <div className="space-y-6">

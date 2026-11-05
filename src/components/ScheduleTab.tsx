@@ -1378,7 +1378,7 @@ export const ScheduleTab: React.FC = () => {
                       type="button"
                       onClick={() => handleQuickSyncOrganized('weekend')}
                       className="min-h-[30px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/90 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-[#F4F4F5] border border-zinc-200/80 dark:border-white/10 font-semibold text-[11px] sm:text-xs transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
-                      title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
+                      title="Sincronizar el bosquejo oficial y cánticos del fin de semana"
                     >
                       <RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span className="sm:hidden">Sincronizar</span>

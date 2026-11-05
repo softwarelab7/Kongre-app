@@ -673,7 +673,7 @@ export default function ClmScheduleView({
         }
       }
 
-      // 4. Fallback con Organized y WeekSchedule de la congregación
+      // 4. Fallback con catálogo oficial y WeekSchedule de la congregación
       if (!isCancelled) {
         const correspondingWeek = weeks.find((w) => w.weekStartDate === semanaFechaStr);
         setPrograma(sanitizeProgramaIds(createDefaultPrograma(semanaFechaStr, congregationId, correspondingWeek, publishers)));
@@ -1100,13 +1100,13 @@ export default function ClmScheduleView({
     showToast('Se quitaron todos los asignados de esta reunión.');
   };
 
-  // Sincronizar catálogo oficial exactamente como en Organized
+  // Sincronizar catálogo oficial del programa
   const handleSyncOrganized = () => {
     if (!programa) return;
     const correspondingWeek = weeks.find((w) => w.weekStartDate === programa.semana_fecha);
     const org = getOrganizedScheduleForWeek(programa.id, programa.semana_fecha);
     if (!org) {
-      showToast('No se encontró catálogo para esta semana en Organized.');
+      showToast('No se encontró programa oficial para esta semana.');
       return;
     }
     if (correspondingWeek) {
@@ -1119,7 +1119,7 @@ export default function ClmScheduleView({
       localStorage.setItem(`clm_programa_${programa.semana_fecha}`, JSON.stringify(fresh));
     } catch {}
     updateClmPrograma(fresh);
-    showToast('Datos de la semana sincronizados exactamente con Organized.');
+    showToast('Datos de la semana sincronizados con el programa oficial.');
   };
 
   // Enviar a Cartelera
@@ -1883,7 +1883,7 @@ export default function ClmScheduleView({
               <button
                 onClick={handleSyncOrganized}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-                title="Sincronizar catálogo oficial con Organized"
+                title="Sincronizar programa oficial"
               >
                 <RefreshCw size={13} className="shrink-0" />
                 <span>Sincronizar</span>

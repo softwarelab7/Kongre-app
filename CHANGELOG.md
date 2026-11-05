@@ -15,7 +15,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🧩 **Deduplicación Estricta de Partes y Sanitización de Datos (`clmBridge.ts`, `clmDefaultProgram.ts`, `CongregationContext.tsx`):**
   - Resolución determinista de identificadores únicos en partes de reunión (Tesoros, Maestros y Vida Cristiana).
   - Erradicación definitiva de advertencias de claves duplicadas de React y prevención de colisiones en la sincronización de programas semanales.
-- 📖 **Aislamiento y Enfoque del Modal de Bosquejos Organized (`OrganizedImportModal.tsx`, `organizedSync.ts`):**
+- 📖 **Aislamiento y Enfoque del Catálogo de Bosquejos y Programas (`OrganizedImportModal.tsx`, `organizedSync.ts`):**
   - Reestructuración enfocada en búsqueda rápida de bosquejos públicos y carga de programas con aislamiento CSS contra interferencias de capas superiores (*overlays*).
 - 🔐 **Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores (`sensitiveFields.ts`, `CongregationContext.tsx`, `PublishersTab.tsx`, `usePublisherForm.ts`):**
   - Desacoplamiento de la clave canónica de reposo V4 de tokens volátiles de sesión (`sessionPin`), garantizando descifrado determinista e inmediato a partir de la sal de dispositivo y la entropía no extraíble de IndexedDB.

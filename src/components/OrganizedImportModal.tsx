@@ -342,7 +342,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: 194 BOSQUEJOS PÚBLICOS DE ORGANIZED */}
+          {/* 194 BOSQUEJOS PÚBLICOS OFICIALES */}
           {activeTab === 'bosquejos' && (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

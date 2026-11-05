@@ -512,7 +512,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
-  // Invitation code login state (Organized Pocket mode)
+  // Invitation code login state (Kongre Pocket mode)
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [showInviteCode, setShowInviteCode] = useState(false);
   const [isActivatingCode, setIsActivatingCode] = useState(false);
@@ -2384,7 +2384,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </div>
               )}
 
-              {/* VIEW: INICIAR SESIÓN CON CÓDIGO DE INVITACIÓN (Organized Pocket SignUp) */}
+              {/* VIEW: INICIAR SESIÓN CON CÓDIGO DE INVITACIÓN (Kongre Pocket SignUp) */}
               {activeTab === 'invite_code_login' && (
                 <div className="space-y-5 pt-1 animate-in fade-in zoom-in-95 duration-150">
                   {isQrDetected && (
@@ -2491,7 +2491,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 />
               )}
 
-              {/* VIEW: CUENTA NO AUTORIZADA (Estilo Organized Unauthorized Role) */}
+              {/* VIEW: CUENTA NO AUTORIZADA */}
               {activeTab === 'unauthorized' && unauthorizedGoogleAccount && (
                 <div className="space-y-5 pt-1 animate-in fade-in zoom-in-95 text-center">
                   <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-inner">

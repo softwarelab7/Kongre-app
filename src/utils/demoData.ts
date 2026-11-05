@@ -1,8 +1,7 @@
 // src/utils/demoData.ts
 /**
- * Datos de demostración de Congregación Modelo (Organized-grade Test Dataset)
- * Permite a cualquier usuario probar Kongre con una congregación completa y realista,
- * idéntico al modo de prueba de Organized (test.organized-app.com).
+ * Datos de demostración de Congregación Modelo (Dataset de prueba oficial de Kongre)
+ * Permite a cualquier usuario probar Kongre con una congregación completa y realista.
  */
 import {
   Publisher,
@@ -1003,7 +1002,7 @@ export function generateDemoWeeks(): WeekSchedule[] {
 }
 
 /**
- * Paquete completo de demostración para hidratar Kongre como en Organized
+ * Paquete completo de demostración para hidratar Kongre con datos de prueba realistas
  */
 export function getDemoCongregationData() {
   return {

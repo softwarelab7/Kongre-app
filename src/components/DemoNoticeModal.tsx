@@ -1,7 +1,6 @@
 // src/components/DemoNoticeModal.tsx
 /**
- * DemoNoticeModal - Modal de bienvenida al modo de prueba de Kongre,
- * directamente inspirado en DemoNotice de Organized (src/features/demo/notice/index.tsx).
+ * DemoNoticeModal - Modal de bienvenida al modo de prueba de Kongre.
  */
 import React from 'react';
 import {
@@ -65,7 +64,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
           </button>
         </div>
 
-        {/* Description (Organized wording adapted for Kongre) */}
+        {/* Description */}
         <div className="text-xs sm:text-sm text-zinc-600 dark:text-[#D4D4D8] space-y-2 leading-relaxed">
           <p>
             Este es un entorno de demostración con datos predefinidos para una <strong>congregación modelo imaginaria</strong>.

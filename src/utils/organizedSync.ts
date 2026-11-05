@@ -508,7 +508,7 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
 ];
 
 /**
- * Encuentra un programa oficial de Organized por clave de semana o fecha.
+ * Encuentra un programa oficial por clave de semana o fecha.
  * Garantiza coincidencia precisa por fechas ISO (ej. 2026-10-05), semana ISO o rango.
  */
 export function getOrganizedScheduleForWeek(weekId?: string, dateStr?: string): OrganizedWeekSchedule {
@@ -567,7 +567,7 @@ export function getOrganizedScheduleForWeek(weekId?: string, dateStr?: string): 
 }
 
 /**
- * Verifica rigurosamente si una semana carece de datos oficiales de Organized
+ * Verifica rigurosamente si una semana carece de datos oficiales del programa
  * (tanto en la reunión entre semana como en la de fin de semana).
  */
 export function isWeekNeedingOrganizedSync(week: WeekSchedule): boolean {
@@ -618,7 +618,7 @@ export interface ApplyOrganizedOptions {
 }
 
 /**
- * Aplica los datos oficiales de Organized a una semana en Kongre,
+ * Aplica los datos oficiales del programa a una semana en Kongre,
  * preservando los publicadores ya asignados y actualizando títulos teocráticos,
  * lecturas, cánticos y bosquejos.
  */
@@ -764,7 +764,7 @@ export function parseOrganizedJsonOrText(raw: string): {
     try {
       const parsed = JSON.parse(trimmed);
 
-      // Handle Organized app backup or meeting export object
+      // Handle JSON backup or meeting export object
       const data = Array.isArray(parsed) ? parsed[0] : parsed;
 
       // Extract midweek data

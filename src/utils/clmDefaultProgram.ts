@@ -15,7 +15,7 @@ export function getMonday(d: Date | string): string {
 
 /**
  * Plantilla inicial para generar las partes de una semana de reunión Vida y Ministerio
- * Enriquece automáticamente con datos de Organized y/o WeekSchedule de Kongre si están disponibles.
+ * Enriquece automáticamente con datos del catálogo oficial y/o WeekSchedule de Kongre si están disponibles.
  */
 export function createDefaultPrograma(
   semanaFecha: string,
@@ -29,7 +29,7 @@ export function createDefaultPrograma(
     ((dateObj.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + 1) / 7
   );
 
-  // Intentar cargar datos oficiales de Organized para esta fecha
+  // Intentar cargar datos del catálogo oficial para esta fecha
   const org = getOrganizedScheduleForWeek(week?.id || `week-${year}-${weekNum}`, semanaFecha);
 
   const tesorosDiscurso =
@@ -160,7 +160,7 @@ export function createDefaultPrograma(
       });
     });
   } else {
-    // Demostraciones predeterminadas o de Organized
+    // Demostraciones predeterminadas del catálogo oficial
     const demos = org?.midweek?.demonstrations || [
       { title: 'Empiece conversaciones (2 min)', timeMinutes: 2 },
       { title: 'Haga revisitas (3 min)', timeMinutes: 3 },

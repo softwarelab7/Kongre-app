@@ -1,6 +1,6 @@
 // src/components/DemoBanner.tsx
 /**
- * DemoBanner - Insignia de modo de prueba inspirada en Organized (DemoBanner).
+ * DemoBanner - Insignia de modo de prueba para Kongre.
  * Se muestra junto al logotipo en la barra de navegación para indicar visualmente
  * que el usuario está explorando un entorno de demostración con datos de prueba.
  */

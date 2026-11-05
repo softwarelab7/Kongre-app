@@ -801,7 +801,7 @@ const AppContent: React.FC = () => {
     }
   }, [effectiveRoleInfo.id, activeTab, setActiveTab]);
 
-  // Organized-style "Pocket Mode" Direct Invitation Link (?tk=... or legacy ?cong=...&cpin=...&pub=...&pin=... or ?invite=...)
+  // Kongre "Pocket Mode" Direct Invitation Link (?tk=... or legacy ?cong=...&cpin=...&pub=...&pin=... or ?invite=...)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
@@ -1388,7 +1388,7 @@ const AppContent: React.FC = () => {
 
   // Mandatory Congregation Registration Check:
   // A user MUST register the congregation (or join an existing one with verified PIN/credentials),
-  // OR enter as guest (read-only mode like Organized app) before accessing the platform
+  // OR enter as guest (read-only mode) before accessing the platform
   const isGuestSession = Boolean(
     isDemoMode ||
     isSafeDemoMode() ||
@@ -1961,7 +1961,7 @@ const AppContent: React.FC = () => {
         onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
       />
 
-      {/* Demo Notice Modal (Organized-style Welcome to Demo Notice) */}
+      {/* Demo Notice Modal (Welcome to Demo Notice) */}
       <DemoNoticeModal
         isOpen={isDemoNoticeOpen}
         onClose={() => {

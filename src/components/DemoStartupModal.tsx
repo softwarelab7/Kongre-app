@@ -1,7 +1,6 @@
 // src/components/DemoStartupModal.tsx
 /**
- * DemoStartupModal - Pantalla de carga y preparación de datos de prueba,
- * inspirada directamente en DemoStartup de Organized (src/features/demo/start/index.tsx).
+ * DemoStartupModal - Pantalla de carga y preparación de datos de prueba de Kongre.
  */
 import React from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';

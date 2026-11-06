@@ -10,6 +10,12 @@ function makeDb(clock: { t: number }) {
     async getRow(id) { const r = rows.get(id); return r ? { ...r } : null; },
     async insertRow(row) { if (rows.has(row.id_congregacion)) return false; rows.set(row.id_congregacion, { ...row }); return true; },
     async updateRow(id, patch) { rows.set(id, { ...rows.get(id)!, ...patch }); },
+    async updateRowIfVersion(id, patch, expected) {
+      const cur = rows.get(id);
+      if (!cur || Date.parse(cur.created_at) !== Date.parse(expected)) return false;
+      rows.set(id, { ...cur, ...patch });
+      return true;
+    },
     async deleteRow(id) { rows.delete(id); },
     async lockedUntil(keys) {
       let m: number | null = null;
@@ -656,4 +662,33 @@ test('migración transparente: push con master_legacy autentica y actualiza veri
     tokens: { master: T.masterA },
   }, '2.2.2.2');
   assert.equal(pullOldRejected.status, 401);
+});
+
+test('concurrencia optimista: el formato de fecha de Postgres (+00:00) no provoca falsos conflictos', async () => {
+  const { call, clock, rows } = setup();
+  const c1 = await create(call);
+  const v1: string = c1.body.created_at; // "...Z" (lo que recibe el cliente)
+  // Postgres devuelve la misma marca con otro formato al leer la fila.
+  const row = rows.get('CONG1')!;
+  rows.set('CONG1', { ...row, created_at: v1.replace('Z', '+00:00') });
+  clock.t += 1000;
+  const r = await call({
+    action: 'push', id: 'CONG1', tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_2', payload_public: 'PUB_2', expected_version: v1,
+  });
+  assert.equal(r.status, 200, 'misma marca de tiempo en distinto formato no es un conflicto');
+});
+
+test('concurrencia optimista: dos push simultáneos con la misma versión → solo uno gana (compare-and-swap)', async () => {
+  const { call, clock } = setup();
+  const c1 = await create(call);
+  const v1 = c1.body.created_at;
+  clock.t += 1000;
+  const body = (p: string) => ({
+    action: 'push', id: 'CONG1', tokens: { master: T.masterA, public: T.publicA },
+    payload: p, payload_public: p, expected_version: v1,
+  });
+  const [x, y] = await Promise.all([call(body('A')), call(body('B'))]);
+  const statuses = [x.status, y.status].sort();
+  assert.deepEqual(statuses, [200, 409], 'exactamente un push debe aceptarse y el otro recibir 409');
 });

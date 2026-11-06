@@ -40,6 +40,11 @@ export interface SyncDb {
   /** Inserta; devuelve false si ya existía (carrera). */
   insertRow(row: SyncRow): Promise<boolean>;
   updateRow(id: string, patch: Partial<SyncRow>): Promise<void>;
+  /**
+   * Compare-and-swap atómico: actualiza SOLO si la fila sigue en `expectedCreatedAt` (valor tal como lo devolvió getRow).
+   * Devuelve false si otro push se adelantó entre la lectura y la escritura (no se modifica nada).
+   */
+  updateRowIfVersion(id: string, patch: Partial<SyncRow>, expectedCreatedAt: string): Promise<boolean>;
   deleteRow(id: string): Promise<void>;
   /** Epoch ms hasta el que alguna de las claves está bloqueada, o null. */
   lockedUntil(keys: string[]): Promise<number | null>;
@@ -180,6 +185,18 @@ export async function verifyServerRoleToken(
     roles: rolesStr.split(',').filter(Boolean),
     expiresAt: exp,
   };
+}
+
+/**
+ * Compara dos marcas de versión de forma semántica. El cliente guarda `...Z` (la que devolvió el push) y Postgres
+ * puede devolver `...+00:00` (o con microsegundos): comparar cadenas daría falsos conflictos.
+ */
+export function versionsEqual(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return false;
+  const ta = Date.parse(a);
+  const tb = Date.parse(b);
+  if (Number.isFinite(ta) && Number.isFinite(tb)) return ta === tb;
+  return a === b;
 }
 
 function safeEqual(a: string, b: string): boolean {
@@ -402,7 +419,7 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (body.expected_version !== undefined && (typeof body.expected_version !== 'string' || body.expected_version.length > 100)) {
       return json(req, env, 400, { ok: false, error: 'bad_expected_version' });
     }
-    if (expectedVersion && current.created_at && current.created_at !== expectedVersion) {
+    if (expectedVersion && current.created_at && !versionsEqual(current.created_at, expectedVersion)) {
       return json(req, env, 409, {
         ok: false,
         error: 'conflict_detected',
@@ -443,7 +460,16 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       if (rt.public) patch.public_verifier = await verifierOf(env.pepper, 'public', id, rt.public);
     }
 
-    await db.updateRow(id, patch);
+    if (expectedVersion && current.created_at) {
+      // La comprobación anterior solo da un mensaje rápido; la garantía real es este compare-and-swap atómico.
+      const swapped = await db.updateRowIfVersion(id, patch, current.created_at);
+      if (!swapped) {
+        const latest = await db.getRow(id);
+        return json(req, env, 409, { ok: false, error: 'conflict_detected', current_version: latest?.created_at ?? null });
+      }
+    } else {
+      await db.updateRow(id, patch);
+    }
     return json(req, env, 200, { ok: true, created_at: nowIso, tier });
   }
 

@@ -497,3 +497,39 @@ export function restorePinRecordsFromLocalStorage<T extends Record<string, any>>
     };
   });
 }
+
+/**
+ * Campos de una visita de pastoreo que revelan situación personal (salud, duelo, inactividad, notas de los ancianos).
+ * `focus` se cifra porque por sí solo ya delata el motivo de la visita.
+ */
+const SENSITIVE_SHEPHERDING_KEYS = ['notes', 'scripturesOrPoints', 'focus'] as const;
+
+/** Cifra en reposo los campos sensibles de las visitas de pastoreo antes de escribir en localStorage. */
+export function sanitizeShepherdingVisitsForLocalStorage<T extends Record<string, any>>(visits: T[]): T[] {
+  if (!Array.isArray(visits)) return [];
+  return visits.map((v) => {
+    if (!v || typeof v !== 'object') return v;
+    const clone: Record<string, any> = { ...v };
+    for (const k of SENSITIVE_SHEPHERDING_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = encryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}
+
+/** Descifra en memoria las visitas leídas de localStorage (acepta texto plano heredado y se re-cifra al siguiente guardado). */
+export function restoreShepherdingVisitsFromLocalStorage<T extends Record<string, any>>(visits: T[]): T[] {
+  if (!Array.isArray(visits)) return [];
+  return visits.map((v) => {
+    if (!v || typeof v !== 'object') return v;
+    const clone: Record<string, any> = { ...v };
+    for (const k of SENSITIVE_SHEPHERDING_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = decryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}

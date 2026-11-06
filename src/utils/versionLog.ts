@@ -47,7 +47,11 @@ export const VERSION_HISTORY: VersionRecord[] = [
       },
       {
         category: 'security',
-        text: 'Concurrencia Optimista y Detección de Conflictos (core.ts, syncApi.ts, supabaseSyncService.ts): Implementación de expected_version en el endpoint de push para detectar cuando dos ancianos guardan simultáneamente desde dispositivos distintos, rechazando la sobrescritura accidental con HTTP 409 Conflict (conflict_detected).',
+        text: 'Concurrencia Optimista, Compare-and-Swap y Auto-Reconciliación (core.ts, index.ts, supabaseSyncService.ts): Implementación de Compare-and-Swap atómico en servidor (updateRowIfVersion) con normalización semántica de timestamps (versionsEqual) y auto-fusión transparente en cliente ante HTTP 409.',
+      },
+      {
+        category: 'security',
+        text: 'Cifrado en Reposo de Visitas de Pastoreo (sensitiveFields.ts, CongregationContext.tsx, shepherding-at-rest.test.ts): Cifrado granular en reposo de notas confidenciales, escrituras sugeridas y motivo/enfoque de pastoreo en localStorage, con aceptación transparente de datos heredados.',
       },
       {
         category: 'security',

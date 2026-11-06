@@ -44,6 +44,16 @@ const db: SyncDb = {
     const { error } = await supabase.from('sync_queue').update({ ...patch, consumed_at: null }).eq('id_congregacion', id);
     if (error) throw new Error(error.message);
   },
+  async updateRowIfVersion(id, patch, expectedCreatedAt) {
+    const { data, error } = await supabase
+      .from('sync_queue')
+      .update({ ...patch, consumed_at: null })
+      .eq('id_congregacion', id)
+      .eq('created_at', expectedCreatedAt)
+      .select('id_congregacion');
+    if (error) throw new Error(error.message);
+    return Array.isArray(data) && data.length > 0;
+  },
   async deleteRow(id) {
     const { error } = await supabase.from('sync_queue').delete().eq('id_congregacion', id);
     if (error) throw new Error(error.message);

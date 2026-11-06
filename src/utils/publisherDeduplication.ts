@@ -1,4 +1,5 @@
 import { Publisher, PublisherRoles, WeekSchedule } from '../types';
+import { secureRandomInt } from './security/random';
 
 /**
  * Normaliza nombres de personas quitando tildes, signos diacríticos, mayúsculas
@@ -142,25 +143,11 @@ export function ensureImmutablePublisherCode(pub?: Partial<Publisher> | null): s
     return `PUB-${code}`;
   }
 
-  const randomBytes = new Uint8Array(6);
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(randomBytes);
-  } else {
-    // Entorno de ejecución sin crypto global (fallback resiliente con CSPRNG dinámico)
-    try {
-      const nodeCrypto = require('crypto');
-      const buf = nodeCrypto.randomBytes(6);
-      randomBytes.set(buf);
-    } catch {
-      // Si todo CSPRNG falla en pruebas, derivar de performance.now con alta entropía
-      for (let i = 0; i < 6; i++) {
-        randomBytes[i] = (Math.floor(performance.now() * 1000) ^ (i * 37)) & 0xff;
-      }
-    }
-  }
+  // CSPRNG obligatorio: getSecureRandomBytes lanza una excepción si Web Crypto no está disponible,
+  // en lugar de degradar a una fuente predecible. secureRandomInt evita el sesgo de módulo.
   let newCode = '';
   for (let i = 0; i < 6; i++) {
-    newCode += PUB_CODE_ALPHABET[randomBytes[i] % PUB_CODE_ALPHABET.length];
+    newCode += PUB_CODE_ALPHABET[secureRandomInt(PUB_CODE_ALPHABET.length)];
   }
   return `PUB-${newCode}`;
 }

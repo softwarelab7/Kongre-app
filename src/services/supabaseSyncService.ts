@@ -340,6 +340,48 @@ function mergePreachingGroups(
   return Array.from(map.values()).sort((a, b) => a.number - b.number);
 }
 
+/**
+ * Fusiona la versión remota con los datos locales respetando adiciones de ambos extremos.
+ * Se usa tanto al descargar cambios de la nube como al resolver un conflicto de versión (409).
+ */
+function mergeCongregationData(current: CongregationFullData, rData: CongregationFullData): CongregationFullData {
+  return {
+    settings: {
+      ...(current.settings || {}),
+      ...(rData.settings || {}),
+    },
+    publishers: mergePublishers(current.publishers || [], rData.publishers || []),
+    weeks: mergeById(current.weeks || [], rData.weeks || []),
+    territories: mergeById(current.territories || [], rData.territories || []),
+    notices: mergeById(current.notices || [], rData.notices || []),
+    transactions: mergeById(current.transactions || [], rData.transactions || []),
+    audits: mergeById(current.audits || [], rData.audits || []),
+    literatureItems: mergeById(current.literatureItems || [], rData.literatureItems || []),
+    literatureOrders: mergeById(current.literatureOrders || [], rData.literatureOrders || []),
+    literatureDistributions: mergeDistributions(current.literatureDistributions || [], rData.literatureDistributions || []),
+    literatureInventory: mergeById(current.literatureInventory || [], rData.literatureInventory || []),
+    preachingGroups: (rData.preachingGroups && rData.preachingGroups.length > 0) ? mergePreachingGroups(current.preachingGroups || [], rData.preachingGroups) : (current.preachingGroups || []),
+    customDuties: (rData.customDuties && rData.customDuties.length > 0) ? mergeById(current.customDuties || [], rData.customDuties) : (current.customDuties || []),
+    outgoingSpeakers: mergeById(current.outgoingSpeakers || [], rData.outgoingSpeakers || []),
+    fieldServiceMeetings: mergeById(current.fieldServiceMeetings || [], rData.fieldServiceMeetings || []),
+    cartLocations: mergeById(current.cartLocations || [], rData.cartLocations || []),
+    cartShifts: mergeById(current.cartShifts || [], rData.cartShifts || []),
+    monthlyReports: mergeMonthlyReports(current.monthlyReports || [], rData.monthlyReports || []),
+    circuitVisit: rData.circuitVisit !== undefined ? rData.circuitVisit : current.circuitVisit,
+    memorialPlans: mergeById(current.memorialPlans || [], rData.memorialPlans || []),
+    theocraticAssemblies: mergeById(current.theocraticAssemblies || [], rData.theocraticAssemblies || []),
+    congregationEvents: mergeById(current.congregationEvents || [], rData.congregationEvents || []),
+    accountLinkRequests: mergeById(current.accountLinkRequests || [], rData.accountLinkRequests || []),
+    clmProgramas: { ...(current.clmProgramas || {}), ...(rData.clmProgramas || {}) },
+    hospitalityHosts: mergeById(current.hospitalityHosts || [], rData.hospitalityHosts || []),
+    breakers: (rData.breakers && rData.breakers.length > 0) ? mergeById(current.breakers || [], rData.breakers) : (current.breakers || []),
+    maintenanceSheets: (rData.maintenanceSheets && rData.maintenanceSheets.length > 0) ? mergeById(current.maintenanceSheets || [], rData.maintenanceSheets) : (current.maintenanceSheets || []),
+    auxPioneerRequests: mergeById(current.auxPioneerRequests || [], rData.auxPioneerRequests || []),
+    branchReportsS1: mergeById(current.branchReportsS1 || [], rData.branchReportsS1 || []),
+    invitations: rData.invitations && rData.invitations.length > 0 ? rData.invitations : (current.invitations || []),
+  };
+}
+
 export const supabaseSyncService = {
   normalizeCongregationId,
 
@@ -777,6 +819,7 @@ export const supabaseSyncService = {
     action: 'downloaded' | 'uploaded' | 'merged' | 'up_to_date' | 'offline_queued';
     mergedData?: CongregationFullData;
     error?: string;
+    conflict?: boolean;
   }> {
     const cleanId = normalizeCongregationId(params.congregationId);
     if (!cleanId) return { success: false, action: 'up_to_date', error: 'Sin ID de congregación' };
@@ -807,41 +850,7 @@ export const supabaseSyncService = {
           const rData = remote.data;
 
           // 3. Fusionar datos respetando adiciones de ambos extremos
-          const merged: CongregationFullData = {
-            settings: {
-              ...(params.currentData.settings || {}),
-              ...(rData.settings || {}),
-            },
-            publishers: mergePublishers(params.currentData.publishers || [], rData.publishers || []),
-            weeks: mergeById(params.currentData.weeks || [], rData.weeks || []),
-            territories: mergeById(params.currentData.territories || [], rData.territories || []),
-            notices: mergeById(params.currentData.notices || [], rData.notices || []),
-            transactions: mergeById(params.currentData.transactions || [], rData.transactions || []),
-            audits: mergeById(params.currentData.audits || [], rData.audits || []),
-            literatureItems: mergeById(params.currentData.literatureItems || [], rData.literatureItems || []),
-            literatureOrders: mergeById(params.currentData.literatureOrders || [], rData.literatureOrders || []),
-            literatureDistributions: mergeDistributions(params.currentData.literatureDistributions || [], rData.literatureDistributions || []),
-            literatureInventory: mergeById(params.currentData.literatureInventory || [], rData.literatureInventory || []),
-            preachingGroups: (rData.preachingGroups && rData.preachingGroups.length > 0) ? mergePreachingGroups(params.currentData.preachingGroups || [], rData.preachingGroups) : (params.currentData.preachingGroups || []),
-            customDuties: (rData.customDuties && rData.customDuties.length > 0) ? mergeById(params.currentData.customDuties || [], rData.customDuties) : (params.currentData.customDuties || []),
-            outgoingSpeakers: mergeById(params.currentData.outgoingSpeakers || [], rData.outgoingSpeakers || []),
-            fieldServiceMeetings: mergeById(params.currentData.fieldServiceMeetings || [], rData.fieldServiceMeetings || []),
-            cartLocations: mergeById(params.currentData.cartLocations || [], rData.cartLocations || []),
-            cartShifts: mergeById(params.currentData.cartShifts || [], rData.cartShifts || []),
-            monthlyReports: mergeMonthlyReports(params.currentData.monthlyReports || [], rData.monthlyReports || []),
-            circuitVisit: rData.circuitVisit !== undefined ? rData.circuitVisit : params.currentData.circuitVisit,
-            memorialPlans: mergeById(params.currentData.memorialPlans || [], rData.memorialPlans || []),
-            theocraticAssemblies: mergeById(params.currentData.theocraticAssemblies || [], rData.theocraticAssemblies || []),
-            congregationEvents: mergeById(params.currentData.congregationEvents || [], rData.congregationEvents || []),
-            accountLinkRequests: mergeById(params.currentData.accountLinkRequests || [], rData.accountLinkRequests || []),
-            clmProgramas: { ...(params.currentData.clmProgramas || {}), ...(rData.clmProgramas || {}) },
-            hospitalityHosts: mergeById(params.currentData.hospitalityHosts || [], rData.hospitalityHosts || []),
-            breakers: (rData.breakers && rData.breakers.length > 0) ? mergeById(params.currentData.breakers || [], rData.breakers) : (params.currentData.breakers || []),
-            maintenanceSheets: (rData.maintenanceSheets && rData.maintenanceSheets.length > 0) ? mergeById(params.currentData.maintenanceSheets || [], rData.maintenanceSheets) : (params.currentData.maintenanceSheets || []),
-            auxPioneerRequests: mergeById(params.currentData.auxPioneerRequests || [], rData.auxPioneerRequests || []),
-            branchReportsS1: mergeById(params.currentData.branchReportsS1 || [], rData.branchReportsS1 || []),
-            invitations: rData.invitations && rData.invitations.length > 0 ? rData.invitations : (params.currentData.invitations || []),
-          };
+          const merged: CongregationFullData = mergeCongregationData(params.currentData, rData);
 
           if (params.onDataUpdated) {
             params.onDataUpdated(merged);
@@ -863,15 +872,38 @@ export const supabaseSyncService = {
         return { success: true, action: 'up_to_date' };
       }
 
-      const uploadRes = await this.uploadCongregation({
+      let uploadRes = await this.uploadCongregation({
         congregationId: cleanId,
         data: params.currentData,
         pinMaestro: params.pinMaestro,
         pinCongregacion: params.pinCongregacion,
       });
 
+      // Conflicto de versión (409): otro dispositivo guardó mientras trabajábamos. En lugar de dejar al usuario
+      // bloqueado, traemos la versión de la nube, la fusionamos con los cambios locales y reintentamos UNA vez.
+      if (!uploadRes.success && uploadRes.conflict) {
+        const remote = await this.fetchAndDecryptCongregation(
+          cleanId,
+          params.pinMaestro || params.pinCongregacion || ''
+        );
+        if (remote.success && remote.data) {
+          const merged = mergeCongregationData(params.currentData, remote.data);
+          if (params.onDataUpdated) params.onDataUpdated(merged);
+          // fetchAndDecryptCongregation ya dejó la marca de la versión remota como base del reintento.
+          uploadRes = await this.uploadCongregation({
+            congregationId: cleanId,
+            data: merged,
+            pinMaestro: params.pinMaestro,
+            pinCongregacion: params.pinCongregacion,
+          });
+          if (uploadRes.success) {
+            return { success: true, action: 'merged', mergedData: merged };
+          }
+        }
+      }
+
       if (!uploadRes.success) {
-        return { success: false, action: 'up_to_date', error: uploadRes.error };
+        return { success: false, action: 'up_to_date', error: uploadRes.error, conflict: uploadRes.conflict };
       }
 
       return { success: true, action: 'uploaded' };

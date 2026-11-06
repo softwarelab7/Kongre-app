@@ -15,6 +15,7 @@ const db: SyncDb = {
   async getRow(id) { const r = rows.get(id); return r ? { ...r } : null; },
   async insertRow(r) { if (rows.has(r.id_congregacion)) return false; rows.set(r.id_congregacion, { ...r }); return true; },
   async updateRow(id, p) { rows.set(id, { ...rows.get(id)!, ...p }); },
+  async updateRowIfVersion(id, p, expected) { const cur = rows.get(id); if (!cur || Date.parse(cur.created_at) !== Date.parse(expected)) return false; rows.set(id, { ...cur, ...p }); return true; },
   async deleteRow(id) { rows.delete(id); },
   async lockedUntil(keys) { let m: number | null = null; for (const k of keys) { const e = rl.get(k); if (e?.lu && e.lu > Date.now()) m = Math.max(m ?? 0, e.lu); } return m; },
   async registerFailure(k, limit, win, lock) { let e = rl.get(k); if (!e || e.ws < Date.now() - win * 1000) e = { f: 0, ws: Date.now(), lu: e?.lu ?? null }; e.f++; rl.set(k, e); if (e.f >= limit) { e.lu = Date.now() + lock * 1000; e.f = 0; e.ws = Date.now(); return e.lu; } return null; },

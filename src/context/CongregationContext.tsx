@@ -102,6 +102,8 @@ import {
   verifyPersonalPinMatch,
   sanitizePublishersForLocalStorage,
   restorePublishersFromLocalStorage,
+  sanitizeShepherdingVisitsForLocalStorage,
+  restoreShepherdingVisitsFromLocalStorage,
   sanitizePinRecordsForLocalStorage,
   getSecureLocalPin,
   setSecureLocalPin,
@@ -739,7 +741,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [shepherdingVisits, setShepherdingVisits] = useState<ShepherdingVisit[]>(() => {
     try {
       const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_shepherding_visits`);
-      return saved ? JSON.parse(saved) : [];
+      return saved ? restoreShepherdingVisitsFromLocalStorage<ShepherdingVisit>(JSON.parse(saved)) : [];
     } catch {
       return [];
     }
@@ -749,7 +751,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     latestShepherdingVisitsRef.current = shepherdingVisits;
     try {
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_shepherding_visits`, JSON.stringify(shepherdingVisits));
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEY}_shepherding_visits`,
+        JSON.stringify(sanitizeShepherdingVisitsForLocalStorage(shepherdingVisits))
+      );
     } catch (e) {
       console.error('Error saving shepherding_visits:', e);
     }
@@ -2353,7 +2358,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       let msg = 'Sincronización con Supabase completada.';
-      if (res.action === 'downloaded' || res.action === 'merged') {
+      if (res.action === 'merged') {
+        localStorage.removeItem('kongre_needs_cloud_upload');
+        msg = 'Otro dispositivo había guardado cambios al mismo tiempo: se combinaron con los tuyos y todo quedó sincronizado.';
+      } else if (res.action === 'downloaded') {
         msg = 'Se descargaron y combinaron las últimas novedades teocráticas desde Supabase.';
       } else if (res.action === 'uploaded') {
         localStorage.removeItem('kongre_needs_cloud_upload');

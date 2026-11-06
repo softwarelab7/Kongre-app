@@ -10,6 +10,12 @@ function makeDb(clock: { t: number }) {
     async getRow(id) { const r = rows.get(id); return r ? { ...r } : null; },
     async insertRow(row) { if (rows.has(row.id_congregacion)) return false; rows.set(row.id_congregacion, { ...row }); return true; },
     async updateRow(id, patch) { rows.set(id, { ...rows.get(id)!, ...patch }); },
+    async updateRowIfVersion(id, patch, expected) {
+      const cur = rows.get(id);
+      if (!cur || Date.parse(cur.created_at) !== Date.parse(expected)) return false;
+      rows.set(id, { ...cur, ...patch });
+      return true;
+    },
     async deleteRow(id) { rows.delete(id); },
     async lockedUntil(keys) {
       let m: number | null = null;

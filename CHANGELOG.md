@@ -12,15 +12,17 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🛡️ **Paridad Criptográfica de Tokens de Autenticación a 600.000 Iteraciones (`syncApi.ts`):**
   - Elevación de las iteraciones PBKDF2 de `100.000` a `600.000` en la derivación de tokens de autenticación de PIN, cerrando por completo la asimetría de coste frente al cifrado AES-256-GCM y blindando la seguridad ante posibles filtraciones de base de datos y pepper.
   - Mecanismo de migración transparente y bidireccional: el cliente genera simultáneamente tokens con 600k y tokens legados con 100k, permitiendo que congregaciones preexistentes autentiquen sin fricción y actualicen automáticamente sus verificadores a 600k en su siguiente push.
-- 🔄 **Concurrencia Optimista y Detección de Conflictos de Guardado (`core.ts`, `syncApi.ts`, `supabaseSyncService.ts`):**
-  - Integración del parámetro de versión `expected_version` en la Edge Function `kongre-sync`.
-  - Cuando dos ancianos editan y guardan simultáneamente desde diferentes dispositivos, el servidor detecta el conflicto de versión y responde con HTTP `409 Conflict` (`conflict_detected`), alertando al usuario y evitando la sobrescritura silenciosa de cambios.
+- 🔄 **Concurrencia Optimista, Compare-and-Swap Atómico y Auto-Reconciliación Transparente (`core.ts`, `index.ts`, `supabaseSyncService.ts`):**
+  - Implementación de Compare-and-Swap atómico en la Edge Function (`updateRowIfVersion`) y normalización semántica de marcas temporales (`versionsEqual`), eliminando falsos conflictos entre formatos `...Z` y `...+00:00`.
+  - Mecanismo de auto-fusión ante colisiones: si otro dispositivo guardó cambios en el intervalo (HTTP 409), el cliente descarga la versión remota, la combina inteligentemente con los cambios locales sin perder datos y reintenta la subida de forma transparente, notificando al usuario que sus datos fueron integrados con éxito.
+- 🔒 **Cifrado en Reposo de Visitas de Pastoreo (`sensitiveFields.ts`, `CongregationContext.tsx`, `shepherding-at-rest.test.ts`):**
+  - Cifrado granular en reposo de notas confidenciales, escrituras sugeridas y motivo/enfoque de las visitas de pastoreo (`sanitizeShepherdingVisitsForLocalStorage` y `restoreShepherdingVisitsFromLocalStorage`), garantizando que ninguna información sensible de pastoreo quede en texto plano en `localStorage`. Incluye compatibilidad hacia atrás e idempotencia de cifrado.
 - 🔑 **Soporte de Passphrases y PINs Extendidos de Alta Entropía (`congregationCredentials.ts`):**
   - Ampliación del formateador dinámico de PIN de congregación hasta 24 caracteres alfanuméricos agrupados en bloques de 4 (`XXXX-XXXX-XXXX...`), permitiendo el uso de frases de paso con entropía superior a 60 bits inmunes a ataques de diccionario o fuerza bruta por GPU.
 - 🧹 **Sanitización Rigurosa en Todas las Rutas de Persistencia Local (`CongregationContext.tsx`):**
   - Aseguramiento de que todas las ramas de guardado de publicadores en `localStorage` pasen por `sanitizePublishersForLocalStorage`, eliminando PINs en claro y garantizando el cifrado en reposo de datos médicos y contactos de emergencia.
-- 🎲 **CSPRNG Seguro en Códigos Inmutables (`publisherDeduplication.ts`):**
-  - Sustitución de `Math.random()` por `crypto.getRandomValues()` y generadores CSPRNG criptográficamente seguros para la generación de identificadores inmutables de publicador.
+- 🎲 **CSPRNG Criptográfico sin Degradación (`publisherDeduplication.ts`):**
+  - Uso estricto de `secureRandomInt` sobre Web Crypto API para códigos inmutables de publicador, eliminando dependencias de Node.js o degradaciones no seguras.
 - 📜 **Alineación Normativa y Documentación de Seguridad (`SEGURIDAD.md`, `TermsAndPrivacyModal.tsx`, `public/privacy.html`, `README.md`):**
   - Transparencia explícita sobre el modelo E2EE a nivel de congregación y RBAC en cliente con tokens firmados por servidor (`kgr_srt1`).
   - Delimitación del estado de validación técnica de sobres criptográficos departamentales (`compartments.ts`).

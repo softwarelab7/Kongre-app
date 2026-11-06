@@ -377,13 +377,6 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           icon: NAV_ICONS.asistencia,
           colorKey: 'teal',
         },
-        {
-          id: 'cuentas',
-          label: 'Cuentas S-26',
-          description: 'Registro contable, donaciones, resolución y sucursal',
-          icon: NAV_ICONS.cuentas,
-          colorKey: 'fuchsia',
-        },
       ],
     },
     {

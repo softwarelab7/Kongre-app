@@ -81,7 +81,7 @@ import { OfflineDashboard } from './components/OfflineDashboard';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
-import { Building2, ArrowLeft } from 'lucide-react';
+import { Building2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import {
   checkUpcomingAssignmentsAndNotify,
@@ -1758,7 +1758,23 @@ const AppContent: React.FC = () => {
                 {activeTab === 'informe_s1' && <InformeSucursalS1Tab />}
                 {activeTab === 'informes_servicio' && <InformesServicioTab />}
                 {activeTab === 'tarjetas_s21' && <TarjetasS21Tab />}
-                {activeTab === 'cuentas' && <CuentasTab />}
+                {activeTab === 'cuentas' && (
+                  <div className="p-8 text-center max-w-lg mx-auto kg-card-bento kg-glass-surface rounded-3xl border border-zinc-200/80 dark:border-white/10 mt-12 space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                      <AlertTriangle className="w-7 h-7" />
+                    </div>
+                    <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Módulo Desactivado</h2>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      El módulo de cuentas de la congregación se encuentra temporalmente desactivado.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('inicio')}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer"
+                    >
+                      Volver al Inicio
+                    </button>
+                  </div>
+                )}
                 {activeTab === 'literatura' && <LiteraturaTab />}
                 {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
                 {(activeTab === 'mantenimiento' || activeTab === 'panel_electrico') && (

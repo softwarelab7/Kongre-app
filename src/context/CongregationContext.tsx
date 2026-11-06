@@ -43,6 +43,7 @@ import {
   AuxPioneerRequest,
   BranchReportS1,
   S1SubmissionStatus,
+  ShepherdingVisit,
   ClmPrograma,
   CongregationEvent,
 } from '../types';
@@ -268,6 +269,13 @@ interface CongregationContextType {
   addCartShift: (shift: Omit<CartShift, 'id'>) => void;
   updateCartShift: (shift: CartShift) => void;
   deleteCartShift: (id: string) => void;
+
+  // Pastoreo y Cuidado Espiritual
+  shepherdingVisits: ShepherdingVisit[];
+  addShepherdingVisit: (visit: Omit<ShepherdingVisit, 'id' | 'createdAt'>) => void;
+  updateShepherdingVisit: (visit: ShepherdingVisit) => void;
+  deleteShepherdingVisit: (id: string) => void;
+  completeShepherdingVisit: (id: string, completedDate?: string, notes?: string) => void;
 
   // Notices
   addNotice: (notice: Omit<CongregationNotice, 'id'>) => void;
@@ -727,6 +735,25 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_cart_shifts`);
     return saved ? JSON.parse(saved) : INITIAL_CART_SHIFTS;
   });
+
+  const [shepherdingVisits, setShepherdingVisits] = useState<ShepherdingVisit[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_shepherding_visits`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const latestShepherdingVisitsRef = useRef<ShepherdingVisit[]>(shepherdingVisits);
+  useEffect(() => {
+    latestShepherdingVisitsRef.current = shepherdingVisits;
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_shepherding_visits`, JSON.stringify(shepherdingVisits));
+    } catch (e) {
+      console.error('Error saving shepherding_visits:', e);
+    }
+  }, [shepherdingVisits]);
 
   const [notices, setNotices] = useState<CongregationNotice[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_notices`);
@@ -4572,6 +4599,48 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, updated);
   };
 
+  const addShepherdingVisit = (visitData: Omit<ShepherdingVisit, 'id' | 'createdAt'>) => {
+    const newVisit: ShepherdingVisit = {
+      ...visitData,
+      id: `svisit-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: new Date().toISOString(),
+    };
+    setShepherdingVisits((prev) => [newVisit, ...prev]);
+  };
+
+  const updateShepherdingVisit = (visit: ShepherdingVisit) => {
+    setShepherdingVisits((prev) => prev.map((v) => (v.id === visit.id ? visit : v)));
+  };
+
+  const deleteShepherdingVisit = (id: string) => {
+    setShepherdingVisits((prev) => prev.filter((v) => v.id !== id));
+  };
+
+  const completeShepherdingVisit = (id: string, completedDate?: string, notes?: string) => {
+    const target = shepherdingVisits.find((v) => v.id === id);
+    if (!target) return;
+    const finalDate = completedDate || new Date().toISOString().slice(0, 10);
+    const updatedVisit: ShepherdingVisit = {
+      ...target,
+      status: 'completada',
+      completedDate: finalDate,
+      notes: notes !== undefined ? notes : target.notes,
+    };
+    setShepherdingVisits((prev) => prev.map((v) => (v.id === id ? updatedVisit : v)));
+
+    // Update corresponding publisher last_shepherding_visit
+    const pub = publishers.find((p) => p.id === target.publisherId);
+    if (pub) {
+      const elders = [target.elder1Name, target.elder2Name].filter(Boolean).join(' y ');
+      updatePublisher({
+        ...pub,
+        last_shepherding_visit: finalDate,
+        shepherding_elders: elders || pub.shepherding_elders,
+        pastoral_priority: 'normal',
+      });
+    }
+  };
+
   const addNotice = (noticeData: Omit<CongregationNotice, 'id'>) => {
     const newNotice: CongregationNotice = {
       ...noticeData,
@@ -6353,6 +6422,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         fieldServiceMeetings,
         cartLocations,
         cartShifts,
+        shepherdingVisits,
         notices,
         monthlyReports,
         territories,
@@ -6428,6 +6498,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         addCartShift,
         updateCartShift,
         deleteCartShift,
+        addShepherdingVisit,
+        updateShepherdingVisit,
+        deleteShepherdingVisit,
+        completeShepherdingVisit,
         addNotice,
         updateNotice,
         deleteNotice,
@@ -6542,6 +6616,7 @@ const FALLBACK_CONGREGATION_CONTEXT: CongregationContextType = {
   fieldServiceMeetings: [],
   cartLocations: [],
   cartShifts: [],
+  shepherdingVisits: [],
   notices: [],
   monthlyReports: [],
   territories: [],
@@ -6618,6 +6693,10 @@ const FALLBACK_CONGREGATION_CONTEXT: CongregationContextType = {
   addCartShift: () => {},
   updateCartShift: () => {},
   deleteCartShift: () => {},
+  addShepherdingVisit: () => {},
+  updateShepherdingVisit: () => {},
+  deleteShepherdingVisit: () => {},
+  completeShepherdingVisit: () => {},
   addNotice: () => {},
   updateNotice: () => {},
   deleteNotice: () => {},

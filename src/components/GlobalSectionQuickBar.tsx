@@ -180,13 +180,6 @@ export const APP_DEPARTMENT_GROUPS: QuickDepartmentGroup[] = [
         subtitle: 'Registro semanal y promedios mensuales de asistencia',
         icon: NAV_ICONS.asistencia,
       },
-      {
-        id: 'cuentas',
-        label: 'Cuentas de la Congregación S-26',
-        shortLabel: 'Cuentas S-26',
-        subtitle: 'Registro contable, donaciones y resoluciones mensuales',
-        icon: NAV_ICONS.cuentas,
-      },
     ],
   },
   {

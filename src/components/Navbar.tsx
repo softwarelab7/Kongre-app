@@ -530,7 +530,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Secretaría y Registros',
       shortTitle: 'Secretaría',
       icon: NAV_ICONS.secretaria,
-      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'],
+      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1'],
       items: [
         {
           id: 'estadisticas_secretaria',
@@ -575,12 +575,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           label: 'Asistencia S-88',
           description: 'Registro de asistencia a reuniones y promedios',
           icon: NAV_ICONS.asistencia,
-        },
-        {
-          id: 'cuentas',
-          label: 'Cuentas S-26',
-          description: 'Registro financiero, donaciones y sucursal',
-          icon: NAV_ICONS.cuentas,
         },
       ],
     },
@@ -770,7 +764,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       shortTitle: 'Secretaría',
       icon: NAV_ICONS.secretaria,
       primaryTab: 'estadisticas_secretaria' as ActiveTab,
-      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'] as ActiveTab[],
+      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',

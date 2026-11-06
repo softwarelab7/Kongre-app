@@ -264,7 +264,7 @@ export const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({
             icon: CreditCard,
             accentClass: 'hover:border-emerald-500/40 dark:hover:border-emerald-400/40',
             iconBgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-            onClick: () => setActiveTab('cuentas'),
+            onClick: () => setActiveTab('tablero_anuncios'),
           },
           {
             id: 'tablero_anuncios_cta',

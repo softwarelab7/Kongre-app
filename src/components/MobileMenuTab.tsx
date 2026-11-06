@@ -267,12 +267,6 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
           badgeColor: 'bg-amber-500 text-white',
         },
         {
-          id: 'cuentas',
-          label: 'Cuentas S-26',
-          description: 'Contabilidad y donaciones',
-          icon: NAV_ICONS.cuentas,
-        },
-        {
           id: 'estadisticas_secretaria',
           label: 'Estadísticas y Gráficos',
           description: 'Métricas de la congregación',

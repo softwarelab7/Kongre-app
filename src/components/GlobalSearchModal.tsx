@@ -252,15 +252,6 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       action: () => onNavigate('informe_s1'),
     },
     {
-      id: 'mod-cuentas-s26',
-      category: 'modulos',
-      categoryLabel: 'Secretaría',
-      title: 'Cuentas de Congregación S-26',
-      subtitle: 'Ingresos, gastos, fondo de sucursal y conciliación mensual',
-      icon: Landmark,
-      action: () => onNavigate('cuentas'),
-    },
-    {
       id: 'mod-territorios-s13',
       category: 'modulos',
       categoryLabel: 'Predicación',

@@ -19,6 +19,7 @@ import {
   buildGroupSpecialOrdersWhatsApp,
   openSafeWhatsAppUrl,
   printLiteratureInventoryS28A4,
+  printGroupLiteratureDispatchA4,
 } from '../utils/literatureHelper';
 import {
   BookOpen,
@@ -45,6 +46,7 @@ import {
   Flame,
   ArrowUpDown,
   Upload,
+  MessageCircle,
 } from 'lucide-react';
 import { SplashCheckbox } from './SplashCheckbox';
 import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
@@ -84,6 +86,9 @@ export const LiteraturaTab: React.FC = () => {
   const [onlyLowStock, setOnlyLowStock] = useState<boolean>(false);
   const [orderGroupFilter, setOrderGroupFilter] = useState<string>('todos');
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('todos');
+  const [dispatchGroupFilter, setDispatchGroupFilter] = useState<number | 'todos'>('todos');
+  const [dispatchStatusFilter, setDispatchStatusFilter] = useState<string>('recibido_en_salon');
+  const [dispatchSearchQuery, setDispatchSearchQuery] = useState<string>('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -238,6 +243,40 @@ export const LiteraturaTab: React.FC = () => {
   const handleOpenWhatsApp = (text: string, phone?: string) => {
     openSafeWhatsAppUrl(text, phone);
   };
+
+  // Dispatch filtered orders by preaching group
+  const dispatchOrders = useMemo(() => {
+    return specialOrders.filter((order) => {
+      if (order.status === 'cancelado') return false;
+      if (dispatchStatusFilter !== 'todos' && order.status !== dispatchStatusFilter) {
+        return false;
+      }
+      const pub = publishers.find((p) => p.id === order.publisherId);
+      if (dispatchGroupFilter !== 'todos') {
+        const belongs =
+          pub?.groupNumber === dispatchGroupFilter ||
+          Boolean(preachingGroups.find((g) => g.number === dispatchGroupFilter)?.memberIds.includes(order.publisherId));
+        if (!belongs) return false;
+      }
+      if (dispatchSearchQuery.trim()) {
+        const q = dispatchSearchQuery.toLowerCase();
+        const matchesPub = (pub?.name || '').toLowerCase().includes(q);
+        const matchesTitle = order.itemTitle.toLowerCase().includes(q);
+        if (!matchesPub && !matchesTitle) return false;
+      }
+      return true;
+    });
+  }, [specialOrders, dispatchStatusFilter, dispatchGroupFilter, dispatchSearchQuery, publishers, preachingGroups]);
+
+  // Quick dispatch KPIs
+  const dispatchKpis = useMemo(() => {
+    const readyCount = specialOrders.filter((o) => o.status === 'recibido_en_salon').length;
+    const inTransitCount = specialOrders.filter(
+      (o) => o.status === 'pedido_a_betel' || o.status === 'solicitado'
+    ).length;
+    const deliveredCount = specialOrders.filter((o) => o.status === 'entregado').length;
+    return { readyCount, inTransitCount, deliveredCount };
+  }, [specialOrders]);
 
   // Adjust stock
   const handleAdjustStock = (item: LiteratureItem, delta: number) => {
@@ -1043,119 +1082,417 @@ export const LiteraturaTab: React.FC = () => {
       )}
 
       {/* ========================================================= */}
-      {/* SUBTAB 3: DISTRIBUCIÓN A GRUPOS DE PREDICACIÓN           */}
+      {/* SUBTAB 3: DESPACHO Y DISTRIBUCIÓN POR GRUPOS              */}
       {/* ========================================================= */}
       {activeSubTab === 'grupos' && (
-        <div className="space-y-4">
-          <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
-            <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
-              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <span>Distribución Periódica de Revistas y Tratados a los Grupos</span>
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
-              Paquetes de predicación preparados para cada grupo de servicio del campo para las salidas
-              semanales.
-            </p>
+        <div className="space-y-6 animate-fade-in">
+          {/* SECCIÓN 1: DESPACHO DE PEDIDOS ESPECIALES POR GRUPO */}
+          <div className="space-y-4">
+            {/* KPI Ribbon de Despacho */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="p-4 rounded-3xl kg-card-bento kg-glass-surface kg-sheen-top border border-emerald-500/25 bg-emerald-500/5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                    Listos en Mostrador
+                  </span>
+                  <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
+                    {dispatchKpis.readyCount}
+                  </div>
+                  <div className="text-[11px] text-zinc-500">Listos para entrega inmediata</div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-3xl kg-card-bento kg-glass-surface kg-sheen-top border border-indigo-500/25 bg-indigo-500/5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                    En Trámite / Sucursal
+                  </span>
+                  <div className="text-2xl font-black text-indigo-700 dark:text-indigo-400 tabular-nums">
+                    {dispatchKpis.inTransitCount}
+                  </div>
+                  <div className="text-[11px] text-zinc-500">Pendientes de recibir en el salón</div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <Truck className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-3xl kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                    Entregados con Éxito
+                  </span>
+                  <div className="text-2xl font-black text-zinc-800 dark:text-zinc-200 tabular-nums">
+                    {dispatchKpis.deliveredCount}
+                  </div>
+                  <div className="text-[11px] text-zinc-500">Historial de pedidos entregados</div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-zinc-200/60 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 flex items-center justify-center">
+                  <Inbox className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
+            {/* Filter and Actions Bar */}
+            <div className="p-4 rounded-3xl kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex flex-wrap items-center gap-3 flex-1">
+                {/* Search */}
+                <div className="relative min-w-[180px] flex-1">
+                  <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={dispatchSearchQuery}
+                    onChange={(e) => setDispatchSearchQuery(e.target.value)}
+                    placeholder="Buscar publicador o publicación..."
+                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                {/* Filter by Group */}
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-zinc-500">Grupo:</span>
+                  <select
+                    value={String(dispatchGroupFilter)}
+                    onChange={(e) =>
+                      setDispatchGroupFilter(e.target.value === 'todos' ? 'todos' : Number(e.target.value))
+                    }
+                    className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white font-bold text-xs cursor-pointer outline-hidden"
+                  >
+                    <option value="todos">Todos los Grupos</option>
+                    {preachingGroups.map((g) => (
+                      <option key={g.number} value={String(g.number)}>
+                        Grupo {g.number} ({g.name})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Filter by Status */}
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-zinc-500">Estado:</span>
+                  <select
+                    value={dispatchStatusFilter}
+                    onChange={(e) => setDispatchStatusFilter(e.target.value)}
+                    className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white font-bold text-xs cursor-pointer outline-hidden"
+                  >
+                    <option value="recibido_en_salon">🟢 Listos en Mostrador ({dispatchKpis.readyCount})</option>
+                    <option value="todos">Todos los Estados</option>
+                    <option value="pedido_a_betel">📦 Pedidos a Betel</option>
+                    <option value="solicitado">⏳ Solicitados</option>
+                    <option value="entregado">✓ Entregados</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    printGroupLiteratureDispatchA4({
+                      congregationName: settings.congregationName,
+                      selectedGroup: dispatchGroupFilter,
+                      specialOrders,
+                      publishers,
+                      preachingGroups,
+                    })
+                  }
+                  className="px-3.5 py-2 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-xs"
+                  title="Imprimir hoja de entrega física para firmas en el mostrador"
+                >
+                  <Printer className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Imprimir Despacho A4</span>
+                </button>
+
+                {dispatchGroupFilter !== 'todos' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const grp = preachingGroups.find((g) => g.number === dispatchGroupFilter);
+                      const overseer = publishers.find((p) => p.id === grp?.overseerId);
+                      const groupSummary = inventoryAnalysis.ordersByGroup.find(
+                        (g) => g.groupNumber === dispatchGroupFilter
+                      );
+                      if (groupSummary) {
+                        const msg = buildGroupSpecialOrdersWhatsApp(groupSummary);
+                        handleOpenWhatsApp(msg, overseer?.phone);
+                      }
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-xs"
+                    title="Enviar resumen completo de pedidos del grupo por WhatsApp al conductor"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Avisar al Conductor G{dispatchGroupFilter}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Special Orders Table for Dispatch */}
+            <div className="kg-card-bento kg-glass-surface rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-zinc-100/80 dark:bg-white/5 border-b border-zinc-200/80 dark:border-white/10 text-zinc-600 dark:text-zinc-400 font-bold uppercase text-[10px] tracking-wider">
+                      <th className="py-3 px-4">Publicador</th>
+                      <th className="py-3 px-3">Grupo</th>
+                      <th className="py-3 px-4">Publicación Solicitada</th>
+                      <th className="py-3 px-3 text-center">Cant.</th>
+                      <th className="py-3 px-4">Estado Actual</th>
+                      <th className="py-3 px-4 text-right">Acciones de Entrega</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-200/60 dark:divide-white/5">
+                    {dispatchOrders.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-zinc-400">
+                          No hay pedidos especiales con los filtros seleccionados.
+                        </td>
+                      </tr>
+                    ) : (
+                      dispatchOrders.map((order) => {
+                        const pub = publishers.find((p) => p.id === order.publisherId);
+                        const statusConf = SPECIAL_ORDER_STATUS_CONFIG[order.status];
+                        const isReady = order.status === 'recibido_en_salon';
+                        const isDelivered = order.status === 'entregado';
+
+                        return (
+                          <tr
+                            key={order.id}
+                            className="hover:bg-zinc-50/70 dark:hover:bg-white/5 transition-colors"
+                          >
+                            {/* Publisher */}
+                            <td className="py-3.5 px-4 font-semibold text-zinc-900 dark:text-white">
+                              <div className="font-bold">{pub?.name || 'Publicador'}</div>
+                              {pub?.phone && (
+                                <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                                  {pub.phone}
+                                </div>
+                              )}
+                            </td>
+
+                            {/* Group */}
+                            <td className="py-3.5 px-3">
+                              <span className="px-2 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-bold text-[11px]">
+                                G{pub?.groupNumber || '—'}
+                              </span>
+                            </td>
+
+                            {/* Item Title & Language */}
+                            <td className="py-3.5 px-4">
+                              <div className="font-bold text-zinc-900 dark:text-white">
+                                {order.itemTitle}
+                              </div>
+                              <div className="text-[10px] text-zinc-500 mt-0.5">
+                                {order.language || 'Español'}
+                                {order.requestDate ? ` · Solicitado: ${order.requestDate}` : ''}
+                              </div>
+                            </td>
+
+                            {/* Quantity */}
+                            <td className="py-3.5 px-3 text-center font-bold text-zinc-900 dark:text-white font-mono text-sm">
+                              {order.quantity}
+                            </td>
+
+                            {/* Status */}
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  statusConf?.badgeClass || 'bg-zinc-100 text-zinc-700'
+                                }`}
+                              >
+                                {statusConf?.label || order.status}
+                              </span>
+                              {order.deliveredDate && (
+                                <div className="text-[10px] text-zinc-500 font-mono mt-1">
+                                  Entregado: {order.deliveredDate}
+                                </div>
+                              )}
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3.5 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {isReady && (
+                                  <>
+                                    {/* WhatsApp to publisher */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (pub) {
+                                          const msg = buildSpecialOrderArrivedWhatsApp(order, pub.name);
+                                          handleOpenWhatsApp(msg, pub.phone);
+                                        }
+                                      }}
+                                      className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                                      title="Avisar al publicador por WhatsApp que ya llegó su libro/Biblia"
+                                    >
+                                      <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                      <span>Avisar</span>
+                                    </button>
+
+                                    {/* Mark as delivered */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        handleUpdateOrderStatus(order, 'entregado');
+                                        showToast(`Pedido entregado a ${pub?.name || 'publicador'}.`);
+                                      }}
+                                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
+                                    >
+                                      <Check className="w-3.5 h-3.5" />
+                                      <span>Entregar ✓</span>
+                                    </button>
+                                  </>
+                                )}
+
+                                {!isReady && !isDelivered && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      handleUpdateOrderStatus(order, 'recibido_en_salon');
+                                      showToast(`Marcado como recibido en salón.`);
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 font-bold text-[11px] border border-indigo-200 dark:border-indigo-800 transition cursor-pointer"
+                                  >
+                                    Llegó al Salón
+                                  </button>
+                                )}
+
+                                {isDelivered && (
+                                  <span className="text-[11px] font-bold text-zinc-400">
+                                    Entregado ✓
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {preachingGroups.map(group => {
-              const dist = groupDistributions.find(d => d.groupNumber === group.number) || {
-                groupNumber: group.number,
-                magazinesCount: 25,
-                tractsCount: 50,
-                brochuresCount: 10,
-                lastDistributedDate: '2026-09-20',
-              };
+          {/* SECCIÓN 2: DISTRIBUCIÓN PERIÓDICA DE REVISTAS Y TRATADOS A LOS GRUPOS */}
+          <div className="space-y-4 pt-4 border-t border-zinc-200/80 dark:border-white/10">
+            <div className="kg-card-bento kg-glass-surface kg-sheen-top p-4 sm:p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm">
+              <h2 className="text-base font-bold text-zinc-900 dark:text-[#F4F4F5] flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <span>Distribución Periódica de Revistas y Tratados a los Grupos</span>
+              </h2>
+              <p className="text-xs text-zinc-500 dark:text-[#A1A1AA] mt-0.5">
+                Paquetes de predicación preparados para cada grupo de servicio del campo para las salidas
+                semanales.
+              </p>
+            </div>
 
-              const overseer = publishers.find(p => p.id === group.overseerId);
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {preachingGroups.map((group) => {
+                const dist = groupDistributions.find((d) => d.groupNumber === group.number) || {
+                  groupNumber: group.number,
+                  magazinesCount: 25,
+                  tractsCount: 50,
+                  brochuresCount: 10,
+                  lastDistributedDate: '2026-09-20',
+                };
 
-              return (
-                <div
-                  key={group.number}
-                  className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-extrabold flex items-center justify-center text-sm">
-                        G{group.number}
-                      </span>
-                      <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">{group.name}</span>
+                const overseer = publishers.find((p) => p.id === group.overseerId);
+
+                return (
+                  <div
+                    key={group.number}
+                    className="kg-card-bento kg-glass-surface kg-sheen-top p-5 rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-4 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-extrabold flex items-center justify-center text-sm">
+                          G{group.number}
+                        </span>
+                        <span className="text-xs font-bold text-zinc-700 dark:text-[#F4F4F5]">
+                          {group.name}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
+                        <span>Superintendente: </span>
+                        <strong className="text-zinc-800 dark:text-zinc-200 block truncate">
+                          {overseer?.name || 'Por designar'}
+                        </strong>
+                      </div>
+
+                      <div className="bg-zinc-50/80 dark:bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">📰 Revistas:</span>
+                          <input
+                            type="number"
+                            value={dist.magazinesCount}
+                            onChange={(e) =>
+                              updateGroupDistribution({
+                                ...dist,
+                                magazinesCount: Number(e.target.value),
+                              })
+                            }
+                            className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">📑 Tratados:</span>
+                          <input
+                            type="number"
+                            value={dist.tractsCount}
+                            onChange={(e) =>
+                              updateGroupDistribution({
+                                ...dist,
+                                tractsCount: Number(e.target.value),
+                              })
+                            }
+                            className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-600 dark:text-[#A1A1AA]">📖 Folletos:</span>
+                          <input
+                            type="number"
+                            value={dist.brochuresCount}
+                            onChange={(e) =>
+                              updateGroupDistribution({
+                                ...dist,
+                                brochuresCount: Number(e.target.value),
+                              })
+                            }
+                            className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="text-xs text-zinc-500 dark:text-[#A1A1AA]">
-                      <span>Superintendente: </span>
-                      <strong className="text-zinc-800 dark:text-zinc-200 block truncate">
-                        {overseer?.name || 'Por designar'}
-                      </strong>
-                    </div>
-
-                    <div className="bg-zinc-50/80 dark:bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/10 space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📰 Revistas:</span>
-                        <input
-                          type="number"
-                          value={dist.magazinesCount}
-                          onChange={e =>
-                            updateGroupDistribution({
-                              ...dist,
-                              magazinesCount: Number(e.target.value),
-                            })
-                          }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📑 Tratados:</span>
-                        <input
-                          type="number"
-                          value={dist.tractsCount}
-                          onChange={e =>
-                            updateGroupDistribution({
-                              ...dist,
-                              tractsCount: Number(e.target.value),
-                            })
-                          }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-600 dark:text-[#A1A1AA]">📖 Folletos:</span>
-                        <input
-                          type="number"
-                          value={dist.brochuresCount}
-                          onChange={e =>
-                            updateGroupDistribution({
-                              ...dist,
-                              brochuresCount: Number(e.target.value),
-                            })
-                          }
-                          className="w-16 text-center font-mono font-bold tabular-nums p-1 rounded-lg border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-[#F4F4F5]"
-                        />
-                      </div>
+                    <div className="pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+                      <button
+                        onClick={() => {
+                          const msg = buildGroupDistributionWhatsApp(
+                            group.number,
+                            dist.magazinesCount,
+                            dist.tractsCount,
+                            overseer?.name
+                          );
+                          handleOpenWhatsApp(msg, overseer?.phone);
+                        }}
+                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Notificar por WhatsApp</span>
+                      </button>
                     </div>
                   </div>
-
-                  <div className="pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
-                    <button
-                      onClick={() => {
-                        const msg = buildGroupDistributionWhatsApp(
-                          group.number,
-                          dist.magazinesCount,
-                          dist.tractsCount,
-                          overseer?.name
-                        );
-                        handleOpenWhatsApp(msg, overseer?.phone);
-                      }}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Notificar por WhatsApp</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

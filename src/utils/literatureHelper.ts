@@ -713,3 +713,156 @@ export function printLiteratureInventoryS28A4(params: {
     }, 300);
   }
 }
+
+/**
+ * Imprime la Hoja Interna A4 de Despacho y Entrega de Pedidos Especiales por Grupos
+ */
+export function printGroupLiteratureDispatchA4(params: {
+  congregationName: string;
+  selectedGroup: number | 'todos';
+  specialOrders: LiteratureSpecialOrder[];
+  publishers: Publisher[];
+  preachingGroups: PreachingGroup[];
+}): void {
+  const { congregationName, selectedGroup, specialOrders, publishers, preachingGroups } = params;
+  const pubMap = new Map<string, Publisher>();
+  publishers.forEach((p) => pubMap.set(p.id, p));
+
+  const filteredOrders = specialOrders.filter((o) => {
+    if (o.status === 'cancelado') return false;
+    if (selectedGroup === 'todos') return true;
+    const pub = pubMap.get(o.publisherId);
+    return pub?.groupNumber === selectedGroup;
+  });
+
+  const todayStr = new Date().toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const targetGroupObj =
+    selectedGroup !== 'todos' ? preachingGroups.find((g) => g.number === selectedGroup) : null;
+  const groupOverseer = targetGroupObj?.overseerId ? pubMap.get(targetGroupObj.overseerId)?.name : null;
+
+  const titleSuffix =
+    selectedGroup !== 'todos'
+      ? `Grupo de Servicio ${selectedGroup} ${targetGroupObj ? `(${targetGroupObj.name})` : ''}`
+      : 'Todos los Grupos de Servicio';
+
+  const rowsHtml =
+    filteredOrders.length > 0
+      ? filteredOrders
+          .map((o, idx) => {
+            const pub = pubMap.get(o.publisherId);
+            const statusLabel = SPECIAL_ORDER_STATUS_CONFIG[o.status]?.label || o.status;
+            const isReady = o.status === 'recibido_en_salon';
+            return `
+            <tr>
+              <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+              <td><strong>${pub?.name || 'Publicador'}</strong>${pub?.phone ? `<br><span style="font-size: 8.5px; color: #52525b;">${pub.phone}</span>` : ''}</td>
+              <td style="text-align: center; font-weight: bold;">G${pub?.groupNumber || '—'}</td>
+              <td><strong>${o.itemTitle}</strong>${o.language ? ` (${o.language})` : ''}</td>
+              <td style="text-align: center; font-weight: bold; font-size: 11px;">${o.quantity}</td>
+              <td style="text-align: center;">${o.requestDate || '—'}</td>
+              <td style="text-align: center; font-weight: bold; color: ${isReady ? '#047857' : '#374151'};">${statusLabel}</td>
+              <td style="width: 110px; height: 28px; border-bottom: 1px dashed #71717a; text-align: center; vertical-align: bottom; font-size: 8px; color: #a1a1aa;">Firma de recibido</td>
+            </tr>
+          `;
+          })
+          .join('')
+      : `<tr><td colspan="8" style="text-align: center; padding: 15px; color: #71717a;">No hay pedidos de literatura para este criterio.</td></tr>`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Despacho de Literatura - ${congregationName}</title>
+      <style>
+        @page { size: A4 portrait; margin: 15mm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10.5px; color: #18181b; margin: 0; line-height: 1.35; }
+        .header { text-align: center; border-bottom: 2px solid #18181b; padding-bottom: 8px; margin-bottom: 12px; }
+        .header h1 { font-size: 16px; margin: 0; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+        .header-sub { font-size: 11px; color: #4b5563; margin-top: 3px; font-weight: 600; }
+        .info-card { display: flex; justify-content: space-between; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 6px; padding: 6px 12px; margin-bottom: 12px; font-size: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        th, td { border: 1px solid #d4d4d8; padding: 5px 6px; text-align: left; }
+        th { background: #1e1b4b; color: #ffffff; font-weight: bold; font-size: 9.5px; text-transform: uppercase; }
+        .footer { margin-top: 25px; display: flex; justify-content: space-around; text-align: center; font-size: 10px; }
+        .sig-line { width: 200px; border-top: 1px solid #18181b; padding-top: 4px; margin-top: 40px; font-weight: bold; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Hoja de Despacho y Entrega de Literatura</h1>
+        <div class="header-sub">Congregación: <strong>${congregationName}</strong> · ${titleSuffix}</div>
+      </div>
+
+      <div class="info-card">
+        <div><strong>Fecha de emisión:</strong> ${todayStr}</div>
+        <div><strong>Pedidos listados:</strong> ${filteredOrders.length}</div>
+        ${groupOverseer ? `<div><strong>Superintendente de Grupo:</strong> ${groupOverseer}</div>` : ''}
+        <div><strong>Departamento:</strong> Literatura del Salón</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%; text-align: center;">#</th>
+            <th style="width: 23%;">Publicador Solicitante</th>
+            <th style="width: 7%; text-align: center;">Grupo</th>
+            <th style="width: 25%;">Publicación Solicitada</th>
+            <th style="width: 6%; text-align: center;">Cant.</th>
+            <th style="width: 10%; text-align: center;">F. Pedido</th>
+            <th style="width: 12%; text-align: center;">Estado</th>
+            <th style="width: 12%; text-align: center;">Firma / Retiro</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+
+      <div style="font-size: 9px; color: #71717a; margin-top: 5px;">
+        * Nota para el hermano del mostrador y conductor de grupo: Solicitar la firma del publicador al momento de la entrega física para mantener el control de pedidos recibidos.
+      </div>
+
+      <div class="footer">
+        <div>
+          <div class="sig-line">Siervo de Literatura</div>
+        </div>
+        <div>
+          <div class="sig-line">${groupOverseer || 'Superintendente de Grupo'}</div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (doc) {
+    doc.open();
+    doc.write(html);
+    doc.close();
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 2000);
+    }, 300);
+  }
+}
+

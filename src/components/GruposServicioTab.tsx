@@ -29,7 +29,9 @@ import {
   Check,
   RotateCcw,
   Send,
+  HeartHandshake,
 } from 'lucide-react';
+import { ShepherdingDashboard } from './shepherding/ShepherdingDashboard';
 import { useToast } from '../context/ToastContext';
 import {
   FieldServiceSlotTemplate,
@@ -66,8 +68,8 @@ export const GruposServicioTab: React.FC = () => {
     weeks,
   } = useCongregation();
 
-  // Sub-vista principal: 'grupos' | 'salidas_khs'
-  const [activeSubTab, setActiveSubTab] = useState<'grupos' | 'salidas_khs'>('grupos');
+  // Sub-vista principal: 'grupos' | 'salidas_khs' | 'pastoreo'
+  const [activeSubTab, setActiveSubTab] = useState<'grupos' | 'salidas_khs' | 'pastoreo'>('grupos');
 
   // =========================================================
   // ESTADO DE GRUPOS DE SERVICIO
@@ -693,9 +695,22 @@ export const GruposServicioTab: React.FC = () => {
             <Compass className="w-4 h-4 shrink-0" />
             <span className="truncate">Salidas al Campo <span className="font-mono tabular-nums">({fieldServiceMeetings.length})</span></span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('pastoreo')}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+              activeSubTab === 'pastoreo'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30'
+                : 'text-zinc-500 dark:text-[#71717A] hover:text-zinc-900 dark:hover:text-[#F4F4F5] hover:bg-white/60 dark:hover:bg-white/5'
+            }`}
+          >
+            <HeartHandshake className="w-4 h-4 shrink-0" />
+            <span className="truncate">Cuidado Pastoral y Pastoreo</span>
+          </button>
         </div>
 
-        {activeSubTab === 'grupos' ? (
+        {activeSubTab === 'grupos' && (
           <button
             type="button"
             onClick={handleOpenNewGroup}
@@ -704,7 +719,9 @@ export const GruposServicioTab: React.FC = () => {
             <Plus className="w-4 h-4" />
             <span>Nuevo Grupo</span>
           </button>
-        ) : (
+        )}
+
+        {activeSubTab === 'salidas_khs' && (
           <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full md:w-auto">
             <button
               type="button"
@@ -1476,6 +1493,11 @@ export const GruposServicioTab: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* ========================================================= */}
+      {/* SUB-VISTA 3: CUIDADO PASTORAL Y PASTOREO                  */}
+      {/* ========================================================= */}
+      {activeSubTab === 'pastoreo' && <ShepherdingDashboard />}
 
       {/* ========================================================= */}
       {/* MODAL 1: EDIT / CREATE GROUP                              */}

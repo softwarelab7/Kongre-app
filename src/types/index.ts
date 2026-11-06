@@ -237,6 +237,39 @@ export interface Publisher {
   };
 }
 
+// Registro y Agenda de Visitas de Pastoreo
+export type ShepherdingUrgency = 'urgente' | 'atencion' | 'al_dia';
+export type ShepherdingVisitStatus = 'programada' | 'completada' | 'cancelada';
+export type ShepherdingFocus =
+  | 'general'
+  | 'animo'
+  | 'enfermedad'
+  | 'duelo'
+  | 'inactividad'
+  | 'nuevo_bautizado'
+  | 'meta_espiritual'
+  | 'familia'
+  | 'jovenes';
+
+export interface ShepherdingVisit {
+  id: string;
+  publisherId: string;
+  publisherName?: string;
+  groupNumber?: number;
+  scheduledDate: string; // YYYY-MM-DD
+  scheduledTime?: string; // HH:mm
+  elder1Id: string; // Anciano titular o conductor
+  elder1Name?: string;
+  elder2Id?: string; // Anciano acompañante
+  elder2Name?: string;
+  status: ShepherdingVisitStatus;
+  focus: ShepherdingFocus;
+  scripturesOrPoints?: string;
+  notes?: string;
+  completedDate?: string;
+  createdAt: string;
+}
+
 // Assignment item in a meeting
 export interface AssignmentItem {
   id: string;

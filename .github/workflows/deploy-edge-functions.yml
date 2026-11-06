@@ -1,0 +1,35 @@
+name: Desplegar Edge Functions a Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/functions/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Desplegar kongre-sync
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Desplegar función kongre-sync en producción
+        run: supabase functions deploy kongre-sync --project-ref rceyevhwhtjshsthrrtp --no-verify-jwt
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

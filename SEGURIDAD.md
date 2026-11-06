@@ -8,11 +8,11 @@ Este documento describe qué protege cada credencial, qué **no** protege y las 
 
 | Nivel | Credencial | Qué permite en el servidor |
 |---|---|---|
-| **Maestro** | PIN maestro de la congregación (12 dígitos) | Leer y **escribir** (`push`), rotar credenciales, acceso a auditorías y comités |
-| **Público** | PIN de congregación (4 a 8 caracteres) | Descifrar y leer el `payload_public` (agenda, asignaciones públicas y tablero) |
+| **Maestro** | PIN maestro de la congregación (12 dígitos numéricos de alta entropía) | Leer y **escribir** (`push`), rotar credenciales, acceso a auditorías y comités |
+| **Público** | PIN de congregación (mínimo 8 caracteres, soporta passphrases de hasta 24) | Descifrar y leer el `payload_public` (agenda, asignaciones públicas y tablero) |
 | **Personal** | PIN personal del publicador (mínimo 6 dígitos) | Verificar identidad, token de rol firmado (`kgr_srt1`) y descifrado de su tarjeta S-21 |
 
-El servidor nunca almacena ni conoce los PINs en texto claro. El cliente deriva un token criptográfico determinista con PBKDF2-SHA256 (100.000 iteraciones) y el servidor almacena únicamente `HMAC(pepper, rol|id|token)`. Por tanto, `KONGRE_SYNC_PEPPER` es el secreto maestro del servidor y jamás debe modificarse en producción para no invalidar las sesiones activas.
+El servidor nunca almacena ni conoce los PINs en texto claro. El cliente deriva un token criptográfico determinista con PBKDF2-SHA256 (600.000 iteraciones en la versión actual, garantizando paridad de coste computacional con el cifrado de datos y soportando actualización transparente desde 100.000 iteraciones heredadas) y el servidor almacena únicamente `HMAC(pepper, rol|id|token)`. Por tanto, `KONGRE_SYNC_PEPPER` es el secreto maestro del servidor y jamás debe modificarse en producción para no invalidar las sesiones activas.
 
 ---
 
@@ -22,24 +22,41 @@ El servidor nunca almacena ni conoce los PINs en texto claro. El cliente deriva 
 - **Decisión:** El registro de nuevas congregaciones permanece **abierto y descentralizado**, sin exigir un código de invitación inicial ni aprobación previa por correo.
 - **Justificación:** Preserva la soberanía, anonimato y modelo Zero-Knowledge de cada cuerpo de ancianos. Ningún servidor ni administrador global actúa como guardián o punto de fallo central.
 - **Protección contra abuso:**
-  1. *Límite por IP en Edge Function:* Máximo 5 creaciones por hora por dirección IP (`MAX_CREATIONS_PER_IP`).
+  1. *Límite por IP en Edge Function:* Máximo 5 creaciones por hora por dirección IP (`LIMITS.create`).
   2. *Entropía del PIN Maestro:* Generación de 12 dígitos aleatorios vía CSPRNG Web Crypto (rechazando secuencias triviales o repetitivas).
-  3. *Inmutabilidad de ID existente:* Rechazo con `409 Conflict` si el ID de congregación ya fue registrado previamente en Supabase.
+  3. *Inmutabilidad de ID existente:* Rechazo si el ID de congregación ya fue registrado previamente en Supabase.
 
-### 2. Normalización de PINs y Plan de Migración (Soporte de Símbolos)
-- **Estado Actual (`v1/v2`):** `normalizePin` convierte a mayúsculas y suprime caracteres no alfanuméricos (`[^A-Z0-9]`). Por tanto, `Abc!1234` y `ABC1234` son tratados como equivalentes.
+### 2. Normalización de PINs y Plan de Migración (Soporte de Símbolos y Passphrases)
+- **Estado Actual (`v1/v2`):** `normalizePin` convierte a mayúsculas y suprime caracteres no alfanuméricos (`[^A-Z0-9]`). El formateador de PIN de congregación admite entre 8 y 24 caracteres (formato `XXXX-XXXX` estándar o bloques extendidos `XXXX-XXXX-XXXX...` para passphrases de mayor entropía resistente a ataques offline por GPU).
 - **Plan de Migración Transparente hacia `v3`:**
   - *Fase 1 (Derivación Dual en Cliente):* Al verificar un PIN o descifrar un payload, el cliente intenta primero la derivación con el PIN exacto Unicode NFKC (`pin.trim()`). Si falla el tag de autenticación en AES-GCM, reintenta automáticamente con `normalizePin(pin)`.
-  - *Fase 2 (Auto-actualización Silenciosa):* Al comprobar con éxito una clave en formato legado durante una sesión con permisos de escritura, el cliente recalcula el verificador al nuevo formato estricto y lo envía a Supabase en el siguiente push.
+  - *Fase 2 (Auto-actualización Silenciosa):* Al comprobar con éxito una clave en formato legado durante una sesión con permisos de escritura, el cliente recalcula el verificador a 600.000 iteraciones y lo envía a Supabase en el siguiente push.
   - *Fase 3 (Deprecación de Limpieza Alfanumérica):* Una vez completada la ventana de migración, se consolida la compatibilidad total con símbolos (`@`, `#`, `!`, `-`, `_`, etc.) sin riesgo de bloqueo para usuarios existentes.
 
-### 3. Criptografía Estricta por Rol (Zero-Trust Compartments)
-- **Evolución:** Transición del modelo de "ocultamiento en interfaz" hacia **Criptografía Estricta Compartimentada**.
-- **Arquitectura de Compartimentos Cifrados:**
-  1. *Compartimento Público (`payload_public`):* Cifrado con la Clave de Congregación (`K_pub`). Accesible para todos los miembros con el PIN de la congregación (programas, asignaciones de reuniones, tablero general).
-  2. *Compartimento Departamental (`payload_dept`):* Cifrado con Clave Departamental (`K_dept`). Protege manzanas y direcciones detalladas de territorios (S-13), libro de cuentas de congregación (S-26) y almacén de literatura. Un publicador general no puede descifrar estos datos aunque intercepte el tráfico de red.
-  3. *Compartimento Personal (`payload_personal_${id}`):* Cifrado con la clave derivada del PIN Personal (`K_personal`). Protege la tarjeta individual S-21 y notas privadas del publicador frente a otros publicadores.
-  4. *Compartimento Maestro (`payload_master`):* Cifrado con la Clave Maestra (`K_master`). Exclusivo para el cuerpo de ancianos. Contiene auditorías, nombramientos e historial completo, con capacidad de super-descifrado jerárquico de emergencia.
+### 3. Modelo Criptográfico y Segregación de Roles
+
+#### A. Modelo en Producción Actual: E2EE Jerárquico + RBAC Verificado por Servidor
+- **Cifrado E2EE a Nivel de Congregación:** El servidor solo almacena dos paquetes cifrados opacos:
+  1. `payload`: Cifrado con la Clave Maestra derivada del PIN Maestro (`K_master`). Exclusivo para el cuerpo de ancianos. Contiene el snapshot completo (publicadores, comités, cuentas, territorios detallados, auditorías).
+  2. `payload_public`: Cifrado con la Clave de Congregación (`K_pub`). Accesible para todos los miembros con el PIN de la congregación (programas de reuniones, tablero general, anuncios).
+- **Segregación por Rol (RBAC en Cliente):**
+  - La separación departamental de pantallas y funciones en la aplicación cliente se controla mediante **RBAC (Role-Based Access Control)**.
+  - Para siervos ministeriales y publicadores, la identidad y privilegios se autentican mediante verificación de PIN personal en la Edge Function, la cual emite un token de sesión de rol firmado con HMAC (`kgr_srt1`).
+- **Custodia de Credenciales:** En la arquitectura actual, quien posee el PIN Maestro tiene acceso al snapshot íntegro de la congregación. El cuerpo de ancianos debe salvaguardar el PIN Maestro y no compartirlo fuera del cuerpo.
+
+#### B. Sobres Criptográficos Departamentales (En Validación Técnica)
+- El motor de sobres cifrados departamentales (`EncryptedCompartmentEnvelope` en `src/utils/security/compartments.ts` y validado en `test/compartments.test.ts`) implementa el cifrado de datos específicos de departamento mediante claves independientes (`K_dept`).
+- Su activación en la sincronización en red está planificada como una fase posterior para asegurar una gestión robusta de rotación de claves entre siervos ministeriales.
+
+### 4. Concurrencia Optimista y Detección de Conflictos (Anti-Sobrescritura)
+- El cliente envía en cada `syncPush` la marca de tiempo `expected_version` correspondiente a la versión remota leída en el último `syncPull`.
+- Si otro anciano ha guardado cambios en la nube en el intervalo, el servidor detecta el desfase de versión y devuelve HTTP `409 Conflict` (`conflict_detected`), alertando al usuario para sincronizar primero y evitando pérdida silenciosa de modificaciones concurrentes.
+
+### 5. Protección de Datos de Especial Sensibilidad (RGPD Art. 9 / Ley 1581)
+- La afiliación religiosa, directivas médicas (DPA / Voluntad Anticipada), contactos de emergencia e informes de servicio constituyen **datos de categoría especial**.
+- **Salvaguardas en Reposo:**
+  - Toda persistencia en `localStorage` pasa obligatoriamente por `sanitizePublishersForLocalStorage`, eliminando PINs en texto claro y cifrando campos sensibles.
+  - La información médica confidencial y notas de pastoreo emplean cifrado local granular `kgr_sec4` respaldado por la bóveda `atRestVault` con CryptoKeys AES-GCM no extraíbles en IndexedDB.
 
 ---
 

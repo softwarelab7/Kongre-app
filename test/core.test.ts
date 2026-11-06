@@ -86,6 +86,50 @@ test('maestro escribe ambos y preserve_master protege el payload', async () => {
   assert.equal(rows.get('CONG1')!.payload, 'ADMIN2'); assert.equal(rows.get('CONG1')!.payload_public, 'PUB3');
 });
 
+test('concurrencia optimista: push rechaza sobrescritura con 409 si expected_version no coincide', async () => {
+  const { call, clock } = setup();
+  const c1 = await create(call);
+  assert.equal(c1.status, 200);
+  const version1 = c1.body.created_at;
+
+  // Anciano A actualiza con expected_version coincidente => éxito
+  clock.t += 1000;
+  const a1 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_A',
+    payload_public: 'PUB_A',
+    expected_version: version1,
+  });
+  assert.equal(a1.status, 200);
+  const version2 = a1.body.created_at;
+
+  // Anciano B intenta guardar con la versión vieja version1 => conflicto 409
+  clock.t += 1000;
+  const b1 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_B_VIEJO',
+    payload_public: 'PUB_B_VIEJO',
+    expected_version: version1,
+  });
+  assert.equal(b1.status, 409);
+  assert.equal(b1.body.error, 'conflict_detected');
+  assert.equal(b1.body.current_version, version2);
+
+  // Guardado forzado o sin expected_version sigue funcionando
+  const b2 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_B_FORZADO',
+    payload_public: 'PUB_B_FORZADO',
+  });
+  assert.equal(b2.status, 200);
+});
+
 test('rotación de credenciales: las viejas dejan de funcionar', async () => {
   const { call } = setup();
   await create(call);

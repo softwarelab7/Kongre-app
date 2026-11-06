@@ -6,6 +6,30 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.45] — 5 de Noviembre, 2026
+**Blindaje Criptográfico de Tokens a 600.000 Iteraciones PBKDF2, Concurrencia Optimista (Anti-Conflictos de Guardado), Soporte de Passphrases y Sanitización Estricta**
+
+- 🛡️ **Paridad Criptográfica de Tokens de Autenticación a 600.000 Iteraciones (`syncApi.ts`):**
+  - Elevación de las iteraciones PBKDF2 de `100.000` a `600.000` en la derivación de tokens de autenticación de PIN, cerrando por completo la asimetría de coste frente al cifrado AES-256-GCM y blindando la seguridad ante posibles filtraciones de base de datos y pepper.
+  - Mecanismo de migración transparente y bidireccional: el cliente genera simultáneamente tokens con 600k y tokens legados con 100k, permitiendo que congregaciones preexistentes autentiquen sin fricción y actualicen automáticamente sus verificadores a 600k en su siguiente push.
+- 🔄 **Concurrencia Optimista y Detección de Conflictos de Guardado (`core.ts`, `syncApi.ts`, `supabaseSyncService.ts`):**
+  - Integración del parámetro de versión `expected_version` en la Edge Function `kongre-sync`.
+  - Cuando dos ancianos editan y guardan simultáneamente desde diferentes dispositivos, el servidor detecta el conflicto de versión y responde con HTTP `409 Conflict` (`conflict_detected`), alertando al usuario y evitando la sobrescritura silenciosa de cambios.
+- 🔑 **Soporte de Passphrases y PINs Extendidos de Alta Entropía (`congregationCredentials.ts`):**
+  - Ampliación del formateador dinámico de PIN de congregación hasta 24 caracteres alfanuméricos agrupados en bloques de 4 (`XXXX-XXXX-XXXX...`), permitiendo el uso de frases de paso con entropía superior a 60 bits inmunes a ataques de diccionario o fuerza bruta por GPU.
+- 🧹 **Sanitización Rigurosa en Todas las Rutas de Persistencia Local (`CongregationContext.tsx`):**
+  - Aseguramiento de que todas las ramas de guardado de publicadores en `localStorage` pasen por `sanitizePublishersForLocalStorage`, eliminando PINs en claro y garantizando el cifrado en reposo de datos médicos y contactos de emergencia.
+- 🎲 **CSPRNG Seguro en Códigos Inmutables (`publisherDeduplication.ts`):**
+  - Sustitución de `Math.random()` por `crypto.getRandomValues()` y generadores CSPRNG criptográficamente seguros para la generación de identificadores inmutables de publicador.
+- 📜 **Alineación Normativa y Documentación de Seguridad (`SEGURIDAD.md`, `TermsAndPrivacyModal.tsx`, `public/privacy.html`, `README.md`):**
+  - Transparencia explícita sobre el modelo E2EE a nivel de congregación y RBAC en cliente con tokens firmados por servidor (`kgr_srt1`).
+  - Delimitación del estado de validación técnica de sobres criptográficos departamentales (`compartments.ts`).
+  - Reconocimiento formal de la pertenencia religiosa, directivas médicas (DPA) y contactos de emergencia como datos de especial sensibilidad bajo el RGPD (Art. 9) y Ley 1581 de 2012.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.44] — 4 de Noviembre, 2026
 **Territorios y Cartografía (S-13): Geocerca GPS en Tiempo Real, Control Dinámico de Manzanas, Registro Georreferenciado y Radar de Cobertura Anual**
 

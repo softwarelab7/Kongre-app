@@ -10,7 +10,8 @@ import { SUPABASE_URL } from '../lib/supabase';
 import { normalizePin, normalizePinV2, isLegacyPinFormat } from '../utils/crypto';
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/kongre-sync`;
-const AUTH_ITERATIONS = 100_000;
+export const AUTH_ITERATIONS = 600_000;
+export const AUTH_ITERATIONS_LEGACY = 100_000;
 
 export type SyncRole = 'master' | 'public';
 
@@ -23,7 +24,7 @@ export interface SyncTokens {
 
 export type SyncResult<T> =
   | ({ ok: true } & T)
-  | { ok: false; status: number; error: string; retryAfter?: number };
+  | { ok: false; status: number; error: string; retryAfter?: number; current_version?: string };
 
 const tokenCache = new Map<string, string>();
 
@@ -36,10 +37,11 @@ export async function deriveAuthToken(
   pin: string,
   congregationId: string,
   role: SyncRole,
-  legacy: boolean = false
+  legacy: boolean = false,
+  iterations: number = legacy ? AUTH_ITERATIONS_LEGACY : AUTH_ITERATIONS
 ): Promise<string> {
   const cleanPin = legacy ? normalizePin(pin) : normalizePinV2(pin);
-  const cacheKey = `${role}|${congregationId}|${legacy ? 'leg:' : 'v2:'}${cleanPin}`;
+  const cacheKey = `${role}|${congregationId}|${iterations}|${legacy ? 'leg:' : 'v2:'}${cleanPin}`;
   const cached = tokenCache.get(cacheKey);
   if (cached) return cached;
 
@@ -49,7 +51,7 @@ export async function deriveAuthToken(
     {
       name: 'PBKDF2',
       salt: enc.encode(`kongre-sync-auth-v1|${role}|${congregationId}`),
-      iterations: AUTH_ITERATIONS,
+      iterations,
       hash: 'SHA-256',
     },
     base,
@@ -60,24 +62,25 @@ export async function deriveAuthToken(
   return token;
 }
 
-/** Tokens para una sesión con un único PIN (soporta derivación dual v2 con fallback transparente a v1). */
+/** Tokens para una sesión con un único PIN (soporta derivación dual v2 a 600k con fallback a 100k legado). */
 export async function tokensFromSinglePin(pin: string, congregationId: string): Promise<SyncTokens> {
   const isLegacy = isLegacyPinFormat(pin);
   const [master, pub] = await Promise.all([
-    deriveAuthToken(pin, congregationId, 'master', false),
-    deriveAuthToken(pin, congregationId, 'public', false),
+    deriveAuthToken(pin, congregationId, 'master', false, AUTH_ITERATIONS),
+    deriveAuthToken(pin, congregationId, 'public', false, AUTH_ITERATIONS),
   ]);
 
-  const tokens: SyncTokens = { master, public: pub };
-  if (isLegacy) {
-    const [masterLegacy, pubLegacy] = await Promise.all([
-      deriveAuthToken(pin, congregationId, 'master', true),
-      deriveAuthToken(pin, congregationId, 'public', true),
-    ]);
-    tokens.master_legacy = masterLegacy;
-    tokens.public_legacy = pubLegacy;
-  }
-  return tokens;
+  const [masterLegacy, pubLegacy] = await Promise.all([
+    deriveAuthToken(pin, congregationId, 'master', isLegacy, AUTH_ITERATIONS_LEGACY),
+    deriveAuthToken(pin, congregationId, 'public', isLegacy, AUTH_ITERATIONS_LEGACY),
+  ]);
+
+  return {
+    master,
+    public: pub,
+    master_legacy: masterLegacy,
+    public_legacy: pubLegacy,
+  };
 }
 
 function getSyncEndpoint(): string {
@@ -276,11 +279,15 @@ export function syncVerifyRoleToken(
   congregationPin: string,
   token: string
 ) {
-  return deriveAuthToken(congregationPin, id, 'public').then((publicToken) =>
+  const isLegacy = isLegacyPinFormat(congregationPin);
+  return Promise.all([
+    deriveAuthToken(congregationPin, id, 'public', false, AUTH_ITERATIONS),
+    deriveAuthToken(congregationPin, id, 'public', isLegacy, AUTH_ITERATIONS_LEGACY),
+  ]).then(([publicToken, publicLegacyToken]) =>
     call<{ valid: boolean; publisher_id: string; role: string; roles: string[]; expires_at: number }>({
       action: 'verify_role_token',
       id,
-      tokens: { public: publicToken },
+      tokens: { public: publicToken, public_legacy: publicLegacyToken },
       token,
     })
   );
@@ -298,26 +305,28 @@ export async function syncPush(params: {
   personalPins?: PersonalPinEntry[];
   /** Rotación de credenciales: PINs nuevos. Los PINs actuales (masterPin/publicPin) autentican la operación. */
   rotateTo?: { masterPin?: string; publicPin?: string };
+  /** Versión esperada (marca de tiempo de última lectura) para evitar sobreescritura accidental concurrente (409 Conflict). */
+  expectedVersion?: string;
 }) {
   const masterLegacy = isLegacyPinFormat(params.masterPin);
   const publicLegacy = isLegacyPinFormat(params.publicPin);
 
   const tokens: SyncTokens = {
-    master: await deriveAuthToken(params.masterPin, params.id, 'master', false),
-    public: await deriveAuthToken(params.publicPin, params.id, 'public', false),
+    master: await deriveAuthToken(params.masterPin, params.id, 'master', false, AUTH_ITERATIONS),
+    public: await deriveAuthToken(params.publicPin, params.id, 'public', false, AUTH_ITERATIONS),
+    master_legacy: await deriveAuthToken(params.masterPin, params.id, 'master', masterLegacy, AUTH_ITERATIONS_LEGACY),
+    public_legacy: await deriveAuthToken(params.publicPin, params.id, 'public', publicLegacy, AUTH_ITERATIONS_LEGACY),
   };
-  if (masterLegacy) {
-    tokens.master_legacy = await deriveAuthToken(params.masterPin, params.id, 'master', true);
-  }
-  if (publicLegacy) {
-    tokens.public_legacy = await deriveAuthToken(params.publicPin, params.id, 'public', true);
-  }
 
   let rotate_to: SyncTokens | undefined;
   if (params.rotateTo) {
     rotate_to = {};
-    if (params.rotateTo.masterPin) rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master', false);
-    if (params.rotateTo.publicPin) rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public', false);
+    if (params.rotateTo.masterPin) {
+      rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master', false, AUTH_ITERATIONS);
+    }
+    if (params.rotateTo.publicPin) {
+      rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public', false, AUTH_ITERATIONS);
+    }
   }
   let personal_pins: Array<{ id: string; token: string; v: 2; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
   if (params.personalPins && params.personalPins.length > 0) {
@@ -342,12 +351,17 @@ export async function syncPush(params: {
     preserve_master: params.preserveMaster ? true : undefined,
     personal_pins,
     rotate_to,
+    expected_version: params.expectedVersion,
   });
 }
 
 export function syncDelete(id: string, masterPin: string) {
-  return deriveAuthToken(masterPin, id, 'master').then((master) =>
-    call<{ deleted: boolean }>({ action: 'delete', id, tokens: { master } })
+  const isLegacy = isLegacyPinFormat(masterPin);
+  return Promise.all([
+    deriveAuthToken(masterPin, id, 'master', false, AUTH_ITERATIONS),
+    deriveAuthToken(masterPin, id, 'master', isLegacy, AUTH_ITERATIONS_LEGACY),
+  ]).then(([master, masterLegacy]) =>
+    call<{ deleted: boolean }>({ action: 'delete', id, tokens: { master, master_legacy: masterLegacy } })
   );
 }
 
@@ -359,6 +373,9 @@ export function describeSyncError(r: { status: number; error: string; retryAfter
   if (r.status === 429) {
     const mins = r.retryAfter ? Math.max(1, Math.ceil(r.retryAfter / 60)) : 1;
     return `Demasiados intentos. Espera ${mins} minuto${mins === 1 ? '' : 's'} antes de volver a intentar.`;
+  }
+  if (r.status === 409 || r.error === 'conflict_detected') {
+    return 'Se detectaron cambios más recientes guardados desde otro dispositivo. Para no sobrescribir el trabajo de otro hermano, sincroniza primero los datos de la nube.';
   }
   if (r.status === 401) return 'El ID de congregación o el PIN no son correctos.';
   if (r.status === 403) return 'Tu nivel de acceso no permite esta operación.';

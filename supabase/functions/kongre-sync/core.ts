@@ -397,6 +397,19 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 403, { ok: false, error: 'push_requires_master_tier' });
     }
 
+    // Detección de conflictos de concurrencia optimista (ETag / Versión de guardado)
+    const expectedVersion = typeof body?.expected_version === 'string' ? body.expected_version.trim() : undefined;
+    if (body.expected_version !== undefined && (typeof body.expected_version !== 'string' || body.expected_version.length > 100)) {
+      return json(req, env, 400, { ok: false, error: 'bad_expected_version' });
+    }
+    if (expectedVersion && current.created_at && current.created_at !== expectedVersion) {
+      return json(req, env, 409, {
+        ok: false,
+        error: 'conflict_detected',
+        current_version: current.created_at,
+      });
+    }
+
     const patch: Partial<SyncRow> = { created_at: nowIso, type: 'full_sync' };
     if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
     if (typeof payload === 'string' && !body.preserve_master) patch.payload = payload;

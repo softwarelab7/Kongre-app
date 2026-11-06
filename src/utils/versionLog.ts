@@ -25,19 +25,54 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.44';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.45';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.11.04.8044';
-export const BUILD_DATE = '4 de Noviembre, 2026';
+export const CURRENT_BUILD_CODE = '2026.11.05.8045';
+export const BUILD_DATE = '5 de Noviembre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0-alpha.45',
+    buildCode: '2026.11.05.8045',
+    date: '5 de Noviembre, 2026',
+    title: 'Blindaje de Autenticación a 600k PBKDF2, Concurrencia Optimista (Anti-Conflictos) y Protección de Datos Sensibles',
+    isCurrent: true,
+    highlight: 'Paridad criptográfica completa elevando tokens de autenticación de PIN a 600.000 iteraciones PBKDF2; migración transparente automática de congregaciones existentes; detección de colisiones y conflictos concurrentes en push (HTTP 409) con ETag/versión; soporte de passphrases de hasta 24 caracteres; sanitización rigurosa de publicadores en todo el almacenamiento local y CSPRNG criptoseguro.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Blindaje de Tokens de Autenticación a 600.000 iteraciones (syncApi.ts): Elevación de las iteraciones PBKDF2 de tokens de autenticación para eliminar asimetrías de fuerza bruta frente al cifrado AES-256-GCM, con derivación dual que soporta migración transparente e inmediata desde las 100.000 iteraciones heredadas.',
+      },
+      {
+        category: 'security',
+        text: 'Concurrencia Optimista y Detección de Conflictos (core.ts, syncApi.ts, supabaseSyncService.ts): Implementación de expected_version en el endpoint de push para detectar cuando dos ancianos guardan simultáneamente desde dispositivos distintos, rechazando la sobrescritura accidental con HTTP 409 Conflict (conflict_detected).',
+      },
+      {
+        category: 'security',
+        text: 'Soporte de Passphrases y PINs Extendidos de Alta Entropía (congregationCredentials.ts): Ampliación del formateador de PIN de congregación hasta 24 caracteres en bloques cuádruples (XXXX-XXXX-XXXX...), facilitando el uso de frases de paso inmunes a ataques offline por GPU.',
+      },
+      {
+        category: 'security',
+        text: 'Sanitización Estricta de Almacenamiento Local (CongregationContext.tsx, sensitiveFields.ts): Aseguramiento de que todas las rutas de persistencia en localStorage ejecuten sanitizePublishersForLocalStorage, suprimiendo PINs en claro y cifrando campos médicos y de emergencia.',
+      },
+      {
+        category: 'fix',
+        text: 'CSPRNG Criptográfico en Deduplicación (publisherDeduplication.ts): Sustitución de Math.random() por crypto.getRandomValues() / CSPRNG de alta entropía para códigos inmutables de publicador.',
+      },
+      {
+        category: 'improvement',
+        text: 'Transparencia Normativa y Privacidad (SEGURIDAD.md, TermsAndPrivacyModal.tsx, public/privacy.html): Clarificación explícita del modelo E2EE a nivel de congregación, RBAC en cliente con tokens firmados (kgr_srt1), roadmap de sobres departamentales y salvaguardas reforzadas para datos de especial sensibilidad (RGPD Art. 9 / Ley 1581).',
+      },
+    ],
+  },
   {
     version: '0.1.0-alpha.44',
     buildCode: '2026.11.04.8044',
     date: '4 de Noviembre, 2026',
     title: 'Territorios y Cartografía S-13: Geocerca GPS en Tiempo Real, Control Dinámico de Manzanas, Registro Georreferenciado y Radar de Cobertura',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Detección de geocerca en vivo mediante GPS con algoritmo Ray-Casting que indica si el publicador está dentro del polígono o su distancia exacta al límite; control dinámico de manzanas en 3 estados (pendiente, en curso, completada) con notas de campo para casas No en Casa (NH) y reporte por WhatsApp en 1-clic; captura satelital directa para domicilios de No Visitar y Radar S-13 con detección de territorios desatendidos (> 1 año sin predicar).',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

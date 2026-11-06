@@ -3312,7 +3312,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     setPublishers(currentPubs);
     try {
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(currentPubs));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(sanitizePublishersForLocalStorage(currentPubs)));
     } catch {}
     saveToFirestore(currentPubs);
     return importedCount;
@@ -3359,7 +3359,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (mergedCount > 0) {
       setPublishers(cleanList);
       try {
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(cleanList));
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(sanitizePublishersForLocalStorage(cleanList)));
       } catch {}
 
       // Reasignar semanas si hubo cambio de IDs

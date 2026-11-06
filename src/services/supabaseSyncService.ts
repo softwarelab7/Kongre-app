@@ -368,7 +368,9 @@ export const supabaseSyncService = {
      * las credenciales vigentes en el servidor.
      */
     rotateFrom?: { pinMaestro?: string; pinCongregacion?: string };
-  }): Promise<{ success: boolean; error?: string }> {
+    /** Omitir comprobación de concurrencia optimista (forzar sobrescritura intencional) */
+    forceOverwrite?: boolean;
+  }): Promise<{ success: boolean; error?: string; conflict?: boolean }> {
     const cleanId = normalizeCongregationId(params.congregationId);
     const cleanMasterPin = normalizePinV2(params.pinMaestro);
     const cleanPublicPin = normalizePinV2(params.pinCongregacion || params.pinMaestro);
@@ -548,6 +550,7 @@ export const supabaseSyncService = {
       //    maestro existente (evita el borrado catastrófico de datos de ancianos).
       const preserveMaster = Boolean(params.data.publishers && params.data.publishers.length <= 1);
       const rotating = Boolean(params.rotateFrom && (params.rotateFrom.pinMaestro || params.rotateFrom.pinCongregacion));
+      const lastSyncTimestamp = this.getLastSyncTimestamp();
       const pushRes = await syncPush({
         id: cleanId,
         masterPin: params.rotateFrom?.pinMaestro ? normalizePinV2(params.rotateFrom.pinMaestro) : cleanMasterPin,
@@ -562,11 +565,19 @@ export const supabaseSyncService = {
               publicPin: params.rotateFrom?.pinCongregacion ? cleanPublicPin : undefined,
             }
           : undefined,
+        expectedVersion: params.forceOverwrite ? undefined : (lastSyncTimestamp || undefined),
       });
 
       if (!pushRes.ok) {
         const err = pushRes as SyncFailure;
         const message = describeSyncError(err);
+        if (err.status === 409 || err.error === 'conflict_detected') {
+          return {
+            success: false,
+            conflict: true,
+            error: message,
+          };
+        }
         // Errores de acceso o de límite de intentos no se reintentan desde la cola offline.
         if (err.status === 401 || err.status === 403 || err.status === 429) {
           return {

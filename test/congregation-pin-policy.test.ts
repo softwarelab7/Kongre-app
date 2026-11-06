@@ -5,6 +5,7 @@ import {
   countCongregationPinChars,
   isValidCongregationPinLength,
   generateSecureCongregationPin,
+  formatCongregationPinInput,
 } from '../src/utils/theocraticSecurity.ts';
 
 test('el mínimo del PIN de congregación son 8 caracteres reales', () => {
@@ -31,4 +32,11 @@ test('el generador siempre produce un PIN válido', () => {
     assert.equal(isValidCongregationPinLength(pin), true, pin);
     assert.equal(countCongregationPinChars(pin), 8);
   }
+});
+
+test('formato de PIN extendido y passphrases de alta entropía', () => {
+  assert.equal(formatCongregationPinInput('8X4W9M2K'), '8X4W-9M2K');
+  assert.equal(formatCongregationPinInput('8X4W9M2K7P3Q'), '8X4W-9M2K-7P3Q');
+  assert.equal(countCongregationPinChars('8X4W-9M2K-7P3Q'), 12);
+  assert.equal(isValidCongregationPinLength('8X4W-9M2K-7P3Q'), true);
 });

@@ -123,7 +123,8 @@ export function formatCongregationPinInput(input: string, prev: string = ''): st
     return input.slice(0, -1);
   }
 
-  const clean = input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  // Permitir hasta 24 caracteres (soporta passphrases o PINs extendidos de alta entropía)
+  const clean = input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 24);
   if (!clean) return '';
 
   if (clean.length <= 4) {
@@ -132,7 +133,16 @@ export function formatCongregationPinInput(input: string, prev: string = ''): st
       : clean;
   }
 
-  return `${clean.slice(0, 4)}-${clean.slice(4)}`;
+  if (clean.length <= 8) {
+    return `${clean.slice(0, 4)}-${clean.slice(4)}`;
+  }
+
+  // Claves extendidas / passphrases (> 8 caracteres): agrupar en bloques de 4
+  const chunks: string[] = [];
+  for (let i = 0; i < clean.length; i += 4) {
+    chunks.push(clean.slice(i, i + 4));
+  }
+  return chunks.join('-');
 }
 
 /** Mínimo de caracteres alfanuméricos del PIN de congregación (el guion de formato NO cuenta). */

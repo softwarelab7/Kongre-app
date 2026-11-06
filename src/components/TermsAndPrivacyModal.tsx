@@ -267,18 +267,27 @@ export const ProfessionalPrivacyContent: React.FC = () => (
       <p>
         <strong>1.2. Imposibilidad Técnica de Lectura por Terceros:</strong> Debido a que las claves de cifrado se derivan exclusivamente del PIN Maestro y del PIN de la Congregación en el navegador o teléfono del usuario mediante la API nativa <code>Web Crypto API</code>, ni los desarrolladores de Kongre, ni los proveedores de bases de datos en la nube (Supabase / AWS), ni terceros pueden leer, indexar o descifrar el contenido de los directorios, tarjetas S-21 o programaciones.
       </p>
+      <p>
+        <strong>1.3. Transparencia en la Segregación de Roles:</strong> El cifrado de extremo a extremo opera a nivel de congregación (paquete maestro para ancianos y paquete público para publicadores). La compartimentación interna entre departamentos se gestiona mediante Control de Acceso Basado en Roles (RBAC en cliente) respaldado por tokens de sesión de rol firmados con HMAC por el servidor (<code>kgr_srt1</code>), requiriéndose la debida custodia del PIN Maestro de 12 dígitos por parte del cuerpo de ancianos.
+      </p>
     </section>
 
     {/* Section 2 */}
     <section className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121216]/90 border border-zinc-200/80 dark:border-[#27272A] space-y-2.5 shadow-2xs">
       <h4 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
         <Database className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-        <span>2. Principio de Minimización e Inventario de Datos Tratados</span>
+        <span>2. Principio de Minimización y Tratamiento de Datos de Especial Sensibilidad</span>
       </h4>
       <p>
-        Kongre recopila y procesa únicamente los datos estrictamente necesarios para el funcionamiento de los módulos teocráticos:
+        Kongre reconoce que la información relativa a convicciones religiosas, directivas médicas sobre tratamientos (DPA / Voluntad Anticipada), notas de pastoreo y contactos de emergencia constituyen <strong>datos de categoría especial y sensible</strong> bajo el <strong>Artículo 9 del RGPD (UE)</strong> y normativas homólogas (como la <strong>Ley 1581 de 2012</strong>):
       </p>
       <ul className="list-disc list-inside space-y-2 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
+        <li>
+          <strong>Salvaguardas Criptográficas Reforzadas:</strong> Los datos de directivas médicas, contactos de emergencia y pastoreo confidencial se someten a cifrado granular en reposo (<code>kgr_sec4</code>) respaldado por la bóveda criptográfica local de IndexedDB con claves no extraíbles (<code>extractable: false</code>), y se excluyen permanentemente del paquete de sincronización pública.
+        </li>
+        <li>
+          <strong>Sanitización en Almacenamiento Local:</strong> Toda persistencia en el dispositivo ejecuta filtros de sanitización automática, suprimiendo PINs en texto plano y transformando credenciales en hashes criptográficos irreversibles.
+        </li>
         <li>
           <strong>Datos Institucionales de la Congregación:</strong> Nombre de la congregación, identificador único (<span className="font-mono">KGR-XXXX-XXXX</span>), número de circuito, ciudad, país, dirección del Salón del Reino y horarios de reuniones semanales.
         </li>
@@ -289,7 +298,7 @@ export const ProfessionalPrivacyContent: React.FC = () => (
           <strong>Datos de Contacto Opcionales:</strong> Número telefónico (utilizado exclusivamente para enviar recordatorios o papeletas S-89 vía WhatsApp a solicitud del usuario) y dirección de correo electrónico (para vinculación de cuenta y recuperación de acceso).
         </li>
         <li>
-          <strong>Metadatos de Seguridad y Auditoría:</strong> Hashes criptográficos de verificación de PIN, configuración opcional de segundo factor (2FA TOTP) y registros internos de auditoría teocrática visibles únicamente para los ancianos de la congregación.
+          <strong>Metadatos de Seguridad y Auditoría:</strong> Hashes criptográficos de verificación de PIN con 600.000 iteraciones PBKDF2, configuración opcional de segundo factor (2FA TOTP), marcas de tiempo de versión para control de concurrencia y registros internos de auditoría teocrática.
         </li>
       </ul>
     </section>

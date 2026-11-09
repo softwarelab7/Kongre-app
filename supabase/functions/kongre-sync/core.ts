@@ -217,8 +217,11 @@ function clientIp(req: Request): string {
 
 export function corsHeaders(req: Request, env: SyncEnv): Record<string, string> {
   const origin = req.headers.get('origin') || '';
-  const allowAny = env.allowedOrigins.length === 0;
-  const allowed = allowAny ? '*' : env.allowedOrigins.includes(origin) ? origin : env.allowedOrigins[0];
+  const validOrigins = (env.allowedOrigins || []).filter(
+    (o) => Boolean(o) && o !== 'false' && o !== 'none' && o !== 'null' && o !== 'undefined'
+  );
+  const allowAny = validOrigins.length === 0 || validOrigins.includes('*');
+  const allowed = allowAny ? (origin || '*') : validOrigins.includes(origin) ? origin : (validOrigins[0] || '*');
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',

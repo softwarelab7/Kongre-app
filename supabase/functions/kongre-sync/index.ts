@@ -78,7 +78,10 @@ const db: SyncDb = {
 
 const env = {
   pepper,
-  allowedOrigins: (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map((s) => s.trim()).filter(Boolean),
+  allowedOrigins: (Deno.env.get('ALLOWED_ORIGINS') || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => Boolean(s) && s !== 'false' && s !== 'none' && s !== 'null' && s !== 'undefined'),
   legacyClaim: Deno.env.get('LEGACY_CLAIM') === 'true',
 };
 

@@ -18,6 +18,7 @@ import {
 } from '../services/pinChangeRequestsService';
 import { SolicitudCambioPin } from '../types';
 import { ActiveTab } from './Navbar';
+import { ElderCodeRedemptionsPanel } from './ElderCodeRedemptionsPanel';
 import {
   ShieldCheck,
   Shield,
@@ -95,13 +96,14 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
   // Navigation tab modes:
   // - 'directorio': Responsabilidades y PINs de los hermanos (Gestión principal)
+  // - 'revocaciones': Gestión y Revocación de Códigos de Acceso (Control de Ancianos)
   // - 'mi_sesion': Mi perfil actual, cambiar con PIN y simulación de roles
   // - 'nube_qr': Vinculación Google y Códigos QR
   // - 'matriz': Matriz de Permisos Teocráticos por Roles
-  const [activeTabMode, setActiveTabMode] = useState<'tarjetas' | 'directorio' | 'mi_sesion' | 'nube_qr' | 'matriz'>('directorio');
+  const [activeTabMode, setActiveTabMode] = useState<'tarjetas' | 'directorio' | 'revocaciones' | 'mi_sesion' | 'nube_qr' | 'matriz'>('directorio');
 
   useEffect(() => {
-    if (!isAllowedAccess && activeTabMode === 'directorio') {
+    if (!isAllowedAccess && (activeTabMode === 'directorio' || activeTabMode === 'revocaciones')) {
       setActiveTabMode('mi_sesion');
     }
   }, [isAllowedAccess, activeTabMode]);
@@ -1204,6 +1206,21 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                 </button>
               )}
 
+              {isAllowedAccess && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTabMode('revocaciones')}
+                  className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                    activeTabMode === 'revocaciones'
+                      ? 'bg-white dark:bg-indigo-600 text-zinc-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-black'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span className="truncate">Revocación y Códigos</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setActiveTabMode('mi_sesion')}
@@ -1312,6 +1329,38 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
               </div>
               <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
                 <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                  Entrar a esta sección →
+                </span>
+              </div>
+            </button>
+          )}
+
+          {isAllowedAccess && (
+            <button
+              type="button"
+              onClick={() => setActiveTabMode('revocaciones')}
+              className="group text-left kg-card-bento kg-glass-surface kg-sheen-top border border-zinc-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/60 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer"
+            >
+              <div className="space-y-3.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-xs">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[11px] font-black bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
+                    Control de Ancianos
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-base font-black text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                    Gestión y Revocación de Códigos
+                  </h4>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                    Audita publicadores con PIN activado, cambia credenciales olvidadas o extraviadas con motivo obligatorio y consulta códigos revocados.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                   Entrar a esta sección →
                 </span>
               </div>
@@ -1678,6 +1727,13 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             )}
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SECTION: GESTIÓN Y REVOCACIÓN DE CÓDIGOS DE ACCESO (CONTROL DE ANCIANOS) */}
+      {/* ========================================================================= */}
+      {activeTabMode === 'revocaciones' && isAllowedAccess && (
+        <ElderCodeRedemptionsPanel />
       )}
 
       {/* ========================================================================= */}

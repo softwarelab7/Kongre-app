@@ -172,22 +172,22 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+    <div className="kg-card-bento kg-glass-surface kg-sheen-top bg-white/95 dark:bg-[#121216]/90 p-5 sm:p-7 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-white/10 shadow-sm space-y-5">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/10">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-2xs">
+            <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 ring-4 ring-amber-500/10">
               <KeyRound className="w-4 h-4" />
             </div>
-            <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+            <h3 className="text-sm sm:text-base font-black text-zinc-900 dark:text-white">
               Gestión y Revocación de Códigos de Acceso por Publicador
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border border-amber-300/70 dark:border-amber-800">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border border-amber-300/70 dark:border-amber-800">
               Control de Ancianos
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Si un hermano necesita cambiar su código (lo olvidó, perdió el teléfono, alguien más lo sabe, etc.), llena el formulario especificando la razón para que el código anterior quede revocado. Por privacidad, el historial de dispositivos y ubicaciones solo es visible para cada publicador en su perfil personal.
           </p>
         </div>
@@ -195,17 +195,17 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
         {/* Search & Quick Filter */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchPerson}
               onChange={(e) => setSearchPerson(e.target.value)}
               placeholder="Buscar hermano o dispositivo..."
-              className="w-full sm:w-56 pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30"
+              className="w-full sm:w-56 pl-8 pr-3 py-1.5 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-zinc-100/90 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-white/10 p-1 rounded-xl">
             {[
               { id: 'all' as const, label: 'Todos' },
               { id: 'redeemed' as const, label: 'Canjeados' },
@@ -215,10 +215,10 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setElderFilter(tab.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                   elderFilter === tab.id
-                    ? 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-300 shadow-2xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-zinc-900 text-amber-700 dark:text-amber-300 shadow-xs ring-1 ring-black/5 dark:ring-white/10 font-black'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 {tab.label}
@@ -250,12 +250,12 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
             return (
               <div
                 key={pub.id}
-                className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/70 flex flex-col gap-3"
+                className="p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 transition-all flex flex-col gap-3 shadow-2xs"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                   {/* Left: Person Identity + Role + Current PIN */}
                   <div className="flex items-start sm:items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-extrabold text-xs text-indigo-600 dark:text-indigo-400 shrink-0 shadow-2xs">
+                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-white/10 flex items-center justify-center font-black text-xs text-indigo-600 dark:text-indigo-400 shrink-0 shadow-xs">
                       {pub.name
                         .split(' ')
                         .map((n) => n[0])
@@ -265,14 +265,14 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
                     </div>
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                        <span className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white">
                           {pub.name}
                         </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800">
                           {roleLabel}
                         </span>
                         {pin ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs font-extrabold text-slate-800 dark:text-slate-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-white/10 font-mono text-xs font-black text-zinc-800 dark:text-zinc-200 shadow-2xs">
                             <KeyRound className="w-3 h-3 text-amber-500" />
                             <span>{isRevealed ? pin : `••${pin.slice(-2)}`}</span>
                             <button
@@ -280,7 +280,7 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
                               onClick={() =>
                                 setRevealedPins((prev) => ({ ...prev, [pub.id]: !prev[pub.id] }))
                               }
-                              className="ml-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                              className="ml-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
                               title={isRevealed ? 'Ocultar código' : 'Mostrar código'}
                             >
                               {isRevealed ? (
@@ -341,8 +341,8 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
 
                 {/* Historical Revocations for this specific Brother */}
                 {personRevocations.length > 0 && (
-                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-slate-700/60 space-y-1.5">
-                    <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                  <div className="pt-2.5 border-t border-zinc-200/70 dark:border-white/10 space-y-1.5">
+                    <span className="text-[10.5px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1">
                       <ShieldAlert className="w-3 h-3" />
                       <span>Códigos anteriores revocados de {pub.name} ({personRevocations.length}):</span>
                     </span>
@@ -352,17 +352,17 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
                         return (
                           <div
                             key={rev.id}
-                            className="p-2.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                            className="p-2.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/70 dark:border-rose-900/40 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                           >
                             <div className="space-y-0.5">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-1.5 py-0.5 rounded bg-rose-600 text-white font-extrabold text-[9.5px] uppercase">
+                                <span className="px-1.5 py-0.5 rounded bg-rose-600 text-white font-black text-[9.5px] uppercase">
                                   Revocado
-                               </span>
+                                </span>
                                 <span className="font-mono line-through text-rose-700 dark:text-rose-300 font-bold">
                                   Código ant.: {rev.previousCodeMasked}
                                 </span>
-                                <span className="text-slate-600 dark:text-slate-300">
+                                <span className="text-zinc-600 dark:text-zinc-300">
                                   → Nuevo: <strong className="font-mono">{rev.newCodeMasked}</strong>
                                 </span>
                                 <span className="font-bold text-rose-900 dark:text-rose-200">
@@ -370,12 +370,12 @@ export const ElderCodeRedemptionsPanel: React.FC = () => {
                                 </span>
                               </div>
                               {rev.reasonDetails && (
-                                <p className="text-slate-600 dark:text-slate-400 italic">
+                                <p className="text-zinc-600 dark:text-zinc-400 italic">
                                   “{rev.reasonDetails}”
                                 </p>
                               )}
                             </div>
-                            <div className="text-[10.5px] text-slate-500 dark:text-slate-400 shrink-0">
+                            <div className="text-[10.5px] text-zinc-500 dark:text-zinc-400 shrink-0">
                               <div>{revDt.day} · {revDt.hour}</div>
                               <div>Por: {rev.revokedBy}</div>
                             </div>

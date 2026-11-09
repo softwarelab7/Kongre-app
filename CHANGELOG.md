@@ -6,6 +6,199 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.45] — 5 de Noviembre, 2026
+**Blindaje Criptográfico de Tokens a 600.000 Iteraciones PBKDF2, Concurrencia Optimista (Anti-Conflictos de Guardado), Soporte de Passphrases y Sanitización Estricta**
+
+- 🛡️ **Paridad Criptográfica de Tokens de Autenticación a 600.000 Iteraciones (`syncApi.ts`):**
+  - Elevación de las iteraciones PBKDF2 de `100.000` a `600.000` en la derivación de tokens de autenticación de PIN, cerrando por completo la asimetría de coste frente al cifrado AES-256-GCM y blindando la seguridad ante posibles filtraciones de base de datos y pepper.
+  - Mecanismo de migración transparente y bidireccional: el cliente genera simultáneamente tokens con 600k y tokens legados con 100k, permitiendo que congregaciones preexistentes autentiquen sin fricción y actualicen automáticamente sus verificadores a 600k en su siguiente push.
+- 🔄 **Concurrencia Optimista, Compare-and-Swap Atómico y Auto-Reconciliación Transparente (`core.ts`, `index.ts`, `supabaseSyncService.ts`):**
+  - Implementación de Compare-and-Swap atómico en la Edge Function (`updateRowIfVersion`) y normalización semántica de marcas temporales (`versionsEqual`), eliminando falsos conflictos entre formatos `...Z` y `...+00:00`.
+  - Mecanismo de auto-fusión ante colisiones: si otro dispositivo guardó cambios en el intervalo (HTTP 409), el cliente descarga la versión remota, la combina inteligentemente con los cambios locales sin perder datos y reintenta la subida de forma transparente, notificando al usuario que sus datos fueron integrados con éxito.
+- 🔒 **Cifrado en Reposo de Visitas de Pastoreo (`sensitiveFields.ts`, `CongregationContext.tsx`, `shepherding-at-rest.test.ts`):**
+  - Cifrado granular en reposo de notas confidenciales, escrituras sugeridas y motivo/enfoque de las visitas de pastoreo (`sanitizeShepherdingVisitsForLocalStorage` y `restoreShepherdingVisitsFromLocalStorage`), garantizando que ninguna información sensible de pastoreo quede en texto plano en `localStorage`. Incluye compatibilidad hacia atrás e idempotencia de cifrado.
+- 🔑 **Soporte de Passphrases y PINs Extendidos de Alta Entropía (`congregationCredentials.ts`):**
+  - Ampliación del formateador dinámico de PIN de congregación hasta 24 caracteres alfanuméricos agrupados en bloques de 4 (`XXXX-XXXX-XXXX...`), permitiendo el uso de frases de paso con entropía superior a 60 bits inmunes a ataques de diccionario o fuerza bruta por GPU.
+- 🧹 **Sanitización Rigurosa en Todas las Rutas de Persistencia Local (`CongregationContext.tsx`):**
+  - Aseguramiento de que todas las ramas de guardado de publicadores en `localStorage` pasen por `sanitizePublishersForLocalStorage`, eliminando PINs en claro y garantizando el cifrado en reposo de datos médicos y contactos de emergencia.
+- 🎲 **CSPRNG Criptográfico sin Degradación (`publisherDeduplication.ts`):**
+  - Uso estricto de `secureRandomInt` sobre Web Crypto API para códigos inmutables de publicador, eliminando dependencias de Node.js o degradaciones no seguras.
+- 🔐 **Cifrado en Reposo con AES-256-GCM Estándar (`kgr_sec5`) (`sensitiveFields.ts`, `sec5-aes-gcm.test.ts`):**
+  - Los campos sensibles locales (teléfonos, direcciones, salud/DPA, notas, visitas de pastoreo) se cifran ahora con AES-256-GCM (`@noble/ciphers` 2.4.0, sin dependencias) con subclave aleatoria por registro, en lugar del esquema CTR + MAC propio (`kgr_sec4`). La clave nace de la entropía de la bóveda y el salt del dispositivo, sin PIN.
+  - Retrocompatibilidad total: `kgr_sec4`, `kgr_sec3` y `kgr_sec2` se siguen leyendo y se migran solos a `kgr_sec5` en el siguiente guardado; un valor que no se pueda descifrar se conserva intacto.
+- 📜 **Alineación Normativa y Documentación de Seguridad (`SEGURIDAD.md`, `TermsAndPrivacyModal.tsx`, `public/privacy.html`, `README.md`):**
+  - Transparencia explícita sobre el modelo E2EE a nivel de congregación y RBAC en cliente con tokens firmados por servidor (`kgr_srt1`).
+  - Delimitación del estado de validación técnica de sobres criptográficos departamentales (`compartments.ts`).
+  - Reconocimiento formal de la pertenencia religiosa, directivas médicas (DPA) y contactos de emergencia como datos de especial sensibilidad bajo el RGPD (Art. 9) y Ley 1581 de 2012.
+
+---
+
+## 📜 Versiones Anteriores
+
+### [v0.1.0-alpha.44] — 4 de Noviembre, 2026
+**Territorios y Cartografía (S-13): Geocerca GPS en Tiempo Real, Control Dinámico de Manzanas, Registro Georreferenciado y Radar de Cobertura Anual**
+
+- 🛰️ **Geocerca Satelital GPS en Tiempo Real (`TerritoryCardMap.tsx`, `TerritoryMapUtils.ts`):**
+  - Implementación del algoritmo geométrico *Ray-Casting* y cálculo esferoide en metros para verificar instantáneamente si el publicador se encuentra dentro del polígono oficial del territorio asignado.
+  - Indicador flotante en vivo: 🟢 *«Dentro del Territorio»* o 🟡 *«A X metros del límite»* con notificación auditiva/háptica y cálculo de proximidad para evitar predicar aceras no correspondientes.
+  - Renderizado de manzanas y cuadras poligonales en mapa base con diferenciación por colores según su estado teocrático.
+- 📱 **Gestor Dinámico de Manzanas y Modo Campo Móvil (`DigitalTerritoryModal.tsx`):**
+  - Superación de cuadrículas estáticas por un sistema dinámico y ajustable (1 a 30 manzanas) que refleja la realidad física del sector.
+  - Estados progresivos al pulsar cada manzana: **Pendiente** (neutro) → **En curso hoy** (azul con pulsación) → **Completada** (verde esmeralda con check).
+  - Barra de progreso visual con porcentaje de cobertura en tiempo real y contador de manzanas trabajadas.
+  - **Bloc de notas de campo para casas «No en casa» (NH) y revisitas:** Registro ágil de puertas donde no hubo respuesta o personas interesadas con almacenamiento persistente en el dispositivo del publicador.
+- 💬 **Informe de Avance Teocrático en 1-Clic por WhatsApp (`DigitalTerritoryModal.tsx`):**
+  - Generador de mensaje preformateado para enviar el avance diario de predicación al Siervo de Territorios o al superintendente de grupo con desglose de manzanas cubiertas, casas no en casa y confirmación de casas de «No Visitar» respetadas.
+- 📍 **Georreferenciación GPS Directa para Domicilios «No Visitar» (`DigitalTerritoryModal.tsx`, `TerritoriosTab.tsx`):**
+  - Botón *«Capturar mi ubicación GPS actual»* en el formulario de reporte de casas que han pedido explícitamente no ser visitadas.
+  - Registro de coordenadas satelitales exactas (`[lat, lng]`), visualización de marcador de advertencia en el mapa y enlace directo a Google Maps para verificación de ancianos.
+- 🎯 **Radar S-13 Completo y Filtro de Territorios Desatendidos (`TerritoriosTab.tsx`, `khsPublicWitnessingEngine.ts`):**
+  - Expansión del Radar S-13 para abarcar las 3 prioridades organizacionales:
+    1. **Vencidos (> 4 meses):** Botón directo para enviar recordatorio amigable por WhatsApp o registrar devolución.
+    2. **Por vencer (< 15 días):** Alerta preventiva para prórroga o coordinación con el grupo.
+    3. **Desatendidos (> 1 año sin predicar):** Detección automática en el año de servicio con botón de asignación inmediata en 1-clic.
+  - Nuevo filtro rápido por chip: *«Desatendidos (+1 año)»* en la barra de herramientas de territorios.
+- 📐 **Configuración de Manzanas en Creación y Edición (`TerritoriosTab.tsx`):**
+  - Campo específico para definir la cantidad de manzanas/cuadras estimadas al dar de alta o actualizar un territorio.
+  - Visualización del desglose de manzanas con su estado en la ficha técnica detallada S-13.
+- 🧪 **Suite de Pruebas Automatizadas de Territorios (`test/territories-s13.test.ts`):**
+  - Cobertura de pruebas unitarias para el algoritmo de geocerca (puntos dentro, fuera y en el borde), cálculo métrico de distancias, clasificación del Radar S-13 y exportación a formato GeoJSON estándar.
+
+---
+
+## 📜 Versiones Anteriores
+
+### [v0.1.0-alpha.43] — 4 de Noviembre, 2026
+**Optimización de Agenda Teocrática, Deduplicación de Asignaciones, Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores**
+
+- ⚡ **Optimización de la Barra de Herramientas de Agenda Teocrática (`ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
+  - Barra de herramientas más limpia y despejada para alternar reuniones, semanas y vistas de forma intuitiva.
+  - Implementación de controladores de cierre al hacer clic fuera (*click-outside handlers*) para evitar menús o selectores flotantes atascados.
+- 🧩 **Deduplicación Estricta de Partes y Sanitización de Datos (`clmBridge.ts`, `clmDefaultProgram.ts`, `CongregationContext.tsx`):**
+  - Resolución determinista de identificadores únicos en partes de reunión (Tesoros, Maestros y Vida Cristiana).
+  - Erradicación definitiva de advertencias de claves duplicadas de React y prevención de colisiones en la sincronización de programas semanales.
+- 📖 **Aislamiento y Enfoque del Catálogo de Bosquejos y Programas (`OrganizedImportModal.tsx`, `organizedSync.ts`):**
+  - Reestructuración enfocada en búsqueda rápida de bosquejos públicos y carga de programas con aislamiento CSS contra interferencias de capas superiores (*overlays*).
+- 🔐 **Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores (`sensitiveFields.ts`, `CongregationContext.tsx`, `PublishersTab.tsx`, `usePublisherForm.ts`):**
+  - Desacoplamiento de la clave canónica de reposo V4 de tokens volátiles de sesión (`sessionPin`), garantizando descifrado determinista e inmediato a partir de la sal de dispositivo y la entropía no extraíble de IndexedDB.
+  - Implementación de evaluación de claves candidatas (`getCandidateKeysV4` y `getCandidateKeysV3`) para descifrado retrocompatible transparente de registros previos ante el tag MAC.
+  - Autocorrección reactiva en el contexto de congregación que detecta y descifra automáticamente campos huérfanos en memoria y restaura registros demo si falta la sesión.
+  - Blindaje visual defensivo en las tarjetas y tablas de publicadores (`getDisplayPhone`, `getDisplayAddress`, `sanitizeDisplayField`) impidiendo la renderización de cadenas crudas `kgr_sec4:...` en teléfonos, domicilios, colonias y correos, previniendo colisiones visuales de columnas mediante `truncate max-w-[170px]` y `gap-2`.
+- 🔔 **Centro Inteligente de Avisos y Recordatorios Teocráticos Automatizados (`ConflictsModal.tsx`, `Navbar.tsx`, `theocraticReminders.ts`):**
+  - **Detección proactiva en tiempo real:** Supervisión continua de asignaciones no confirmadas de la semana entrante (con distintivo de urgencia `<48h`), turnos de carritos públicos sin cubrir o con cobertura parcial en los próximos 7 días, informes mensuales S-4 pendientes de recolección en ventana de cierre de mes y comprobantes de cuentas sin verificar.
+  - **Resolución en 1-clic:** Envío de recordatorios personalizados y amables por WhatsApp y confirmación directa de asignaciones sin salir del modal.
+  - **Notificaciones Nativas del Sistema Operativo (`Notification API`):** Alertas locales de escritorio en PC (Tauri / Linux / Windows / macOS) y dispositivos móviles PWA con panel de estado y prueba en vivo.
+- 📡 **Centro de Transferencia Directa Local Salón P2P & QR Offline-First (`LocalP2PTransferModal.tsx`, `p2pTransferEngine.ts`):**
+  - **100% Sin Internet:** Intercambio directo de datos teocráticos entre hermanos en el Salón del Reino sin necesidad de cobertura móvil ni servidores externos.
+  - **Transferencia Modular por Rol:** Permite compartir únicamente lo necesario (programa de reuniones para sonido/plataforma, informes de servicio S-4 para secretaría, territorios S-13 o copia de seguridad completa).
+  - **Código QR Comprimido de Alta Densidad:** Compresión nativa en memoria con `CompressionStream ('deflate')` para transferir programas completos en un único código QR escaneable con cámara móvil o archivo de imagen.
+  - **Fusión Diferencial Inteligente:** Opción de integrar y combinar novedades respetando el historial existente sin sobrescribir módulos no relacionados.
+- 📄 **Generación Resiliente Dual de Documentos Oficiales en 1-Clic (`TarjetasS21Tab.tsx`, `S89SlipsTab.tsx`, `ClmScheduleView.tsx`, `ScheduleTab.tsx`, `pdfGenerator.ts`):**
+  - **Experiencia sin bloqueos:** Los hermanos encargados ya no son bloqueados con advertencias o pantallas de carga obligatoria al descargar tarjetas de publicador (S-21) u hojas de asignación estudiantil (S-89).
+  - **Vía Dual Automática:** Si la congregación cargó el archivo oficial de JW Hub en su bóveda IndexedDB, se rellenan los campos AcroForm con fidelidad milimétrica; si no lo cargó (o si la plantilla presenta incompatibilidad), Kongre genera instantáneamente el documento PDF vectorial de alta resolución en un solo clic.
+  - **Generador por lotes S-89:** Nueva función `generateS89PdfFromSlips` y `buildS89PdfDocFromSlips` para estructurar automáticamente asignaciones estudiantiles en cuadrículas de 4 por página.
+
+---
+
+## 📜 Versiones Anteriores
+
+### [v0.1.0-alpha.42] — 4 de Noviembre, 2026
+**Elevación Completa al Sistema Linear + Apple Bento (Editor de Publicadores, Modales y Vistas Teocráticas), Consolidación del Panel Eléctrico en Mantenimiento, Revocación Inmediata de Credenciales, Panel de Auditoría para Ancianos, Panel Offline con IndexedDB y Visor Interactivo PDF**
+
+- 🍱 **Elevación Integral de las 10 Subsecciones del Editor de Publicadores (`PublisherEditor/sections/*`):**
+  - Migración sistemática de todas las tarjetas y subpaneles internos al sistema Bento (`.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, bordes translúcidos `border-zinc-200/80 dark:border-white/10` y esquinas suaves `rounded-3xl`).
+  - **Identidad Básica (`BasicInfoSection.tsx`):** Tarjetas Bento para cabecera demográfica con insignia de género `.kg-glow-badge`, núcleo familiar para coincidencia de noches de reunión y matriz de habilidades de mantenimiento del salón.
+  - **Contacto y Movilidad (`ContactSection.tsx`):** Tarjetas Bento para canales de pastoreo, integración GPS con enlaces directos a mapas y logística de vehículos/transporte para contingencias.
+  - **Contactos de Emergencia (`EmergencyContactsSection.tsx`):** Tarjeta Bento con badge de urgencia `.kg-glow-badge` y buscador congregacional para importación rápida.
+  - **Privilegios Teocráticos y Nombramiento S-21 (`PrivilegesSection.tsx`):** Contenedores Bento para clasificación eclesiástica S-21, línea de tiempo espiritual, servicio de precursor, pastoreo pastoral y departamentos de congregación.
+  - **Asignaciones Teocráticas y Tareas Operativas S-89 (`AssignmentsSection.tsx`):** Tarjeta Bento para parámetros de estudiante S-38 / orador público y catálogo de habilitaciones teocráticas por áreas.
+  - **Registro de Publicador S-21 (`S21RecordsSection.tsx`):** Tarjeta Bento con visualización SVG integrada de curva de actividad anual (horas, cursos bíblicos y horas acreditadas).
+  - **Directriz Médica Anticipada DPA (`MedicalDpaSection.tsx`):** Tarjeta Bento con cinta de vigencia, representantes de salud designados y consideraciones de emergencia para el CLH.
+  - **Condiciones Especiales y Accesibilidad (`SpecialConditionsSection.tsx`):** Tarjeta Bento con indicadores de salud, acomodación en el salón y control de traslado de congregación.
+  - **Credenciales de Acceso y PIN Personal (`AccessCredentialsSection.tsx`):** Tarjeta Bento con badge de llave `.kg-glow-badge`, copiado rápido y compartición segura por WhatsApp.
+  - **Ausencias y Notas Administrativas (`AbsenceAndNotesSection.tsx`):** Tarjetas Bento en cuadrícula de dos columnas para calendario preventivo de ausencias y bloc de notas de secretaría.
+- ⚡ **Consolidación del Panel de Disyuntores Eléctricos en Mantenimiento (`ElectricalPanelModal.tsx`, `MantenimientoTab.tsx`, `GlobalSectionQuickBar.tsx`):**
+  - Desacoplamiento del panel de disyuntores de la barra de navegación rápida global para integrarlo de forma natural y cohesionada dentro de la pestaña de **Mantenimiento del Salón del Reino**.
+  - Nueva tarjeta Bento lanzadora con métricas de circuitos activos y modal flotante de alta resolución (`ElectricalPanelModal`) para la inspección y maniobra de disyuntores de cabina.
+- 🎨 **Elevación Arquitectónica al Sistema Linear + Apple Bento en Modales y Pestañas Auxiliares (`src/components/*`):**
+  - Unificación visual de más de 35 modales y pantallas departamentales con `.kg-card-bento`, `.kg-glass-surface` y `.kg-sheen-top` en los 4 temas del sistema (Claro, Oscuro, Sepia y Cabina A/V).
+  - Cobertura completa en modales de asignaciones estudiantiles S-89, historial pedagógico S-38, sustituciones, carritos de predicación pública, grupos de servicio, informes S-4, precursores S-205b, informe mensual a la sucursal S-1, hospitalidad, oradores visitantes, visitas del superintendente de circuito y asambleas.
+
+- 🚫 **Erradicación Total de Diálogos Nativos del Navegador (`ModalContext.tsx`, `StudyInspectorPanel.tsx`, `PersonalViewTab.tsx`, `TerritoriosTab.tsx`, `CleaningDutiesTab.tsx`, `InformeSucursalS1Tab.tsx`, `ErrorBoundary.tsx`):**
+  - Eliminación definitiva de todos los cuadros de diálogo intrusivos del navegador (`window.confirm`, `window.alert`, avisos de "localhost dice...") que interrumpían la experiencia de usuario.
+  - Sustitución integral por modales estilizados con la estética teocrática de Kongre (`useModal` con soporte para confirmaciones de peligro/advertencia/información) y notificaciones toast no invasivas (`useToast`).
+  - Cobertura completa en la eliminación de notas del panel de estudio JW, desactivación de 2FA, reseteo de caché en pantalla de error, gestión de territorios y turnos de limpieza.
+- ⬆️ **Botón Flotante Reactivo de Retorno al Inicio (`ScrollToTopButton.tsx`, `App.tsx`):**
+  - Implementación de un botón flotante con anillo SVG circular de progreso dinámico que refleja visualmente el porcentaje de avance de lectura/scroll en la pantalla.
+  - Aparición suave con animación (`motion/react`) tras rebasar el umbral de desplazamiento, con micro-animaciones en hover y retroalimentación táctil interactiva.
+  - Posicionamiento inteligente adaptativo: respeta la barra inferior de navegación móvil (`bottom-20 md:bottom-6`) y ajusta automáticamente su margen lateral cuando el panel de estudio acoplado JW está abierto (`lg:right-[436px]`).
+  - Acción de retorno fluido (`smooth scroll`) instantánea en cualquier plataforma (Web, PWA y Tauri Desktop).
+- 📝 **Panel de Estudio y Notas Teocráticas JW Rediseñado (`StudyInspectorPanel.tsx`):**
+  - Transformación integral de la experiencia del panel acoplado, enfocándolo exclusivamente en la toma ágil de notas personales, anotaciones de estudio y referencias teocráticas sin distracciones ni saturación visual.
+- 🛡️ **Revocación y Sustitución de Credenciales Teocráticas (`CredentialRevocationModal.tsx`, `SecurityContext.tsx`, `types/index.ts`):**
+  - Implementación del modal teocrático de revocación inmediata de credenciales y PINs ante contingencias de seguridad, con categorización de motivos oficiales (`olvido`, `extravio_robo`, `rotacion_rutinaria`, `sospecha_compromiso`, `desasociacion_baja`).
+  - Generación instantánea de nuevo PIN numérico de 6 dígitos con entropía criptográfica y opción de reemplazo asistido.
+  - Registro auditable del evento con fecha, hora, motivo, detalles y actor responsable, invalidando las credenciales anteriores sin desestabilizar la sesión local.
+- 👨‍💼 **Panel de Auditoría de Códigos y Canjes para Ancianos (`ElderCodeRedemptionsPanel.tsx`, `UserProfileSettingsView.tsx`, `AccessCredentialsSection.tsx`):**
+  - Nuevo panel exclusivo para el cuerpo de ancianos en la sección de seguridad de usuarios, facilitando la supervisión exhaustiva de accesos y canjes de invitaciones.
+  - Identificación detallada del hardware vinculado por publicador: tipo de dispositivo (móvil, tablet, escritorio), navegador web, sistema operativo y fecha/hora de canje.
+  - Pestaña de historial de revocaciones para trazabilidad teocrática completa y botón directo para revocar o rotar credenciales en caliente.
+  - Integración de tarjetas de estado de canje e historial de revocaciones en el editor de publicadores del directorio.
+- 📱 **Monitoreo de Dispositivos y Solicitud de Cambio de PIN (`ProfileDevicesAndCodesSection.tsx`, `PinManagementModal.tsx`, `pinChangeRequestsService.ts`):**
+  - Visualización transparente para cada publicador en su perfil personal de sus dispositivos activos vinculados, ID de hardware enmascarado y geolocalización aproximada segura basada en zona horaria (`detectApproximateLocation`).
+  - Capacidad de cerrar sesiones remotas y auditar la actividad de acceso.
+  - Modal y servicio para enviar solicitudes de cambio de PIN dirigidas a los ancianos, con almacenamiento local en IndexedDB/localStorage y sincronización en la nube con Supabase.
+- 🌐 **Panel Integral de Sincronización y Estado Offline (`OfflineDashboard.tsx`, `App.tsx`):**
+  - Sustitución del antiguo modal de cola por un panel integral de diagnóstico sin conexión y almacén local.
+  - Resumen en tiempo real del inventario de datos en caché local: publicadores activos, semanas lectivas, informes de servicio (S-4/S-21), territorios, avisos, eventos, cuentas y literatura.
+  - Inspección exhaustiva de la cola de mutaciones pendientes en IndexedDB, con botones para forzar sincronización manual inmediata y depuración de operaciones completadas.
+- 📄 **Visor Interactivo y Navegación de Documentos PDF (`ExportPdfTab.tsx`, `package.json`):**
+  - Incorporación de la biblioteca `react-pdf` (`v11.0.0`) y configuración del worker local y fallback en CDN.
+  - Visor interactivo con controles de cambio de página (`ChevronLeft` / `ChevronRight`), zoom incremental multinivel (`ZoomIn` / `ZoomOut`), rotación de pliegos (`RotateCw`), botón de ajuste a pantalla y visor a pantalla completa.
+- 🔄 **Indicador Reactivo de Sincronización en Tiempo Real (`Navbar.tsx`):**
+  - Anillo luminoso dinámico y badge contextual en el avatar del usuario con tres estados: Sincronizando (ámbar), Sin Conexión (rosa pulsante) y En Línea (esmeralda).
+  - Contador visual en vivo de mutaciones pendientes en cola local (`pendingOfflineCount`).
+  - Sincronización manual forzada con un solo toque directamente desde el avatar o estado, con toast de confirmación y feedback táctil.
+- 🤖 **Autoasignación Inteligente para Fin de Semana y Programa Completo (`ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
+  - Autoasignación simultánea con un solo clic de Entre Semana (VMC) y Fin de Semana (`handleAutoAssignAllMeetings`).
+  - Algoritmo especializado para la Reunión de Fin de Semana (`handleAutoAssignWeekendOnly`) seleccionando automáticamente hermanos varones aptos para Presidente, Lector de La Atalaya y Oraciones según privilegios y rotación histórica.
+  - Almacenamiento local preventivo en `localStorage` de las asignaciones generadas (`clm_programa_${date}`).
+- ⚡ **Barra Superior de Acceso Rápido Departamental (`GlobalSectionQuickBar.tsx`, `App.tsx`):**
+  - Integración de una barra de navegación rápida en la cabecera para transicionar ágilmente entre los departamentos principales (Ministerio Personal, Reuniones, Secretaría, Territorios, Servicios y Finanzas) sin fricción de menús secundarios.
+- 🎛️ **Matriz Contextual de Herramientas Rápidas por Rol (`ResumenInicioTab.tsx`):**
+  - Componente adaptativo `QuickAccessGrid` con accesos rápidos y badges contextuales adaptados al rol teocrático activo (Secretario, Anciano/Coordinador, Auxiliar de VMC, Superintendente de Servicio/Grupo y encargados departamentales de Cuentas, Literatura o Mantenimiento).
+- 📋 **Acceso Prominente al Registro de Asistencia S-88 (`PanoramaGeneralTab.tsx`):**
+  - Tarjeta ejecutiva destacada en el panorama general con métricas en vivo de asistencia presencial y por videoconferencia (Zoom) de la semana corriente y botón de registro directo.
+- 📇 **Auto-consulta S-21 y Solicitud Directa de PIN en Pantalla de Bloqueo (`PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
+  - Acceso directo a la subpestaña de tarjetas personales S-21 dentro de Mi Ministerio para auto-consulta del historial de predicación.
+  - Enlace de asistencia inmediata en la pantalla de desbloqueo de PIN personal para solicitar reemplazo de PIN al cuerpo de ancianos en caso de olvido o pérdida de equipo.
+- 🛡️ **Bandeja de Gestión de Solicitudes de PIN para Ancianos (`RolesManagerTab.tsx`):**
+  - Pestaña de administración y resolución inmediata de solicitudes de PIN emitidas por los publicadores, permitiendo aprobar y generar credenciales seguras con un solo toque y registro de auditoría.
+- 📦 **Consolidación del Ecosistema de Paquetes con Bun (`bun.lock`, `package-lock.json`):**
+  - Migración definitiva del gestor de dependencias a Bun (`bun.lock`), eliminando más de 9.000 líneas redundantes de `package-lock.json` y optimizando la velocidad del ciclo de desarrollo.
+
+---
+
+### [v0.1.0-alpha.41] — 31 de Octubre, 2026
+**Estandarización Visual Táctil Neutra JW Library, Erradicación de Paneles de Color Saturados, Depuración del Catálogo y Aislamiento de Reuniones**
+
+- 🎨 **Estandarización Estética Integral Estilo JW Library (`index.css`, `CleaningDutiesTab.tsx`, `CarritosTab.tsx`, `CategoryHubTab.tsx`, componentes de la aplicación):**
+  - Erradicación sistemática de paneles inundados de color saturado (fondos rojizos `bg-rose-950/20`, púrpuras, ámbar y esmeraldas intensos) que causaban fricción y fatiga visual en modo oscuro.
+  - Adopción universal de superficies táctiles oscuras de alto contraste (`#121216` y `#18181F`) con bordes de zinc precisos (`#27272A`), botones de acción principal en contraste monocromático (`bg-zinc-900` / `dark:bg-white`) y botones táctiles neutros de apoyo.
+  - Sustitución de cajas de advertencia saturadas por micropuntos semánticos sutiles (`w-1.5 h-1.5`) para señalar estados de cobertura, alertas de choques e indicadores de condición.
+- 🗂️ **Depuración y Simplificación del Catálogo de Módulos (`CategoryHubTab.tsx`):**
+  - Eliminación de la barra horizontal superior de categorías y campo de búsqueda redundante, permitiendo que la pantalla principal cargue directamente con los departamentos teocráticos ordenados y sin barreras de navegación.
+  - Supresión de botones de filtro secundarios (*"Ver solo..."*) para una experiencia limpia y libre de distracciones.
+- 🏛️ **Aislamiento Departamental Estricto de Reuniones (`CategoryHubTab.tsx`, `Navbar.tsx`):**
+  - Desacoplamiento total del ministerio personal respecto a la administración de las reuniones de congregación.
+  - Al acceder a **Reuniones**, la vista presenta exclusivamente sus 4 módulos teocráticos: *Programa de Reuniones* (Vida y Ministerio Cristianos y Fin de Semana), *Hojas de Asignación S-89*, *Discursos Públicos* y *Hospitalidad de Oradores*.
+  - El ministerio personal (cronómetro de horas, revisitas, estudios bíblicos y portal S-4) permanece aislado en el portal privado del publicador (`inicio`).
+- 🧹 **Neutralización en Servicios de la Congregación y Predicación con Carritos (`CleaningDutiesTab.tsx`, `CarritosTab.tsx`):**
+  - Transformación del *Detector de Choques en Deberes* hacia tarjetas ejecutivas neutras con microindicadores de conflicto y botones táctiles de reemplazo.
+  - Estandarización de las tarjetas de turnos de carritos, matriz de equidad, tarjetas de métricas KPI y badges de parejas familiares.
+
+---
+
 ### [v0.1.0-alpha.40] — 29 de Octubre, 2026
 **Compartimentos Zero-Trust (Envelope Encryption), Validación Estricta de PINs, Pipeline CI con Barrera de Release y CSP Estricto en PC**
 

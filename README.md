@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.40-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.40" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.45-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.45" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,20 +44,43 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.40`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.45`)
 
-Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
+Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](DESKTOP_RUST.md).
 
-### 🔐 Seguridad: PINs Personales v2 con Sal por Publicador y Mínimo de 6 Dígitos
-- **Sal PBKDF2 Única por Publicador:** Derivación criptográfica con `kongre-personal-pin-v2|congId|publisherId` para asegurar que verificadores de publicadores con PINs idénticos no compartan hash en base de datos.
-- **Migración Transparente y Suave:** Adopción automática a v2 en el próximo sync del coordinador sin intervención manual ni cortes de servicio.
-- **Mínimo de 6 Dígitos:** Incremento de la longitud mínima requerida para nuevos PINs personales para una protección robusta contra ataques de diccionario y fuerza bruta.
+### 🔒 Blindaje Criptográfico de Tokens a 600.000 PBKDF2 y Concurrencia Optimista
+- **Tokens de Autenticación a 600k PBKDF2:** Elevación de las iteraciones de derivación para los tokens de autenticación de PIN (`syncApi.ts`), garantizando paridad con el cifrado de datos AES-256-GCM y eliminando el camino más económico para ataques offline. Incluye derivación dual y migración transparente de verificadores en servidor.
+- **Detección de Conflictos de Guardado (ETag / Versión):** Control de concurrencia optimista (`core.ts`, `supabaseSyncService.ts`) que rechaza sobrescrituras accidentales con HTTP `409 Conflict` cuando dos ancianos guardan simultáneamente desde dispositivos diferentes.
+- **Soporte de Passphrases de Alta Entropía:** Formateador de PIN de congregación ampliado hasta 24 caracteres alfanuméricos (`XXXX-XXXX-XXXX...`), habilitando claves de más de 60 bits de entropía.
+- **Sanitización Exhaustiva en Almacenamiento Local:** Confirmación de que todas las vías de persistencia en `localStorage` ejecuten `sanitizePublishersForLocalStorage`, suprimiendo credenciales en texto claro y cifrando datos sensibles (salud y contactos de emergencia).
+- **CSPRNG Seguro:** Reemplazo de generadores pseudoaleatorios por CSPRNG criptográficamente seguros (`crypto.getRandomValues`) en `publisherDeduplication.ts`.
 
-### 🛡️ Endurecimiento de Seguridad CSP en la App de Escritorio
-- **Content Security Policy Estricto en Tauri:** Reemplazo de directiva abierta por reglas rigurosas sin scripts inline y restricción estricta de conexiones a Supabase, mapas y GitHub Releases.
+### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
+- **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.
+- **Editor de Publicadores 100% Bento (10 Subsecciones):** Transformación integral de las 10 subsecciones de `PublisherEditor/sections/*` (`BasicInfoSection`, `ContactSection`, `EmergencyContactsSection`, `PrivilegesSection`, `AssignmentsSection`, `S21RecordsSection`, `MedicalDpaSection`, `SpecialConditionsSection`, `AccessCredentialsSection`, `AbsenceAndNotesSection`) a contenedores `.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, insignias con halo `.kg-glow-badge` y bordes de cristal `rounded-3xl`.
+- **Consolidación del Panel Eléctrico en Mantenimiento:** Integración como submódulo y modal especializado (`ElectricalPanelModal`) dentro del módulo de Mantenimiento del Salón del Reino, optimizando el espacio en la barra superior global.
+- **Superficies Translúcidas de Cristal (`.kg-glass-surface` & `.kg-sheen-top`):** Tarjetas y modales con `backdrop-blur-md` / `backdrop-blur-xl`, reflejos sutiles en el borde superior (*specular sheen*) y elevación fluida sin sombras opacas excesivas.
+- **Jerarquía Bento Asimétrica (`.kg-card-bento`):** Cuadrículas asimétricas de alto impacto en vistas ejecutivas, métricas KPI con resplandor radial suave y microinteracciones de entrada de escala 0.98 a 1.
+- **Insignias Vivas (`.kg-glow-badge`):** Contenedores de iconos con halo difuso de acento que destacan el rol teocrático y el contexto de cada diálogo.
+- **Conmutadores Segmentados Estilo Apple:** Píldoras de selección en una sola pieza táctil para alternar semanas, filtros, roles y modos operativos sin pestañas toscas.
+- **Erradicación Total de Diálogos Nativos:** Cero uso de `window.alert()`, `confirm()` o `prompt()` nativos en favor de una experiencia inmersiva fluida en los 4 temas del sistema (Claro, Oscuro `#09090b`/`#121216`, Sepia `#f4ecd8` y Cabina A/V `#000000`).
+- **Verificación Rigurosa y Cero Regresiones:** 92 pruebas unitarias y E2E completamente aprobadas (`92 pass, 0 fail`) y verificación estricta de tipos de TypeScript sin errores (`tsc --noEmit`).
 
-### 🧩 Resiliencia de Contexto y Estabilidad de Renderizado
-- **Prevención de Excepciones de Montaje:** Hook `useOptionalCongregation()` y estado seguro `FALLBACK_CONGREGATION_CONTEXT` para blindar componentes globales y evitar pantallas rojas de error.
+### 🔐 Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores
+- **Descifrado Transparente en Reposo (V4):** Desacoplamiento de la clave de reposo de tokens de sesión volátiles, garantizando el descifrado inmediato de campos confidenciales (teléfono, dirección, notas y directriz médica) desde almacenamiento local mediante sal de dispositivo y entropía IndexedDB no extraíble.
+- **Blindaje Visual Defensivo:** Erradicación de fugas de cadenas cifradas (`kgr_sec4:...`) en pantalla y contención estricta de desbordamientos horizontales en tarjetas Bento y vistas tabulares del directorio.
+
+### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
+- **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.
+- **Panel de Auditoría de Códigos y Hardware:** Visualización exhaustiva para ancianos de hardware vinculado (móvil, tablet, PC), navegadores, sistemas operativos y fecha/hora de canje para cada publicador, con historial de revocaciones.
+
+### 🌐 Centro de Control Offline y Respaldo en IndexedDB
+- **Dashboard Diagnóstico Offline:** Inspección en tiempo real de registros en caché (publicadores, semanas, informes S-4/S-21, territorios, eventos) y cola de mutaciones con forzado manual de sincronización.
+- **Anillo Reactivo en Cabecera:** Indicador visual de estado (Sincronizando / Desconectado / En línea) en el avatar con contador en vivo de cambios pendientes y sincronización en 1 clic.
+
+### 📄 Visor PDF Interactivo y Autoasignación Inteligente
+- **Navegación Fluida de Documentos PDF:** Integración de `react-pdf` con paginación, zoom multinivel, rotación y modo pantalla completa.
+- **Autoasignación Integral de Reuniones:** Asignación coordinada de Entre Semana (VMC) y Fin de Semana con filtro por hermanos cualificados y rotación equitativa.
 
 ### 📖 Sincronización Bíblica y Programa CLM/VMC Actualizado
 - **Alineación con Jeremías 38 a 48:** Actualización de cronogramas semanales, lectura bíblica asignada, perlas escondidas y estudio bíblico de congregación.
@@ -89,7 +112,7 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 ### 🔐 Seguridad Cero Conocimiento (Fase 2) y Bóveda Criptográfica en Reposo
 - **Bóveda no extraíble `atRestVault`:** Almacenamiento seguro con clave criptográfica AES-256 no extraíble (`extractable: false`) en IndexedDB (`kongre_vault_db`).
 - **Token de Rol Firmado en Servidor (`kgr_srt1` HMAC-SHA256):** Validación en Edge Function de privilegios que impide la manipulación no autorizada en DevTools o variables locales.
-- **Protección de Datos Médicos DPA y Notas:** Cifrado en modo CTR con nonce CSPRNG (`kgr_sec4:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
+- **Protección de Datos Médicos DPA y Notas:** Cifrado AES-256-GCM con subclave por registro (`kgr_sec5:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
 
 ---
 
@@ -97,10 +120,10 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 | Módulo | Icono Oficial | Descripción y Funcionalidades |
 | :--- | :---: | :--- |
-| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de plantillas oficiales **S-89** en PDF y control de sustituciones en tiempo real. |
+| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de asignaciones oficiales **S-89** en PDF (con vía dual: AcroForm oficial o generador vectorial nativo en 1 clic) y control de sustituciones en tiempo real. |
 | **Reunión Pública y Fin de Semana** | `discursos.svg` | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
 | **Territorios y Cartografía** | `predicacion.svg` | Cartografía interactiva con Leaflet y OpenStreetMap, polígonos de manzanas, asignaciones **S-13**, códigos QR para publicadores y registro de turnos en carritos públicos. |
-| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA y deduplicación inteligente de registros. |
+| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA, tarjetas **S-21** en PDF con generación nativa resiliente y deduplicación inteligente de registros. |
 | **Asistencia a las Reuniones (S-88)** | `secretaria.svg` | Registro numérico presencial vs. Zoom, cálculo automático de promedios mensuales y gráficas analíticas por año de servicio con Recharts. |
 | **Informes del Servicio del Campo** | `informes_servicio.svg` | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales. |
 | **Cuentas y Mantenimiento del Salón** | — | Libro de transacciones de congregación, arqueo de fondos, inventario físico de publicaciones y diagrama del panel de disyuntores eléctricos de cabina. |
@@ -113,8 +136,8 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 | :--- | :--- |
 | **Frontend Web** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/) |
 | **Escritorio Nativo** | [Rust 2021](https://www.rust-lang.org/), [Tauri v2](https://v2.tauri.app/) (Edge WebView2 en Windows, WebKitGTK en Linux, WebKit nativo en macOS) |
-| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema |
-| **Temas Visuales** | **Claro**, **Oscuro** y modo especial de alto contraste para cabina de audio/video |
+| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema y componentes **Linear + Apple Bento (`.kg-*`)** |
+| **Temas Visuales** | **Claro**, **Oscuro** (`#09090b`/`#121216`), **Sepia** (`#f4ecd8`) y modo especial de alto contraste para **Cabina A/V** (`#000000`) |
 | **Gráficos & Visualización** | [Recharts](https://recharts.org/) |
 | **Cartografía** | [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri World Imagery |
 | **Criptografía** | Web Crypto API nativa: AES-256-GCM, PBKDF2 (hasta 600.000 iteraciones), HMAC-SHA1 TOTP (RFC 6238), CSPRNG |
@@ -181,8 +204,8 @@ Kongre fue diseñado desde el primer día con los más estrictos estándares de 
 4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
 
 Las políticas legales completas están disponibles en:
-- [Términos y Condiciones](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/terms.html)
-- [Política de Privacidad y Protección de Datos](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/privacy.html)
+- [Términos y Condiciones](public/terms.html)
+- [Política de Privacidad y Protección de Datos](public/privacy.html)
 
 ---
 

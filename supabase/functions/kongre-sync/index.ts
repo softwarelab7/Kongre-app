@@ -76,21 +76,32 @@ const db: SyncDb = {
   },
 };
 
+const rawAllowedOrigins = Deno.env.get('ALLOWED_ORIGINS');
+const parsedOrigins = (rawAllowedOrigins || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter((s) => Boolean(s) && s !== 'false' && s !== 'none' && s !== 'null' && s !== 'undefined');
+
 const env = {
   pepper,
-  allowedOrigins: (Deno.env.get('ALLOWED_ORIGINS') || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter((s) => Boolean(s) && s !== 'false' && s !== 'none' && s !== 'null' && s !== 'undefined'),
+  allowedOrigins: parsedOrigins,
   legacyClaim: Deno.env.get('LEGACY_CLAIM') === 'true',
 };
 
 // Avisos de configuración al arrancar (visibles en Dashboard → Edge Functions → Logs).
 if (env.allowedOrigins.length === 0) {
-  console.warn(
-    'AVISO: ALLOWED_ORIGINS vacío; CORS responde "*" (cualquier origen). En producción define ALLOWED_ORIGINS ' +
-      '(incluye también los orígenes de la app de escritorio: tauri://localhost y http://tauri.localhost).'
-  );
+  if (rawAllowedOrigins) {
+    console.warn(
+      `AVISO: ALLOWED_ORIGINS está definido como "${rawAllowedOrigins}", pero no contiene ningún origen web válido. ` +
+        'Se usará fallback permisivo CORS "*" (o del originante). En producción define una lista separada por comas ' +
+        '(ej: https://www.kongre-app.com,tauri://localhost,http://localhost:3000).'
+    );
+  } else {
+    console.warn(
+      'AVISO: ALLOWED_ORIGINS no está configurado; CORS responderá a cualquier origen ("*"). ' +
+        'En producción define ALLOWED_ORIGINS (ej: https://www.kongre-app.com,tauri://localhost).'
+    );
+  }
 }
 if (env.legacyClaim) {
   console.warn('AVISO: LEGACY_CLAIM=true. Debe usarse solo durante la migración de congregaciones existentes; desactívalo después.');

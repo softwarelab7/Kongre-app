@@ -4,6 +4,7 @@ name: CI (tipos, tests y build)
 # Se puede ejecutar manualmente desde la pestaña Actions cuando se desee.
 on:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read

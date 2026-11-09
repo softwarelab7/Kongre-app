@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import App from './App.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { initAtRestVault } from './utils/atRestVault.ts';
+import { isDesktopApp } from './utils/platform.ts';
 import './index.css';
 import './kongre-autolock.css';
 
@@ -13,12 +14,18 @@ await initAtRestVault(2500).catch((err) => {
   console.warn('[atRestVault] Arranque con almacenamiento de respaldo:', err);
 });
 
+const isDesktop = isDesktopApp();
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <App />
-      <Analytics />
-      <SpeedInsights />
+      {!isDesktop && (
+        <>
+          <Analytics />
+          <SpeedInsights />
+        </>
+      )}
     </ErrorBoundary>
   </StrictMode>,
 );

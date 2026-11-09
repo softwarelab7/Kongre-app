@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -11,74 +11,14 @@ import { CongregationProvider, useCongregation } from './context/CongregationCon
 import { Navbar, ActiveTab } from './components/Navbar';
 import { isTabAllowedForRole, TheocraticRole, THEOCRATIC_ROLES } from './utils/rbac';
 import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature, verifyInvitationCodeMatch, decryptPinAtRest, encryptPinAtRest, isEncryptedPinAtRest, isSafeDemoMode } from './utils/theocraticSecurity';
-import { CongregationCalendar } from './components/CongregationCalendar';
-import { ScheduleTab } from './components/ScheduleTab';
-import ClmScheduleView from './components/ClmScheduleView';
-import { S89SlipsTab } from './components/S89SlipsTab';
-import { PublishersTab } from './components/PublishersTab';
-import { GruposServicioTab } from './components/GruposServicioTab';
-import { TerritoriosTab } from './components/TerritoriosTab';
-import { VisitaSuperintendenteTab } from './components/VisitaSuperintendenteTab';
-import { MemorialAsambleasTab } from './components/MemorialAsambleasTab';
-import { DiscursosPublicosTab } from './components/DiscursosPublicosTab';
-import { CarritosTab } from './components/CarritosTab';
-import { HospitalidadTab } from './components/HospitalidadTab';
-import { AsistenciaTab } from './components/AsistenciaTab';
-import { InformesServicioTab } from './components/InformesServicioTab';
-import { TarjetasS21Tab } from './components/TarjetasS21Tab';
-import { PrecursoresAuxiliaresTab } from './components/PrecursoresAuxiliaresTab';
-import { InformeSucursalS1Tab } from './components/InformeSucursalS1Tab';
-import { CuentasTab } from './components/CuentasTab';
-import { LiteraturaTab } from './components/LiteraturaTab';
-import { CleaningDutiesTab } from './components/CleaningDutiesTab';
-import { PanelElectricoTab } from './components/PanelElectricoTab';
-import { MantenimientoTab } from './components/MantenimientoTab';
-import { TableroAnunciosTab } from './components/TableroAnunciosTab';
-import { ConflictCenterTab } from './components/ConflictCenterTab';
-import { EquidadDashboardTab } from './components/EquidadDashboardTab';
-import { ExportPdfTab } from './components/ExportPdfTab';
-import { PersonalViewTab } from './components/PersonalViewTab';
-import { SettingsTab } from './components/SettingsTab';
-import { UserProfileSettingsView } from './components/UserProfileSettingsView';
-import { ConflictsModal } from './components/ConflictsModal';
-import { QrCodeModal } from './components/QrCodeModal';
-import { LocalP2PTransferModal } from './components/LocalP2PTransferModal';
-import { MeetingTimerModal } from './components/MeetingTimerModal';
-import { TableroSalonModal } from './components/TableroSalonModal';
-import { GlobalSearchModal } from './components/GlobalSearchModal';
-import { AssignmentConfirmationModal } from './components/AssignmentConfirmationModal';
-import { DigitalTerritoryModal } from './components/DigitalTerritoryModal';
-import { ThemeToggleModal } from './components/ThemeToggleModal';
-import { OfflineSyncBanner } from './components/OfflineSyncBanner';
-import { ResumenInicioTab } from './components/ResumenInicioTab';
-import { PanoramaGeneralTab } from './components/PanoramaGeneralTab';
-import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
-import { RolesManagerTab } from './components/RolesManagerTab';
-import { MobileMenuTab } from './components/MobileMenuTab';
-import { CategoryHubTab } from './components/CategoryHubTab';
 import { GlobalSectionQuickBar } from './components/GlobalSectionQuickBar';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
-import { SessionLockModal } from './components/SessionLockModal';
 import { AutoLockToastWarning } from './components/AutoLockToastWarning';
-import { JoinCongregationModal } from './components/JoinCongregationModal';
-import { InvitationManagerModal } from './components/InvitationManagerModal';
-import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
-import { KongreOfficialWebsite, WebsiteSection } from './components/KongreOfficialWebsite';
-import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
-import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
-import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
-import { PendingApprovalView } from './components/PendingApprovalView';
-import { PublisherPinsModal } from './components/PublisherPinsModal';
-import { AuditLogModal } from './components/AuditLogModal';
+import { OfflineSyncBanner } from './components/OfflineSyncBanner';
 import { AppFooter } from './components/AppFooter';
-import { VersionHistoryModal } from './components/VersionHistoryModal';
-import { DesktopUpdateModal } from './components/DesktopUpdateModal';
-import { checkForDesktopUpdate, DesktopUpdateInfo } from './services/desktopUpdateService';
+import { checkForDesktopUpdate, type DesktopUpdateInfo } from './services/desktopUpdateService';
 import { isDesktopApp } from './utils/platform';
-import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
-import { OfflineDashboard } from './components/OfflineDashboard';
-import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { Building2, ArrowLeft, AlertTriangle } from 'lucide-react';
@@ -93,6 +33,83 @@ import { ModalProvider } from './context/ModalContext';
 import { StudyInspectorProvider, useStudyInspector } from './context/StudyInspectorContext';
 import { StudyInspectorPanel } from './components/jw';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
+import type { WebsiteSection } from './components/KongreOfficialWebsite';
+
+// Helper para carga diferida de exportaciones nombradas (Code-Splitting)
+function lazyNamed<T extends Record<string, any>, K extends keyof T>(
+  factory: () => Promise<T>,
+  key: K
+): React.LazyExoticComponent<T[K]> {
+  return React.lazy(() => factory().then((m) => ({ default: m[key] })));
+}
+
+// ---------------------------------------------------------------------------
+// PESTAÑAS (TABS) PRINCIPALES CON CARGA DIFERIDA
+// ---------------------------------------------------------------------------
+const CongregationCalendar = lazyNamed(() => import('./components/CongregationCalendar'), 'CongregationCalendar');
+const ScheduleTab = lazyNamed(() => import('./components/ScheduleTab'), 'ScheduleTab');
+const ClmScheduleView = React.lazy(() => import('./components/ClmScheduleView'));
+const S89SlipsTab = lazyNamed(() => import('./components/S89SlipsTab'), 'S89SlipsTab');
+const PublishersTab = lazyNamed(() => import('./components/PublishersTab'), 'PublishersTab');
+const GruposServicioTab = lazyNamed(() => import('./components/GruposServicioTab'), 'GruposServicioTab');
+const TerritoriosTab = lazyNamed(() => import('./components/TerritoriosTab'), 'TerritoriosTab');
+const VisitaSuperintendenteTab = lazyNamed(() => import('./components/VisitaSuperintendenteTab'), 'VisitaSuperintendenteTab');
+const MemorialAsambleasTab = lazyNamed(() => import('./components/MemorialAsambleasTab'), 'MemorialAsambleasTab');
+const DiscursosPublicosTab = lazyNamed(() => import('./components/DiscursosPublicosTab'), 'DiscursosPublicosTab');
+const CarritosTab = lazyNamed(() => import('./components/CarritosTab'), 'CarritosTab');
+const HospitalidadTab = lazyNamed(() => import('./components/HospitalidadTab'), 'HospitalidadTab');
+const AsistenciaTab = lazyNamed(() => import('./components/AsistenciaTab'), 'AsistenciaTab');
+const InformesServicioTab = lazyNamed(() => import('./components/InformesServicioTab'), 'InformesServicioTab');
+const TarjetasS21Tab = lazyNamed(() => import('./components/TarjetasS21Tab'), 'TarjetasS21Tab');
+const PrecursoresAuxiliaresTab = lazyNamed(() => import('./components/PrecursoresAuxiliaresTab'), 'PrecursoresAuxiliaresTab');
+const InformeSucursalS1Tab = lazyNamed(() => import('./components/InformeSucursalS1Tab'), 'InformeSucursalS1Tab');
+const CuentasTab = lazyNamed(() => import('./components/CuentasTab'), 'CuentasTab');
+const LiteraturaTab = lazyNamed(() => import('./components/LiteraturaTab'), 'LiteraturaTab');
+const CleaningDutiesTab = lazyNamed(() => import('./components/CleaningDutiesTab'), 'CleaningDutiesTab');
+const PanelElectricoTab = lazyNamed(() => import('./components/PanelElectricoTab'), 'PanelElectricoTab');
+const MantenimientoTab = lazyNamed(() => import('./components/MantenimientoTab'), 'MantenimientoTab');
+const TableroAnunciosTab = lazyNamed(() => import('./components/TableroAnunciosTab'), 'TableroAnunciosTab');
+const ConflictCenterTab = lazyNamed(() => import('./components/ConflictCenterTab'), 'ConflictCenterTab');
+const EquidadDashboardTab = lazyNamed(() => import('./components/EquidadDashboardTab'), 'EquidadDashboardTab');
+const ExportPdfTab = lazyNamed(() => import('./components/ExportPdfTab'), 'ExportPdfTab');
+const PersonalViewTab = lazyNamed(() => import('./components/PersonalViewTab'), 'PersonalViewTab');
+const SettingsTab = lazyNamed(() => import('./components/SettingsTab'), 'SettingsTab');
+const UserProfileSettingsView = lazyNamed(() => import('./components/UserProfileSettingsView'), 'UserProfileSettingsView');
+const ResumenInicioTab = lazyNamed(() => import('./components/ResumenInicioTab'), 'ResumenInicioTab');
+const PanoramaGeneralTab = lazyNamed(() => import('./components/PanoramaGeneralTab'), 'PanoramaGeneralTab');
+const MinisterioPublicadorTab = lazyNamed(() => import('./components/MinisterioPublicadorTab'), 'MinisterioPublicadorTab');
+const RolesManagerTab = lazyNamed(() => import('./components/RolesManagerTab'), 'RolesManagerTab');
+const MobileMenuTab = lazyNamed(() => import('./components/MobileMenuTab'), 'MobileMenuTab');
+const CategoryHubTab = lazyNamed(() => import('./components/CategoryHubTab'), 'CategoryHubTab');
+
+// ---------------------------------------------------------------------------
+// MODALES Y VISTAS PESADAS CON CARGA DIFERIDA
+// ---------------------------------------------------------------------------
+const ConflictsModal = lazyNamed(() => import('./components/ConflictsModal'), 'ConflictsModal');
+const QrCodeModal = lazyNamed(() => import('./components/QrCodeModal'), 'QrCodeModal');
+const LocalP2PTransferModal = lazyNamed(() => import('./components/LocalP2PTransferModal'), 'LocalP2PTransferModal');
+const MeetingTimerModal = lazyNamed(() => import('./components/MeetingTimerModal'), 'MeetingTimerModal');
+const TableroSalonModal = lazyNamed(() => import('./components/TableroSalonModal'), 'TableroSalonModal');
+const GlobalSearchModal = lazyNamed(() => import('./components/GlobalSearchModal'), 'GlobalSearchModal');
+const AssignmentConfirmationModal = lazyNamed(() => import('./components/AssignmentConfirmationModal'), 'AssignmentConfirmationModal');
+const DigitalTerritoryModal = lazyNamed(() => import('./components/DigitalTerritoryModal'), 'DigitalTerritoryModal');
+const ThemeToggleModal = lazyNamed(() => import('./components/ThemeToggleModal'), 'ThemeToggleModal');
+const SessionLockModal = lazyNamed(() => import('./components/SessionLockModal'), 'SessionLockModal');
+const JoinCongregationModal = lazyNamed(() => import('./components/JoinCongregationModal'), 'JoinCongregationModal');
+const InvitationManagerModal = lazyNamed(() => import('./components/InvitationManagerModal'), 'InvitationManagerModal');
+const CongregationWelcomeLanding = lazyNamed(() => import('./components/CongregationWelcomeLanding'), 'CongregationWelcomeLanding');
+const KongreOfficialWebsite = lazyNamed(() => import('./components/KongreOfficialWebsite'), 'KongreOfficialWebsite');
+const RegisterCongregationWizard = lazyNamed(() => import('./components/RegisterCongregationWizard'), 'RegisterCongregationWizard');
+const AppLockPinSuggestionModal = lazyNamed(() => import('./components/AppLockPinSuggestionModal'), 'AppLockPinSuggestionModal');
+const AccountLinkRequestsModal = lazyNamed(() => import('./components/AccountLinkRequestsModal'), 'AccountLinkRequestsModal');
+const PendingApprovalView = lazyNamed(() => import('./components/PendingApprovalView'), 'PendingApprovalView');
+const PublisherPinsModal = lazyNamed(() => import('./components/PublisherPinsModal'), 'PublisherPinsModal');
+const AuditLogModal = lazyNamed(() => import('./components/AuditLogModal'), 'AuditLogModal');
+const VersionHistoryModal = lazyNamed(() => import('./components/VersionHistoryModal'), 'VersionHistoryModal');
+const DesktopUpdateModal = lazyNamed(() => import('./components/DesktopUpdateModal'), 'DesktopUpdateModal');
+const OfflineSyncQueueModal = lazyNamed(() => import('./components/OfflineSyncQueueModal'), 'OfflineSyncQueueModal');
+const OfflineDashboard = lazyNamed(() => import('./components/OfflineDashboard'), 'OfflineDashboard');
+const DemoNoticeModal = lazyNamed(() => import('./components/DemoNoticeModal'), 'DemoNoticeModal');
 
 export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   inicio: 'inicio',
@@ -1407,79 +1424,81 @@ const AppContent: React.FC = () => {
   // Full-page Version History / Changelog view (NO pop-up)
   if (isVersionModalOpen) {
     return (
-      <VersionHistoryModal
-        isOpen={true}
-        onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
-      />
+      <Suspense fallback={<LoadingSpinner isVisible={true} mode="fullscreen" message="Cargando historial de versiones..." />}>
+        <VersionHistoryModal
+          isOpen={true}
+          onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+        />
+      </Suspense>
     );
   }
 
   // Official Product Presentation & Documentation Website (www.kongre-app.com / root URL)
   if (showOfficialWebsite) {
     return (
-      <>
+      <Suspense fallback={<LoadingSpinner isVisible={true} mode="fullscreen" message="Cargando presentación de Kongre..." />}>
         <KongreOfficialWebsite
-        initialSection={websiteInitialSection}
-        onGoToPortal={(initialPortalTab) => {
-          try {
-            sessionStorage.setItem('kongre_portal_explicit_v2', 'true');
-          } catch {}
-          setShowOfficialWebsite(false);
-          if (initialPortalTab === 'register') {
-            setIsRegisterWizardOpen(true);
+          initialSection={websiteInitialSection}
+          onGoToPortal={(initialPortalTab) => {
+            try {
+              sessionStorage.setItem('kongre_portal_explicit_v2', 'true');
+            } catch {}
+            setShowOfficialWebsite(false);
+            if (initialPortalTab === 'register') {
+              setIsRegisterWizardOpen(true);
+              window.history.pushState(
+                { tab: activeTab, modal: 'registro_congregacion', landing: false, website: false },
+                '',
+                '#portal?modal=registro_congregacion'
+              );
+              return;
+            }
+            setShowWelcomeLanding(true);
             window.history.pushState(
-              { tab: activeTab, modal: 'registro_congregacion', landing: false, website: false },
+              { tab: activeTab, modal: null, landing: true, website: false },
               '',
-              '#portal?modal=registro_congregacion'
+              '#portal'
             );
-            return;
-          }
-          setShowWelcomeLanding(true);
-          window.history.pushState(
-            { tab: activeTab, modal: null, landing: true, website: false },
-            '',
-            '#portal'
-          );
-        }}
-        onStartDemoMode={() => {
-          loadDemoData();
-          setShowOfficialWebsite(false);
-          setShowWelcomeLanding(false);
-          sessionStorage.removeItem('kongre_show_landing');
-          localStorage.setItem('kongre_has_entered_app', 'true');
-          localStorage.setItem('kongre_is_guest', 'true');
-          setActiveTab('inicio');
-        }}
-        onOpenVersionModal={() => {
-          openModalWithHistory('versiones', setIsVersionModalOpen);
-        }}
-        isSignedInOrRegistered={isCongregationRegistered}
-        onEnterAppDirectly={() => {
-          setShowOfficialWebsite(false);
-          setShowWelcomeLanding(false);
-          setActiveTab('inicio');
-          window.history.pushState(
-            { tab: 'inicio', modal: null, landing: false, website: false },
-            '',
-            '#inicio'
-          );
-        }}
-      />
-      {/* Aviso de actualización para PC en la vista de presentación/web */}
-      <DesktopUpdateModal
-        isOpen={isDesktopUpdateOpen}
-        updateInfo={desktopUpdate}
-        onClose={() => setIsDesktopUpdateOpen(false)}
-      />
-      {/* Botón flotante para volver arriba */}
-      <ScrollToTopButton />
-    </>
-  );
-}
+          }}
+          onStartDemoMode={() => {
+            loadDemoData();
+            setShowOfficialWebsite(false);
+            setShowWelcomeLanding(false);
+            sessionStorage.removeItem('kongre_show_landing');
+            localStorage.setItem('kongre_has_entered_app', 'true');
+            localStorage.setItem('kongre_is_guest', 'true');
+            setActiveTab('inicio');
+          }}
+          onOpenVersionModal={() => {
+            openModalWithHistory('versiones', setIsVersionModalOpen);
+          }}
+          isSignedInOrRegistered={isCongregationRegistered}
+          onEnterAppDirectly={() => {
+            setShowOfficialWebsite(false);
+            setShowWelcomeLanding(false);
+            setActiveTab('inicio');
+            window.history.pushState(
+              { tab: 'inicio', modal: null, landing: false, website: false },
+              '',
+              '#inicio'
+            );
+          }}
+        />
+        {/* Aviso de actualización para PC en la vista de presentación/web */}
+        <DesktopUpdateModal
+          isOpen={isDesktopUpdateOpen}
+          updateInfo={desktopUpdate}
+          onClose={() => setIsDesktopUpdateOpen(false)}
+        />
+        {/* Botón flotante para volver arriba */}
+        <ScrollToTopButton />
+      </Suspense>
+    );
+  }
 
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
-      <>
+      <Suspense fallback={<LoadingSpinner isVisible={true} mode="fullscreen" message="Cargando bienvenida..." />}>
         {!isDesktopApp() && (
           <div className="w-full bg-[#121216] text-white px-3.5 sm:px-4 py-1.5 flex items-center justify-between gap-2 text-xs border-b border-[#27272A] z-50 shrink-0">
             <button
@@ -1560,17 +1579,19 @@ const AppContent: React.FC = () => {
           updateInfo={desktopUpdate}
           onClose={() => setIsDesktopUpdateOpen(false)}
         />
-      </>
+      </Suspense>
     );
   }
 
   // If registering congregation, show full-page registration view (NO pop-up)
   if (isRegisterWizardOpen) {
     return (
-      <RegisterCongregationWizard
-        onClose={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
-        onRegisteredSuccess={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
-      />
+      <Suspense fallback={<LoadingSpinner isVisible={true} mode="fullscreen" message="Cargando asistente de registro..." />}>
+        <RegisterCongregationWizard
+          onClose={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
+          onRegisteredSuccess={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
+        />
+      </Suspense>
     );
   }
 
@@ -1583,17 +1604,19 @@ const AppContent: React.FC = () => {
 
   if (userPendingReq) {
     return (
-      <PendingApprovalView
-        email={user?.email || ''}
-        onEnterApp={() => {
-          localStorage.setItem('kongre_has_entered_app', 'true');
-          setShowWelcomeLanding(false);
-        }}
-        onSignOut={async () => {
-          await signOutUser();
-          setShowWelcomeLanding(true);
-        }}
-      />
+      <Suspense fallback={<LoadingSpinner isVisible={true} mode="fullscreen" message="Verificando solicitud..." />}>
+        <PendingApprovalView
+          email={user?.email || ''}
+          onEnterApp={() => {
+            localStorage.setItem('kongre_has_entered_app', 'true');
+            setShowWelcomeLanding(false);
+          }}
+          onSignOut={async () => {
+            await signOutUser();
+            setShowWelcomeLanding(true);
+          }}
+        />
+      </Suspense>
     );
   }
 
@@ -1704,24 +1727,31 @@ const AppContent: React.FC = () => {
                 }}
                 className="w-full"
               >
-                {(activeTab === 'inicio' ||
-                  activeTab === 'cronometro_ministerio' ||
-                  activeTab === 'revisitas' ||
-                  activeTab === 'estudios_biblicos') && (
-                  <MinisterioPublicadorTab
-                    setActiveTab={setActiveTab}
-                    initialSubTab={
-                      activeTab === 'cronometro_ministerio'
-                        ? 'cronometro'
-                        : activeTab === 'revisitas'
-                        ? 'revisitas'
-                        : activeTab === 'estudios_biblicos'
-                        ? 'estudios'
-                        : 'resumen'
-                    }
-                    onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-                  />
-                )}
+                <Suspense
+                  fallback={
+                    <div className="py-24 flex items-center justify-center">
+                      <LoadingSpinner isVisible={true} mode="overlay" activeTab={activeTab} />
+                    </div>
+                  }
+                >
+                  {(activeTab === 'inicio' ||
+                    activeTab === 'cronometro_ministerio' ||
+                    activeTab === 'revisitas' ||
+                    activeTab === 'estudios_biblicos') && (
+                    <MinisterioPublicadorTab
+                      setActiveTab={setActiveTab}
+                      initialSubTab={
+                        activeTab === 'cronometro_ministerio'
+                          ? 'cronometro'
+                          : activeTab === 'revisitas'
+                          ? 'revisitas'
+                          : activeTab === 'estudios_biblicos'
+                          ? 'estudios'
+                          : 'resumen'
+                      }
+                      onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                    />
+                  )}
                 {activeTab === 'panorama_general' && (
                   <PanoramaGeneralTab setActiveTab={setActiveTab} />
                 )}
@@ -1819,6 +1849,7 @@ const AppContent: React.FC = () => {
                     onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
                   />
                 )}
+                </Suspense>
               </motion.div>
             </AnimatePresence>
           </>
@@ -1834,12 +1865,13 @@ const AppContent: React.FC = () => {
         />
       </main>
 
-      {/* Global Modals */}
-      <ConflictsModal
-        isOpen={isConflictsModalOpen}
-        onClose={() => closeModalWithHistory('conflictos', setIsConflictsModalOpen)}
-        onNavigateToWeek={handleNavigateToWeek}
-      />
+      {/* Global Modals con Carga Diferida (Code-Splitting) */}
+      <Suspense fallback={null}>
+        <ConflictsModal
+          isOpen={isConflictsModalOpen}
+          onClose={() => closeModalWithHistory('conflictos', setIsConflictsModalOpen)}
+          onNavigateToWeek={handleNavigateToWeek}
+        />
 
       <QrCodeModal
         isOpen={isQrModalOpen}
@@ -2005,15 +2037,16 @@ const AppContent: React.FC = () => {
         onAccepted={() => setHasAcceptedTermsState(true)}
       />
 
-      {/* Panel de Estudio e Inspector Acoplado (Zero Context-Switching JW) */}
-      <StudyInspectorPanel
-        isOpen={isInspectorOpen}
-        onClose={closeInspector}
-        activeReference={activeReference}
-        references={references}
-        activeAnnotation={activeAnnotation}
-        onSaveAnnotation={saveAnnotation}
-      />
+        {/* Panel de Estudio e Inspector Acoplado (Zero Context-Switching JW) */}
+        <StudyInspectorPanel
+          isOpen={isInspectorOpen}
+          onClose={closeInspector}
+          activeReference={activeReference}
+          references={references}
+          activeAnnotation={activeAnnotation}
+          onSaveAnnotation={saveAnnotation}
+        />
+      </Suspense>
 
       {/* Botón flotante para volver arriba de forma ágil */}
       <ScrollToTopButton isInspectorOpen={isInspectorOpen} />

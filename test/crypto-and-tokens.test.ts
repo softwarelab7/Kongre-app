@@ -327,7 +327,7 @@ test('auditoría: sanitización de actor NID y detalles contra tablas arcoíris 
   assert.equal(cleanClave, 'Cambio de clave = •••• exitoso');
 });
 
-test('Fase 2 Bóveda Local: Cifrado kgr_sec4 respaldado por IndexedDB para salud (DPA) y notas confidenciales', () => {
+test('Fase 2 Bóveda Local: Cifrado kgr_sec5 respaldado por IndexedDB para salud (DPA) y notas confidenciales', () => {
   const store: Record<string, string> = {};
   const mockStorage = {
     getItem: (k: string) => store[k] ?? null,
@@ -363,20 +363,20 @@ test('Fase 2 Bóveda Local: Cifrado kgr_sec4 respaldado por IndexedDB para salud
     },
   ];
 
-  // 2. Sanitizar para localStorage: todos los campos de salud DPA y notas deben cifrarse con kgr_sec4
+  // 2. Sanitizar para localStorage: todos los campos de salud DPA y notas deben cifrarse con kgr_sec5
   const sanitized = sanitizePublishersForLocalStorage(pubWithDpaAndNotes);
   const sPub = sanitized[0];
   assert.equal(sPub.personalPin, undefined, 'PIN no debe guardarse en claro');
   assert.ok(sPub.personalPinHash, 'Debe haber hash del PIN');
   assert.ok(sPub.encryptedPin?.startsWith('kgr_v4:'), 'El PIN de publicador debe estar en kgr_v4:');
-  assert.ok(sPub.phone.startsWith('kgr_sec4:'), 'Teléfono debe estar en kgr_sec4:');
-  assert.ok(sPub.healthcare_agent_name.startsWith('kgr_sec4:'), 'Representante DPA debe estar en kgr_sec4:');
-  assert.ok(sPub.healthcare_agent_phone.startsWith('kgr_sec4:'), 'Teléfono representante DPA debe estar en kgr_sec4:');
-  assert.ok(sPub.medical_allergies.startsWith('kgr_sec4:'), 'Alergias médicas deben estar en kgr_sec4:');
-  assert.ok(sPub.medical_conditions.startsWith('kgr_sec4:'), 'Condiciones médicas deben estar en kgr_sec4:');
-  assert.ok(sPub.dpa_date.startsWith('kgr_sec4:'), 'Fecha DPA debe estar en kgr_sec4:');
-  assert.ok(sPub.spiritual_notes.startsWith('kgr_sec4:'), 'Notas espirituales confidenciales deben estar en kgr_sec4:');
-  assert.ok(sPub.notes.startsWith('kgr_sec4:'), 'Notas generales deben estar en kgr_sec4:');
+  assert.ok(sPub.phone.startsWith('kgr_sec5:'), 'Teléfono debe estar en kgr_sec5:');
+  assert.ok(sPub.healthcare_agent_name.startsWith('kgr_sec5:'), 'Representante DPA debe estar en kgr_sec5:');
+  assert.ok(sPub.healthcare_agent_phone.startsWith('kgr_sec5:'), 'Teléfono representante DPA debe estar en kgr_sec5:');
+  assert.ok(sPub.medical_allergies.startsWith('kgr_sec5:'), 'Alergias médicas deben estar en kgr_sec5:');
+  assert.ok(sPub.medical_conditions.startsWith('kgr_sec5:'), 'Condiciones médicas deben estar en kgr_sec5:');
+  assert.ok(sPub.dpa_date.startsWith('kgr_sec5:'), 'Fecha DPA debe estar en kgr_sec5:');
+  assert.ok(sPub.spiritual_notes.startsWith('kgr_sec5:'), 'Notas espirituales confidenciales deben estar en kgr_sec5:');
+  assert.ok(sPub.notes.startsWith('kgr_sec5:'), 'Notas generales deben estar en kgr_sec5:');
 
   // 3. Restaurar en memoria con la bóveda activa: recupera exactamente los valores originales
   const restored = restorePublishersFromLocalStorage(sanitized);
@@ -391,11 +391,11 @@ test('Fase 2 Bóveda Local: Cifrado kgr_sec4 respaldado por IndexedDB para salud
 
   // 4. Prueba de aislamiento contra robo de dump de localStorage:
   // Si un atacante extrae localStorage sin la clave unextractable de IndexedDB (sin vaultSessionEntropy),
-  // kgr_sec4 no puede ser descifrado y devuelve el valor cifrado sin fugar texto claro.
+  // kgr_sec5 no puede ser descifrado y devuelve el valor cifrado sin fugar texto claro.
   setVaultSessionEntropyForTesting(null);
   const stolenDumpRestored = restorePublishersFromLocalStorage(sanitized);
-  assert.ok(stolenDumpRestored[0].medical_allergies.startsWith('kgr_sec4:'), 'Sin la bóveda no se puede descifrar');
-  assert.ok(stolenDumpRestored[0].spiritual_notes.startsWith('kgr_sec4:'), 'Sin la bóveda las notas no se descifran');
+  assert.ok(stolenDumpRestored[0].medical_allergies.startsWith('kgr_sec5:'), 'Sin la bóveda no se puede descifrar');
+  assert.ok(stolenDumpRestored[0].spiritual_notes.startsWith('kgr_sec5:'), 'Sin la bóveda las notas no se descifran');
 
   // 5. Retrocompatibilidad: Si existen datos antiguos en kgr_sec3 o kgr_sec2 se leen sin problemas
   setVaultSessionEntropyForTesting(null); // simular entorno básico
@@ -489,7 +489,8 @@ test('Bóveda Local: descifrado resiliente de campos sensibles ante cambios de P
   ];
 
   const sanitized = sanitizePublishersForLocalStorage(pub);
-  assert.ok(sanitized[0].phone.startsWith('kgr_sec4:'));
+  // kgr_sec5 no depende del PIN ni del ID de congregación: solo de la bóveda y del dispositivo.
+  assert.ok(sanitized[0].phone.startsWith('kgr_sec5:'));
 
   // Simular cambio o borrado de sesión (ej. recarga de página antes de autenticar o cambio de rol)
   delete store.kongre_session_pin_v2;

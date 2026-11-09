@@ -23,6 +23,9 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Aseguramiento de que todas las ramas de guardado de publicadores en `localStorage` pasen por `sanitizePublishersForLocalStorage`, eliminando PINs en claro y garantizando el cifrado en reposo de datos médicos y contactos de emergencia.
 - 🎲 **CSPRNG Criptográfico sin Degradación (`publisherDeduplication.ts`):**
   - Uso estricto de `secureRandomInt` sobre Web Crypto API para códigos inmutables de publicador, eliminando dependencias de Node.js o degradaciones no seguras.
+- 🔐 **Cifrado en Reposo con AES-256-GCM Estándar (`kgr_sec5`) (`sensitiveFields.ts`, `sec5-aes-gcm.test.ts`):**
+  - Los campos sensibles locales (teléfonos, direcciones, salud/DPA, notas, visitas de pastoreo) se cifran ahora con AES-256-GCM (`@noble/ciphers` 2.4.0, sin dependencias) con subclave aleatoria por registro, en lugar del esquema CTR + MAC propio (`kgr_sec4`). La clave nace de la entropía de la bóveda y el salt del dispositivo, sin PIN.
+  - Retrocompatibilidad total: `kgr_sec4`, `kgr_sec3` y `kgr_sec2` se siguen leyendo y se migran solos a `kgr_sec5` en el siguiente guardado; un valor que no se pueda descifrar se conserva intacto.
 - 📜 **Alineación Normativa y Documentación de Seguridad (`SEGURIDAD.md`, `TermsAndPrivacyModal.tsx`, `public/privacy.html`, `README.md`):**
   - Transparencia explícita sobre el modelo E2EE a nivel de congregación y RBAC en cliente con tokens firmados por servidor (`kgr_srt1`).
   - Delimitación del estado de validación técnica de sobres criptográficos departamentales (`compartments.ts`).

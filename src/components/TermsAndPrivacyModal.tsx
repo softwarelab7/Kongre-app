@@ -283,7 +283,7 @@ export const ProfessionalPrivacyContent: React.FC = () => (
       </p>
       <ul className="list-disc list-inside space-y-2 pl-1 text-zinc-600 dark:text-[#D4D4D8]">
         <li>
-          <strong>Salvaguardas Criptográficas Reforzadas:</strong> Los datos de directivas médicas, contactos de emergencia y pastoreo confidencial se someten a cifrado granular en reposo (<code>kgr_sec4</code>) respaldado por la bóveda criptográfica local de IndexedDB con claves no extraíbles (<code>extractable: false</code>), y se excluyen permanentemente del paquete de sincronización pública.
+          <strong>Salvaguardas Criptográficas Reforzadas:</strong> Los datos de directivas médicas, contactos de emergencia y pastoreo confidencial se someten a cifrado granular en reposo con AES-256-GCM (<code>kgr_sec5</code>) respaldado por la bóveda criptográfica local de IndexedDB con claves no extraíbles (<code>extractable: false</code>), y se excluyen permanentemente del paquete de sincronización pública.
         </li>
         <li>
           <strong>Sanitización en Almacenamiento Local:</strong> Toda persistencia en el dispositivo ejecuta filtros de sanitización automática, suprimiendo PINs en texto plano y transformando credenciales en hashes criptográficos irreversibles.

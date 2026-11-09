@@ -56,7 +56,7 @@ El servidor nunca almacena ni conoce los PINs en texto claro. El cliente deriva 
 - La afiliación religiosa, directivas médicas (DPA / Voluntad Anticipada), contactos de emergencia e informes de servicio constituyen **datos de categoría especial**.
 - **Salvaguardas en Reposo:**
   - Toda persistencia en `localStorage` pasa obligatoriamente por `sanitizePublishersForLocalStorage`, eliminando PINs en texto claro y cifrando campos sensibles.
-  - La información médica confidencial y notas de pastoreo emplean cifrado local granular `kgr_sec4` respaldado por la bóveda `atRestVault` con CryptoKeys AES-GCM no extraíbles en IndexedDB.
+  - La información médica confidencial y notas de pastoreo emplean cifrado local granular `kgr_sec5` (AES-256-GCM con subclave por registro) cuya clave se deriva de la entropía de la bóveda `atRestVault` (CryptoKey no extraíble en IndexedDB) y del salt del dispositivo. El PIN ya no interviene en esta clave. Los formatos anteriores (`kgr_sec4`, `kgr_sec3`, `kgr_sec2`) se siguen leyendo y se re-cifran a `kgr_sec5` en el siguiente guardado.
 
 ---
 
@@ -72,7 +72,8 @@ El servidor nunca almacena ni conoce los PINs en texto claro. El cliente deriva 
 
 - Los PINs y credenciales persistidos en el almacenamiento local se cifran mediante `atRestVault` utilizando una CryptoKey AES-GCM no extraíble (`extractable: false`) respaldada por IndexedDB.
 - Esta medida evita la copia no autorizada de archivos de almacenamiento hacia otros dispositivos o navegadores.
-- Los datos médicos (DPA) y notas pastorales confidenciales utilizan cifrado granular complementario (`kgr_sec4`) en reposo.
+- Los datos médicos (DPA) y notas pastorales confidenciales utilizan cifrado granular complementario (`kgr_sec5`, AES-256-GCM) en reposo. Si la bóveda no está disponible (IndexedDB bloqueado) se usa el formato de respaldo `kgr_sec3`, que depende del PIN de sesión y es más débil.
+- Límite conocido: la clave reside en memoria de la página mientras la app está abierta, por lo que este cifrado protege contra la copia del almacenamiento del navegador, no contra un XSS ni contra alguien con la sesión desbloqueada.
 
 ---
 

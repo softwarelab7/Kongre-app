@@ -1,6 +1,7 @@
 // src/utils/security/sensitiveFields.ts
 // Extraído sin cambios de comportamiento desde theocraticSecurity.ts (ver barril src/utils/theocraticSecurity.ts).
 import { getVaultSessionEntropy } from '../atRestVault.ts';
+import { gcm } from '@noble/ciphers/aes.js';
 import { DEMO_PUBLISHERS } from '../demoData.ts';
 import { decryptPinAtRest, encryptPinAtRest, getDeviceEntropySalt, getSecureLocalPin, isEncryptedPinAtRest } from './atRestPin.ts';
 import { bufferToHex, hexToBuffer } from './bytes.ts';
@@ -141,16 +142,79 @@ function getCandidateKeysV3(): string[] {
   return candidates;
 }
 
+// ───────────────────────────────────────────────────────────────────────────────────────────────
+// kgr_sec5: AES-256-GCM estándar (AEAD) con subclave por registro.
+//
+// Formato:  kgr_sec5:<salt 16 B hex>:<iv 12 B hex>:<texto cifrado + etiqueta GCM de 16 B, hex>
+//
+// - Clave maestra: SHA-256 de la entropía NO EXTRAÍBLE de la bóveda (IndexedDB, 256 bits) + salt del dispositivo.
+//   El PIN ya no interviene: el secreto es de alta entropía, así que un hash con separación de dominio es un KDF
+//   adecuado y no hay nada que adivinar por fuerza bruta.
+// - Subclave por registro: SHA-256(clave maestra + salt aleatorio de 128 bits). Con una clave distinta para cada
+//   valor, el límite de nonces aleatorios de 96 bits de GCM no es un riesgo aunque se re-cifre miles de veces.
+// - AAD fija ('kgr_sec5'): liga el texto cifrado a este formato/propósito. No se liga al nombre del campo porque
+//   hay lectores (formularios, recordatorios) que descifran sin conocer de qué campo viene el valor.
+// - La implementación es @noble/ciphers (sin dependencias, síncrona), que permite conservar la API síncrona
+//   que usan ~25 puntos de lectura/escritura (render, recordatorios, exportaciones) sin volverlos asíncronos.
+// - Si la bóveda no está disponible (IndexedDB bloqueado) se mantiene el formato kgr_sec3 como único respaldo.
+// ───────────────────────────────────────────────────────────────────────────────────────────────
+const SEC5_PREFIX = 'kgr_sec5:';
+const SEC5_AAD = new TextEncoder().encode('kgr_sec5');
+
+// Memoriza la clave maestra (depende solo de la bóveda y del salt del dispositivo) para no recalcularla por campo.
+let sec5MasterMemo: { id: string; hex: string } | null = null;
+
+function getSec5MasterKeyHex(vaultEntropy: string): string {
+  const id = `${getDeviceEntropySalt()}:${vaultEntropy}`;
+  if (sec5MasterMemo && sec5MasterMemo.id === id) return sec5MasterMemo.hex;
+  const hex = sha256HexSync(`kgr_sec5_master_v1:${id}`);
+  sec5MasterMemo = { id, hex };
+  return hex;
+}
+
+function getSec5RecordKey(vaultEntropy: string, saltHex: string): Uint8Array {
+  return hexToBuffer(sha256HexSync(`kgr_sec5_record_v1:${getSec5MasterKeyHex(vaultEntropy)}:${saltHex}`));
+}
+
+function encryptSec5(rawStr: string, vaultEntropy: string): string {
+  const salt = getSecureRandomBytes(16);
+  const iv = getSecureRandomBytes(12);
+  const saltHex = bufferToHex(salt.buffer);
+  const key = getSec5RecordKey(vaultEntropy, saltHex);
+  const ct = gcm(key, iv, SEC5_AAD).encrypt(new TextEncoder().encode(rawStr));
+  return `${SEC5_PREFIX}${saltHex}:${bufferToHex(iv.buffer)}:${bufferToHex(ct.buffer)}`;
+}
+
+function decryptSec5(val: string): any {
+  try {
+    const vaultEntropy = getVaultSessionEntropy();
+    if (!vaultEntropy) return val;
+    const parts = val.slice(SEC5_PREFIX.length).split(':');
+    if (parts.length !== 3) return val;
+    const [saltHex, ivHex, ctHex] = parts;
+    if (saltHex.length !== 32 || ivHex.length !== 24 || ctHex.length < 32 || ctHex.length % 2 !== 0) return val;
+    if (!/^[0-9a-f]+$/i.test(saltHex + ivHex + ctHex)) return val;
+    const key = getSec5RecordKey(vaultEntropy, saltHex.toLowerCase());
+    // decrypt lanza si la etiqueta no valida (manipulación, clave distinta): devolvemos el valor cifrado sin fugar nada.
+    const plain = gcm(key, hexToBuffer(ivHex), SEC5_AAD).decrypt(hexToBuffer(ctHex));
+    const decoded = new TextDecoder().decode(plain);
+    return decoded.startsWith('json:') ? JSON.parse(decoded.slice(5)) : decoded;
+  } catch {
+    return val;
+  }
+}
+
 /**
  * Cifra en reposo un campo sensible (salud, directiva DPA, notas confidenciales, teléfono, contactos)
- * mediante Counter-Mode (CTR) con nonce CSPRNG de 128 bits y etiqueta de autenticación (kgr_sec4:...).
- * Cuando la Bóveda Local atRestVault está disponible, vincula la clave a la CryptoKey no extraíble de IndexedDB.
+ * Con la Bóveda Local disponible usa AES-256-GCM (kgr_sec5:), con la clave ligada a la CryptoKey no extraíble de
+ * IndexedDB. Sin bóveda cae al formato legado kgr_sec3 (CTR + MAC propio). Los valores ya cifrados se devuelven tal cual.
  */
 export function encryptSensitiveFieldAtRest(val: any): any {
   if (val === null || val === undefined || val === '') return val;
   if (
     typeof val === 'string' &&
-    (val.startsWith('kgr_sec4:') ||
+    (val.startsWith('kgr_sec5:') ||
+      val.startsWith('kgr_sec4:') ||
       val.startsWith('kgr_sec3:') ||
       val.startsWith('kgr_sec2:'))
   ) {
@@ -160,11 +224,13 @@ export function encryptSensitiveFieldAtRest(val: any): any {
   try {
     const rawStr = typeof val === 'object' ? `json:${JSON.stringify(val)}` : String(val);
     const vaultEntropy = getVaultSessionEntropy();
-    const isVaultAvailable = Boolean(vaultEntropy && vaultEntropy.length >= 32);
-    const key = isVaultAvailable
-      ? getSensitiveDataAtRestKeyV4(vaultEntropy!)
-      : getSensitiveDataAtRestKey();
-    const versionPrefix = isVaultAvailable ? 'kgr_sec4:' : 'kgr_sec3:';
+    if (vaultEntropy && vaultEntropy.length >= 32) {
+      return encryptSec5(rawStr, vaultEntropy);
+    }
+
+    // Respaldo sin bóveda: formato legado kgr_sec3.
+    const key = getSensitiveDataAtRestKey();
+    const versionPrefix = 'kgr_sec3:';
 
     const plainBytes = new TextEncoder().encode(rawStr);
     const nonce = getSecureRandomBytes(16);
@@ -193,13 +259,16 @@ export function encryptSensitiveFieldAtRest(val: any): any {
 
 /**
  * Descifra en memoria un valor sensible leído desde localStorage.
- * Soporta kgr_sec4 (respaldado por la Bóveda Local atRestVault), kgr_sec3 (CTR autenticado),
- * kgr_sec2 (legado) y texto plano (compatibilidad garantizada).
+ * Soporta kgr_sec5 (AES-256-GCM), y por compatibilidad kgr_sec4 (bóveda + CTR/MAC), kgr_sec3 (CTR autenticado),
+ * kgr_sec2 (legado) y texto plano. Los formatos antiguos se re-cifran a kgr_sec5 en el siguiente guardado.
  */
 export function decryptSensitiveFieldAtRest(val: any): any {
   if (typeof val !== 'string') return val;
 
-  // 1. Formato kgr_sec4: Respaldado por la Bóveda Local atRestVault en IndexedDB (AES-256 no extraíble) + CTR + MAC
+  // 0. Formato kgr_sec5: AES-256-GCM (formato actual)
+  if (val.startsWith(SEC5_PREFIX)) return decryptSec5(val);
+
+  // 1. Formato kgr_sec4 (legado): Respaldado por la Bóveda Local atRestVault en IndexedDB (AES-256 no extraíble) + CTR + MAC
   if (val.startsWith('kgr_sec4:')) {
     try {
       const parts = val.slice('kgr_sec4:'.length).split(':');
@@ -418,7 +487,8 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
         // Autocorrección de datos de demostración si por alguna razón no se pudo descifrar (ej. sesión no inicializada)
         if (
           typeof restored[k] === 'string' &&
-          (restored[k].startsWith('kgr_sec4:') ||
+          (restored[k].startsWith('kgr_sec5:') ||
+            restored[k].startsWith('kgr_sec4:') ||
             restored[k].startsWith('kgr_sec3:') ||
             restored[k].startsWith('kgr_sec2:'))
         ) {

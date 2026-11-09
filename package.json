@@ -11,13 +11,14 @@
     "clean": "rm -rf dist dev-dist server.js && cargo clean --manifest-path src-tauri/Cargo.toml 2>/dev/null || true",
     "clean:tauri": "cargo clean --manifest-path src-tauri/Cargo.toml",
     "lint": "tsc --noEmit",
-    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts test/totp.test.ts test/atRestVault.test.ts test/personal-pin-v2.test.ts test/congregation-pin-policy.test.ts test/compartments.test.ts test/theocratic-domain-s21.test.ts test/theocratic-reminders.test.ts test/p2p-transfer.test.ts test/territories-s13.test.ts test/shepherding-at-rest.test.ts",
+    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts test/totp.test.ts test/atRestVault.test.ts test/personal-pin-v2.test.ts test/congregation-pin-policy.test.ts test/compartments.test.ts test/theocratic-domain-s21.test.ts test/theocratic-reminders.test.ts test/p2p-transfer.test.ts test/territories-s13.test.ts test/shepherding-at-rest.test.ts test/sec5-aes-gcm.test.ts",
     "verify": "bun scripts/verify-production.ts",
     "tauri": "tauri",
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build"
   },
   "dependencies": {
+    "@noble/ciphers": "2.4.0",
     "@supabase/supabase-js": "^2.118.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tauri-apps/api": "^2.12.4",

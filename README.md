@@ -112,7 +112,7 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 ### 🔐 Seguridad Cero Conocimiento (Fase 2) y Bóveda Criptográfica en Reposo
 - **Bóveda no extraíble `atRestVault`:** Almacenamiento seguro con clave criptográfica AES-256 no extraíble (`extractable: false`) en IndexedDB (`kongre_vault_db`).
 - **Token de Rol Firmado en Servidor (`kgr_srt1` HMAC-SHA256):** Validación en Edge Function de privilegios que impide la manipulación no autorizada en DevTools o variables locales.
-- **Protección de Datos Médicos DPA y Notas:** Cifrado en modo CTR con nonce CSPRNG (`kgr_sec4:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
+- **Protección de Datos Médicos DPA y Notas:** Cifrado AES-256-GCM con subclave por registro (`kgr_sec5:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
 
 ---
 

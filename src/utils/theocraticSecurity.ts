@@ -18,7 +18,7 @@ export { isSafeDemoMode, isCongregationIdString, getFriendlyCongregationName, sa
 export { sha256HexSync } from './security/sha256.ts';
 export { normalizePersonalPinInput, hashPersonalPin } from './security/personalPin.ts';
 export { getDeviceEntropySalt, encryptPinAtRest, isEncryptedPinAtRest, decryptPinAtRest, verifyPersonalPinMatch, setSecureLocalPin, getSecureLocalPin, verifySecureLocalPin, AT_REST_CIPHER_KEY } from './security/atRestPin.ts';
-export { getSensitiveDataAtRestKey, encryptSensitiveFieldAtRest, decryptSensitiveFieldAtRest, sanitizePublishersForLocalStorage, restorePublishersFromLocalStorage, sanitizePinRecordsForLocalStorage, restorePinRecordsFromLocalStorage, sanitizeShepherdingVisitsForLocalStorage, restoreShepherdingVisitsFromLocalStorage, sanitizeTransactionsForLocalStorage, restoreTransactionsFromLocalStorage, sanitizeAuditsForLocalStorage, restoreAuditsFromLocalStorage } from './security/sensitiveFields.ts';
+export { encryptSensitiveFieldAtRest, decryptSensitiveFieldAtRest, sanitizePublishersForLocalStorage, restorePublishersFromLocalStorage, sanitizePinRecordsForLocalStorage, restorePinRecordsFromLocalStorage, sanitizeShepherdingVisitsForLocalStorage, restoreShepherdingVisitsFromLocalStorage, sanitizeTransactionsForLocalStorage, restoreTransactionsFromLocalStorage, sanitizeAuditsForLocalStorage, restoreAuditsFromLocalStorage } from './security/sensitiveFields.ts';
 export { SERVER_ROLE_TOKEN_STORAGE_KEY, parseServerRoleToken, signRoleSession, verifyRoleSessionSignature } from './security/roleSession.ts';
 export type { ParsedServerRoleToken } from './security/roleSession.ts';
 export { generateSecureInvitationCode, encodeSecureShareToken, decodeSecureShareToken } from './security/shareTokens.ts';

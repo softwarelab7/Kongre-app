@@ -3,200 +3,81 @@
 import { getVaultSessionEntropy } from '../atRestVault.ts';
 import { gcm } from '@noble/ciphers/aes.js';
 import { DEMO_PUBLISHERS } from '../demoData.ts';
-import { decryptPinAtRest, encryptPinAtRest, getDeviceEntropySalt, getSecureLocalPin, isEncryptedPinAtRest } from './atRestPin.ts';
+import { decryptPinAtRest, encryptPinAtRest, getDeviceEntropySalt, isEncryptedPinAtRest } from './atRestPin.ts';
 import { bufferToHex, hexToBuffer } from './bytes.ts';
 import { hashPersonalPin } from './personalPin.ts';
 import { getSecureRandomBytes } from './random.ts';
 import { sha256HexSync } from './sha256.ts';
 
-/**
- * Deriva una clave única para cifrar datos sensibles en reposo (salud, contactos de emergencia, teléfonos)
- * combinando la sesión activa del usuario (PIN personal o congregación) con la entropía del dispositivo (v2).
- */
-export function getSensitiveDataAtRestKey(): string {
-  const sessionPin =
-    (typeof window !== 'undefined'
-      ? getSecureLocalPin('kongre_session_pin_v2') ||
-        getSecureLocalPin('kongre_coordinator_pin') ||
-        getSecureLocalPin('kongre_registered_cong_pin') ||
-        getSecureLocalPin('kongre_last_cong_pin')
-      : '') || '';
-  const congId =
-    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
-      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
-      : '';
-  const deviceSalt = getDeviceEntropySalt();
-  return sha256HexSync(`kgr_health_contacts_rest_v2:${sessionPin}:${congId}:${deviceSalt}`);
-}
-
-/** Clave para descifrar datos sensibles guardados con formato v1 legado (kgr_sec2:) */
-function getSensitiveDataAtRestKeyV1(): string {
-  const sessionPin =
-    (typeof window !== 'undefined'
-      ? getSecureLocalPin('kongre_session_pin_v2') ||
-        getSecureLocalPin('kongre_coordinator_pin') ||
-        getSecureLocalPin('kongre_registered_cong_pin') ||
-        getSecureLocalPin('kongre_last_cong_pin')
-      : '') || '';
-  const congId =
-    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
-      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
-      : '';
-  const deviceSalt = getDeviceEntropySalt();
-  return sha256HexSync(`kgr_health_contacts_rest_v1:${sessionPin}:${congId}:${deviceSalt}`);
-}
-
-/**
- * Clave para cifrar y descifrar datos sensibles (DPA, notas confidenciales, contactos)
- * respaldada por la Bóveda Local en IndexedDB (kgr_sec4:).
- * Incorpora la entropía no extraíble de la bóveda para hacer invulnerable la extracción aislada de localStorage.
- */
-function getSensitiveDataAtRestKeyV4(vaultEntropy: string): string {
-  const deviceSalt = getDeviceEntropySalt();
-  return sha256HexSync(`kgr_health_dpa_rest_v4:::${deviceSalt}:${vaultEntropy}`);
-}
-
-/**
- * Deriva las posibles claves candidatas de descifrado para kgr_sec4
- * probando variaciones de PIN y ID de congregación para evitar fallos si la sesión cambia.
- */
-function getCandidateKeysV4(vaultEntropy: string): string[] {
-  const deviceSalt = getDeviceEntropySalt();
-  const candidates: string[] = [
-    getSensitiveDataAtRestKeyV4(vaultEntropy),
-    sha256HexSync(`kgr_health_dpa_rest_v4:${deviceSalt}:${vaultEntropy}`),
-  ];
-
-  const congIds = new Set<string>(['']);
-  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-    const c1 = localStorage.getItem('kongre_congregation_number');
-    const c2 = localStorage.getItem('kongre_canonical_cong_id');
-    const c3 = localStorage.getItem('kongre_congregation_id');
-    if (c1) congIds.add(c1.trim());
-    if (c2) congIds.add(c2.trim());
-    if (c3) congIds.add(c3.trim());
-  }
-
-  const pins = new Set<string>(['']);
-  if (typeof window !== 'undefined') {
-    const p1 = getSecureLocalPin('kongre_session_pin_v2');
-    const p2 = getSecureLocalPin('kongre_coordinator_pin');
-    const p3 = getSecureLocalPin('kongre_registered_cong_pin');
-    const p4 = getSecureLocalPin('kongre_last_cong_pin');
-    if (p1) pins.add(p1.trim());
-    if (p2) pins.add(p2.trim());
-    if (p3) pins.add(p3.trim());
-    if (p4) pins.add(p4.trim());
-  }
-
-  for (const p of pins) {
-    for (const c of congIds) {
-      const k = sha256HexSync(`kgr_health_dpa_rest_v4:${p}:${c}:${deviceSalt}:${vaultEntropy}`);
-      if (!candidates.includes(k)) {
-        candidates.push(k);
-      }
-    }
-  }
-
-  return candidates;
-}
-
-/**
- * Deriva las posibles claves candidatas de descifrado para kgr_sec3
- * probando variaciones de PIN y ID de congregación para compatibilidad.
- */
-function getCandidateKeysV3(): string[] {
-  const deviceSalt = getDeviceEntropySalt();
-  const congIds = new Set<string>(['']);
-  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-    const c1 = localStorage.getItem('kongre_congregation_number');
-    const c2 = localStorage.getItem('kongre_canonical_cong_id');
-    const c3 = localStorage.getItem('kongre_congregation_id');
-    if (c1) congIds.add(c1.trim());
-    if (c2) congIds.add(c2.trim());
-    if (c3) congIds.add(c3.trim());
-  }
-
-  const pins = new Set<string>(['']);
-  if (typeof window !== 'undefined') {
-    const p1 = getSecureLocalPin('kongre_session_pin_v2');
-    const p2 = getSecureLocalPin('kongre_coordinator_pin');
-    const p3 = getSecureLocalPin('kongre_registered_cong_pin');
-    const p4 = getSecureLocalPin('kongre_last_cong_pin');
-    if (p1) pins.add(p1.trim());
-    if (p2) pins.add(p2.trim());
-    if (p3) pins.add(p3.trim());
-    if (p4) pins.add(p4.trim());
-  }
-
-  const candidates: string[] = [getSensitiveDataAtRestKey()];
-  for (const p of pins) {
-    for (const c of congIds) {
-      const k = sha256HexSync(`kgr_health_contacts_rest_v2:${p}:${c}:${deviceSalt}`);
-      if (!candidates.includes(k)) {
-        candidates.push(k);
-      }
-    }
-  }
-
-  return candidates;
-}
-
 // ───────────────────────────────────────────────────────────────────────────────────────────────
-// kgr_sec5: AES-256-GCM estándar (AEAD) con subclave por registro.
+// Cifrado en reposo de campos sensibles: AES-256-GCM (AEAD) con subclave por registro.
 //
-// Formato:  kgr_sec5:<salt 16 B hex>:<iv 12 B hex>:<texto cifrado + etiqueta GCM de 16 B, hex>
+// Formato:  <prefijo>:<salt 16 B hex>:<iv 12 B hex>:<texto cifrado + etiqueta GCM de 16 B, hex>
+//   - kgr_sec5:   clave derivada de la entropía NO EXTRAÍBLE de la bóveda (IndexedDB, 256 bits) y del salt del dispositivo.
+//                 El PIN no interviene: el secreto es de alta entropía, así que un hash con separación de dominio es
+//                 un KDF adecuado y no hay nada que adivinar por fuerza bruta.
+//   - kgr_sec5d:  respaldo SIN bóveda (IndexedDB bloqueado). La clave sale solo del salt del dispositivo, que está en
+//                 el mismo localStorage: protege contra una lectura casual, NO contra quien copie el almacenamiento.
+//                 Al volver a haber bóveda el valor se re-cifra solo a kgr_sec5 en el siguiente guardado.
 //
-// - Clave maestra: SHA-256 de la entropía NO EXTRAÍBLE de la bóveda (IndexedDB, 256 bits) + salt del dispositivo.
-//   El PIN ya no interviene: el secreto es de alta entropía, así que un hash con separación de dominio es un KDF
-//   adecuado y no hay nada que adivinar por fuerza bruta.
-// - Subclave por registro: SHA-256(clave maestra + salt aleatorio de 128 bits). Con una clave distinta para cada
-//   valor, el límite de nonces aleatorios de 96 bits de GCM no es un riesgo aunque se re-cifre miles de veces.
-// - AAD fija ('kgr_sec5'): liga el texto cifrado a este formato/propósito. No se liga al nombre del campo porque
-//   hay lectores (formularios, recordatorios) que descifran sin conocer de qué campo viene el valor.
-// - La implementación es @noble/ciphers (sin dependencias, síncrona), que permite conservar la API síncrona
-//   que usan ~25 puntos de lectura/escritura (render, recordatorios, exportaciones) sin volverlos asíncronos.
-// - Si la bóveda no está disponible (IndexedDB bloqueado) se mantiene el formato kgr_sec3 como único respaldo.
+// - Subclave por registro: SHA-256(clave maestra + salt aleatorio de 128 bits). Con una clave distinta para cada valor,
+//   el límite de nonces aleatorios de 96 bits de GCM no es un riesgo aunque se re-cifre miles de veces.
+// - AAD = nombre del formato: liga el texto cifrado a su propósito y separa kgr_sec5 de kgr_sec5d. No se liga al campo
+//   porque hay lectores (formularios, recordatorios) que descifran sin conocer de qué campo viene el valor.
+// - Implementación: @noble/ciphers (sin dependencias, síncrona). Mantiene la API síncrona que usan ~25 puntos de
+//   lectura/escritura (render, recordatorios, exportaciones) sin volverlos asíncronos.
+// - No hay lectores de formatos anteriores (kgr_sec2/3/4): un valor con ese prefijo se conserva tal cual, sin descifrar.
 // ───────────────────────────────────────────────────────────────────────────────────────────────
 const SEC5_PREFIX = 'kgr_sec5:';
-const SEC5_AAD = new TextEncoder().encode('kgr_sec5');
+const SEC5D_PREFIX = 'kgr_sec5d:';
+const NO_VAULT_SECRET = 'kgr_sec5d_device_only';
+/** Cualquier valor ya cifrado por esta app (incluidos formatos retirados): no se vuelve a cifrar ni se toca. */
+const ANY_ENCRYPTED_RE = /^kgr_sec\d+d?:/;
 
-// Memoriza la clave maestra (depende solo de la bóveda y del salt del dispositivo) para no recalcularla por campo.
+// Memoriza la clave maestra (depende solo del secreto y del salt del dispositivo) para no recalcularla por campo.
 let sec5MasterMemo: { id: string; hex: string } | null = null;
 
-function getSec5MasterKeyHex(vaultEntropy: string): string {
-  const id = `${getDeviceEntropySalt()}:${vaultEntropy}`;
+function getSec5MasterKeyHex(secret: string): string {
+  const id = `${getDeviceEntropySalt()}:${secret}`;
   if (sec5MasterMemo && sec5MasterMemo.id === id) return sec5MasterMemo.hex;
   const hex = sha256HexSync(`kgr_sec5_master_v1:${id}`);
   sec5MasterMemo = { id, hex };
   return hex;
 }
 
-function getSec5RecordKey(vaultEntropy: string, saltHex: string): Uint8Array {
-  return hexToBuffer(sha256HexSync(`kgr_sec5_record_v1:${getSec5MasterKeyHex(vaultEntropy)}:${saltHex}`));
+function getSec5RecordKey(secret: string, saltHex: string): Uint8Array {
+  return hexToBuffer(sha256HexSync(`kgr_sec5_record_v1:${getSec5MasterKeyHex(secret)}:${saltHex}`));
 }
 
-function encryptSec5(rawStr: string, vaultEntropy: string): string {
+const aadOf = (prefix: string) => new TextEncoder().encode(prefix.slice(0, -1));
+
+function encryptSec5(rawStr: string, secret: string, prefix: string): string {
   const salt = getSecureRandomBytes(16);
   const iv = getSecureRandomBytes(12);
   const saltHex = bufferToHex(salt.buffer);
-  const key = getSec5RecordKey(vaultEntropy, saltHex);
-  const ct = gcm(key, iv, SEC5_AAD).encrypt(new TextEncoder().encode(rawStr));
-  return `${SEC5_PREFIX}${saltHex}:${bufferToHex(iv.buffer)}:${bufferToHex(ct.buffer)}`;
+  const key = getSec5RecordKey(secret, saltHex);
+  const ct = gcm(key, iv, aadOf(prefix)).encrypt(new TextEncoder().encode(rawStr));
+  return `${prefix}${saltHex}:${bufferToHex(iv.buffer)}:${bufferToHex(ct.buffer)}`;
 }
 
-function decryptSec5(val: string): any {
+function decryptSec5(val: string, prefix: string): any {
   try {
-    const vaultEntropy = getVaultSessionEntropy();
-    if (!vaultEntropy) return val;
-    const parts = val.slice(SEC5_PREFIX.length).split(':');
+    let secret: string;
+    if (prefix === SEC5_PREFIX) {
+      const vaultEntropy = getVaultSessionEntropy();
+      if (!vaultEntropy) return val;
+      secret = vaultEntropy;
+    } else {
+      secret = NO_VAULT_SECRET;
+    }
+    const parts = val.slice(prefix.length).split(':');
     if (parts.length !== 3) return val;
     const [saltHex, ivHex, ctHex] = parts;
     if (saltHex.length !== 32 || ivHex.length !== 24 || ctHex.length < 32 || ctHex.length % 2 !== 0) return val;
     if (!/^[0-9a-f]+$/i.test(saltHex + ivHex + ctHex)) return val;
-    const key = getSec5RecordKey(vaultEntropy, saltHex.toLowerCase());
+    const key = getSec5RecordKey(secret, saltHex.toLowerCase());
     // decrypt lanza si la etiqueta no valida (manipulación, clave distinta): devolvemos el valor cifrado sin fugar nada.
-    const plain = gcm(key, hexToBuffer(ivHex), SEC5_AAD).decrypt(hexToBuffer(ctHex));
+    const plain = gcm(key, hexToBuffer(ivHex), aadOf(prefix)).decrypt(hexToBuffer(ctHex));
     const decoded = new TextDecoder().decode(plain);
     return decoded.startsWith('json:') ? JSON.parse(decoded.slice(5)) : decoded;
   } catch {
@@ -205,53 +86,21 @@ function decryptSec5(val: string): any {
 }
 
 /**
- * Cifra en reposo un campo sensible (salud, directiva DPA, notas confidenciales, teléfono, contactos)
- * Con la Bóveda Local disponible usa AES-256-GCM (kgr_sec5:), con la clave ligada a la CryptoKey no extraíble de
- * IndexedDB. Sin bóveda cae al formato legado kgr_sec3 (CTR + MAC propio). Los valores ya cifrados se devuelven tal cual.
+ * Cifra en reposo un campo sensible (salud, directiva DPA, notas confidenciales, teléfono, contactos).
+ * Con la Bóveda Local disponible usa kgr_sec5; sin ella, el respaldo kgr_sec5d (solo ofuscación, ver arriba).
+ * Los valores ya cifrados se devuelven tal cual.
  */
 export function encryptSensitiveFieldAtRest(val: any): any {
   if (val === null || val === undefined || val === '') return val;
-  if (
-    typeof val === 'string' &&
-    (val.startsWith('kgr_sec5:') ||
-      val.startsWith('kgr_sec4:') ||
-      val.startsWith('kgr_sec3:') ||
-      val.startsWith('kgr_sec2:'))
-  ) {
-    return val;
-  }
+  if (typeof val === 'string' && ANY_ENCRYPTED_RE.test(val)) return val;
 
   try {
     const rawStr = typeof val === 'object' ? `json:${JSON.stringify(val)}` : String(val);
     const vaultEntropy = getVaultSessionEntropy();
     if (vaultEntropy && vaultEntropy.length >= 32) {
-      return encryptSec5(rawStr, vaultEntropy);
+      return encryptSec5(rawStr, vaultEntropy, SEC5_PREFIX);
     }
-
-    // Respaldo sin bóveda: formato legado kgr_sec3.
-    const key = getSensitiveDataAtRestKey();
-    const versionPrefix = 'kgr_sec3:';
-
-    const plainBytes = new TextEncoder().encode(rawStr);
-    const nonce = getSecureRandomBytes(16);
-    const nonceHex = bufferToHex(nonce.buffer);
-
-    const out = new Uint8Array(plainBytes.length);
-    let currentBlock = -1;
-    let currentKeyHex = '';
-    for (let i = 0; i < plainBytes.length; i++) {
-      const blockIdx = Math.floor(i / 32);
-      const byteInBlock = i % 32;
-      if (blockIdx !== currentBlock) {
-        currentBlock = blockIdx;
-        currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
-      }
-      const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
-      out[i] = plainBytes[i] ^ kByte;
-    }
-    const cipherHex = bufferToHex(out.buffer);
-    const authTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-    return `${versionPrefix}${nonceHex}:${authTag}:${cipherHex}`;
+    return encryptSec5(rawStr, NO_VAULT_SECRET, SEC5D_PREFIX);
   } catch {
     return val;
   }
@@ -259,137 +108,12 @@ export function encryptSensitiveFieldAtRest(val: any): any {
 
 /**
  * Descifra en memoria un valor sensible leído desde localStorage.
- * Soporta kgr_sec5 (AES-256-GCM), y por compatibilidad kgr_sec4 (bóveda + CTR/MAC), kgr_sec3 (CTR autenticado),
- * kgr_sec2 (legado) y texto plano. Los formatos antiguos se re-cifran a kgr_sec5 en el siguiente guardado.
+ * Soporta kgr_sec5 y kgr_sec5d (AES-256-GCM) y texto plano. Cualquier otro valor cifrado se devuelve sin tocar.
  */
 export function decryptSensitiveFieldAtRest(val: any): any {
   if (typeof val !== 'string') return val;
-
-  // 0. Formato kgr_sec5: AES-256-GCM (formato actual)
-  if (val.startsWith(SEC5_PREFIX)) return decryptSec5(val);
-
-  // 1. Formato kgr_sec4 (legado): Respaldado por la Bóveda Local atRestVault en IndexedDB (AES-256 no extraíble) + CTR + MAC
-  if (val.startsWith('kgr_sec4:')) {
-    try {
-      const parts = val.slice('kgr_sec4:'.length).split(':');
-      if (parts.length !== 3) return val;
-      const [nonceHex, authTag, cipherHex] = parts;
-      if (!nonceHex || !authTag || !cipherHex || cipherHex.length % 2 !== 0) return val;
-
-      const vaultEntropy = getVaultSessionEntropy();
-      if (!vaultEntropy) {
-        return val;
-      }
-
-      const candidateKeys = getCandidateKeysV4(vaultEntropy);
-      let matchedKey: string | null = null;
-      for (const k of candidateKeys) {
-        const expectedTag = sha256HexSync(`${k}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-        if (authTag.toLowerCase() === expectedTag.toLowerCase()) {
-          matchedKey = k;
-          break;
-        }
-      }
-
-      if (!matchedKey) {
-        return val;
-      }
-
-      const cipherBytes = hexToBuffer(cipherHex);
-      const out = new Uint8Array(cipherBytes.length);
-      let currentBlock = -1;
-      let currentKeyHex = '';
-      for (let i = 0; i < cipherBytes.length; i++) {
-        const blockIdx = Math.floor(i / 32);
-        const byteInBlock = i % 32;
-        if (blockIdx !== currentBlock) {
-          currentBlock = blockIdx;
-          currentKeyHex = sha256HexSync(`${matchedKey}:${nonceHex}:${blockIdx}:ctr`);
-        }
-        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
-        out[i] = cipherBytes[i] ^ kByte;
-      }
-      const decoded = new TextDecoder().decode(out);
-      if (decoded.startsWith('json:')) {
-        return JSON.parse(decoded.slice(5));
-      }
-      return decoded;
-    } catch {
-      return val;
-    }
-  }
-
-  // 2. Formato kgr_sec3: Counter-Mode autenticado con nonce de 128 bits (H-02)
-  if (val.startsWith('kgr_sec3:')) {
-    try {
-      const parts = val.slice('kgr_sec3:'.length).split(':');
-      if (parts.length !== 3) return val;
-      const [nonceHex, authTag, cipherHex] = parts;
-      if (!nonceHex || !authTag || !cipherHex || cipherHex.length % 2 !== 0) return val;
-
-      const candidateKeys = getCandidateKeysV3();
-      let matchedKey: string | null = null;
-      for (const k of candidateKeys) {
-        const expectedTag = sha256HexSync(`${k}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-        if (authTag.toLowerCase() === expectedTag.toLowerCase()) {
-          matchedKey = k;
-          break;
-        }
-      }
-
-      if (!matchedKey) {
-        return val;
-      }
-
-      const cipherBytes = hexToBuffer(cipherHex);
-      const out = new Uint8Array(cipherBytes.length);
-      let currentBlock = -1;
-      let currentKeyHex = '';
-      for (let i = 0; i < cipherBytes.length; i++) {
-        const blockIdx = Math.floor(i / 32);
-        const byteInBlock = i % 32;
-        if (blockIdx !== currentBlock) {
-          currentBlock = blockIdx;
-          currentKeyHex = sha256HexSync(`${matchedKey}:${nonceHex}:${blockIdx}:ctr`);
-        }
-        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
-        out[i] = cipherBytes[i] ^ kByte;
-      }
-      const decoded = new TextDecoder().decode(out);
-      if (decoded.startsWith('json:')) {
-        return JSON.parse(decoded.slice(5));
-      }
-      return decoded;
-    } catch {
-      return val;
-    }
-  }
-
-  // 3. Formato kgr_sec2: compatibilidad con datos cifrados en versiones anteriores
-  if (val.startsWith('kgr_sec2:')) {
-    try {
-      const payloadHex = val.slice('kgr_sec2:'.length);
-      if (payloadHex.length < 8) return val;
-      const nonceHex = payloadHex.slice(0, 8);
-      const cipherHex = payloadHex.slice(8);
-      const cipherBytes = hexToBuffer(cipherHex);
-      const key = getSensitiveDataAtRestKeyV1();
-      const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
-      const out = new Uint8Array(cipherBytes.length);
-      for (let i = 0; i < cipherBytes.length; i++) {
-        const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
-        out[i] = cipherBytes[i] ^ kByte;
-      }
-      const decoded = new TextDecoder().decode(out);
-      if (decoded.startsWith('json:')) {
-        return JSON.parse(decoded.slice(5));
-      }
-      return decoded;
-    } catch {
-      return val;
-    }
-  }
-
+  if (val.startsWith(SEC5_PREFIX)) return decryptSec5(val, SEC5_PREFIX);
+  if (val.startsWith(SEC5D_PREFIX)) return decryptSec5(val, SEC5D_PREFIX);
   return val;
 }
 
@@ -488,6 +212,7 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
         if (
           typeof restored[k] === 'string' &&
           (restored[k].startsWith('kgr_sec5:') ||
+            restored[k].startsWith('kgr_sec5d:') ||
             restored[k].startsWith('kgr_sec4:') ||
             restored[k].startsWith('kgr_sec3:') ||
             restored[k].startsWith('kgr_sec2:'))

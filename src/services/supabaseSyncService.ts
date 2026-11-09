@@ -16,7 +16,7 @@ import {
   type VerifiedPublisher,
   type SyncFailure,
 } from './syncApi';
-import { encryptForSupabase, decryptFromSupabase, normalizePin, normalizePinV2 } from '../utils/crypto';
+import { encryptForSupabase, decryptFromSupabase, normalizePinV2 } from '../utils/crypto';
 import {
   hashPersonalPin,
   encryptPinAtRest,
@@ -592,7 +592,12 @@ export const supabaseSyncService = {
       //    maestro existente (evita el borrado catastrófico de datos de ancianos).
       const preserveMaster = Boolean(params.data.publishers && params.data.publishers.length <= 1);
       const rotating = Boolean(params.rotateFrom && (params.rotateFrom.pinMaestro || params.rotateFrom.pinCongregacion));
-      const lastSyncTimestamp = this.getLastSyncTimestamp();
+      let lastSyncTimestamp: string | null | undefined = this.getLastSyncTimestamp();
+      if (params.forceOverwrite) {
+        // Sobrescritura intencional: se parte de la versión vigente en el servidor (el servidor exige siempre una versión).
+        const meta = await syncMeta(cleanId, params.rotateFrom?.pinMaestro ? normalizePinV2(params.rotateFrom.pinMaestro) : cleanMasterPin);
+        lastSyncTimestamp = meta.ok ? meta.created_at : undefined;
+      }
       const pushRes = await syncPush({
         id: cleanId,
         masterPin: params.rotateFrom?.pinMaestro ? normalizePinV2(params.rotateFrom.pinMaestro) : cleanMasterPin,
@@ -607,13 +612,14 @@ export const supabaseSyncService = {
               publicPin: params.rotateFrom?.pinCongregacion ? cleanPublicPin : undefined,
             }
           : undefined,
-        expectedVersion: params.forceOverwrite ? undefined : (lastSyncTimestamp || undefined),
+        expectedVersion: lastSyncTimestamp || undefined,
       });
 
       if (!pushRes.ok) {
         const err = pushRes as SyncFailure;
         const message = describeSyncError(err);
-        if (err.status === 409 || err.error === 'conflict_detected') {
+        // 409: otro dispositivo guardó antes. 428: este dispositivo nunca descargó la versión vigente.
+        if (err.status === 409 || err.status === 428 || err.error === 'conflict_detected' || err.error === 'expected_version_required') {
           return {
             success: false,
             conflict: true,

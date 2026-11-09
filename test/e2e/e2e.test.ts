@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleRequest, type SyncDb, type SyncRow } from '../../supabase/functions/kongre-sync/core.ts';
-import { syncPull, syncMeta, syncPush, syncDelete, syncVerifyPersonalPin, describeSyncError } from './services/syncApi.ts';
-import { encryptForSupabase, decryptFromSupabase } from './utils/crypto.ts';
+// Cliente REAL (src/), no copias: así el e2e detecta cualquier divergencia entre el cliente y el servidor.
+import { syncPull, syncMeta, syncPush, syncDelete, syncVerifyPersonalPin, describeSyncError } from '../../src/services/syncApi.ts';
+import { encryptForSupabase, decryptFromSupabase } from '../../src/utils/crypto.ts';
+import { SUPABASE_URL } from '../../src/lib/supabase.ts';
 import {
   generateSecureCongregationPin,
   generateSecureMasterPin,
@@ -21,10 +23,10 @@ const db: SyncDb = {
   async registerFailure(k, limit, win, lock) { let e = rl.get(k); if (!e || e.ws < Date.now() - win * 1000) e = { f: 0, ws: Date.now(), lu: e?.lu ?? null }; e.f++; rl.set(k, e); if (e.f >= limit) { e.lu = Date.now() + lock * 1000; e.f = 0; e.ws = Date.now(); return e.lu; } return null; },
   async clearFailures(k) { rl.delete(k); },
 };
-const env = { pepper: 'x'.repeat(48), allowedOrigins: [], legacyClaim: false };
+const env = { pepper: 'x'.repeat(48), allowedOrigins: [] };
 let ip = 10;
 (globalThis as any).fetch = async (url: string, init: any) => {
-  assert.equal(url, 'https://proj.supabase.co/functions/v1/kongre-sync');
+  assert.equal(url, `${SUPABASE_URL}/functions/v1/kongre-sync`);
   return handleRequest(new Request(url, { ...init, headers: { ...init.headers, 'cf-connecting-ip': `10.0.0.${ip}` } }), db, env);
 };
 
@@ -93,7 +95,7 @@ test('flujo completo cliente real ↔ servidor real', async () => {
   // rotación del PIN maestro (con PIN anterior para autenticar)
   const NEW = 'NuevoCoord-5588';
   const rot = await syncPush({ id: ID, masterPin: MASTER, publicPin: PUB, payload: await encryptForSupabase(secretAdmin, NEW),
-    payloadPublic: rows.get(ID)!.payload_public!, rotateTo: { masterPin: NEW } });
+    payloadPublic: rows.get(ID)!.payload_public!, rotateTo: { masterPin: NEW }, expectedVersion: rows.get(ID)!.created_at });
   assert.ok(rot.ok);
   ip++;
   assert.ok(!(await syncPull(ID, MASTER)).ok, 'el PIN maestro anterior deja de funcionar');
@@ -131,6 +133,7 @@ test('rotación de PIN de congregación y rotación simultánea de ambos PINs', 
   ip++;
   const rotPub = await syncPush({
     id: ID,
+    expectedVersion: rows.get(ID)!.created_at,
     masterPin: MASTER_INIT,
     publicPin: PUB_INIT,
     payload: await encryptForSupabase(secretAdmin, MASTER_INIT),
@@ -166,6 +169,7 @@ test('rotación de PIN de congregación y rotación simultánea de ambos PINs', 
   ip++;
   const rotBoth = await syncPush({
     id: ID,
+    expectedVersion: rows.get(ID)!.created_at,
     masterPin: MASTER_INIT,
     publicPin: formattedNewPub,
     payload: await encryptForSupabase(dualSecretAdmin, DUAL_NEW_MASTER),

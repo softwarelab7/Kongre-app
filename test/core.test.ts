@@ -42,12 +42,17 @@ const PEPPER = 'p'.repeat(40);
 function setup(opts: Partial<SyncEnv> = {}) {
   const clock = { t: 1_800_000_000_000 };
   const { db, rows } = makeDb(clock);
-  const env: SyncEnv = { pepper: PEPPER, allowedOrigins: [], legacyClaim: false, now: () => clock.t, ...opts };
-  const call = async (body: any, ip = '1.1.1.1') => {
+  const env: SyncEnv = { pepper: PEPPER, allowedOrigins: [], now: () => clock.t, ...opts };
+  const callRaw = async (body: any, ip = '1.1.1.1') => {
     const res = await handleRequest(new Request('https://x/f', { method: 'POST', headers: { 'cf-connecting-ip': ip }, body: JSON.stringify(body) }), db, env);
     return { status: res.status, body: await res.json() };
   };
-  return { clock, db, rows, env, call };
+  // Como el cliente real: todo push sobre una fila existente declara la versión en la que se basa (el servidor la exige).
+  const call = async (body: any, ip = '1.1.1.1') => {
+    const base = body?.action === 'push' && body.expected_version === undefined ? rows.get(body.id)?.created_at : undefined;
+    return callRaw(base ? { ...body, expected_version: base } : body, ip);
+  };
+  return { clock, db, rows, env, call, callRaw };
 }
 
 const create = (call: any, id = 'CONG1') =>
@@ -92,8 +97,9 @@ test('maestro escribe ambos y preserve_master protege el payload', async () => {
   assert.equal(rows.get('CONG1')!.payload, 'ADMIN2'); assert.equal(rows.get('CONG1')!.payload_public, 'PUB3');
 });
 
-test('concurrencia optimista: push rechaza sobrescritura con 409 si expected_version no coincide', async () => {
-  const { call, clock } = setup();
+test('concurrencia optimista: push rechaza sobrescritura con 409 y exige expected_version (428)', async () => {
+  const ctx = setup();
+  const { call, clock } = ctx;
   const c1 = await create(call);
   assert.equal(c1.status, 200);
   const version1 = c1.body.created_at;
@@ -125,15 +131,31 @@ test('concurrencia optimista: push rechaza sobrescritura con 409 si expected_ver
   assert.equal(b1.body.error, 'conflict_detected');
   assert.equal(b1.body.current_version, version2);
 
-  // Guardado forzado o sin expected_version sigue funcionando
-  const b2 = await call({
+  // Sin expected_version el servidor ya no sobrescribe a ciegas: exige la versión (428) y revela la vigente.
+  const { callRaw } = ctx;
+  const b2 = await callRaw({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_B_SIN_VERSION',
+    payload_public: 'PUB_B_SIN_VERSION',
+  });
+  assert.equal(b2.status, 428);
+  assert.equal(b2.body.error, 'expected_version_required');
+  assert.equal(b2.body.current_version, version2);
+  assert.equal(ctx.rows.get('CONG1')!.payload, 'ADMIN_A', 'el payload vigente no se tocó');
+
+  // Con la versión vigente sí se guarda (esto es lo que hace "forzar" en el cliente: leer la versión y usarla).
+  const b3 = await callRaw({
     action: 'push',
     id: 'CONG1',
     tokens: { master: T.masterA, public: T.publicA },
     payload: 'ADMIN_B_FORZADO',
     payload_public: 'PUB_B_FORZADO',
+    expected_version: version2,
   });
-  assert.equal(b2.status, 200);
+  assert.equal(b3.status, 200);
+  assert.equal(ctx.rows.get('CONG1')!.payload, 'ADMIN_B_FORZADO');
 });
 
 test('rotación de credenciales: las viejas dejan de funcionar', async () => {
@@ -221,18 +243,13 @@ test('límite por IP entre congregaciones distintas', async () => {
   assert.equal(last, 429);
 });
 
-test('filas antiguas: no se leen y solo se reclaman con LEGACY_CLAIM', async () => {
-  for (const legacyClaim of [false, true]) {
-    const { call, rows } = setup({ legacyClaim });
-    rows.set('OLD1', { id_congregacion: 'OLD1', payload: 'X', payload_public: 'Y', created_at: new Date(0).toISOString(), type: 'full_sync', master_verifier: null, public_verifier: null });
-    assert.equal((await call({ action: 'pull', id: 'OLD1', tokens: { master: T.masterA } })).status, 401);
-    const claim = await call({ action: 'push', id: 'OLD1', tokens: { master: T.masterA, public: T.publicA }, payload: 'NEW', payload_public: 'NEWP' });
-    if (!legacyClaim) { assert.equal(claim.status, 401); assert.equal(rows.get('OLD1')!.payload, 'X'); }
-    else {
-      assert.equal(claim.status, 200); assert.equal(claim.body.claimed, true);
-      assert.equal((await call({ action: 'pull', id: 'OLD1', tokens: { master: T.masterA } })).body.payload, 'NEW');
-    }
-  }
+test('filas sin verificadores: no se leen y nadie puede reclamarlas', async () => {
+  const { call, rows } = setup();
+  rows.set('OLD1', { id_congregacion: 'OLD1', payload: 'X', payload_public: 'Y', created_at: new Date(0).toISOString(), type: 'full_sync', master_verifier: null, public_verifier: null });
+  assert.equal((await call({ action: 'pull', id: 'OLD1', tokens: { master: T.masterA } })).status, 401);
+  const claim = await call({ action: 'push', id: 'OLD1', tokens: { master: T.masterA, public: T.publicA }, payload: 'NEW', payload_public: 'NEWP' });
+  assert.equal(claim.status, 401);
+  assert.equal(rows.get('OLD1')!.payload, 'X', 'la fila huérfana no se modifica');
 });
 
 test('validaciones de entrada', async () => {
@@ -268,7 +285,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     payload: 'ADMIN',
     payload_public: 'PUB',
     personal_pins: [
-      { id: 'pub_anciano', token: pinToken1, name: 'Hermano Anciano', role: 'anciano', privilege: 'anciano' },
+      { id: 'pub_anciano', token: pinToken1, v: 2, name: 'Hermano Anciano', role: 'anciano', privilege: 'anciano' },
     ],
   });
   assert.equal(created.status, 200);
@@ -285,7 +302,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     action: 'verify_personal_pin',
     id: CONG,
     tokens: { public: T.publicA },
-    pin_token: pinToken1,
+    pin_token_v2: pinToken1,
   });
   assert.equal(noPubRes.status, 400);
   assert.equal(noPubRes.body.error, 'publisher_id_required');
@@ -295,7 +312,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     action: 'verify_personal_pin',
     id: CONG,
     tokens: { public: T.publicA },
-    pin_token: pinToken1,
+    pin_token_v2: pinToken1,
     publisher_id: 'pub_anciano',
   });
   assert.equal(okRes.status, 200);
@@ -308,7 +325,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     action: 'verify_personal_pin',
     id: CONG,
     tokens: { public: T.wrong },
-    pin_token: pinToken1,
+    pin_token_v2: pinToken1,
     publisher_id: 'pub_anciano',
   });
   assert.equal(badCong.status, 401);
@@ -320,7 +337,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
       action: 'verify_personal_pin',
       id: CONG,
       tokens: { public: T.publicA },
-      pin_token: pinTokenWrong,
+      pin_token_v2: pinTokenWrong,
       publisher_id: 'pub_anciano',
     }, '9.9.9.9');
     assert.equal(fail.status, 401);
@@ -329,7 +346,7 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     action: 'verify_personal_pin',
     id: CONG,
     tokens: { public: T.publicA },
-    pin_token: pinTokenWrong,
+    pin_token_v2: pinTokenWrong,
     publisher_id: 'pub_anciano',
   }, '9.9.9.9');
   assert.equal(blocked.status, 429);
@@ -342,10 +359,10 @@ test('PIN personal: el tope por publicador se aplica aunque el atacante cambie d
   const guess = (n: number) => n.toString(16).padStart(64, '0');
   await call({
     action: 'push', id: CONG, tokens: { master: T.masterA, public: T.publicA }, payload: 'A', payload_public: 'P',
-    personal_pins: [{ id: 'pubX', token: good, name: 'X', role: 'anciano', privilege: 'anciano' }],
+    personal_pins: [{ id: 'pubX', token: good, v: 2, name: 'X', role: 'anciano', privilege: 'anciano' }],
   });
   const verify = (tok: string, ip: string) =>
-    call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token: tok, publisher_id: 'pubX' }, ip);
+    call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token_v2: tok, publisher_id: 'pubX' }, ip);
 
   // 6 intentos fallidos desde 6 IPs distintas: el tope por (congregación, publicador) debe saltar igual
   let last: any;
@@ -357,7 +374,7 @@ test('PIN personal: el tope por publicador se aplica aunque el atacante cambie d
   assert.equal(during.status, 429);
 
   // Otro publicador de la misma congregación NO se ve afectado por este bloqueo
-  const other = await call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token: good, publisher_id: 'otro' }, '10.8.8.8');
+  const other = await call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token_v2: good, publisher_id: 'otro' }, '10.8.8.8');
   assert.notEqual(other.status, 429);
 
   // Pasado el bloqueo (30 min) el PIN correcto vuelve a funcionar
@@ -370,12 +387,12 @@ test('PIN personal: el tope por publicador se aplica aunque el atacante cambie d
 test('PIN personal: publisher_id demasiado largo se rechaza (no se crean contadores arbitrarios)', async () => {
   const { call } = setup();
   await create(call, 'CONGLONG');
-  const r = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token: hex('f'), publisher_id: 'x'.repeat(101) });
+  const r = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token_v2: hex('f'), publisher_id: 'x'.repeat(101) });
   assert.equal(r.status, 400);
   assert.equal(r.body.error, 'bad_publisher_id');
 
   // Caracteres no permitidos (inyección / caracteres de control)
-  const rInvalid = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token: hex('f'), publisher_id: 'pub:admin\n' });
+  const rInvalid = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token_v2: hex('f'), publisher_id: 'pub:admin\n' });
   assert.equal(rInvalid.status, 400);
   assert.equal(rInvalid.body.error, 'bad_publisher_id');
 });
@@ -388,13 +405,13 @@ test('PIN personal: publisher_id inexistente se rechaza sin crear registros de p
     tokens: { master: T.masterA, public: T.publicA },
     payload: 'ADMIN',
     payload_public: 'PUB',
-    personal_pins: [{ id: 'pubReal', token: hex('1'), name: 'Real', role: 'publico', privilege: 'publicador' }],
+    personal_pins: [{ id: 'pubReal', token: hex('1'), v: 2, name: 'Real', role: 'publico', privilege: 'publicador' }],
   });
   const r = await call({
     action: 'verify_personal_pin',
     id: 'CONGFAKE',
     tokens: { public: T.publicA },
-    pin_token: hex('1'),
+    pin_token_v2: hex('1'),
     publisher_id: 'pubInventado',
   });
   assert.equal(r.status, 401);
@@ -407,6 +424,7 @@ test('PIN personal: límite de publicadores por congregación (>500 rechazado)',
   const manyPublishers = Array.from({ length: 501 }, (_, i) => ({
     id: `pub_${i}`,
     token: hex('1'),
+    v: 2,
     name: `Pub ${i}`,
     role: 'publico',
   }));
@@ -431,6 +449,7 @@ test('PIN personal: verify_personal_pin devuelve session_token firmado por el se
     personal_pins: [{
       id: 'pub1',
       token: hex('1'),
+      v: 2,
       name: 'Hno Juan',
       role: 'publicador',
       privilege: 'publicador',
@@ -443,7 +462,7 @@ test('PIN personal: verify_personal_pin devuelve session_token firmado por el se
     action: 'verify_personal_pin',
     id: 'CONGTOKEN',
     tokens: { public: T.publicA },
-    pin_token: hex('1'),
+    pin_token_v2: hex('1'),
     publisher_id: 'pub1',
   });
   assert.equal(r1.status, 200);
@@ -509,6 +528,7 @@ test('verify_role_token: revoca el token si el publicador es eliminado o cambia 
     personal_pins: [{
       id: 'pubAnciano',
       token: hex('1'),
+      v: 2,
       name: 'Hno Pedro',
       role: 'anciano',
       privilege: 'anciano',
@@ -520,7 +540,7 @@ test('verify_role_token: revoca el token si el publicador es eliminado o cambia 
     action: 'verify_personal_pin',
     id: 'CONGREVOKE',
     tokens: { public: T.publicA },
-    pin_token: hex('1'),
+    pin_token_v2: hex('1'),
     publisher_id: 'pubAnciano',
   });
   assert.equal(login.status, 200);
@@ -536,6 +556,7 @@ test('verify_role_token: revoca el token si el publicador es eliminado o cambia 
     personal_pins: [{
       id: 'pubAnciano',
       token: hex('1'),
+      v: 2,
       name: 'Hno Pedro',
       role: 'publicador',
       privilege: 'publicador',
@@ -583,6 +604,7 @@ test('signServerRoleToken: caracteres separadores en role o theocraticRoles no r
     personal_pins: [{
       id: 'pub.con.punto',
       token: hex('1'),
+      v: 2,
       name: 'Hno',
       role: 'anciano:coord',
       privilege: 'anciano',
@@ -594,7 +616,7 @@ test('signServerRoleToken: caracteres separadores en role o theocraticRoles no r
     action: 'verify_personal_pin',
     id: 'CONGSEP',
     tokens: { public: T.publicA },
-    pin_token: hex('1'),
+    pin_token_v2: hex('1'),
     publisher_id: 'pub.con.punto',
   });
   assert.equal(login.status, 200);
@@ -610,58 +632,15 @@ test('signServerRoleToken: caracteres separadores en role o theocraticRoles no r
   assert.equal(check.body.publisher_id, 'pub.con.punto');
 });
 
-test('migración transparente: push con master_legacy autentica y actualiza verificadores a v2', async () => {
-  const { call, rows } = setup();
-  // 1. Alta con verificadores legados (T.masterA, T.publicA)
-  await call({
-    action: 'push',
-    id: 'CONGMIGRATION',
-    tokens: { master: T.masterA, public: T.publicA },
-    payload: 'ADMIN_V1',
-    payload_public: 'PUB_V1',
-  });
-
-  // Comprobar que pull inicial autentica con T.masterA
-  const pullV1 = await call({
-    action: 'pull',
-    id: 'CONGMIGRATION',
-    tokens: { master: T.masterA },
-  });
-  assert.equal(pullV1.status, 200);
-  assert.equal(pullV1.body.tier, 'master');
-
-  // 2. Cliente v2 sincroniza con token nuevo (T.masterNew) y provee fallback (T.masterA en master_legacy)
-  const pushMigrate = await call({
-    action: 'push',
-    id: 'CONGMIGRATION',
-    tokens: {
-      master: T.masterNew,
-      public: T.publicNew,
-      master_legacy: T.masterA,
-      public_legacy: T.publicA,
-    },
-    payload: 'ADMIN_V2',
-    payload_public: 'PUB_V2',
-  });
-  assert.equal(pushMigrate.status, 200);
-
-  // 3. El verificador en el servidor fue actualizado automáticamente a V2 (T.masterNew)
-  const pullV2 = await call({
-    action: 'pull',
-    id: 'CONGMIGRATION',
-    tokens: { master: T.masterNew },
-  });
-  assert.equal(pullV2.status, 200);
-  assert.equal(pullV2.body.payload, 'ADMIN_V2');
-  assert.equal(pullV2.body.is_legacy, false);
-
-  // 4. El token legado antiguo (T.masterA) ya no abre sin token v2 nuevo
-  const pullOldRejected = await call({
-    action: 'pull',
-    id: 'CONGMIGRATION',
-    tokens: { master: T.masterA },
-  }, '2.2.2.2');
-  assert.equal(pullOldRejected.status, 401);
+test('tokens legados: master_legacy / public_legacy ya no son credenciales válidas', async () => {
+  const { call, callRaw } = setup();
+  await create(call);
+  // Solo con campos legados no hay ningún token reconocible: petición mal formada.
+  const onlyLegacy = await callRaw({ action: 'pull', id: 'CONG1', tokens: { master_legacy: T.masterA, public_legacy: T.publicA } });
+  assert.equal(onlyLegacy.status, 400);
+  // Un token legado correcto acompañando a uno incorrecto tampoco autentica.
+  const mixed = await callRaw({ action: 'pull', id: 'CONG1', tokens: { master: T.wrong, master_legacy: T.masterA } }, '4.4.4.4');
+  assert.equal(mixed.status, 401);
 });
 
 test('concurrencia optimista: el formato de fecha de Postgres (+00:00) no provoca falsos conflictos', async () => {

@@ -5,21 +5,16 @@ import {
   decryptFromSupabase,
   encryptData,
   decryptData,
-  normalizePin,
   normalizePinV2,
-  isLegacyPinFormat,
 } from '../src/utils/crypto.ts';
 
 test('normalización v2: preserva símbolos, mayúsculas/minúsculas y realiza NFKC trim', () => {
   assert.equal(normalizePinV2('  Teo#2026!  '), 'Teo#2026!');
   assert.equal(normalizePinV2('8X4W-9M2K'), '8X4W-9M2K');
   assert.equal(normalizePinV2('user@cong_123'), 'user@cong_123');
-
-  // Comparación contra v1
-  assert.equal(normalizePin('  Teo#2026!  '), 'TEO2026');
-  assert.equal(isLegacyPinFormat('Teo#2026!'), true);
-  assert.equal(isLegacyPinFormat('8X4W-9M2K'), true); // v1 elimina el guion
-  assert.equal(isLegacyPinFormat('123456789012'), false); // numérico puro es idéntico
+  // PIN estándar de congregación: mayúsculas y guion canónico, con o sin guion y en minúsculas
+  assert.equal(normalizePinV2('8x4w9m2k'), '8X4W-9M2K');
+  assert.equal(normalizePinV2('123456789012'), '123456789012');
 });
 
 test('cifrado v2 con símbolos: ida y vuelta con caracteres especiales', async () => {
@@ -31,28 +26,27 @@ test('cifrado v2 con símbolos: ida y vuelta con caracteres especiales', async (
   assert.deepEqual(decrypted, data);
 });
 
-test('cifrado: fallback dual transparente para descifrar datos legados (v1 normalizado)', async () => {
+// Genera texto cifrado con el esquema ANTERIOR (PBKDF2 de 100.000 iteraciones, PIN normalizado a mayúsculas sin símbolos).
+async function makeOldFormatCiphertext(pin: string, iters: number) {
   const { webcrypto } = await import('node:crypto');
   const enc = new TextEncoder();
-  // Simular ciphertext legado v1 cifrado con PIN que fue normalizado a mayúsculas sin símbolos
-  const rawPin = 'MyPass#2026!';
-  const legacyNormalizedPin = normalizePin(rawPin); // "MYPASS2026"
   const salt = webcrypto.getRandomValues(new Uint8Array(16));
   const iv = webcrypto.getRandomValues(new Uint8Array(12));
-  const base = await webcrypto.subtle.importKey('raw', enc.encode(legacyNormalizedPin), 'PBKDF2', false, ['deriveKey']);
-  const key = await webcrypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
-  const buf = new Uint8Array(await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify({ legacy: true, secret: 999 }))));
+  const base = await webcrypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
+  const key = await webcrypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iters, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+  const buf = new Uint8Array(await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify({ ok: 1 }))));
   const h = (b: Uint8Array) => Array.from(b).map((x) => x.toString(16).padStart(2, '0')).join('');
-  const legacyCiphertext = `${h(salt)}:${h(iv)}:${h(buf.slice(-16))}:${h(buf.slice(0, -16))}`;
+  return `${h(salt)}:${h(iv)}:${h(buf.slice(-16))}:${h(buf.slice(0, -16))}`;
+}
 
-  // El usuario introduce su PIN con símbolos rawPin ("MyPass#2026!").
-  // El primer intento v2 fallará el auth tag, y el fallback v1 lo descifrará con éxito.
-  const decrypted = await decryptFromSupabase(legacyCiphertext, rawPin);
-  assert.deepEqual(decrypted, { legacy: true, secret: 999 });
-
-  // Si se introduce un PIN incorrecto, falla limpiamente
-  await assert.rejects(decryptFromSupabase(legacyCiphertext, 'WrongPass#2026!'), /PIN incorrecto/);
+test('cifrado: los formatos anteriores (sin prefijo v2:, 100k, PIN sin símbolos) ya NO se leen', async () => {
+  const old = await makeOldFormatCiphertext('MYPASS2026', 100000);
+  await assert.rejects(decryptFromSupabase(old, 'MyPass#2026!'), /PIN incorrecto/);
+  await assert.rejects(decryptFromSupabase(old, 'MYPASS2026'), /PIN incorrecto/, 'ni siquiera con el PIN normalizado v1');
+  await assert.rejects(decryptData(old, 'MYPASS2026'), /PIN incorrecto/);
+  await assert.rejects(decryptFromSupabase('', 'x'), /inválido/);
 });
+
 import {
   encodeSecureShareToken,
   decodeSecureShareToken,
@@ -84,22 +78,15 @@ test('cifrado: ida y vuelta con el formato actual', async () => {
   assert.deepEqual(await decryptData(await encryptData(data, 'clave'), 'clave'), data);
 });
 
-test('cifrado: se siguen leyendo datos v1 (sin prefijo) y v2 ("v2:") — compatibilidad hacia atrás', async () => {
-  // Texto cifrado v1 real generado con el código ORIGINAL (100.000 iteraciones, PIN "ABC12345")
-  const { webcrypto } = await import('node:crypto');
-  const enc = new TextEncoder();
-  const mk = async (pin: string, iters: number) => {
-    const salt = webcrypto.getRandomValues(new Uint8Array(16));
-    const iv = webcrypto.getRandomValues(new Uint8Array(12));
-    const base = await webcrypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
-    const key = await webcrypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iters, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
-    const buf = new Uint8Array(await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify({ ok: 1 }))));
-    const h = (b: Uint8Array) => Array.from(b).map((x) => x.toString(16).padStart(2, '0')).join('');
-    return `${h(salt)}:${h(iv)}:${h(buf.slice(-16))}:${h(buf.slice(0, -16))}`;
-  };
-  assert.deepEqual(await decryptFromSupabase(await mk('ABC12345', 100000), 'abc-12345'), { ok: 1 });
-  assert.deepEqual(await decryptFromSupabase('v2:' + (await mk('ABC12345', 600000)), 'ABC12345'), { ok: 1 });
-  await assert.rejects(decryptFromSupabase('v2:' + (await mk('ABC12345', 100000)), 'ABC12345'), 'v2 con KDF equivocado debe fallar');
+test('cifrado: solo existe el formato v2 (600k) y el PIN con símbolos conserva toda su entropía', async () => {
+  const good = await encryptForSupabase({ ok: 1 }, 'ABC12345');
+  assert.ok(good.startsWith('v2:'));
+  assert.deepEqual(await decryptFromSupabase(good, 'abc1-2345'), { ok: 1 }, 'PIN estándar: mayúsculas y guion canónicos');
+  // v2 con KDF equivocado (100k) debe fallar
+  await assert.rejects(decryptFromSupabase('v2:' + (await makeOldFormatCiphertext('ABC1-2345', 100000)), 'ABC12345'), /PIN incorrecto/);
+  // Sin recorte de símbolos: dos frases que solo difieren en símbolos NO son equivalentes.
+  const enc = await encryptForSupabase({ ok: 2 }, 'Frase#Larga-2026!');
+  await assert.rejects(decryptFromSupabase(enc, 'FRASELARGA2026'), /PIN incorrecto/);
 });
 
 test('token compartible: NO contiene PINs de congregación ni personales y caduca', () => {
@@ -145,11 +132,11 @@ test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se resta
   const sanitized = sanitizePublishersForLocalStorage(originalPubs);
   assert.equal(sanitized[0].personalPin, undefined, 'El PIN no debe existir en texto plano');
   assert.ok(sanitized[0].personalPinHash, 'Debe tener hash del PIN');
-  assert.ok(sanitized[0].phone.startsWith('kgr_sec3:'), 'El teléfono debe estar cifrado en reposo con CTR kgr_sec3:');
-  assert.ok(sanitized[0].address.startsWith('kgr_sec3:'), 'La dirección debe estar cifrada en reposo con CTR kgr_sec3:');
-  assert.ok(sanitized[0].emergencyContactName.startsWith('kgr_sec3:'), 'El contacto de emergencia debe estar cifrado');
-  assert.ok(sanitized[0].notes.startsWith('kgr_sec3:'), 'Las notas médicas deben estar cifradas');
-  assert.ok(sanitized[0].birthDate.startsWith('kgr_sec3:'), 'La fecha de nacimiento debe estar cifrada');
+  assert.ok(sanitized[0].phone.startsWith('kgr_sec5d:'), 'El teléfono debe estar cifrado en reposo (sin bóveda: kgr_sec5d)');
+  assert.ok(sanitized[0].address.startsWith('kgr_sec5d:'), 'La dirección debe estar cifrada en reposo (sin bóveda: kgr_sec5d)');
+  assert.ok(sanitized[0].emergencyContactName.startsWith('kgr_sec5d:'), 'El contacto de emergencia debe estar cifrado');
+  assert.ok(sanitized[0].notes.startsWith('kgr_sec5d:'), 'Las notas médicas deben estar cifradas');
+  assert.ok(sanitized[0].birthDate.startsWith('kgr_sec5d:'), 'La fecha de nacimiento debe estar cifrada');
 
   // 2. Restaurar en memoria: debe devolver los valores exactos originales
   const restored = restorePublishersFromLocalStorage(sanitized);
@@ -161,10 +148,11 @@ test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se resta
   assert.equal(restored[0].birthDate, '1990-05-15');
   assert.equal(restored[0].notes, 'Alergia a la penicilina y mariscos. DPA vigente.');
 
-  // 3. Compatibilidad hacia atrás: registros legados kgr_sec2: se descifran transparentemente
+  // 3. Los formatos retirados (kgr_sec2/3/4) ya no se leen: el valor se conserva intacto, sin descifrar ni perderse
   const legacySec2Pub = [{ id: 'leg2', name: 'Marta', phone: 'kgr_sec2:1122334455667788', notes: 'Hipertensión' }];
   const restoredSec2 = restorePublishersFromLocalStorage(legacySec2Pub);
-  assert.ok(restoredSec2[0].notes, 'Hipertensión');
+  assert.equal(restoredSec2[0].notes, 'Hipertensión', 'texto plano heredado se lee tal cual');
+  assert.ok(String(restoredSec2[0].phone ?? '').startsWith('kgr_sec2:') || restoredSec2[0].phone === '', 'valor de formato retirado: sin descifrar');
 
   // 4. Compatibilidad hacia atrás: registros legados sin cifrar se leen intactos
   const legacyPub = [{ id: 'leg1', name: 'Pedro', phone: '3001234567', notes: 'Hipertensión' }];
@@ -397,11 +385,11 @@ test('Fase 2 Bóveda Local: Cifrado kgr_sec5 respaldado por IndexedDB para salud
   assert.ok(stolenDumpRestored[0].medical_allergies.startsWith('kgr_sec5:'), 'Sin la bóveda no se puede descifrar');
   assert.ok(stolenDumpRestored[0].spiritual_notes.startsWith('kgr_sec5:'), 'Sin la bóveda las notas no se descifran');
 
-  // 5. Retrocompatibilidad: Si existen datos antiguos en kgr_sec3 o kgr_sec2 se leen sin problemas
+  // 5. Sin bóveda (IndexedDB bloqueado) se usa el respaldo kgr_sec5d (AES-GCM, solo ofuscación)
   setVaultSessionEntropyForTesting(null); // simular entorno básico
-  const legacyEncrypted = encryptSensitiveFieldAtRest('Alergia al polen');
-  assert.ok(legacyEncrypted.startsWith('kgr_sec3:'));
-  assert.equal(decryptSensitiveFieldAtRest(legacyEncrypted), 'Alergia al polen');
+  const fallbackEncrypted = encryptSensitiveFieldAtRest('Alergia al polen');
+  assert.ok(fallbackEncrypted.startsWith('kgr_sec5d:'));
+  assert.equal(decryptSensitiveFieldAtRest(fallbackEncrypted), 'Alergia al polen');
 
   // Restaurar estado
   setVaultSessionEntropyForTesting(null);

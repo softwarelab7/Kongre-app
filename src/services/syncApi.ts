@@ -7,19 +7,16 @@
  * El servidor valida el token, limita los intentos y decide qué nivel de datos devuelve.
  */
 import { SUPABASE_URL } from '../lib/supabase';
-import { normalizePin, normalizePinV2, isLegacyPinFormat } from '../utils/crypto';
+import { normalizePinV2 } from '../utils/crypto';
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/kongre-sync`;
 export const AUTH_ITERATIONS = 600_000;
-export const AUTH_ITERATIONS_LEGACY = 100_000;
 
 export type SyncRole = 'master' | 'public';
 
 export interface SyncTokens {
   master?: string;
   public?: string;
-  master_legacy?: string;
-  public_legacy?: string;
 }
 
 export type SyncSuccess<T> = { ok: true } & T;
@@ -33,15 +30,9 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 /** Token de autenticación determinista: PBKDF2-SHA256(PIN normalizado, sal = rol|congregación). */
-export async function deriveAuthToken(
-  pin: string,
-  congregationId: string,
-  role: SyncRole,
-  legacy: boolean = false,
-  iterations: number = legacy ? AUTH_ITERATIONS_LEGACY : AUTH_ITERATIONS
-): Promise<string> {
-  const cleanPin = legacy ? normalizePin(pin) : normalizePinV2(pin);
-  const cacheKey = `${role}|${congregationId}|${iterations}|${legacy ? 'leg:' : 'v2:'}${cleanPin}`;
+export async function deriveAuthToken(pin: string, congregationId: string, role: SyncRole): Promise<string> {
+  const cleanPin = normalizePinV2(pin);
+  const cacheKey = `${role}|${congregationId}|${cleanPin}`;
   const cached = tokenCache.get(cacheKey);
   if (cached) return cached;
 
@@ -51,7 +42,7 @@ export async function deriveAuthToken(
     {
       name: 'PBKDF2',
       salt: enc.encode(`kongre-sync-auth-v1|${role}|${congregationId}`),
-      iterations,
+      iterations: AUTH_ITERATIONS,
       hash: 'SHA-256',
     },
     base,
@@ -62,26 +53,13 @@ export async function deriveAuthToken(
   return token;
 }
 
-/** Tokens para una sesión con un único PIN (soporta derivación dual v2 a 600k iteraciones con fallback transparente a 100k iteraciones legadas). */
+/** Tokens para una sesión con un único PIN: el mismo PIN abre el nivel maestro o el público según el verificador que coincida. */
 export async function tokensFromSinglePin(pin: string, congregationId: string): Promise<SyncTokens> {
-  const isLegacy = isLegacyPinFormat(pin);
   const [master, pub] = await Promise.all([
-    deriveAuthToken(pin, congregationId, 'master', false, AUTH_ITERATIONS),
-    deriveAuthToken(pin, congregationId, 'public', false, AUTH_ITERATIONS),
+    deriveAuthToken(pin, congregationId, 'master'),
+    deriveAuthToken(pin, congregationId, 'public'),
   ]);
-
-  // Proveer siempre tokens legados (100k) para permitir auto-actualización transparente de congregaciones existentes
-  const [masterLegacy, pubLegacy] = await Promise.all([
-    deriveAuthToken(pin, congregationId, 'master', isLegacy, AUTH_ITERATIONS_LEGACY),
-    deriveAuthToken(pin, congregationId, 'public', isLegacy, AUTH_ITERATIONS_LEGACY),
-  ]);
-
-  return {
-    master,
-    public: pub,
-    master_legacy: masterLegacy,
-    public_legacy: pubLegacy,
-  };
+  return { master, public: pub };
 }
 
 function getSyncEndpoint(): string {
@@ -169,7 +147,6 @@ async function call<T>(body: Record<string, unknown>): Promise<SyncResult<T>> {
 
 export interface PullData {
   tier: SyncRole;
-  is_legacy?: boolean;
   created_at: string;
   type: string | null;
   payload: string | null;
@@ -182,32 +159,8 @@ export function syncPull(id: string, pin: string) {
 
 export function syncMeta(id: string, pin: string) {
   return tokensFromSinglePin(pin, id).then((tokens) =>
-    call<{ tier: SyncRole; is_legacy?: boolean; created_at: string; type: string | null }>({ action: 'meta', id, tokens })
+    call<{ tier: SyncRole; created_at: string; type: string | null }>({ action: 'meta', id, tokens })
   );
-}
-
-/** Token para PIN personal: PBKDF2(PIN normalizado, sal = `kongre-personal-pin-v1|${congregationId}`) */
-export async function derivePersonalPinToken(pin: string, congregationId: string): Promise<string> {
-  const cleanPin = normalizePin(pin);
-  const cacheKey = `personal|${congregationId}|${cleanPin}`;
-  const cached = tokenCache.get(cacheKey);
-  if (cached) return cached;
-
-  const enc = new TextEncoder();
-  const base = await crypto.subtle.importKey('raw', enc.encode(cleanPin), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt: enc.encode(`kongre-personal-pin-v1|${congregationId}`),
-      iterations: AUTH_ITERATIONS,
-      hash: 'SHA-256',
-    },
-    base,
-    256
-  );
-  const token = toHex(bits);
-  tokenCache.set(cacheKey, token);
-  return token;
 }
 
 /** v2: la sal incluye el publisherId, así un mismo PIN produce tokens distintos en cada publicador. */
@@ -260,18 +213,14 @@ export function syncVerifyPersonalPin(
   if (!publisherId || !publisherId.trim()) {
     return Promise.resolve({ ok: false as const, status: 400, error: 'publisher_id_required' });
   }
-  const isLegacy = isLegacyPinFormat(congregationPin);
   return Promise.all([
-    deriveAuthToken(congregationPin, id, 'public', false, AUTH_ITERATIONS),
-    deriveAuthToken(congregationPin, id, 'public', isLegacy, AUTH_ITERATIONS_LEGACY),
-    derivePersonalPinToken(personalPin, id),
+    deriveAuthToken(congregationPin, id, 'public'),
     derivePersonalPinTokenV2(personalPin, id, publisherId.trim()),
-  ]).then(([publicToken, publicLegacyToken, pinToken, pinTokenV2]) =>
+  ]).then(([publicToken, pinTokenV2]) =>
     call<{ publisher: VerifiedPublisher; session_token?: string; expires_at?: number }>({
       action: 'verify_personal_pin',
       id,
-      tokens: { public: publicToken, public_legacy: publicLegacyToken },
-      pin_token: pinToken,
+      tokens: { public: publicToken },
       pin_token_v2: pinTokenV2,
       publisher_id: publisherId.trim(),
     })
@@ -283,15 +232,11 @@ export function syncVerifyRoleToken(
   congregationPin: string,
   token: string
 ) {
-  const isLegacy = isLegacyPinFormat(congregationPin);
-  return Promise.all([
-    deriveAuthToken(congregationPin, id, 'public', false, AUTH_ITERATIONS),
-    deriveAuthToken(congregationPin, id, 'public', isLegacy, AUTH_ITERATIONS_LEGACY),
-  ]).then(([publicToken, publicLegacyToken]) =>
+  return deriveAuthToken(congregationPin, id, 'public').then((publicToken) =>
     call<{ valid: boolean; publisher_id: string; role: string; roles: string[]; expires_at: number }>({
       action: 'verify_role_token',
       id,
-      tokens: { public: publicToken, public_legacy: publicLegacyToken },
+      tokens: { public: publicToken },
       token,
     })
   );
@@ -312,24 +257,19 @@ export async function syncPush(params: {
   /** Versión esperada (marca de tiempo de última lectura) para evitar sobreescritura accidental concurrente (409 Conflict). */
   expectedVersion?: string;
 }) {
-  const masterLegacy = isLegacyPinFormat(params.masterPin);
-  const publicLegacy = isLegacyPinFormat(params.publicPin);
-
   const tokens: SyncTokens = {
-    master: await deriveAuthToken(params.masterPin, params.id, 'master', false, AUTH_ITERATIONS),
-    public: await deriveAuthToken(params.publicPin, params.id, 'public', false, AUTH_ITERATIONS),
-    master_legacy: await deriveAuthToken(params.masterPin, params.id, 'master', masterLegacy, AUTH_ITERATIONS_LEGACY),
-    public_legacy: await deriveAuthToken(params.publicPin, params.id, 'public', publicLegacy, AUTH_ITERATIONS_LEGACY),
+    master: await deriveAuthToken(params.masterPin, params.id, 'master'),
+    public: await deriveAuthToken(params.publicPin, params.id, 'public'),
   };
 
   let rotate_to: SyncTokens | undefined;
   if (params.rotateTo) {
     rotate_to = {};
     if (params.rotateTo.masterPin) {
-      rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master', false, AUTH_ITERATIONS);
+      rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master');
     }
     if (params.rotateTo.publicPin) {
-      rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public', false, AUTH_ITERATIONS);
+      rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public');
     }
   }
   let personal_pins: Array<{ id: string; token: string; v: 2; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
@@ -346,7 +286,7 @@ export async function syncPush(params: {
       }))
     );
   }
-  return call<{ created_at: string; tier: SyncRole; is_legacy?: boolean; created?: boolean; claimed?: boolean }>({
+  return call<{ created_at: string; tier: SyncRole; created?: boolean }>({
     action: 'push',
     id: params.id,
     tokens,
@@ -360,12 +300,8 @@ export async function syncPush(params: {
 }
 
 export function syncDelete(id: string, masterPin: string) {
-  const isLegacy = isLegacyPinFormat(masterPin);
-  return Promise.all([
-    deriveAuthToken(masterPin, id, 'master', false, AUTH_ITERATIONS),
-    deriveAuthToken(masterPin, id, 'master', isLegacy, AUTH_ITERATIONS_LEGACY),
-  ]).then(([master, masterLegacy]) =>
-    call<{ deleted: boolean }>({ action: 'delete', id, tokens: { master, master_legacy: masterLegacy } })
+  return deriveAuthToken(masterPin, id, 'master').then((master) =>
+    call<{ deleted: boolean }>({ action: 'delete', id, tokens: { master } })
   );
 }
 
@@ -377,6 +313,9 @@ export function describeSyncError(r: SyncFailure | { status?: number; error?: st
   if (r.status === 429) {
     const mins = r.retryAfter ? Math.max(1, Math.ceil(r.retryAfter / 60)) : 1;
     return `Demasiados intentos. Espera ${mins} minuto${mins === 1 ? '' : 's'} antes de volver a intentar.`;
+  }
+  if (r.status === 428 || r.error === 'expected_version_required') {
+    return 'Este dispositivo aún no se ha sincronizado con la nube. Descarga primero los datos de la congregación para no sobrescribir el trabajo de otros hermanos.';
   }
   if (r.status === 409 || r.error === 'conflict_detected') {
     return 'Se detectaron cambios más recientes guardados desde otro dispositivo. Para no sobrescribir el trabajo de otro hermano, sincroniza primero los datos de la nube.';

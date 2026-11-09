@@ -5,7 +5,6 @@
  *   KONGRE_SYNC_PEPPER   cadena aleatoria larga (>= 32 bytes). NO la cambies después: invalida todos los accesos.
  * Opcionales:
  *   ALLOWED_ORIGINS      orígenes permitidos separados por coma (ej. https://kongre.ai.studio,http://localhost:3050)
- *   LEGACY_CLAIM         "true" solo durante la migración de congregaciones existentes
  * Inyectados por Supabase: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -85,7 +84,6 @@ const parsedOrigins = (rawAllowedOrigins || '')
 const env = {
   pepper,
   allowedOrigins: parsedOrigins,
-  legacyClaim: Deno.env.get('LEGACY_CLAIM') === 'true',
 };
 
 // Avisos de configuración al arrancar (visibles en Dashboard → Edge Functions → Logs).
@@ -102,9 +100,6 @@ if (env.allowedOrigins.length === 0) {
         'En producción define ALLOWED_ORIGINS (ej: https://www.kongre-app.com,tauri://localhost).'
     );
   }
-}
-if (env.legacyClaim) {
-  console.warn('AVISO: LEGACY_CLAIM=true. Debe usarse solo durante la migración de congregaciones existentes; desactívalo después.');
 }
 
 Deno.serve(async (req) => {

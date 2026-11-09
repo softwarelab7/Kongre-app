@@ -120,7 +120,7 @@ import {
   computeBackupIntegritySeal,
   verifyBackupIntegritySeal,
 } from '../utils/theocraticSecurity';
-import { normalizePin, normalizePinV2 } from '../utils/crypto';
+import { normalizePinV2 } from '../utils/crypto';
 import { insertAuditLog } from '../services/auditLogService';
 import {
   normalizePersonName,

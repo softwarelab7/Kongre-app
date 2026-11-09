@@ -20,7 +20,7 @@ export interface PersonalVerifier {
   role: string;
   privilege?: string;
   theocraticRoles?: string[];
-  /** Versión del verificador: 2 = HMAC con publisherId en el mensaje y sal por publicador en el cliente. Sin valor = heredado. */
+  /** Versión del verificador. Solo existe la 2: HMAC con publisherId en el mensaje y sal por publicador en el cliente. */
   v?: number;
 }
 
@@ -56,8 +56,6 @@ export interface SyncDb {
 export interface SyncEnv {
   pepper: string;
   allowedOrigins: string[];
-  /** Permite reclamar filas antiguas (sin verificadores). Activar solo durante la migración. */
-  legacyClaim: boolean;
   now?: () => number;
 }
 
@@ -94,12 +92,6 @@ async function verifierOf(pepper: string, role: Tier, id: string, token: string)
   return toHex(sig);
 }
 
-export async function verifierOfPersonal(pepper: string, congId: string, token: string): Promise<string> {
-  const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`personal|${congId}|${token}`));
-  return toHex(sig);
-}
-
 /** v2: el publisherId forma parte del mensaje, así dos publicadores con el mismo PIN ya no comparten verificador. */
 export async function verifierOfPersonalV2(pepper: string, congId: string, pubId: string, token: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -114,14 +106,12 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
     const pubId = typeof item.id === 'string' ? item.id.trim() : '';
     const token = typeof item.token === 'string' ? item.token.trim() : '';
     if (!pubId || !PUB_ID_RE.test(pubId) || !TOKEN_RE.test(token)) continue;
-    const isV2 = item.v === 2;
-    const verifier = isV2
-      ? await verifierOfPersonalV2(pepper, congId, pubId, token)
-      : await verifierOfPersonal(pepper, congId, token);
+    // Solo se acepta el esquema v2 (el publisherId entra en el HMAC): un mismo PIN en dos publicadores no comparte verificador.
+    if (item.v !== 2) continue;
     out.push({
       id: pubId,
-      verifier,
-      ...(isV2 ? { v: 2 } : {}),
+      verifier: await verifierOfPersonalV2(pepper, congId, pubId, token),
+      v: 2,
       name: typeof item.name === 'string' ? item.name.trim().slice(0, 120) : '',
       role: typeof item.role === 'string' ? item.role.trim().slice(0, 40) : 'publico',
       privilege: typeof item.privilege === 'string' ? item.privilege.trim().slice(0, 40) : undefined,
@@ -241,8 +231,6 @@ function json(req: Request, env: SyncEnv, status: number, body: unknown): Respon
 interface Tokens {
   master?: string;
   public?: string;
-  master_legacy?: string;
-  public_legacy?: string;
 }
 
 function parseTokens(raw: any): Tokens | null {
@@ -256,15 +244,7 @@ function parseTokens(raw: any): Tokens | null {
     if (typeof raw.public !== 'string' || !TOKEN_RE.test(raw.public)) return null;
     out.public = raw.public;
   }
-  if (raw.master_legacy !== undefined) {
-    if (typeof raw.master_legacy !== 'string' || !TOKEN_RE.test(raw.master_legacy)) return null;
-    out.master_legacy = raw.master_legacy;
-  }
-  if (raw.public_legacy !== undefined) {
-    if (typeof raw.public_legacy !== 'string' || !TOKEN_RE.test(raw.public_legacy)) return null;
-    out.public_legacy = raw.public_legacy;
-  }
-  return out.master || out.public || out.master_legacy || out.public_legacy ? out : null;
+  return out.master || out.public ? out : null;
 }
 
 export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Promise<Response> {
@@ -310,22 +290,14 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     return json(req, env, 401, { ok: false, error: 'invalid_credentials' });
   };
 
-  const authOf = async (row: SyncRow): Promise<{ tier: Tier; isLegacy: boolean } | null> => {
+  const authOf = async (row: SyncRow): Promise<{ tier: Tier } | null> => {
     if (tokens.master && row.master_verifier) {
       const mv = await verifierOf(env.pepper, 'master', id, tokens.master);
-      if (safeEqual(mv, row.master_verifier)) return { tier: 'master', isLegacy: false };
-    }
-    if (tokens.master_legacy && row.master_verifier) {
-      const mvl = await verifierOf(env.pepper, 'master', id, tokens.master_legacy);
-      if (safeEqual(mvl, row.master_verifier)) return { tier: 'master', isLegacy: true };
+      if (safeEqual(mv, row.master_verifier)) return { tier: 'master' };
     }
     if (tokens.public && row.public_verifier) {
       const pv = await verifierOf(env.pepper, 'public', id, tokens.public);
-      if (safeEqual(pv, row.public_verifier)) return { tier: 'public', isLegacy: false };
-    }
-    if (tokens.public_legacy && row.public_verifier) {
-      const pvl = await verifierOf(env.pepper, 'public', id, tokens.public_legacy);
-      if (safeEqual(pvl, row.public_verifier)) return { tier: 'public', isLegacy: true };
+      if (safeEqual(pv, row.public_verifier)) return { tier: 'public' };
     }
     return null;
   };
@@ -386,25 +358,8 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       if (!current) return json(req, env, 500, { ok: false, error: 'internal' });
     }
 
-    // Fila antigua sin verificadores: solo se puede reclamar con LEGACY_CLAIM activo.
-    if (!current.master_verifier) {
-      if (!env.legacyClaim || !tokens.master || !tokens.public) return reject();
-      const patch: Partial<SyncRow> = {
-        created_at: nowIso,
-        type: 'full_sync',
-        master_verifier: await verifierOf(env.pepper, 'master', id, tokens.master),
-        public_verifier: await verifierOf(env.pepper, 'public', id, tokens.public),
-      };
-      if (typeof payload === 'string' && !(body.preserve_master && current.payload)) patch.payload = payload;
-      if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
-      if (Array.isArray(body.personal_pins)) {
-        if (body.personal_pins.length > MAX_PERSONAL_PINS) return reject();
-        patch.personal_verifiers = await buildPersonalVerifiers(env.pepper, id, body.personal_pins);
-      }
-      await db.updateRow(id, patch);
-      await db.clearFailures(kCongIp);
-      return json(req, env, 200, { ok: true, created_at: nowIso, tier: 'master', claimed: true });
-    }
+    // Una fila sin verificadores no pertenece a nadie y no se puede reclamar: se trata como credenciales inválidas.
+    if (!current.master_verifier) return reject();
 
     const auth = await authOf(current);
     if (!auth) return reject();
@@ -417,16 +372,20 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 403, { ok: false, error: 'push_requires_master_tier' });
     }
 
-    // Detección de conflictos de concurrencia optimista (ETag / Versión de guardado)
-    const expectedVersion = typeof body?.expected_version === 'string' ? body.expected_version.trim() : undefined;
+    // Concurrencia optimista OBLIGATORIA: toda actualización de una fila existente debe indicar la versión sobre la
+    // que se basa. Sin ella un cliente podría sobrescribir a ciegas el trabajo de otro anciano.
     if (body.expected_version !== undefined && (typeof body.expected_version !== 'string' || body.expected_version.length > 100)) {
       return json(req, env, 400, { ok: false, error: 'bad_expected_version' });
     }
-    if (expectedVersion && current.created_at && !versionsEqual(current.created_at, expectedVersion)) {
+    const expectedVersion = typeof body?.expected_version === 'string' ? body.expected_version.trim() : '';
+    if (!expectedVersion) {
+      return json(req, env, 428, { ok: false, error: 'expected_version_required', current_version: current.created_at ?? null });
+    }
+    if (!current.created_at || !versionsEqual(current.created_at, expectedVersion)) {
       return json(req, env, 409, {
         ok: false,
         error: 'conflict_detected',
-        current_version: current.created_at,
+        current_version: current.created_at ?? null,
       });
     }
 
@@ -434,13 +393,6 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
     if (typeof payload === 'string' && !body.preserve_master) patch.payload = payload;
 
-    // Actualización automática transparente de verificador legado a V2 (Fase 2 de migración)
-    if (auth.isLegacy && tokens.master && typeof payload === 'string' && !body.preserve_master) {
-      patch.master_verifier = await verifierOf(env.pepper, 'master', id, tokens.master);
-      if (tokens.public && typeof payloadPublic === 'string') {
-        patch.public_verifier = await verifierOf(env.pepper, 'public', id, tokens.public);
-      }
-    }
     if (Array.isArray(body.personal_pins)) {
       if (body.personal_pins.length > MAX_PERSONAL_PINS) {
         return json(req, env, 400, { ok: false, error: 'too_many_publishers' });
@@ -463,15 +415,11 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       if (rt.public) patch.public_verifier = await verifierOf(env.pepper, 'public', id, rt.public);
     }
 
-    if (expectedVersion && current.created_at) {
-      // La comprobación anterior solo da un mensaje rápido; la garantía real es este compare-and-swap atómico.
-      const swapped = await db.updateRowIfVersion(id, patch, current.created_at);
-      if (!swapped) {
-        const latest = await db.getRow(id);
-        return json(req, env, 409, { ok: false, error: 'conflict_detected', current_version: latest?.created_at ?? null });
-      }
-    } else {
-      await db.updateRow(id, patch);
+    // La comprobación anterior solo da un mensaje rápido; la garantía real es este compare-and-swap atómico.
+    const swapped = await db.updateRowIfVersion(id, patch, current.created_at);
+    if (!swapped) {
+      const latest = await db.getRow(id);
+      return json(req, env, 409, { ok: false, error: 'conflict_detected', current_version: latest?.created_at ?? null });
     }
     return json(req, env, 200, { ok: true, created_at: nowIso, tier });
   }
@@ -482,11 +430,8 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     const tier = await tierOf(row);
     if (!tier) return reject(); // Requiere credenciales válidas de la congregación
 
-    const pinToken = typeof body?.pin_token === 'string' ? body.pin_token.trim() : '';
     const pinTokenV2 = typeof body?.pin_token_v2 === 'string' ? body.pin_token_v2.trim() : '';
-    if (!pinToken && !pinTokenV2) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
-    if (pinToken && !TOKEN_RE.test(pinToken)) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
-    if (pinTokenV2 && !TOKEN_RE.test(pinTokenV2)) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
+    if (!pinTokenV2 || !TOKEN_RE.test(pinTokenV2)) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
 
     // Seguridad: publisher_id es OBLIGATORIO para evitar ataques de colisión aleatoria
     // contra cualquier publicador de la congregación.
@@ -514,16 +459,10 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 429, { ok: false, error: 'rate_limited', retry_after: Math.ceil((lockedPub - now()) / 1000) });
     }
 
-    // Un verificador v2 solo se acepta con el token v2 (sin degradación al esquema heredado).
-    // Los verificadores heredados siguen funcionando hasta que el PIN maestro sincroniza de nuevo.
-    let matched = false;
-    if (targetPublisher.v === 2) {
-      if (!pinTokenV2) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
-      matched = safeEqual(await verifierOfPersonalV2(env.pepper, id, targetPublisher.id, pinTokenV2), targetPublisher.verifier);
-    } else {
-      if (!pinToken) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
-      matched = safeEqual(await verifierOfPersonal(env.pepper, id, pinToken), targetPublisher.verifier);
-    }
+    // Solo existe el esquema v2. Un verificador sin v:2 (fila corrupta o ajena) nunca coincide.
+    const matched =
+      targetPublisher.v === 2 &&
+      safeEqual(await verifierOfPersonalV2(env.pepper, id, targetPublisher.id, pinTokenV2), targetPublisher.verifier);
 
     if (!matched) {
       const pubLock = await db.registerFailure(kPub, LIMITS.pub.limit, LIMITS.pub.window, LIMITS.pub.lock);
@@ -598,14 +537,13 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
   await db.clearFailures(kCongIp);
 
   if (action === 'meta') {
-    return json(req, env, 200, { ok: true, created_at: row.created_at, type: row.type, tier, is_legacy: auth.isLegacy });
+    return json(req, env, 200, { ok: true, created_at: row.created_at, type: row.type, tier });
   }
 
   if (action === 'pull') {
     return json(req, env, 200, {
       ok: true,
       tier,
-      is_legacy: auth.isLegacy,
       created_at: row.created_at,
       type: row.type,
       payload: tier === 'master' ? row.payload : null,

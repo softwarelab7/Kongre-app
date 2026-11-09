@@ -34,7 +34,6 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
    supabase link --project-ref rceyevhwhtjshsthrrtp
    supabase secrets set KONGRE_SYNC_PEPPER="$(openssl rand -base64 48)"
    supabase secrets set ALLOWED_ORIGINS="https://TU-DOMINIO,http://localhost:3050"
-   supabase secrets set LEGACY_CLAIM=true
    ```
 4. **Desplegar la función** (añade el snippet de `config.toml.snippet` a tu `supabase/config.toml`):
    ```bash
@@ -47,20 +46,17 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
      -d '{"action":"meta","id":"PRUEBA1","tokens":{"master":"'$(printf 'a%.0s' {1..64})'"}}'
    ```
 5. **Copiar los archivos de `src/`** sobre tu proyecto, probar en local (`npm run dev`) y publicar la app.
-6. **Reclamar tus congregaciones existentes** (mientras `LEGACY_CLAIM=true`): desde el dispositivo del coordinador
-   con datos actualizados, abre la app nueva y pulsa "Sincronizar con Supabase". Eso registra los verificadores.
-   Repite por cada congregación y comprueba entrando desde otro dispositivo o ventana privada.
-   > La fila sin reclamar no se puede leer por nadie (ni por quien tenga el PIN) hasta que alguien la reclame;
-   > mientras `LEGACY_CLAIM=true`, quien suba primero con un ID existente la reclama. Hazlo enseguida y apaga el flag.
-7. `supabase secrets set LEGACY_CLAIM=false`. Para ver filas sin reclamar:
-   `select id_congregacion, created_at from sync_queue where master_verifier is null;`
+6. **Comprobar que no quedan filas sin verificadores** (el reclamo de filas antiguas ya no existe: una fila sin
+   verificadores no pertenece a nadie y nadie puede leerla ni reclamarla). Si el proyecto ya tiene datos de pruebas
+   anteriores, bórralos: `select id_congregacion, created_at from sync_queue where master_verifier is null;`
+   Crea después la congregación desde la app nueva y compruébala entrando desde otro dispositivo o ventana privada.
 8. **Migración 02** (el cierre). Las versiones antiguas de la app dejan de sincronizar; los usuarios deben recargar/actualizar la PWA.
 9. Verifica con las consultas comentadas al final de la 02 (deben devolver 0 filas).
    Especialmente comprueba que no existan políticas públicas residuales:
    ```sql
    select * from pg_policies where schemaname='public' and tablename='sync_queue';
    ```
-   (debe devolver 0 filas). Asegúrate también de que `LEGACY_CLAIM=false`.
+   (debe devolver 0 filas).
 
 ## Qué probé y qué no
 

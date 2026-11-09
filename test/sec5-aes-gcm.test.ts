@@ -105,43 +105,52 @@ test('kgr_sec5: ligado al dispositivo — otro salt de dispositivo no descifra',
   assert.equal(decryptSensitiveFieldAtRest(enc), enc);
 });
 
-test('migración: valores kgr_sec4 y kgr_sec3 antiguos siguen siendo legibles', () => {
+test('formatos retirados: kgr_sec4 y kgr_sec3 ya no se leen (no hay datos previos que migrar)', () => {
   useStorage();
   setVaultSessionEntropyForTesting(ENTROPY);
-  assert.equal(decryptSensitiveFieldAtRest(LEGACY_SEC4), LEGACY_PLAIN);
+  assert.equal(decryptSensitiveFieldAtRest(LEGACY_SEC4), LEGACY_SEC4, 'se devuelve sin descifrar');
   setVaultSessionEntropyForTesting(null);
-  assert.equal(decryptSensitiveFieldAtRest(LEGACY_SEC3), LEGACY_PLAIN);
+  assert.equal(decryptSensitiveFieldAtRest(LEGACY_SEC3), LEGACY_SEC3, 'se devuelve sin descifrar');
 });
 
-test('migración: un publicador con datos kgr_sec4 se re-cifra a kgr_sec5 al guardar', () => {
+test('formatos retirados: un valor kgr_sec4 en un publicador se conserva intacto al guardar (no se pierde ni se re-cifra)', () => {
   useStorage();
   setVaultSessionEntropyForTesting(ENTROPY);
-  const stored = [{ id: 'p1', name: 'Hno Test', medical_allergies: LEGACY_SEC4, notes: 'texto plano heredado' }];
-  const inMemory = restorePublishersFromLocalStorage(stored as any);
-  assert.equal(inMemory[0].medical_allergies, LEGACY_PLAIN);
-  const persisted = sanitizePublishersForLocalStorage(inMemory as any);
-  assert.ok(persisted[0].medical_allergies.startsWith('kgr_sec5:'), 'alergias migradas');
-  assert.ok(persisted[0].notes.startsWith('kgr_sec5:'), 'texto plano heredado también se cifra');
-  assert.ok(!JSON.stringify(persisted).includes('sulfas'));
-  assert.equal(restorePublishersFromLocalStorage(persisted as any)[0].medical_allergies, LEGACY_PLAIN);
-});
-
-test('migración: un valor legado que no se pudo descifrar se conserva intacto (no se pierde)', () => {
-  useStorage();
-  setVaultSessionEntropyForTesting(null); // bóveda aún no lista
-  const stored = [{ id: 'p1', name: 'Hno Test', medical_allergies: LEGACY_SEC4 }];
+  const stored = [{ id: 'p1', name: 'Hno Test', medical_allergies: LEGACY_SEC4, notes: 'texto plano' }];
   const inMemory = restorePublishersFromLocalStorage(stored as any);
   assert.equal(inMemory[0].medical_allergies, LEGACY_SEC4);
   const persisted = sanitizePublishersForLocalStorage(inMemory as any);
-  assert.equal(persisted[0].medical_allergies, LEGACY_SEC4, 'idempotente: no se re-cifra ni se borra');
+  assert.equal(persisted[0].medical_allergies, LEGACY_SEC4, 'idempotente: no se toca');
+  assert.ok(persisted[0].notes.startsWith('kgr_sec5:'), 'el texto plano sí se cifra');
 });
 
-test('sin bóveda se mantiene el respaldo kgr_sec3 (comportamiento previo)', () => {
+test('sin bóveda: respaldo kgr_sec5d (AES-GCM con clave solo del dispositivo) y re-cifrado a kgr_sec5 cuando hay bóveda', () => {
   useStorage();
   setVaultSessionEntropyForTesting(null);
   const enc = encryptSensitiveFieldAtRest('Alergia al polen');
-  assert.ok(enc.startsWith('kgr_sec3:'));
+  assert.ok(enc.startsWith('kgr_sec5d:'));
+  assert.ok(!enc.includes('polen'));
   assert.equal(decryptSensitiveFieldAtRest(enc), 'Alergia al polen');
+  // manipulación detectada
+  const [salt, iv, ct] = enc.slice('kgr_sec5d:'.length).split(':');
+  const bad = `kgr_sec5d:${salt}:${iv}:${flipHexChar(ct, 0)}`;
+  assert.equal(decryptSensitiveFieldAtRest(bad), bad);
+  // Al aparecer la bóveda, el valor se lee y se re-cifra con kgr_sec5 en el siguiente guardado.
+  setVaultSessionEntropyForTesting(ENTROPY);
+  const inMemory = restorePublishersFromLocalStorage([{ id: 'p1', name: 'X', notes: enc }] as any);
+  assert.equal(inMemory[0].notes, 'Alergia al polen');
+  assert.ok(sanitizePublishersForLocalStorage(inMemory as any)[0].notes.startsWith('kgr_sec5:'));
+});
+
+test('kgr_sec5 y kgr_sec5d no son intercambiables (AAD y secreto distintos)', () => {
+  useStorage();
+  setVaultSessionEntropyForTesting(ENTROPY);
+  const withVault = encryptSensitiveFieldAtRest('dato');
+  setVaultSessionEntropyForTesting(null);
+  const noVault = encryptSensitiveFieldAtRest('dato');
+  const swapped = 'kgr_sec5d:' + withVault.slice('kgr_sec5:'.length);
+  assert.equal(decryptSensitiveFieldAtRest(swapped), swapped, 'un sec5 disfrazado de sec5d no descifra');
+  assert.notEqual(withVault.slice(9), noVault.slice(10));
 });
 
 test('kgr_sec5: cuentas y transacciones — comprobantes, donantes y notas se cifran en reposo', () => {

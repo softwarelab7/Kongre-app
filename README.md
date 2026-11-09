@@ -68,7 +68,7 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 ### 🔐 Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores
 - **Descifrado Transparente en Reposo (V4):** Desacoplamiento de la clave de reposo de tokens de sesión volátiles, garantizando el descifrado inmediato de campos confidenciales (teléfono, dirección, notas y directriz médica) desde almacenamiento local mediante sal de dispositivo y entropía IndexedDB no extraíble.
-- **Blindaje Visual Defensivo:** Erradicación de fugas de cadenas cifradas (`kgr_sec4:...`) en pantalla y contención estricta de desbordamientos horizontales en tarjetas Bento y vistas tabulares del directorio.
+- **Blindaje Visual Defensivo:** Erradicación de fugas de cadenas cifradas (`kgr_sec5:...`) en pantalla y contención estricta de desbordamientos horizontales en tarjetas Bento y vistas tabulares del directorio.
 
 ### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
 - **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.

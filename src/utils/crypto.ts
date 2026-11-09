@@ -1,22 +1,16 @@
 /**
  * src/utils/crypto.ts
  * Motor criptográfico de Cero Conocimiento (Zero-Knowledge) para Kongre2.
- * Implementa cifrado AES-256-GCM y derivación de claves PBKDF2 (600.000 iteraciones en v2; 100.000 en el formato v1 heredado)
+ * Implementa cifrado AES-256-GCM y derivación de claves PBKDF2-SHA256 (600.000 iteraciones, recomendación OWASP)
  * mediante la API nativa del navegador (Web Crypto API).
  *
- * Compatible tanto con formato Base64 como con el formato Hex de Supabase sync_queue:
- * saltHex:ivHex:authTagHex:ciphertextHex
+ * Formato único (el texto cifrado empieza por "v2:"):
+ *   - Supabase sync_queue:  v2:saltHex:ivHex:authTagHex:ciphertextHex
+ *   - Almacenamiento local / respaldos (Base64):  v2:base64(salt 16 + iv 12 + ciphertext + tag)
+ * Un texto sin el prefijo "v2:" se rechaza: no existen formatos anteriores que leer.
  */
 
-// Iteraciones PBKDF2. v1 (heredado) = 100.000; v2 = 600.000 (recomendación OWASP para PBKDF2-SHA256).
-// El formato v2 antepone "v2:" al texto cifrado. Siempre se pueden LEER ambos formatos.
-//
-// DESPLIEGUE EN DOS FASES (importante): los clientes antiguos NO entienden "v2:".
-//   Fase 1: publicar esta versión con WRITE_KDF_V2 = false (todos los dispositivos aprenden a leer v2).
-//   Fase 2: cuando todos los dispositivos se hayan actualizado, cambiar a true y publicar.
-export const WRITE_KDF_V2 = true;
-const ITERATIONS_V1 = 100000;
-const ITERATIONS_V2 = 600000;
+const ITERATIONS = 600000;
 const V2_PREFIX = 'v2:';
 const KEY_LEN = 256;
 const ALGO = 'AES-GCM';
@@ -48,12 +42,10 @@ function base64ToBytes(b64: string): Uint8Array {
   return out;
 }
 
-export function normalizePin(pin: string): string {
-  return String(pin || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
-}
-
+/**
+ * Normalización canónica del PIN: NFKC + recorte. Conserva símbolos y mayúsculas/minúsculas, de modo que una frase
+ * de paso mantiene toda su entropía. Solo el PIN estándar de congregación (XXXX-XXXX) se unifica a mayúsculas con guion.
+ */
 export function normalizePinV2(pin: string): string {
   const clean = String(pin || '').normalize('NFKC').trim();
   // Formato canónico para PIN estándar de congregación (XXXX-XXXX o 8 caracteres Crockford alfanuméricos)
@@ -65,33 +57,17 @@ export function normalizePinV2(pin: string): string {
 }
 
 /**
- * Comprueba si un PIN contiene caracteres que la normalización v1 suprime o altera.
- */
-export function isLegacyPinFormat(pin: string): boolean {
-  if (!pin) return false;
-  return normalizePin(pin) !== normalizePinV2(pin);
-}
-
-/**
  * Deriva una clave AES-GCM de 256 bits a partir de un PIN y un salt usando PBKDF2-SHA-256
  */
-async function deriveKey(pin: string, salt: Uint8Array, iterations: number = ITERATIONS_V1, raw: boolean = false): Promise<CryptoKey> {
+async function deriveKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder();
-  const cleanPin = raw ? normalizePinV2(pin) : normalizePin(pin);
-
-  const baseKey = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(cleanPin),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
+  const baseKey = await crypto.subtle.importKey('raw', encoder.encode(normalizePinV2(pin)), 'PBKDF2', false, ['deriveKey']);
 
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt as unknown as BufferSource,
-      iterations,
+      iterations: ITERATIONS,
       hash: 'SHA-256',
     },
     baseKey,
@@ -112,8 +88,7 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
-  const iterations = WRITE_KDF_V2 ? ITERATIONS_V2 : ITERATIONS_V1;
-  const key = await deriveKey(pin, salt, iterations, true);
+  const key = await deriveKey(pin, salt);
   const encryptedBuf = await crypto.subtle.encrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,
@@ -127,77 +102,51 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   const authTag = encryptedBytes.slice(encryptedBytes.length - authTagLength);
 
   const body = `${bytesToHex(salt)}:${bytesToHex(iv)}:${bytesToHex(authTag)}:${bytesToHex(ciphertext)}`;
-  return WRITE_KDF_V2 ? `${V2_PREFIX}${body}` : body;
-}
-
-async function doDecryptSupabase(payloadStr: string, pin: string, raw: boolean): Promise<any> {
-  const decoder = new TextDecoder();
-  let iterations = ITERATIONS_V1;
-  let str = payloadStr;
-  if (str.startsWith(V2_PREFIX)) {
-    iterations = ITERATIONS_V2;
-    str = str.slice(V2_PREFIX.length);
-  }
-
-  // Formato Hex delimitado por ':' (saltHex:ivHex:authTagHex:ciphertextHex)
-  if (str.includes(':')) {
-    const parts = str.split(':');
-    if (parts.length === 4) {
-      const [saltHex, ivHex, authTagHex, ciphertextHex] = parts;
-      const salt = hexToBytes(saltHex);
-      const iv = hexToBytes(ivHex);
-      const authTag = hexToBytes(authTagHex);
-      const ciphertext = hexToBytes(ciphertextHex);
-
-      const combinedCiphertext = new Uint8Array(ciphertext.length + authTag.length);
-      combinedCiphertext.set(ciphertext, 0);
-      combinedCiphertext.set(authTag, ciphertext.length);
-
-      const key = await deriveKey(pin, salt, iterations, raw);
-      const decryptedBuf = await crypto.subtle.decrypt(
-        { name: ALGO, iv: iv as unknown as BufferSource },
-        key,
-        combinedCiphertext as unknown as BufferSource
-      );
-      return JSON.parse(decoder.decode(decryptedBuf));
-    }
-  }
-
-  // Fallback: Formato Base64 combinado (salt 16 + iv 12 + ciphertext)
-  const combined = base64ToBytes(str);
-  const salt = combined.slice(0, 16);
-  const iv = combined.slice(16, 28);
-  const data = combined.slice(28);
-
-  const key = await deriveKey(pin, salt, iterations, raw);
-  const decryptedBuf = await crypto.subtle.decrypt(
-    { name: ALGO, iv: iv as unknown as BufferSource },
-    key,
-    data as unknown as BufferSource
-  );
-  return JSON.parse(decoder.decode(decryptedBuf));
+  return `${V2_PREFIX}${body}`;
 }
 
 /**
- * Descifra datos provenientes de Supabase sync_queue (o formato Base64) con fallback transparente v2 -> v1
+ * Descifra datos provenientes de Supabase sync_queue (hex "v2:salt:iv:tag:ciphertext") o Base64 con prefijo "v2:".
  */
 export async function decryptFromSupabase(encryptedString: string, pin: string): Promise<any> {
   if (!encryptedString || typeof encryptedString !== 'string') {
     throw new Error('Payload cifrado inválido o vacío.');
   }
-
-  // Intento 1: Derivación v2 (preserva símbolos Unicode NFKC exactos)
+  if (!encryptedString.startsWith(V2_PREFIX)) {
+    throw new Error('PIN incorrecto o payload cifrado dañado.');
+  }
   try {
-    return await doDecryptSupabase(encryptedString, pin, true);
-  } catch (err) {
-    // Si falla y el PIN difiere bajo la normalización v1, reintentar v1 para datos heredados
-    if (isLegacyPinFormat(pin)) {
-      try {
-        return await doDecryptSupabase(encryptedString, pin, false);
-      } catch {
-        // Fallaron ambos intentos
-      }
+    const str = encryptedString.slice(V2_PREFIX.length);
+    const decoder = new TextDecoder();
+
+    // Formato Hex delimitado por ':' (saltHex:ivHex:authTagHex:ciphertextHex)
+    const parts = str.split(':');
+    if (parts.length === 4) {
+      const [saltHex, ivHex, authTagHex, ciphertextHex] = parts;
+      const ciphertext = hexToBytes(ciphertextHex);
+      const authTag = hexToBytes(authTagHex);
+      const combined = new Uint8Array(ciphertext.length + authTag.length);
+      combined.set(ciphertext, 0);
+      combined.set(authTag, ciphertext.length);
+      const key = await deriveKey(pin, hexToBytes(saltHex));
+      const buf = await crypto.subtle.decrypt(
+        { name: ALGO, iv: hexToBytes(ivHex) as unknown as BufferSource },
+        key,
+        combined as unknown as BufferSource
+      );
+      return JSON.parse(decoder.decode(buf));
     }
+
+    // Base64 combinado (salt 16 + iv 12 + ciphertext)
+    const combined = base64ToBytes(str);
+    const key = await deriveKey(pin, combined.slice(0, 16));
+    const buf = await crypto.subtle.decrypt(
+      { name: ALGO, iv: combined.slice(16, 28) as unknown as BufferSource },
+      key,
+      combined.slice(28) as unknown as BufferSource
+    );
+    return JSON.parse(decoder.decode(buf));
+  } catch {
     throw new Error('PIN incorrecto o payload cifrado dañado.');
   }
 }
@@ -211,8 +160,7 @@ export async function encryptData(data: any, password: string): Promise<string> 
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
-  const iterations = WRITE_KDF_V2 ? ITERATIONS_V2 : ITERATIONS_V1;
-  const key = await deriveKey(password, salt, iterations, true);
+  const key = await deriveKey(password, salt);
   const encryptedBuf = await crypto.subtle.encrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,
@@ -224,47 +172,26 @@ export async function encryptData(data: any, password: string): Promise<string> 
   combined.set(iv, salt.length);
   combined.set(new Uint8Array(encryptedBuf), salt.length + iv.length);
 
-  const b64 = bytesToBase64(combined);
-  return WRITE_KDF_V2 ? `${V2_PREFIX}${b64}` : b64;
-}
-
-async function doDecryptDataB64(encryptedBase64: string, password: string, raw: boolean): Promise<any> {
-  const decoder = new TextDecoder();
-  let iterations = ITERATIONS_V1;
-  let b64 = encryptedBase64;
-  if (b64.startsWith(V2_PREFIX)) {
-    iterations = ITERATIONS_V2;
-    b64 = b64.slice(V2_PREFIX.length);
-  }
-  const combined = base64ToBytes(b64);
-
-  const salt = combined.slice(0, 16);
-  const iv = combined.slice(16, 28);
-  const data = combined.slice(28);
-
-  const key = await deriveKey(password, salt, iterations, raw);
-  const decryptedBuf = await crypto.subtle.decrypt(
-    { name: ALGO, iv: iv as unknown as BufferSource },
-    key,
-    data as unknown as BufferSource
-  );
-  return JSON.parse(decoder.decode(decryptedBuf));
+  return `${V2_PREFIX}${bytesToBase64(combined)}`;
 }
 
 /**
- * Función genérica de descifrado (Base64) con fallback transparente v2 -> v1
+ * Función genérica de descifrado (Base64 con prefijo "v2:").
  */
 export async function decryptData(encryptedBase64: string, password: string): Promise<any> {
+  if (typeof encryptedBase64 !== 'string' || !encryptedBase64.startsWith(V2_PREFIX)) {
+    throw new Error('PIN incorrecto o datos cifrados dañados.');
+  }
   try {
-    return await doDecryptDataB64(encryptedBase64, password, true);
-  } catch (err) {
-    if (isLegacyPinFormat(password)) {
-      try {
-        return await doDecryptDataB64(encryptedBase64, password, false);
-      } catch {
-        // Fallaron ambos
-      }
-    }
+    const combined = base64ToBytes(encryptedBase64.slice(V2_PREFIX.length));
+    const key = await deriveKey(password, combined.slice(0, 16));
+    const buf = await crypto.subtle.decrypt(
+      { name: ALGO, iv: combined.slice(16, 28) as unknown as BufferSource },
+      key,
+      combined.slice(28) as unknown as BufferSource
+    );
+    return JSON.parse(new TextDecoder().decode(buf));
+  } catch {
     throw new Error('PIN incorrecto o datos cifrados dañados.');
   }
 }

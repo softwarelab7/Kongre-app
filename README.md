@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.45-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.45" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.46-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.46" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,7 +44,7 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.45`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.46`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](DESKTOP_RUST.md).
 

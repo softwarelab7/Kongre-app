@@ -2,11 +2,50 @@ import type { VersionRecord } from '../utils/versionLog';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '0.1.0-alpha.46',
+    buildCode: '2026.11.09.8046',
+    date: '9 de Noviembre, 2026',
+    title: 'Criptografía V2 Estricta, Concurrencia Optimista CAS, Cifrado en Cuentas y Optimización Radical de Carga (170 kB)',
+    isCurrent: true,
+    highlight: 'Eliminación completa de esquemas criptográficos legados y unificación en PBKDF2 600k (v2:); compare-and-swap atómico obligatorio (expected_version) en sincronización; blindaje AES-256-GCM (kgr_sec5:) de transacciones y auditorías contables; reducción del bundle inicial de 4.4 MB a 170 kB mediante code-splitting con React.lazy; y fallback de ofuscación local kgr_sec5d.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Limpieza de Compatibilidad Heredada y Unificación V2 (crypto.ts, syncApi.ts, core.ts): Eliminación total de tokens legados a 100k iteraciones, unificación de normalización de PIN con preservación de símbolos (normalizePinV2), rechazo estricto de textos sin prefijo "v2:" y eliminación de lectores antiguos kgr_sec2/3/4.',
+      },
+      {
+        category: 'security',
+        text: 'Concurrencia Optimista Estricta (HTTP 428 y CAS): El servidor exige siempre expected_version en sincronizaciones push (updateRowIfVersion) eliminando condiciones de carrera y sobrescrituras involuntarias entre dispositivos.',
+      },
+      {
+        category: 'security',
+        text: 'Blindaje en Reposo de Cuentas y Donaciones (sensitiveFields.ts, CuentasTab.tsx): Cifrado automático con AES-256-GCM (kgr_sec5:) de comprobantes, donantes, notas de transacciones y observaciones de auditorías trimestrales.',
+      },
+      {
+        category: 'security',
+        text: 'Fallback Resiliente kgr_sec5d: En caso de bloqueo de IndexedDB, se aplica cifrado AES-256-GCM con sal de dispositivo en lugar de esquemas propietarios, re-cifrando automáticamente a kgr_sec5 al recuperar la bóveda.',
+      },
+      {
+        category: 'improvement',
+        text: 'Rendimiento y Code-Splitting Modular (App.tsx): Reducción drástica del tamaño del bundle JavaScript inicial de 4.4 MB a solo 170 kB (41 kB gzip) mediante carga diferida dinámica (React.lazy + Suspense) de pantallas y modales pesados.',
+      },
+      {
+        category: 'improvement',
+        text: 'Desacople Arquitectónico del Historial de Versiones: Aislamiento del catálogo histórico de cambios en un módulo diferido (versionHistory.ts), eliminando 2.400 líneas de texto estático del bundle crítico.',
+      },
+      {
+        category: 'improvement',
+        text: 'Alineación de Versiones Multiplataforma: Sincronización oficial del número de versión a v0.1.0-alpha.46 en Web (package.json) y Desktop Tauri (Cargo.toml y tauri.conf.json).',
+      },
+    ],
+  },
+  {
     version: '0.1.0-alpha.45',
     buildCode: '2026.11.05.8045',
     date: '5 de Noviembre, 2026',
     title: 'Blindaje de Autenticación a 600k PBKDF2, Concurrencia Optimista (Anti-Conflictos) y Protección de Datos Sensibles',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Paridad criptográfica completa elevando tokens de autenticación de PIN a 600.000 iteraciones PBKDF2; migración transparente automática de congregaciones existentes; detección de colisiones y conflictos concurrentes en push (HTTP 409) con ETag/versión; soporte de passphrases de hasta 24 caracteres; sanitización rigurosa de publicadores en todo el almacenamiento local y CSPRNG criptoseguro.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

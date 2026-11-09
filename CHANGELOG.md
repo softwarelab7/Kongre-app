@@ -6,6 +6,31 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.46] — 9 de Noviembre, 2026
+**Criptografía V2 Estricta, Concurrencia Optimista CAS Obligatoria, Blindaje de Cuentas y Carga Ultra-Rápida (170 kB)**
+
+- 🧹 **Limpieza de Compatibilidad Heredada (sin congregaciones reales que migrar):**
+  - Servidor (`kongre-sync`): eliminados los tokens de 100k (`master_legacy`/`public_legacy`), `LEGACY_CLAIM` y el reclamo de filas sin verificadores, y el esquema de PIN personal sin `publisherId` (`pin_token`). `expected_version` pasa a ser obligatorio (`428 expected_version_required`).
+  - Cliente: un solo formato de cifrado (`v2:`, PBKDF2 600k) y una sola normalización de PIN (`normalizePinV2`, conserva símbolos). Cada operación de sync deriva 2 tokens en lugar de 4. El texto cifrado sin prefijo `v2:` se rechaza.
+  - Cifrado local: eliminados los lectores `kgr_sec2/3/4` y sus bucles de claves candidatas. Sin bóveda se usa `kgr_sec5d` (AES-GCM, solo ofuscación) en lugar del CTR/MAC propio.
+  - Pruebas: el e2e ahora ejecuta el cliente real de `src/` (antes usaba copias desactualizadas en `test/e2e/`).
+- 🔐 **Cifrado en Reposo con AES-256-GCM Estándar (`kgr_sec5`) (`sensitiveFields.ts`, `sec5-aes-gcm.test.ts`):**
+  - Los campos sensibles locales (teléfonos, direcciones, salud/DPA, notas, visitas de pastoreo) se cifran ahora con AES-256-GCM (`@noble/ciphers` 2.4.0, sin dependencias) con subclave aleatoria por registro, en lugar del esquema CTR + MAC propio (`kgr_sec4`). La clave nace de la entropía de la bóveda y el salt del dispositivo, sin PIN.
+  - Cuentas y transacciones contables: donantes, comprobantes y notas cifradas en reposo (`sanitizeTransactionsForLocalStorage` y `restoreTransactionsFromLocalStorage`).
+  - Auditorías trimestrales: observaciones confidenciales y nombre del revisor blindados con AES-GCM (`sanitizeAuditsForLocalStorage` y `restoreAuditsFromLocalStorage`).
+- ⚡ **Optimización Radical de Rendimiento y Carga Inicial (`App.tsx`):**
+  - División de código (*code-splitting*) exhaustiva con `React.lazy` y `Suspense`: el bundle principal descargado en el arranque pasó de **4.4 MB a 170 kB** (41 kB gzipped), acelerando el tiempo de carga hasta un 96% en conexiones lentas y optimizando el almacenamiento precacheado del Service Worker.
+- 🧩 **Desacople Arquitectónico del Historial de Versiones (`versionHistory.ts`, `versionLog.ts`):**
+  - Aislamiento de más de 2.400 líneas de texto estático y registros históricos en un módulo diferido que solo se descarga cuando el usuario abre el modal de versiones, liberando la memoria del hilo principal.
+- 🔄 **Concurrencia Optimista Estricta y Resolución de Conflictos (`supabaseSyncService.ts`):**
+  - Exigencia estricta de `expected_version` en el cliente. En caso de sobrescritura forzada intencional, se obtiene previamente el metadato del servidor para garantizar el flujo de CAS.
+- 🖥️ **Sincronización Total de Versión en Web y Desktop (Tauri v2):**
+  - Alineación de la versión oficial a `v0.1.0-alpha.46` en `package.json`, `Cargo.toml` y `tauri.conf.json`.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.45] — 5 de Noviembre, 2026
 **Blindaje Criptográfico de Tokens a 600.000 Iteraciones PBKDF2, Concurrencia Optimista (Anti-Conflictos de Guardado), Soporte de Passphrases y Sanitización Estricta**
 
@@ -23,14 +48,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Aseguramiento de que todas las ramas de guardado de publicadores en `localStorage` pasen por `sanitizePublishersForLocalStorage`, eliminando PINs en claro y garantizando el cifrado en reposo de datos médicos y contactos de emergencia.
 - 🎲 **CSPRNG Criptográfico sin Degradación (`publisherDeduplication.ts`):**
   - Uso estricto de `secureRandomInt` sobre Web Crypto API para códigos inmutables de publicador, eliminando dependencias de Node.js o degradaciones no seguras.
-- 🧹 **Limpieza de Compatibilidad Heredada (sin congregaciones reales que migrar):**
-  - Servidor (`kongre-sync`): eliminados los tokens de 100k (`master_legacy`/`public_legacy`), `LEGACY_CLAIM` y el reclamo de filas sin verificadores, y el esquema de PIN personal sin `publisherId` (`pin_token`). `expected_version` pasa a ser obligatorio (`428 expected_version_required`).
-  - Cliente: un solo formato de cifrado (`v2:`, PBKDF2 600k) y una sola normalización de PIN (`normalizePinV2`, conserva símbolos). Cada operación de sync deriva 2 tokens en lugar de 4. El texto cifrado sin prefijo `v2:` se rechaza.
-  - Cifrado local: eliminados los lectores `kgr_sec2/3/4` y sus bucles de claves candidatas. Sin bóveda se usa `kgr_sec5d` (AES-GCM, solo ofuscación) en lugar del CTR/MAC propio.
-  - Pruebas: el e2e ahora ejecuta el cliente real de `src/` (antes usaba copias desactualizadas en `test/e2e/`).
-- 🔐 **Cifrado en Reposo con AES-256-GCM Estándar (`kgr_sec5`) (`sensitiveFields.ts`, `sec5-aes-gcm.test.ts`):**
-  - Los campos sensibles locales (teléfonos, direcciones, salud/DPA, notas, visitas de pastoreo) se cifran ahora con AES-256-GCM (`@noble/ciphers` 2.4.0, sin dependencias) con subclave aleatoria por registro, en lugar del esquema CTR + MAC propio (`kgr_sec4`). La clave nace de la entropía de la bóveda y el salt del dispositivo, sin PIN.
-  - Retrocompatibilidad total: `kgr_sec4`, `kgr_sec3` y `kgr_sec2` se siguen leyendo y se migran solos a `kgr_sec5` en el siguiente guardado; un valor que no se pueda descifrar se conserva intacto.
 - 📜 **Alineación Normativa y Documentación de Seguridad (`SEGURIDAD.md`, `TermsAndPrivacyModal.tsx`, `public/privacy.html`, `README.md`):**
   - Transparencia explícita sobre el modelo E2EE a nivel de congregación y RBAC en cliente con tokens firmados por servidor (`kgr_srt1`).
   - Delimitación del estado de validación técnica de sobres criptográficos departamentales (`compartments.ts`).

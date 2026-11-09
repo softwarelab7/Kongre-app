@@ -25,10 +25,10 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.45';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.46';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.11.05.8045';
-export const BUILD_DATE = '5 de Noviembre, 2026';
+export const CURRENT_BUILD_CODE = '2026.11.09.8046';
+export const BUILD_DATE = '9 de Noviembre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export function getSystemDiagnosticInfo(): string {

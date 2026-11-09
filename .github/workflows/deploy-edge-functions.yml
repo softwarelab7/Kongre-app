@@ -30,6 +30,6 @@ jobs:
           version: latest
 
       - name: Desplegar función kongre-sync en producción
-        run: supabase functions deploy kongre-sync --project-ref rceyevhwhtjshsthrrtp --no-verify-jwt
+        run: supabase functions deploy kongre-sync --project-ref rceyevhwhtjshsthrrtp --no-verify-jwt --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

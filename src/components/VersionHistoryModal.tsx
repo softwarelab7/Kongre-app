@@ -18,10 +18,10 @@ import {
   CURRENT_BUILD_CODE,
   BUILD_DATE,
   BUILD_ENVIRONMENT,
-  VERSION_HISTORY,
   getSystemDiagnosticInfo,
-  VersionRecord,
+  type VersionRecord,
 } from '../utils/versionLog';
+import { VERSION_HISTORY } from '../data/versionHistory';
 import { useToast } from '../context/ToastContext';
 import Logo from '../Logo';
 

@@ -104,6 +104,10 @@ import {
   restorePublishersFromLocalStorage,
   sanitizeShepherdingVisitsForLocalStorage,
   restoreShepherdingVisitsFromLocalStorage,
+  sanitizeTransactionsForLocalStorage,
+  restoreTransactionsFromLocalStorage,
+  sanitizeAuditsForLocalStorage,
+  restoreAuditsFromLocalStorage,
   sanitizePinRecordsForLocalStorage,
   getSecureLocalPin,
   setSecureLocalPin,
@@ -136,6 +140,34 @@ export interface GranularSyncStats {
   literatureExists: boolean;
   isMigrated: boolean;
   lastSyncAt: string | null;
+}
+
+export interface CongregationPersistOptions {
+  immediate?: boolean;
+  publishers?: Publisher[];
+  weeks?: WeekSchedule[];
+  preachingGroups?: PreachingGroup[];
+  customDuties?: CustomDuty[];
+  settings?: Partial<CongregationSettings>;
+  outgoingSpeakers?: OutgoingSpeakerAssignment[];
+  fieldServiceMeetings?: FieldServiceMeeting[];
+  cartLocations?: CartLocation[];
+  cartShifts?: CartShift[];
+  notices?: CongregationNotice[];
+  monthlyReports?: MonthlyServiceReport[];
+  territories?: Territory[];
+  circuitVisit?: CircuitOverseerVisit | null;
+  transactions?: AccountTransaction[];
+  quarterlyAudits?: QuarterlyAudit[];
+  memorialPlans?: MemorialPlan[];
+  theocraticAssemblies?: TheocraticAssembly[];
+  literatureItems?: LiteratureItem[];
+  specialOrders?: LiteratureSpecialOrder[];
+  groupDistributions?: LiteratureGroupDistribution[];
+  inventoryRecords?: LiteratureInventoryRecord[];
+  accountLinkRequests?: AccountLinkRequest[];
+  clmProgramas?: Record<string, ClmPrograma>;
+  congregationEvents?: CongregationEvent[];
 }
 
 interface CongregationContextType {
@@ -782,12 +814,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const [transactions, setTransactions] = useState<AccountTransaction[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_transactions`);
-    return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
+    if (!saved) return INITIAL_TRANSACTIONS;
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? restoreTransactionsFromLocalStorage(parsed) : INITIAL_TRANSACTIONS;
+    } catch {
+      return INITIAL_TRANSACTIONS;
+    }
   });
 
   const [quarterlyAudits, setQuarterlyAudits] = useState<QuarterlyAudit[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`);
-    return saved ? JSON.parse(saved) : INITIAL_QUARTERLY_AUDITS;
+    if (!saved) return INITIAL_QUARTERLY_AUDITS;
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? restoreAuditsFromLocalStorage(parsed) : INITIAL_QUARTERLY_AUDITS;
+    } catch {
+      return INITIAL_QUARTERLY_AUDITS;
+    }
   });
 
   const [memorialPlans, setMemorialPlans] = useState<MemorialPlan[]>(() => {
@@ -1199,11 +1243,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [circuitVisit]);
 
   useEffect(() => {
-    localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(transactions));
+    try {
+      const sanitized = sanitizeTransactionsForLocalStorage(transactions);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(sanitized));
+    } catch {}
   }, [transactions]);
 
   useEffect(() => {
-    localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(quarterlyAudits));
+    try {
+      const sanitized = sanitizeAuditsForLocalStorage(quarterlyAudits);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(sanitized));
+    } catch {}
   }, [quarterlyAudits]);
 
   useEffect(() => {
@@ -1254,8 +1304,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const savedReports = parseKey<MonthlyServiceReport[]>('monthly_reports', monthlyReports);
     const savedTerritories = parseKey<Territory[]>('territories', territories);
     const savedCircuitVisit = parseKey<CircuitOverseerVisit | null>('circuit_visit', circuitVisit);
-    const savedTransactions = parseKey<AccountTransaction[]>('transactions', transactions);
-    const savedAudits = parseKey<QuarterlyAudit[]>('quarterly_audits', quarterlyAudits);
+    const savedTransactions = restoreTransactionsFromLocalStorage(parseKey<AccountTransaction[]>('transactions', transactions));
+    const savedAudits = restoreAuditsFromLocalStorage(parseKey<QuarterlyAudit[]>('quarterly_audits', quarterlyAudits));
     const savedMemorial = parseKey<MemorialPlan[]>('memorial_plans', memorialPlans);
     const savedAssemblies = parseKey<TheocraticAssembly[]>('assemblies', theocraticAssemblies);
     const savedEvents = parseKey<CongregationEvent[]>('congregation_events', congregationEvents);
@@ -1737,11 +1787,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
     if (data.transactions && Array.isArray(data.transactions)) {
       setTransactions(data.transactions);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(data.transactions));
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(sanitizeTransactionsForLocalStorage(data.transactions)));
+      } catch {}
     }
     if (data.quarterlyAudits && Array.isArray(data.quarterlyAudits)) {
       setQuarterlyAudits(data.quarterlyAudits);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(data.quarterlyAudits));
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(sanitizeAuditsForLocalStorage(data.quarterlyAudits)));
+      } catch {}
     }
     if (data.memorialPlans && Array.isArray(data.memorialPlans)) {
       setMemorialPlans(data.memorialPlans);
@@ -1943,37 +1997,73 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, [settings.congregationNumber, settings.congregationId, user?.email, isDemoMode]);
 
-  // Helper to sync changes to Firestore whenever state updates (with debounce & quota guard)
-  const saveToFirestore = async (
-    newPubs = publishers,
-    newWeeks = weeks,
-    newGroups = preachingGroups,
-    newDuties = customDuties,
-    newSettings = latestSettingsRef.current,
-    newOutgoing = outgoingSpeakers,
-    newFieldService = fieldServiceMeetings,
-    newCartLocs = cartLocations,
-    newCartShifts = cartShifts,
-    newNotices = notices,
-    newReports = monthlyReports,
-    newTerritories = territories,
-    newCircuitVisit = circuitVisit,
-    newTransactions = transactions,
-    newQuarterlyAudits = quarterlyAudits,
-    newMemorialPlans = memorialPlans,
-    newAssemblies = theocraticAssemblies,
-    newLiteratureItems = literatureItems,
-    newSpecialOrders = specialOrders,
-    newGroupDistributions = groupDistributions,
-    newInventoryRecords = inventoryRecords,
-    newAccountLinkRequests = accountLinkRequests,
-    newClm = clmProgramas,
+  // Persistencia y sincronización del estado congregacional con opciones por clave o 24 args posicionales legados
+  const persistCongregationState = async (
+    firstArg?: Publisher[] | CongregationPersistOptions,
+    newWeeks: WeekSchedule[] = weeks,
+    newGroups: PreachingGroup[] = preachingGroups,
+    newDuties: CustomDuty[] = customDuties,
+    newSettings: CongregationSettings = latestSettingsRef.current,
+    newOutgoing: OutgoingSpeakerAssignment[] = outgoingSpeakers,
+    newFieldService: FieldServiceMeeting[] = fieldServiceMeetings,
+    newCartLocs: CartLocation[] = cartLocations,
+    newCartShifts: CartShift[] = cartShifts,
+    newNotices: CongregationNotice[] = notices,
+    newReports: MonthlyServiceReport[] = monthlyReports,
+    newTerritories: Territory[] = territories,
+    newCircuitVisit: CircuitOverseerVisit | null = circuitVisit,
+    newTransactions: AccountTransaction[] = transactions,
+    newQuarterlyAudits: QuarterlyAudit[] = quarterlyAudits,
+    newMemorialPlans: MemorialPlan[] = memorialPlans,
+    newAssemblies: TheocraticAssembly[] = theocraticAssemblies,
+    newLiteratureItems: LiteratureItem[] = literatureItems,
+    newSpecialOrders: LiteratureSpecialOrder[] = specialOrders,
+    newGroupDistributions: LiteratureGroupDistribution[] = groupDistributions,
+    newInventoryRecords: LiteratureInventoryRecord[] = inventoryRecords,
+    newAccountLinkRequests: AccountLinkRequest[] = accountLinkRequests,
+    newClm: Record<string, ClmPrograma> = clmProgramas,
     newEventsOrOptions?: CongregationEvent[] | { immediate?: boolean },
     options?: { immediate?: boolean }
   ) => {
+    const isOptionsObject =
+      firstArg !== undefined &&
+      firstArg !== null &&
+      !Array.isArray(firstArg) &&
+      typeof firstArg === 'object';
+
+    const opts: CongregationPersistOptions = isOptionsObject
+      ? (firstArg as CongregationPersistOptions)
+      : {};
+
+    const resolvedPubs = isOptionsObject ? (opts.publishers ?? publishers) : ((firstArg as Publisher[] | undefined) ?? publishers);
+    const resolvedWeeks = isOptionsObject ? (opts.weeks ?? weeks) : newWeeks;
+    const resolvedPassedGroups = isOptionsObject ? (opts.preachingGroups ?? preachingGroups) : newGroups;
+    const resolvedDuties = isOptionsObject ? (opts.customDuties ?? customDuties) : newDuties;
+    const resolvedSettingsInput = isOptionsObject ? (opts.settings ?? latestSettingsRef.current) : newSettings;
+    const resolvedOutgoing = isOptionsObject ? (opts.outgoingSpeakers ?? outgoingSpeakers) : newOutgoing;
+    const resolvedFieldService = isOptionsObject ? (opts.fieldServiceMeetings ?? fieldServiceMeetings) : newFieldService;
+    const resolvedCartLocs = isOptionsObject ? (opts.cartLocations ?? cartLocations) : newCartLocs;
+    const resolvedCartShifts = isOptionsObject ? (opts.cartShifts ?? cartShifts) : newCartShifts;
+    const resolvedNotices = isOptionsObject ? (opts.notices ?? notices) : newNotices;
+    const resolvedReports = isOptionsObject ? (opts.monthlyReports ?? monthlyReports) : newReports;
+    const resolvedTerritories = isOptionsObject ? (opts.territories ?? territories) : newTerritories;
+    const resolvedCircuitVisit = isOptionsObject ? (opts.circuitVisit !== undefined ? opts.circuitVisit : circuitVisit) : newCircuitVisit;
+    const resolvedTransactions = isOptionsObject ? (opts.transactions ?? transactions) : newTransactions;
+    const resolvedQuarterlyAudits = isOptionsObject ? (opts.quarterlyAudits ?? quarterlyAudits) : newQuarterlyAudits;
+    const resolvedMemorialPlans = isOptionsObject ? (opts.memorialPlans ?? memorialPlans) : newMemorialPlans;
+    const resolvedAssemblies = isOptionsObject ? (opts.theocraticAssemblies ?? theocraticAssemblies) : newAssemblies;
+    const resolvedLiteratureItems = isOptionsObject ? (opts.literatureItems ?? literatureItems) : newLiteratureItems;
+    const resolvedSpecialOrders = isOptionsObject ? (opts.specialOrders ?? specialOrders) : newSpecialOrders;
+    const resolvedGroupDistributions = isOptionsObject ? (opts.groupDistributions ?? groupDistributions) : newGroupDistributions;
+    const resolvedInventoryRecords = isOptionsObject ? (opts.inventoryRecords ?? inventoryRecords) : newInventoryRecords;
+    const resolvedAccountLinkRequests = isOptionsObject ? (opts.accountLinkRequests ?? accountLinkRequests) : newAccountLinkRequests;
+    const resolvedClm = isOptionsObject ? (opts.clmProgramas ?? clmProgramas) : newClm;
+
     let resolvedEvents = latestCongregationEventsRef.current;
-    let resolvedOptions = options;
-    if (Array.isArray(newEventsOrOptions)) {
+    let resolvedOptions = isOptionsObject ? (opts.immediate !== undefined ? { immediate: opts.immediate } : undefined) : options;
+    if (isOptionsObject && opts.congregationEvents) {
+      resolvedEvents = opts.congregationEvents;
+    } else if (Array.isArray(newEventsOrOptions)) {
       resolvedEvents = newEventsOrOptions;
     } else if (newEventsOrOptions && typeof newEventsOrOptions === 'object') {
       resolvedOptions = newEventsOrOptions;
@@ -1986,7 +2076,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const baseSettings = latestSettingsRef.current;
     const resolvedSettings: CongregationSettings = {
       ...baseSettings,
-      ...(newSettings || {}),
+      ...(resolvedSettingsInput || {}),
       updatedAt: nowISO,
     };
 
@@ -2027,8 +2117,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // Resolver grupos asegurando que jamás se sobreescriban con un array vacío si existen grupos en ref o localStorage
     let resolvedGroups: PreachingGroup[] | null = null;
-    if (Array.isArray(newGroups) && newGroups.length > 0) {
-      resolvedGroups = newGroups;
+    if (Array.isArray(resolvedPassedGroups) && resolvedPassedGroups.length > 0) {
+      resolvedGroups = resolvedPassedGroups;
     } else if (latestPreachingGroupsRef.current && latestPreachingGroupsRef.current.length > 0) {
       resolvedGroups = latestPreachingGroupsRef.current;
     } else {
@@ -2044,35 +2134,35 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     // Permitir guardar [] sólo si el llamador pasó explícitamente newGroups = [] y la referencia en memoria también está vacía
-    if (newGroups !== undefined && Array.isArray(newGroups) && newGroups.length === 0 && (!latestPreachingGroupsRef.current || latestPreachingGroupsRef.current.length === 0)) {
+    if (resolvedPassedGroups !== undefined && Array.isArray(resolvedPassedGroups) && resolvedPassedGroups.length === 0 && (!latestPreachingGroupsRef.current || latestPreachingGroupsRef.current.length === 0)) {
       resolvedGroups = [];
     }
 
     const payload = sanitizeForFirestore({
-      publishers: newPubs,
-      weeks: newWeeks,
+      publishers: resolvedPubs,
+      weeks: resolvedWeeks,
       ...(resolvedGroups !== null ? { preachingGroups: resolvedGroups } : {}),
-      customDuties: newDuties,
+      customDuties: resolvedDuties,
       settings: resolvedSettings,
       coordinatorPhotoURL: activeCoordPhoto,
-      outgoingSpeakers: newOutgoing,
-      fieldServiceMeetings: newFieldService,
-      cartLocations: newCartLocs,
-      cartShifts: newCartShifts,
-      notices: newNotices,
-      monthlyReports: newReports,
-      territories: newTerritories,
-      circuitVisit: newCircuitVisit,
-      transactions: newTransactions,
-      quarterlyAudits: newQuarterlyAudits,
-      memorialPlans: newMemorialPlans,
-      theocraticAssemblies: newAssemblies,
-      literatureItems: newLiteratureItems,
-      specialOrders: newSpecialOrders,
-      groupDistributions: newGroupDistributions,
-      inventoryRecords: newInventoryRecords,
-      accountLinkRequests: newAccountLinkRequests,
-      clmProgramas: newClm,
+      outgoingSpeakers: resolvedOutgoing,
+      fieldServiceMeetings: resolvedFieldService,
+      cartLocations: resolvedCartLocs,
+      cartShifts: resolvedCartShifts,
+      notices: resolvedNotices,
+      monthlyReports: resolvedReports,
+      territories: resolvedTerritories,
+      circuitVisit: resolvedCircuitVisit,
+      transactions: resolvedTransactions,
+      quarterlyAudits: resolvedQuarterlyAudits,
+      memorialPlans: resolvedMemorialPlans,
+      theocraticAssemblies: resolvedAssemblies,
+      literatureItems: resolvedLiteratureItems,
+      specialOrders: resolvedSpecialOrders,
+      groupDistributions: resolvedGroupDistributions,
+      inventoryRecords: resolvedInventoryRecords,
+      accountLinkRequests: resolvedAccountLinkRequests,
+      clmProgramas: resolvedClm,
       hospitalityHosts: latestHospitalityHostsRef.current,
       breakers: latestBreakersRef.current,
       maintenanceSheets: latestMaintenanceSheetsRef.current,
@@ -2085,29 +2175,29 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const snapshotData = {
       settings: resolvedSettings,
-      publishers: newPubs,
-      weeks: newWeeks,
-      territories: newTerritories,
-      notices: newNotices,
-      transactions: newTransactions,
-      audits: newQuarterlyAudits,
-      literatureItems: newLiteratureItems,
-      literatureOrders: newSpecialOrders,
-      literatureDistributions: newGroupDistributions,
-      literatureInventory: newInventoryRecords,
+      publishers: resolvedPubs,
+      weeks: resolvedWeeks,
+      territories: resolvedTerritories,
+      notices: resolvedNotices,
+      transactions: resolvedTransactions,
+      audits: resolvedQuarterlyAudits,
+      literatureItems: resolvedLiteratureItems,
+      literatureOrders: resolvedSpecialOrders,
+      literatureDistributions: resolvedGroupDistributions,
+      literatureInventory: resolvedInventoryRecords,
       preachingGroups: resolvedGroups || [],
-      customDuties: newDuties,
-      outgoingSpeakers: newOutgoing,
-      fieldServiceMeetings: newFieldService,
-      cartLocations: newCartLocs,
-      cartShifts: newCartShifts,
-      monthlyReports: newReports,
-      circuitVisit: newCircuitVisit,
-      memorialPlans: newMemorialPlans,
-      theocraticAssemblies: newAssemblies,
+      customDuties: resolvedDuties,
+      outgoingSpeakers: resolvedOutgoing,
+      fieldServiceMeetings: resolvedFieldService,
+      cartLocations: resolvedCartLocs,
+      cartShifts: resolvedCartShifts,
+      monthlyReports: resolvedReports,
+      circuitVisit: resolvedCircuitVisit,
+      memorialPlans: resolvedMemorialPlans,
+      theocraticAssemblies: resolvedAssemblies,
       congregationEvents: resolvedEvents,
-      accountLinkRequests: newAccountLinkRequests,
-      clmProgramas: newClm,
+      accountLinkRequests: resolvedAccountLinkRequests,
+      clmProgramas: resolvedClm,
       hospitalityHosts: latestHospitalityHostsRef.current,
       breakers: latestBreakersRef.current,
       maintenanceSheets: latestMaintenanceSheetsRef.current,
@@ -2220,6 +2310,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       await executeCloudWrite();
     }, 350);
   };
+
+  // Alias de compatibilidad total con llamadas que usaban la nomenclatura heredada de Firestore
+  const saveToFirestore = persistCongregationState;
 
   // Función explícita para forzar subida de datos locales cifrados a Supabase
   const uploadLocalDataToGoogle = async (): Promise<{ success: boolean; message: string }> => {
@@ -3890,32 +3983,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setWeeks(updatedWeeks);
     }
 
-    // Persistir de inmediato en Firestore
-    await saveToFirestore(
-      publishers,
-      updatedWeeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      inventoryRecords,
-      accountLinkRequests,
-      updatedClm
-    );
+    // Persistir de inmediato en el estado congregacional
+    await persistCongregationState({
+      weeks: updatedWeeks,
+      clmProgramas: updatedClm,
+    });
   };
 
   const getClmPrograma = (semanaFecha: string): ClmPrograma | null => {
@@ -3977,19 +4049,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...outgoingSpeakers, newItem];
     setOutgoingSpeakers(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, updated);
+    persistCongregationState({ outgoingSpeakers: updated });
   };
 
   const updateOutgoingSpeaker = (item: OutgoingSpeakerAssignment) => {
     const updated = outgoingSpeakers.map(o => (o.id === item.id ? item : o));
     setOutgoingSpeakers(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, updated);
+    persistCongregationState({ outgoingSpeakers: updated });
   };
 
   const deleteOutgoingSpeaker = (id: string) => {
     const updated = outgoingSpeakers.filter(o => o.id !== id);
     setOutgoingSpeakers(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, updated);
+    persistCongregationState({ outgoingSpeakers: updated });
   };
 
   // Hospitality Hosts Actions
@@ -4323,19 +4395,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...fieldServiceMeetings, newItem];
     setFieldServiceMeetings(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, updated);
+    persistCongregationState({ fieldServiceMeetings: updated });
   };
 
   const updateFieldServiceMeeting = (item: FieldServiceMeeting) => {
     const updated = fieldServiceMeetings.map(f => (f.id === item.id ? item : f));
     setFieldServiceMeetings(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, updated);
+    persistCongregationState({ fieldServiceMeetings: updated });
   };
 
   const deleteFieldServiceMeeting = (id: string) => {
     const updated = fieldServiceMeetings.filter(f => f.id !== id);
     setFieldServiceMeetings(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, updated);
+    persistCongregationState({ fieldServiceMeetings: updated });
   };
 
   const replaceFieldServiceMeetings = (items: FieldServiceMeeting[]) => {
@@ -4343,15 +4415,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_field_service`, JSON.stringify(items));
     } catch {}
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      items
-    );
+    persistCongregationState({ fieldServiceMeetings: items });
   };
 
   const updatePreachingGroups = async (groups: PreachingGroup[]): Promise<void> => {
@@ -4362,33 +4426,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch {}
 
     // Sincronizar con el pipeline de guardado inmediato (local, BroadcastChannel y Supabase)
-    await saveToFirestore(
-      publishers,
-      weeks,
-      groups,
-      customDuties,
-      latestSettingsRef.current,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { immediate: true }
-    );
+    await persistCongregationState({
+      preachingGroups: groups,
+      immediate: true,
+    });
   };
 
   const addCustomDuty = (dutyData: Omit<CustomDuty, 'id'>) => {
@@ -4398,19 +4439,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...customDuties, newDuty];
     setCustomDuties(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, updated);
+    persistCongregationState({ customDuties: updated });
   };
 
   const updateCustomDuty = (duty: CustomDuty) => {
     const updated = customDuties.map(d => (d.id === duty.id ? duty : d));
     setCustomDuties(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, updated);
+    persistCongregationState({ customDuties: updated });
   };
 
   const deleteCustomDuty = (id: string) => {
     const updated = customDuties.filter(d => d.id !== id);
     setCustomDuties(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, updated);
+    persistCongregationState({ customDuties: updated });
   };
 
   const updateSettings = async (
@@ -4570,19 +4611,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...cartLocations, newLoc];
     setCartLocations(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, updated);
+    persistCongregationState({ cartLocations: updated });
   };
 
   const updateCartLocation = (loc: CartLocation) => {
     const updated = cartLocations.map(l => (l.id === loc.id ? loc : l));
     setCartLocations(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, updated);
+    persistCongregationState({ cartLocations: updated });
   };
 
   const deleteCartLocation = (id: string) => {
     const updated = cartLocations.filter(l => l.id !== id);
     setCartLocations(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, updated);
+    persistCongregationState({ cartLocations: updated });
   };
 
   const addCartShift = (shiftData: Omit<CartShift, 'id'>) => {
@@ -4592,19 +4633,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...cartShifts, newShift];
     setCartShifts(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, updated);
+    persistCongregationState({ cartShifts: updated });
   };
 
   const updateCartShift = (shift: CartShift) => {
     const updated = cartShifts.map(s => (s.id === shift.id ? shift : s));
     setCartShifts(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, updated);
+    persistCongregationState({ cartShifts: updated });
   };
 
   const deleteCartShift = (id: string) => {
     const updated = cartShifts.filter(s => s.id !== id);
     setCartShifts(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, updated);
+    persistCongregationState({ cartShifts: updated });
   };
 
   const addShepherdingVisit = (visitData: Omit<ShepherdingVisit, 'id' | 'createdAt'>) => {
@@ -4656,22 +4697,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newNotice, ...notices];
     setNotices(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
+    persistCongregationState({ notices: updated });
   };
 
   const updateNotice = (notice: CongregationNotice) => {
     const updated = notices.map(n => (n.id === notice.id ? notice : n));
     setNotices(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
+    persistCongregationState({ notices: updated });
   };
 
   const deleteNotice = (id: string) => {
     const updated = notices.filter(n => n.id !== id);
     setNotices(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
+    persistCongregationState({ notices: updated });
   };
 
   const updateMonthlyReport = (report: MonthlyServiceReport) => {
@@ -4786,22 +4824,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...territories, newTerr];
     setTerritories(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const updateTerritory = (terr: Territory) => {
     const updated = territories.map(t => (t.id === terr.id ? terr : t));
     setTerritories(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const deleteTerritory = (id: string) => {
     const updated = territories.filter(t => t.id !== id);
     setTerritories(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const assignTerritory = (
@@ -4844,7 +4879,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setTerritories(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const returnTerritory = (territoryId: string, returnedDate?: string, notes?: string) => {
@@ -4876,7 +4911,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setTerritories(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const extendTerritoryDueDate = (territoryId: string, newDueDate: string) => {
@@ -4903,7 +4938,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setTerritories(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const addNoVisitAddress = (territoryId: string, noVisitData: Omit<NoVisitAddress, 'id'>) => {
@@ -4921,7 +4956,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setTerritories(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   const removeNoVisitAddress = (territoryId: string, noVisitId: string) => {
@@ -4934,13 +4969,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setTerritories(updated);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
+    persistCongregationState({ territories: updated });
   };
 
   // Circuit Overseer Visit actions
   const updateCircuitVisit = (visit: CircuitOverseerVisit) => {
     setCircuitVisit(visit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, visit);
+    persistCongregationState({ circuitVisit: visit });
   };
 
   const updateMealArrangement = (meal: MealArrangement) => {
@@ -4951,7 +4986,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       meals: updatedMeals,
     };
     setCircuitVisit(updatedVisit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, updatedVisit);
+    persistCongregationState({ circuitVisit: updatedVisit });
   };
 
   const updateMinistryArrangement = (min: MinistryArrangement) => {
@@ -4962,7 +4997,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       ministry: updatedMin,
     };
     setCircuitVisit(updatedVisit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, updatedVisit);
+    persistCongregationState({ circuitVisit: updatedVisit });
   };
 
   const toggleVisitChecklistItem = (checkId: string) => {
@@ -4975,7 +5010,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       checklist: updatedChecklist,
     };
     setCircuitVisit(updatedVisit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, updatedVisit);
+    persistCongregationState({ circuitVisit: updatedVisit });
   };
 
   const addSpecialMeeting = (meetingData: Omit<SpecialMeeting, 'id'>) => {
@@ -4989,7 +5024,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       specialMeetings: [...circuitVisit.specialMeetings, newMeeting],
     };
     setCircuitVisit(updatedVisit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, updatedVisit);
+    persistCongregationState({ circuitVisit: updatedVisit });
   };
 
   const removeSpecialMeeting = (meetingId: string) => {
@@ -4999,7 +5034,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       specialMeetings: circuitVisit.specialMeetings.filter(m => m.id !== meetingId),
     };
     setCircuitVisit(updatedVisit);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, updatedVisit);
+    persistCongregationState({ circuitVisit: updatedVisit });
   };
 
   // Congregation Accounts (S-26, S-30, S-25)
@@ -5010,29 +5045,25 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newTx, ...transactions];
     setTransactions(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
+    persistCongregationState({ transactions: updated });
   };
 
   const updateTransaction = (tx: AccountTransaction) => {
     const updated = transactions.map(t => (t.id === tx.id ? tx : t));
     setTransactions(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
+    persistCongregationState({ transactions: updated });
   };
 
   const deleteTransaction = (id: string) => {
     const updated = transactions.filter(t => t.id !== id);
     setTransactions(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
+    persistCongregationState({ transactions: updated });
   };
 
   const updateQuarterlyAudit = (audit: QuarterlyAudit) => {
     const updated = quarterlyAudits.map(a => (a.id === audit.id ? audit : a));
     setQuarterlyAudits(updated);
-
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, transactions, updated);
+    persistCongregationState({ quarterlyAudits: updated });
   };
 
   // Conmemoración del Memorial & Asambleas Teocráticas
@@ -5042,24 +5073,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       ? memorialPlans.map(p => (p.id === plan.id ? plan : p))
       : [plan, ...memorialPlans];
     setMemorialPlans(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      updated
-    );
+    persistCongregationState({ memorialPlans: updated });
   };
 
   const addTheocraticAssembly = (assemblyData: Omit<TheocraticAssembly, 'id'>) => {
@@ -5069,73 +5083,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newAssembly, ...theocraticAssemblies];
     setTheocraticAssemblies(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      updated
-    );
+    persistCongregationState({ theocraticAssemblies: updated });
   };
 
   const updateTheocraticAssembly = (assembly: TheocraticAssembly) => {
     const updated = theocraticAssemblies.map(a => (a.id === assembly.id ? assembly : a));
     setTheocraticAssemblies(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      updated
-    );
+    persistCongregationState({ theocraticAssemblies: updated });
   };
 
   const deleteTheocraticAssembly = (id: string) => {
     const updated = theocraticAssemblies.filter(a => a.id !== id);
     setTheocraticAssemblies(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      updated
-    );
+    persistCongregationState({ theocraticAssemblies: updated });
   };
 
   // Calendario de Eventos de la Congregación
@@ -5153,32 +5113,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       console.error('Error saving congregation events:', err);
     }
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      inventoryRecords,
-      accountLinkRequests,
-      clmProgramas,
-      updated
-    );
+    persistCongregationState({ congregationEvents: updated });
   };
 
   const updateCongregationEvent = (event: CongregationEvent) => {
@@ -5190,32 +5125,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       console.error('Error updating congregation event:', err);
     }
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      inventoryRecords,
-      accountLinkRequests,
-      clmProgramas,
-      updated
-    );
+    persistCongregationState({ congregationEvents: updated });
   };
 
   const deleteCongregationEvent = (id: string) => {
@@ -5227,32 +5137,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       console.error('Error deleting congregation event:', err);
     }
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      inventoryRecords,
-      accountLinkRequests,
-      clmProgramas,
-      updated
-    );
+    persistCongregationState({ congregationEvents: updated });
   };
 
   // Literatura y Publicaciones (Formulario S-14)
@@ -5263,76 +5148,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newItem, ...literatureItems];
     setLiteratureItems(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      updated
-    );
+    persistCongregationState({ literatureItems: updated });
   };
 
   const updateLiteratureItem = (item: LiteratureItem) => {
     const updated = literatureItems.map(i => (i.id === item.id ? item : i));
     setLiteratureItems(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      updated
-    );
+    persistCongregationState({ literatureItems: updated });
   };
 
   const deleteLiteratureItem = (id: string) => {
     const updated = literatureItems.filter(i => i.id !== id);
     setLiteratureItems(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      updated
-    );
+    persistCongregationState({ literatureItems: updated });
   };
 
   const addSpecialOrder = (orderData: Omit<LiteratureSpecialOrder, 'id'>) => {
@@ -5342,79 +5170,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newOrder, ...specialOrders];
     setSpecialOrders(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      updated
-    );
+    persistCongregationState({ specialOrders: updated });
   };
 
   const updateSpecialOrder = (order: LiteratureSpecialOrder) => {
     const updated = specialOrders.map(o => (o.id === order.id ? order : o));
     setSpecialOrders(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      updated
-    );
+    persistCongregationState({ specialOrders: updated });
   };
 
   const deleteSpecialOrder = (id: string) => {
     const updated = specialOrders.filter(o => o.id !== id);
     setSpecialOrders(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      updated
-    );
+    persistCongregationState({ specialOrders: updated });
   };
 
   const updateGroupDistribution = (dist: LiteratureGroupDistribution) => {
@@ -5423,28 +5191,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       ? groupDistributions.map(d => (d.groupNumber === dist.groupNumber ? dist : d))
       : [...groupDistributions, dist];
     setGroupDistributions(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      updated
-    );
+    persistCongregationState({ groupDistributions: updated });
   };
 
   const recordPhysicalCount = (recordData: Omit<LiteratureInventoryRecord, 'id'>) => {
@@ -5454,29 +5201,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newRecord, ...inventoryRecords];
     setInventoryRecords(updated);
-    saveToFirestore(
-      publishers,
-      weeks,
-      preachingGroups,
-      customDuties,
-      settings,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      updated
-    );
+    persistCongregationState({ inventoryRecords: updated });
   };
 
   const getS89SlipsForWeek = (week: WeekSchedule): S89Slip[] => {

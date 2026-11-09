@@ -130,6 +130,9 @@ export function sanitizeForFirestore<T>(data: T): T {
   }
 }
 
+/** Alias con nomenclatura moderna neutral e independiente del backend */
+export const sanitizeCongregationPayload = sanitizeForFirestore;
+
 export const GENERIC_IDENTITY_NAMES = new Set([
   '',
   'usuario',

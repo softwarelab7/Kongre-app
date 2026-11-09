@@ -603,3 +603,79 @@ export function restoreShepherdingVisitsFromLocalStorage<T extends Record<string
     return clone as T;
   });
 }
+
+/**
+ * Campos de una transacción contable que revelan identidad de donantes, comprobantes y notas financieras privadas.
+ * CuentasTab y donaciones teocráticas.
+ */
+const SENSITIVE_TRANSACTION_KEYS = [
+  'receiptNumber',
+  'payerOrPayee',
+  'description',
+  'notes',
+] as const;
+
+/** Cifra en reposo los campos sensibles de las transacciones antes de escribir en localStorage (AES-256-GCM kgr_sec5:). */
+export function sanitizeTransactionsForLocalStorage<T extends Record<string, any>>(transactions: T[]): T[] {
+  if (!Array.isArray(transactions)) return [];
+  return transactions.map((t) => {
+    if (!t || typeof t !== 'object') return t;
+    const clone: Record<string, any> = { ...t };
+    for (const k of SENSITIVE_TRANSACTION_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = encryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}
+
+/** Descifra en memoria las transacciones leídas de localStorage (acepta texto plano heredado). */
+export function restoreTransactionsFromLocalStorage<T extends Record<string, any>>(transactions: T[]): T[] {
+  if (!Array.isArray(transactions)) return [];
+  return transactions.map((t) => {
+    if (!t || typeof t !== 'object') return t;
+    const clone: Record<string, any> = { ...t };
+    for (const k of SENSITIVE_TRANSACTION_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = decryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}
+
+/**
+ * Campos de una auditoría trimestral que contienen notas y detalles confidenciales del revisor.
+ */
+const SENSITIVE_AUDIT_KEYS = ['findingsNotes', 'auditorName'] as const;
+
+/** Cifra en reposo los campos de auditorías trimestrales antes de escribir en localStorage. */
+export function sanitizeAuditsForLocalStorage<T extends Record<string, any>>(audits: T[]): T[] {
+  if (!Array.isArray(audits)) return [];
+  return audits.map((a) => {
+    if (!a || typeof a !== 'object') return a;
+    const clone: Record<string, any> = { ...a };
+    for (const k of SENSITIVE_AUDIT_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = encryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}
+
+/** Descifra en memoria las auditorías trimestrales leídas de localStorage. */
+export function restoreAuditsFromLocalStorage<T extends Record<string, any>>(audits: T[]): T[] {
+  if (!Array.isArray(audits)) return [];
+  return audits.map((a) => {
+    if (!a || typeof a !== 'object') return a;
+    const clone: Record<string, any> = { ...a };
+    for (const k of SENSITIVE_AUDIT_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = decryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
+    return clone as T;
+  });
+}

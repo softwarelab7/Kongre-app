@@ -5,6 +5,10 @@ import {
   decryptSensitiveFieldAtRest,
   sanitizePublishersForLocalStorage,
   restorePublishersFromLocalStorage,
+  sanitizeTransactionsForLocalStorage,
+  restoreTransactionsFromLocalStorage,
+  sanitizeAuditsForLocalStorage,
+  restoreAuditsFromLocalStorage,
 } from '../src/utils/theocraticSecurity.ts';
 import { setVaultSessionEntropyForTesting } from '../src/utils/atRestVault.ts';
 
@@ -138,4 +142,79 @@ test('sin bóveda se mantiene el respaldo kgr_sec3 (comportamiento previo)', () 
   const enc = encryptSensitiveFieldAtRest('Alergia al polen');
   assert.ok(enc.startsWith('kgr_sec3:'));
   assert.equal(decryptSensitiveFieldAtRest(enc), 'Alergia al polen');
+});
+
+test('kgr_sec5: cuentas y transacciones — comprobantes, donantes y notas se cifran en reposo', () => {
+  useStorage();
+  setVaultSessionEntropyForTesting(ENTROPY);
+
+  const txs = [
+    {
+      id: 'tx-1',
+      date: '2026-11-01',
+      month: '2026-11',
+      type: 'ingreso',
+      fund: 'congregacion',
+      category: 'donaciones_cajas',
+      description: 'Donación caja salón',
+      amount: 150000,
+      receiptNumber: 'REC-2026-001',
+      payerOrPayee: 'Hermano Anónimo',
+      paymentMethod: 'efectivo',
+      verified: true,
+      notes: 'Donación voluntaria para sonido',
+    },
+  ];
+
+  // 1. Sanitizar para localStorage: campos sensibles deben tener kgr_sec5:
+  const sanitized = sanitizeTransactionsForLocalStorage(txs);
+  assert.ok(sanitized[0].receiptNumber.startsWith('kgr_sec5:'), 'comprobante cifrado con kgr_sec5');
+  assert.ok(sanitized[0].payerOrPayee.startsWith('kgr_sec5:'), 'donante cifrado con kgr_sec5');
+  assert.ok(sanitized[0].description.startsWith('kgr_sec5:'), 'descripción cifrada con kgr_sec5');
+  assert.ok(sanitized[0].notes.startsWith('kgr_sec5:'), 'notas cifradas con kgr_sec5');
+  // Valores no sensibles deben mantenerse intactos
+  assert.equal(sanitized[0].amount, 150000);
+  assert.equal(sanitized[0].date, '2026-11-01');
+
+  // Comprobar que en el JSON de localStorage no aparezca ningún texto plano sensible
+  const dumpedJson = JSON.stringify(sanitized);
+  assert.ok(!dumpedJson.includes('REC-2026-001'), 'el comprobante no aparece en texto plano en localStorage');
+  assert.ok(!dumpedJson.includes('Hermano Anónimo'), 'el donante no aparece en texto plano en localStorage');
+  assert.ok(!dumpedJson.includes('sonido'), 'las notas no aparecen en texto plano en localStorage');
+
+  // 2. Restaurar en memoria
+  const restored = restoreTransactionsFromLocalStorage(sanitized);
+  assert.equal(restored[0].receiptNumber, 'REC-2026-001');
+  assert.equal(restored[0].payerOrPayee, 'Hermano Anónimo');
+  assert.equal(restored[0].description, 'Donación caja salón');
+  assert.equal(restored[0].notes, 'Donación voluntaria para sonido');
+});
+
+test('kgr_sec5: auditorías trimestrales — notas de revisión y auditor cifrados en reposo', () => {
+  useStorage();
+  setVaultSessionEntropyForTesting(ENTROPY);
+
+  const audits = [
+    {
+      id: 'aud-1',
+      quarter: 'Q1',
+      serviceYear: '2026-2027',
+      monthsCovered: ['2026-09', '2026-10', '2026-11'],
+      auditorName: 'Anciano Auditor',
+      isCompleted: true,
+      reviewedReceipts: true,
+      verifiedBankStatements: true,
+      checkedS30Announcements: true,
+      findingsNotes: 'Todas las cuentas cuadraron exactamente con los extractos bancarios.',
+    },
+  ];
+
+  const sanitized = sanitizeAuditsForLocalStorage(audits);
+  assert.ok(sanitized[0].auditorName.startsWith('kgr_sec5:'));
+  assert.ok(sanitized[0].findingsNotes.startsWith('kgr_sec5:'));
+  assert.ok(!JSON.stringify(sanitized).includes('extractos bancarios'));
+
+  const restored = restoreAuditsFromLocalStorage(sanitized);
+  assert.equal(restored[0].auditorName, 'Anciano Auditor');
+  assert.equal(restored[0].findingsNotes, 'Todas las cuentas cuadraron exactamente con los extractos bancarios.');
 });

@@ -35,12 +35,27 @@ import { StudyInspectorPanel } from './components/jw';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import type { WebsiteSection } from './components/KongreOfficialWebsite';
 
-// Helper para carga diferida de exportaciones nombradas (Code-Splitting)
+// Helper para carga diferida de exportaciones nombradas (Code-Splitting) con reintento automático
 function lazyNamed<T extends Record<string, any>, K extends keyof T>(
   factory: () => Promise<T>,
   key: K
 ): React.LazyExoticComponent<T[K]> {
-  return React.lazy(() => factory().then((m) => ({ default: m[key] })));
+  return React.lazy(async () => {
+    try {
+      const m = await factory();
+      return { default: (m[key] ?? (m as any).default ?? m) as T[K] };
+    } catch (err) {
+      console.warn(`[lazyNamed] Fallo temporal al cargar '${String(key)}', reintentando...`, err);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        const m = await factory();
+        return { default: (m[key] ?? (m as any).default ?? m) as T[K] };
+      } catch (retryErr) {
+        console.error(`[lazyNamed] Fallo definitivo al cargar '${String(key)}':`, retryErr);
+        throw retryErr;
+      }
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -110,6 +125,7 @@ const DesktopUpdateModal = lazyNamed(() => import('./components/DesktopUpdateMod
 const OfflineSyncQueueModal = lazyNamed(() => import('./components/OfflineSyncQueueModal'), 'OfflineSyncQueueModal');
 const OfflineDashboard = lazyNamed(() => import('./components/OfflineDashboard'), 'OfflineDashboard');
 const DemoNoticeModal = lazyNamed(() => import('./components/DemoNoticeModal'), 'DemoNoticeModal');
+const DemoStartupModal = lazyNamed(() => import('./components/DemoStartupModal'), 'DemoStartupModal');
 
 export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   inicio: 'inicio',
@@ -428,6 +444,7 @@ const AppContent: React.FC = () => {
   } = useCongregation();
 
   const [isDemoNoticeOpen, setIsDemoNoticeOpen] = useState(false);
+  const [isStartingWebsiteDemo, setIsStartingWebsiteDemo] = useState(false);
 
   const [hasAcceptedTermsState, setHasAcceptedTermsState] = useState<boolean>(() =>
     hasAcceptedLegalTerms()
@@ -1461,13 +1478,18 @@ const AppContent: React.FC = () => {
             );
           }}
           onStartDemoMode={() => {
-            loadDemoData();
-            setShowOfficialWebsite(false);
-            setShowWelcomeLanding(false);
-            sessionStorage.removeItem('kongre_show_landing');
-            localStorage.setItem('kongre_has_entered_app', 'true');
-            localStorage.setItem('kongre_is_guest', 'true');
-            setActiveTab('inicio');
+            setIsStartingWebsiteDemo(true);
+            setTimeout(() => {
+              loadDemoData();
+              sessionStorage.setItem('kongre_demo_notice_shown', 'false');
+              setIsStartingWebsiteDemo(false);
+              setShowOfficialWebsite(false);
+              setShowWelcomeLanding(false);
+              sessionStorage.removeItem('kongre_show_landing');
+              localStorage.setItem('kongre_has_entered_app', 'true');
+              localStorage.setItem('kongre_is_guest', 'true');
+              setActiveTab('inicio');
+            }, 1150);
           }}
           onOpenVersionModal={() => {
             openModalWithHistory('versiones', setIsVersionModalOpen);
@@ -1484,6 +1506,7 @@ const AppContent: React.FC = () => {
             );
           }}
         />
+        <DemoStartupModal isOpen={isStartingWebsiteDemo} />
         {/* Aviso de actualización para PC en la vista de presentación/web */}
         <DesktopUpdateModal
           isOpen={isDesktopUpdateOpen}
@@ -1835,19 +1858,36 @@ const AppContent: React.FC = () => {
                   />
                 )}
                 {activeTab === 'menu' && (
-                  <CategoryHubTab
-                    setActiveTab={setActiveTab}
-                    selectedCategory={selectedCategoryHub}
-                    onSelectCategory={setSelectedCategoryHub}
-                    onOpenConflictsModal={openConflictsView}
-                    onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
-                    onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-                    onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-                    onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
-                    onOpenRoleModal={() => setActiveTab('roles')}
-                    onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
-                    onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
-                  />
+                  <>
+                    <div className="md:hidden">
+                      <MobileMenuTab
+                        setActiveTab={setActiveTab}
+                        onOpenConflictsModal={openConflictsView}
+                        onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+                        onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                        onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                        onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+                        onOpenRoleModal={() => setActiveTab('roles')}
+                        onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                        onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+                      />
+                    </div>
+                    <div className="hidden md:block">
+                      <CategoryHubTab
+                        setActiveTab={setActiveTab}
+                        selectedCategory={selectedCategoryHub}
+                        onSelectCategory={setSelectedCategoryHub}
+                        onOpenConflictsModal={openConflictsView}
+                        onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+                        onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                        onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                        onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+                        onOpenRoleModal={() => setActiveTab('roles')}
+                        onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                        onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+                      />
+                    </div>
+                  </>
                 )}
                 </Suspense>
               </motion.div>
@@ -1865,42 +1905,55 @@ const AppContent: React.FC = () => {
         />
       </main>
 
-      {/* Global Modals con Carga Diferida (Code-Splitting) */}
+      {/* Global Modals con Carga Diferida (Code-Splitting bajo demanda) */}
       <Suspense fallback={null}>
-        <ConflictsModal
-          isOpen={isConflictsModalOpen}
-          onClose={() => closeModalWithHistory('conflictos', setIsConflictsModalOpen)}
-          onNavigateToWeek={handleNavigateToWeek}
-        />
+        {isConflictsModalOpen && (
+          <ConflictsModal
+            isOpen={isConflictsModalOpen}
+            onClose={() => closeModalWithHistory('conflictos', setIsConflictsModalOpen)}
+            onNavigateToWeek={handleNavigateToWeek}
+          />
+        )}
 
-      <QrCodeModal
-        isOpen={isQrModalOpen}
-        onClose={() => closeModalWithHistory('qr', setIsQrModalOpen)}
-      />
+        {isQrModalOpen && (
+          <QrCodeModal
+            isOpen={isQrModalOpen}
+            onClose={() => closeModalWithHistory('qr', setIsQrModalOpen)}
+          />
+        )}
 
-      <LocalP2PTransferModal
-        isOpen={isP2PModalOpen}
-        onClose={() => closeModalWithHistory('p2p_transfer', setIsP2PModalOpen)}
-      />
+        {isP2PModalOpen && (
+          <LocalP2PTransferModal
+            isOpen={isP2PModalOpen}
+            onClose={() => closeModalWithHistory('p2p_transfer', setIsP2PModalOpen)}
+          />
+        )}
 
-      <MeetingTimerModal
-        isOpen={isTimerModalOpen}
-        onClose={() => closeModalWithHistory('cronometro', setIsTimerModalOpen)}
-      />
+        {isTimerModalOpen && (
+          <MeetingTimerModal
+            isOpen={isTimerModalOpen}
+            onClose={() => closeModalWithHistory('cronometro', setIsTimerModalOpen)}
+          />
+        )}
 
-      <TableroSalonModal
-        isOpen={isKioskModalOpen}
-        onClose={() => closeModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-      />
+        {isKioskModalOpen && (
+          <TableroSalonModal
+            isOpen={isKioskModalOpen}
+            onClose={() => closeModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+          />
+        )}
 
-      <GlobalSearchModal
-        isOpen={isSearchModalOpen}
-        onClose={() => closeModalWithHistory('buscar', setIsSearchModalOpen)}
-        onNavigate={handleSearchNavigate}
-        onOpenKiosk={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-        onOpenTimer={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
-        onOpenQr={() => openModalWithHistory('qr', setIsQrModalOpen)}
-      />
+        {isSearchModalOpen && (
+          <GlobalSearchModal
+            isOpen={isSearchModalOpen}
+            onClose={() => closeModalWithHistory('buscar', setIsSearchModalOpen)}
+            onNavigate={handleSearchNavigate}
+            onOpenKiosk={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+            onOpenTimer={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+            onOpenQr={() => openModalWithHistory('qr', setIsQrModalOpen)}
+          />
+        )}
+      </Suspense>
 
       {/* 1-Click WhatsApp Direct Assignment Confirmation Modal */}
       {confirmationParams && (
@@ -2046,7 +2099,6 @@ const AppContent: React.FC = () => {
           activeAnnotation={activeAnnotation}
           onSaveAnnotation={saveAnnotation}
         />
-      </Suspense>
 
       {/* Botón flotante para volver arriba de forma ágil */}
       <ScrollToTopButton isInspectorOpen={isInspectorOpen} />

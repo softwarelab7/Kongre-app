@@ -46,6 +46,23 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error in React ErrorBoundary:', error, errorInfo);
     this.setState({ error, errorInfo });
+
+    // Detección y auto-recuperación de fallos de carga dinámica de módulos (Vite rebuild / cache)
+    const errorMsg = error?.message || String(error);
+    const isChunkLoadFailed =
+      error?.name === 'ChunkLoadError' ||
+      errorMsg.includes('Failed to fetch dynamically imported module') ||
+      errorMsg.includes('dynamically imported module') ||
+      errorMsg.includes('error loading dynamically imported module');
+
+    if (isChunkLoadFailed && typeof window !== 'undefined') {
+      const lastReload = sessionStorage.getItem('kongre_chunk_reload_ts');
+      const now = Date.now();
+      if (!lastReload || now - Number(lastReload) > 8000) {
+        sessionStorage.setItem('kongre_chunk_reload_ts', String(now));
+        window.location.reload();
+      }
+    }
   }
 
   private handleReload = () => {

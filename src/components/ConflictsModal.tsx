@@ -631,3 +631,5 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
     </div>
   );
 };
+
+export default ConflictsModal;

@@ -1993,10 +1993,10 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           {/* Derecha: Resumen del Mes y Meta de Horas */}
           <div className="lg:col-span-5 kg-glass-surface kg-sheen-top rounded-3xl p-4 sm:p-5 flex flex-col justify-between gap-3.5 relative overflow-hidden shadow-sm">
             <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3 pb-3 border-b border-zinc-200/60 dark:border-white/10">
-                <div className="min-w-0">
+              <div className="flex flex-col gap-2 mb-3 pb-3 border-b border-zinc-200/60 dark:border-white/10">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                    <span className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                       Resumen de {currentMonthLabel}
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold border border-emerald-500/20 shrink-0">
@@ -2004,22 +2004,27 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                       Autoguardado
                     </span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white mt-1 tracking-tight truncate">
-                    Mi Meta y Registro Mensual
-                  </h3>
+
+                  {/* Selector de meta de horas mensual */}
+                  <div className="shrink-0">
+                    <select
+                      value={hourGoal}
+                      onChange={(e) => handleUpdateGoal(Number(e.target.value))}
+                      className="text-xs font-bold px-2.5 py-1 rounded-xl bg-zinc-100/90 hover:bg-zinc-200/80 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-800 dark:text-zinc-100 border border-zinc-200/80 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer transition shadow-2xs"
+                      title="Configurar meta de horas del mes"
+                    >
+                      <option value={10}>Meta: 10 h (Personal)</option>
+                      <option value={15}>Meta: 15 h (Prec. Auxiliar)</option>
+                      <option value={30}>Meta: 30 h (Prec. Auxiliar)</option>
+                      <option value={50}>Meta: 50 h (Prec. Regular)</option>
+                      <option value={100}>Meta: 100 h (Prec. Especial)</option>
+                    </select>
+                  </div>
                 </div>
-                <select
-                  value={hourGoal}
-                  onChange={(e) => handleUpdateGoal(Number(e.target.value))}
-                  className="w-full sm:w-auto max-w-full text-xs font-bold px-3 py-1.5 rounded-xl bg-zinc-100/80 dark:bg-white/10 text-zinc-800 dark:text-zinc-100 border border-zinc-200/80 dark:border-white/10 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer"
-                  title="Configurar meta de horas del mes"
-                >
-                  <option value={10}>Meta: 10 h (Personal)</option>
-                  <option value={15}>Meta: 15 h (Prec. Auxiliar)</option>
-                  <option value={30}>Meta: 30 h (Prec. Auxiliar)</option>
-                  <option value={50}>Meta: 50 h (Prec. Regular)</option>
-                  <option value={100}>Meta: 100 h (Prec. Especial)</option>
-                </select>
+
+                <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                  Mi Meta y Registro Mensual
+                </h3>
               </div>
 
               {/* Barra de Progreso de Horas */}
@@ -2101,10 +2106,10 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   </div>
 
                   {/* Indicador de ritmo de horas semanales para cumplir la meta */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-500/20 text-[11px]">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 p-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-500/20 text-[11px]">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 shrink-0" />
-                      <span className="font-semibold text-zinc-700 dark:text-zinc-200 truncate">
+                      <span className="font-semibold text-zinc-700 dark:text-zinc-200">
                         Ritmo semanal para la meta:
                       </span>
                     </div>

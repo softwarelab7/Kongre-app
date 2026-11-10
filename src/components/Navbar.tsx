@@ -1,6 +1,6 @@
 // src/components/Navbar.tsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
@@ -419,12 +419,41 @@ export const Navbar: React.FC<NavbarProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
+  const [menuSearchQuery, setMenuSearchQuery] = useState('');
+  const [collapsedDepts, setCollapsedDepts] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!isHamburgerMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsHamburgerMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isHamburgerMenuOpen]);
+
   const lastNonMenuTabRef = useRef<ActiveTab>('inicio');
   useEffect(() => {
     if (activeTab !== 'menu') {
       lastNonMenuTabRef.current = activeTab;
     }
   }, [activeTab]);
+
+  const openUnifiedMenuForDept = (deptId?: string) => {
+    setMenuSearchQuery('');
+    if (deptId && deptId !== 'all') {
+      const nextCollapsed: Record<string, boolean> = {};
+      departments.forEach((d) => {
+        nextCollapsed[d.id] = d.id !== deptId;
+      });
+      setCollapsedDepts(nextCollapsed);
+    } else {
+      setCollapsedDepts({});
+    }
+    setIsHamburgerMenuOpen(true);
+  };
 
   const overdueTerritoriesCount = territories.filter(
     (t) =>
@@ -831,6 +860,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleSelectTab = (tabId: ActiveTab) => {
     setActiveTab(tabId);
     setOpenDropdown(null);
+    setIsHamburgerMenuOpen(false);
   };
 
   const rawCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
@@ -972,8 +1002,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       } else if (cat.id === 'panorama_general') {
                         handleSelectTab('panorama_general');
                       } else {
-                        onSelectCategoryHub?.(cat.id);
-                        handleSelectTab('menu');
+                        openUnifiedMenuForDept(cat.id);
                       }
                     }}
                     aria-label={cat.title}
@@ -983,7 +1012,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         ? 'bg-indigo-50 dark:bg-[#18181F] text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/30 shadow-2xs font-bold'
                         : 'text-zinc-400 dark:text-[#A1A1AA] hover:text-zinc-800 dark:hover:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F]'
                     }`}
-                    title={cat.title}
+                    title={`${cat.title} (Abrir en el menú)`}
                   >
                     <Icon className="w-4 h-4 stroke-[1.8]" />
 
@@ -1051,20 +1080,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Botón integrado directamente en la barra lateral para ocultarla */}
-            {onToggleSidebar && (
-              <div className="relative w-full flex justify-center">
-                <button
-                  type="button"
-                  onClick={onToggleSidebar}
-                  aria-label="Ocultar barra lateral"
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group"
-                  title="Ocultar barra lateral (Ctrl+B / ⌘B)"
-                >
-                  <PanelLeftClose className="w-4 h-4 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            )}
+            {/* Botón integrado en la barra lateral para expandir el menú completo */}
+            <div className="relative w-full flex justify-center">
+              <button
+                type="button"
+                onClick={() => openUnifiedMenuForDept('all')}
+                aria-label="Expandir menú completo"
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F] transition-all cursor-pointer group"
+                title="Expandir menú completo"
+              >
+                <PanelLeftOpen className="w-4 h-4 stroke-[1.8] group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
 
             {/* Versión compacta y elegante sin desbordamiento */}
             {onOpenVersionModal && (
@@ -1095,79 +1122,42 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-3">
           {/* 1. LEFT: Sidebar Toggle & Structured Breadcrumb Context */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            {/* Desktop: Botón Hamburguesa de Categorías (JW Library) */}
-            {isSidebarVisible && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (activeTab === 'menu') {
-                    handleSelectTab(lastNonMenuTabRef.current || 'inicio');
-                  } else {
-                    onSelectCategoryHub?.('all');
-                    handleSelectTab('menu');
-                  }
-                }}
-                aria-label={activeTab === 'menu' ? 'Volver a la vista anterior' : 'Catálogo general de módulos (JW Library)'}
-                aria-expanded={activeTab === 'menu'}
-                className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'menu'
-                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                    : 'text-zinc-600 dark:text-[#A1A1AA] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-[#18181F]'
-                }`}
-                title={activeTab === 'menu' ? 'Volver a la vista anterior' : 'Catálogo general de módulos (JW Library)'}
-              >
-                {activeTab === 'menu' ? (
-                  <X className="w-5 h-5 stroke-[2]" />
-                ) : (
-                  <Menu className="w-5 h-5 stroke-[2]" />
-                )}
-              </button>
-            )}
-
-            {/* Móvil (< md): Botón Volver cuando está en Menú, o Logo directo al Inicio */}
+            {/* Botón Hamburguesa (Solo Escritorio): Abre/Cierra el Menú Lateral Unificado */}
             <button
               type="button"
-              onClick={() => handleSelectTab('inicio')}
-              aria-label={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Ir a Mi Ministerio'}
-              title={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Kongre - Mi Ministerio'}
-              className={`md:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition cursor-pointer ${
-                activeTab === 'menu'
-                  ? 'bg-indigo-600 text-white border border-indigo-600 shadow-2xs'
-                  : 'bg-transparent'
+              onClick={() => {
+                if (isHamburgerMenuOpen) {
+                  setIsHamburgerMenuOpen(false);
+                } else {
+                  openUnifiedMenuForDept('all');
+                }
+              }}
+              aria-label={isHamburgerMenuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
+              aria-expanded={isHamburgerMenuOpen}
+              className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 ${
+                isHamburgerMenuOpen
+                  ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                  : 'text-zinc-700 dark:text-[#F4F4F5] hover:text-indigo-600 dark:hover:text-indigo-400 bg-zinc-100/80 dark:bg-[#121216] hover:bg-zinc-200/70 dark:hover:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]'
               }`}
+              title={isHamburgerMenuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
             >
-              {activeTab === 'menu' ? (
-                <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+              {isHamburgerMenuOpen ? (
+                <X className="w-5 h-5 stroke-[2]" />
               ) : (
-                <Logo variant="isotipo" className="w-8 h-8 object-contain" />
+                <Menu className="w-5 h-5 stroke-[2]" />
               )}
             </button>
 
-            {/* Desktop cuando la barra lateral está oculta (!isSidebarVisible): Botón destacado para mostrarla + Logo */}
-            {!isSidebarVisible && (
-              <div className="hidden md:flex items-center gap-2 shrink-0">
-                {onToggleSidebar && (
-                  <button
-                    type="button"
-                    onClick={onToggleSidebar}
-                    aria-label="Mostrar barra lateral"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-700 dark:text-[#F4F4F5] hover:text-indigo-600 dark:hover:text-indigo-400 bg-zinc-100 dark:bg-[#18181F] hover:bg-indigo-50 dark:hover:bg-[#121216] border border-zinc-200 dark:border-[#27272A] transition-all cursor-pointer shadow-2xs group"
-                    title="Mostrar barra lateral (Ctrl+B / ⌘B)"
-                  >
-                    <PanelLeftOpen className="w-4 h-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleSelectTab('inicio')}
-                  aria-label="Ir al inicio - Mi Ministerio"
-                  className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                  title="Kongre - Mi Ministerio"
-                >
-                  <Logo variant="isotipo" className="w-7 h-7 object-contain" />
-                </button>
-              </div>
-            )}
+            {/* Logo directo al Inicio cuando no está visible la barra lateral en escritorio o en móvil */}
+            <button
+              type="button"
+              onClick={() => handleSelectTab('inicio')}
+              aria-label="Ir a Mi Ministerio"
+              title="Kongre - Mi Ministerio"
+              className={`${isSidebarVisible ? 'md:hidden' : 'flex'} w-8 h-8 rounded-xl items-center justify-center shrink-0 active:scale-95 transition cursor-pointer bg-transparent`}
+            >
+              <Logo variant="isotipo" className="w-7 h-7 object-contain" />
+            </button>
 
             {/* Congregation title & active module breadcrumb */}
             <div className="min-w-0 flex items-center gap-1.5 sm:gap-2.5">
@@ -1572,339 +1562,342 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Redesigned User Profile Panel Popover (Mobile & Desktop) */}
               {openDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] max-w-[340px] sm:w-[350px] bg-white dark:bg-[#121216] rounded-2xl shadow-xl border border-zinc-200/90 dark:border-[#27272A] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  {/* 1. Identity & Sync Card */}
-                  <div className="rounded-xl p-3 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] mb-2 space-y-2.5">
-                    <div className="flex items-center gap-3">
-                      {/* Avatar with Status Dot */}
-                      <div className="relative shrink-0">
-                        <div className="w-11 h-11 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-base shadow-xs overflow-hidden">
-                          {(() => {
-                            const effectiveAvatar = isDemoMode
-                              ? userProfile?.photoURL || null
-                              : userProfile?.photoURL ||
-                                user?.photoURL ||
-                                settings?.coordinatorPhotoURL ||
-                                (typeof window !== 'undefined'
-                                  ? localStorage.getItem('kongre_user_photo') ||
-                                    localStorage.getItem('kongre_google_photo') ||
-                                    localStorage.getItem('kongre_coordinator_photo')
-                                  : null);
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-20px)] max-w-[340px] sm:w-[350px] max-h-[calc(100dvh-4.5rem)] max-h-[calc(100vh-4.5rem)] flex flex-col bg-white dark:bg-[#121216] rounded-2xl shadow-2xl border border-zinc-200/90 dark:border-[#27272A] z-50 animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+                  {/* Scrollable Content Body */}
+                  <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 space-y-2 [scrollbar-width:thin] [scrollbar-color:rgba(156,163,175,0.4)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    {/* 1. Identity & Sync Card */}
+                    <div className="rounded-xl p-2.5 bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A] space-y-2">
+                      <div className="flex items-center gap-2.5">
+                        {/* Avatar with Status Dot */}
+                        <div className="relative shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-xs overflow-hidden">
+                            {(() => {
+                              const effectiveAvatar = isDemoMode
+                                ? userProfile?.photoURL || null
+                                : userProfile?.photoURL ||
+                                  user?.photoURL ||
+                                  settings?.coordinatorPhotoURL ||
+                                  (typeof window !== 'undefined'
+                                    ? localStorage.getItem('kongre_user_photo') ||
+                                      localStorage.getItem('kongre_google_photo') ||
+                                      localStorage.getItem('kongre_coordinator_photo')
+                                    : null);
 
-                            if (effectiveAvatar) {
+                              if (effectiveAvatar) {
+                                return (
+                                  <img
+                                    src={effectiveAvatar}
+                                    alt="Usuario"
+                                    className="w-full h-full object-cover"
+                                  />
+                                );
+                              }
+
                               return (
-                                <img
-                                  src={effectiveAvatar}
-                                  alt="Usuario"
-                                  className="w-full h-full object-cover"
-                                />
+                                <span>
+                                  {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
+                                </span>
                               );
+                            })()}
+                          </div>
+                          <span
+                            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ring-white dark:ring-[#18181F] ${
+                              effectiveSyncState === 'syncing'
+                                ? 'bg-amber-500 animate-pulse'
+                                : effectiveSyncState === 'offline'
+                                ? 'bg-rose-500'
+                                : 'bg-emerald-500'
+                            }`}
+                          />
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight">
+                            {effectiveDisplayName || 'Usuario'}
+                          </p>
+                          <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate flex items-center gap-1 mt-0.5">
+                            <Building2 className="w-3 h-3 text-zinc-400 shrink-0" />
+                            <span className="truncate">{displayCongregationName}</span>
+                          </p>
+                          <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 max-w-full">
+                            <ShieldCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                            <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Integrated Sync Status & Actions Row */}
+                      <div className="pt-2 border-t border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenQueueModal) {
+                              setOpenDropdown(null);
+                              onOpenQueueModal();
                             }
-
-                            return (
-                              <span>
-                                {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                        <span
-                          className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#18181F] ${
-                            effectiveSyncState === 'syncing'
-                              ? 'bg-amber-500 animate-pulse'
+                          }}
+                          className="flex items-center gap-1.5 min-w-0 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left group"
+                          title="Ver cola y estado de datos locales en OfflineDashboard"
+                        >
+                          <span
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                              effectiveSyncState === 'syncing'
+                                ? 'bg-amber-500 animate-pulse'
+                                : effectiveSyncState === 'offline'
+                                ? 'bg-rose-500'
+                                : 'bg-emerald-500'
+                            }`}
+                          />
+                          <span className="truncate">
+                            {effectiveSyncState === 'syncing'
+                              ? 'Sincronizando...'
                               : effectiveSyncState === 'offline'
-                              ? 'bg-rose-500'
-                              : 'bg-emerald-500'
-                          }`}
-                        />
-                      </div>
+                              ? pendingOfflineCount > 0
+                                ? `Sin conexión (${pendingOfflineCount})`
+                                : 'Sin conexión'
+                              : pendingOfflineCount > 0
+                              ? `En línea (${pendingOfflineCount} pendientes)`
+                              : 'En línea y sincronizado'}
+                          </span>
+                          {onOpenQueueModal && (
+                            <ChevronRight className="w-3 h-3 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                          )}
+                        </button>
 
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-bold text-zinc-900 dark:text-[#F4F4F5] truncate tracking-tight">
-                          {effectiveDisplayName || 'Usuario'}
-                        </p>
-                        <p className="text-[11px] text-zinc-500 dark:text-[#A1A1AA] truncate flex items-center gap-1 mt-0.5">
-                          <Building2 className="w-3 h-3 text-zinc-400 shrink-0" />
-                          <span className="truncate">{displayCongregationName}</span>
-                        </p>
-                        <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 max-w-full">
-                          <ShieldCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                          <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={handleForceSync}
+                          disabled={isForcingSync}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10.5px] font-bold bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#22222A] text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs transition-all cursor-pointer active:scale-95 disabled:opacity-50 shrink-0"
+                          title="Forzar sincronización inmediata con Supabase"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isForcingSync ? 'animate-spin text-indigo-500' : 'text-zinc-500 dark:text-zinc-400'}`} />
+                          <span>Sincronizar</span>
+                        </button>
                       </div>
                     </div>
 
-                    {/* Integrated Sync Status & Actions Row */}
-                    <div className="pt-2 border-t border-zinc-200/70 dark:border-[#27272A] flex items-center justify-between gap-2">
+                    {/* 2. Quick Access Cards: Mi Perfil & Mi Portal */}
+                    <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
                         onClick={() => {
-                          if (onOpenQueueModal) {
+                          setOpenDropdown(null);
+                          handleSelectTab('perfil');
+                        }}
+                        className={`group flex items-center gap-2 p-2 rounded-xl border transition-all cursor-pointer text-left ${
+                          activeTab === 'perfil'
+                            ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
+                            : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
+                        }`}
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                          <User className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="block text-xs font-bold leading-tight truncate">Mi Perfil</span>
+                          <span className="block text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Cuenta y PIN</span>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleSelectTab('mi_vista');
+                        }}
+                        className={`group flex items-center gap-2 p-2 rounded-xl border transition-all cursor-pointer text-left ${
+                          activeTab === 'mi_vista'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                            : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
+                        }`}
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                          <UserCheck className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="block text-xs font-bold leading-tight truncate">Mi Portal</span>
+                          <span className="block text-[10px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Asignaciones</span>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* 3. Navigation List Items */}
+                    <div className="space-y-0.5 pt-1.5 border-t border-zinc-200/80 dark:border-[#27272A]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleSelectTab('roles');
+                        }}
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                      >
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            <Shield className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="truncate">{canManageRoles ? 'Roles y Permisos' : 'Cambiar Rol / PIN'}</span>
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                      </button>
+
+                      {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+                        <button
+                          type="button"
+                          onClick={() => {
                             setOpenDropdown(null);
-                            onOpenQueueModal();
-                          }
-                        }}
-                        className="flex items-center gap-1.5 min-w-0 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left group"
-                        title="Ver cola y estado de datos locales en OfflineDashboard"
-                      >
-                        <span
-                          className={`w-2 h-2 rounded-full shrink-0 ${
-                            effectiveSyncState === 'syncing'
-                              ? 'bg-amber-500 animate-pulse'
-                              : effectiveSyncState === 'offline'
-                              ? 'bg-rose-500'
-                              : 'bg-emerald-500'
-                          }`}
-                        />
-                        <span className="truncate">
-                          {effectiveSyncState === 'syncing'
-                            ? 'Sincronizando...'
-                            : effectiveSyncState === 'offline'
-                            ? pendingOfflineCount > 0
-                              ? `Sin conexión (${pendingOfflineCount})`
-                              : 'Sin conexión'
-                            : pendingOfflineCount > 0
-                            ? `En línea (${pendingOfflineCount} pendientes)`
-                            : 'En línea y sincronizado'}
-                        </span>
-                        {onOpenQueueModal && (
-                          <ChevronRight className="w-3 h-3 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                        )}
-                      </button>
+                            handleSelectTab('ajustes');
+                          }}
+                          className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        >
+                          <span className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              <Settings className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="truncate">Ajustes de la Congregación</span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        </button>
+                      )}
+
+                      {permissions.canViewAuditLog && onOpenAuditLog && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenDropdown(null);
+                            onOpenAuditLog();
+                          }}
+                          className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        >
+                          <span className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              <ClipboardList className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="truncate">Registro de Auditoría</span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        </button>
+                      )}
+
+                      {onOpenP2PModal && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenDropdown(null);
+                            onOpenP2PModal();
+                          }}
+                          className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        >
+                          <span className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              <ArrowLeftRight className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="truncate">Transferencia Local Salón (P2P / QR)</span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        </button>
+                      )}
+
+                      {!isDemoMode && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenDropdown(null);
+                            lockSession();
+                          }}
+                          className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
+                        >
+                          <span className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                              <Lock className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="truncate">Bloquear Sesión con PIN</span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        </button>
+                      )}
 
                       <button
                         type="button"
-                        onClick={handleForceSync}
-                        disabled={isForcingSync}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10.5px] font-bold bg-white dark:bg-[#121216] hover:bg-zinc-100 dark:hover:bg-[#22222A] text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-[#27272A] shadow-2xs transition-all cursor-pointer active:scale-95 disabled:opacity-50 shrink-0"
-                        title="Forzar sincronización inmediata con Supabase"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          setDesktopDownloadOpen(true);
+                        }}
+                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
                       >
-                        <RefreshCw className={`w-3 h-3 ${isForcingSync ? 'animate-spin text-indigo-500' : 'text-zinc-500 dark:text-zinc-400'}`} />
-                        <span>Sincronizar</span>
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-6.5 h-6.5 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            <Monitor className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="truncate">Instalador para PC</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 shrink-0">
+                          <span>Descargar</span>
+                          <Download className="w-3 h-3 group-hover:translate-y-0.5 transition-transform" />
+                        </span>
                       </button>
                     </div>
-                  </div>
 
-                  {/* 2. Quick Access Cards: Mi Perfil & Mi Portal */}
-                  <div className="grid grid-cols-2 gap-2 mb-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleSelectTab('perfil');
-                      }}
-                      className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
-                        activeTab === 'perfil'
-                          ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200'
-                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                        <User className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="block text-xs font-bold leading-tight truncate">Mi Perfil</span>
-                        <span className="block text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Cuenta y PIN</span>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleSelectTab('mi_vista');
-                      }}
-                      className={`group flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
-                        activeTab === 'mi_vista'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-                          : 'bg-zinc-50 dark:bg-[#18181F] hover:bg-zinc-100/80 dark:hover:bg-[#22222A] border-zinc-200/80 dark:border-[#27272A] text-zinc-800 dark:text-[#F4F4F5]'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                        <UserCheck className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="block text-xs font-bold leading-tight truncate">Mi Portal</span>
-                        <span className="block text-[10.5px] text-zinc-500 dark:text-[#A1A1AA] truncate mt-0.5">Asignaciones</span>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* 3. Navigation List Items */}
-                  <div className="space-y-0.5 pt-1.5 border-t border-zinc-200/80 dark:border-[#27272A]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleSelectTab('roles');
-                      }}
-                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                    >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                          <Shield className="w-3.5 h-3.5" />
+                    {/* 4. Theme Selector Inset */}
+                    <div className="pt-2 border-t border-zinc-200/80 dark:border-[#27272A]">
+                      <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
+                        <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
+                          {themeMode === 'dark' ? (
+                            <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                          ) : themeMode === 'sepia' ? (
+                            <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                          ) : (
+                            <Sun className="w-3.5 h-3.5 text-amber-500" />
+                          )}
+                          <span>Tema</span>
+                        </span>
+                        <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-200/70 dark:bg-[#09090B] border border-zinc-300/50 dark:border-[#27272A] gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setThemeMode('light')}
+                            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                              themeMode === 'light'
+                                ? 'bg-white text-zinc-900 shadow-2xs'
+                                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                            title="Modo Claro"
+                          >
+                            <Sun className="w-3 h-3 text-amber-500" />
+                            <span>Claro</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setThemeMode('sepia')}
+                            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                              themeMode === 'sepia'
+                                ? 'bg-[#EAE0C8] text-[#2C221E] shadow-2xs font-extrabold'
+                                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-800'
+                            }`}
+                            title="Modo Sepia"
+                          >
+                            <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                            <span>Sepia</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setThemeMode('dark')}
+                            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                              themeMode === 'dark'
+                                ? 'bg-[#18181F] text-white border border-[#27272A] shadow-2xs'
+                                : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-white'
+                            }`}
+                            title="Modo AMOLED"
+                          >
+                            <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                            <span>AMOLED</span>
+                          </button>
                         </div>
-                        <span className="truncate">{canManageRoles ? 'Roles y Permisos' : 'Cambiar Rol / PIN'}</span>
-                      </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                    </button>
-
-                    {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          handleSelectTab('ajustes');
-                        }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                      >
-                        <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            <Settings className="w-3.5 h-3.5" />
-                          </div>
-                          <span className="truncate">Ajustes de la Congregación</span>
-                        </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                      </button>
-                    )}
-
-                    {permissions.canViewAuditLog && onOpenAuditLog && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          onOpenAuditLog();
-                        }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                      >
-                        <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            <ClipboardList className="w-3.5 h-3.5" />
-                          </div>
-                          <span className="truncate">Registro de Auditoría</span>
-                        </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                      </button>
-                    )}
-
-                    {onOpenP2PModal && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          onOpenP2PModal();
-                        }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                      >
-                        <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            <ArrowLeftRight className="w-3.5 h-3.5" />
-                          </div>
-                          <span className="truncate">Transferencia Local Salón (P2P / QR)</span>
-                        </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                      </button>
-                    )}
-
-                    {!isDemoMode && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          lockSession();
-                        }}
-                        className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                      >
-                        <span className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                            <Lock className="w-3.5 h-3.5" />
-                          </div>
-                          <span className="truncate">Bloquear Sesión con PIN</span>
-                        </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        setDesktopDownloadOpen(true);
-                      }}
-                      className="w-full flex items-center justify-between gap-2.5 px-2.5 py-2 text-xs font-medium text-zinc-700 dark:text-[#F4F4F5] hover:bg-zinc-100 dark:hover:bg-[#18181F] rounded-xl transition cursor-pointer text-left group"
-                    >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-[#22222A] text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                          <Monitor className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="truncate">Instalador para PC</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 shrink-0">
-                        <span>Descargar</span>
-                        <Download className="w-3 h-3 group-hover:translate-y-0.5 transition-transform" />
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* 4. Theme Selector Inset */}
-                  <div className="mt-2 pt-2 border-t border-zinc-200/80 dark:border-[#27272A]">
-                    <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-zinc-50 dark:bg-[#18181F] border border-zinc-200/80 dark:border-[#27272A]">
-                      <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-                        {themeMode === 'dark' ? (
-                          <Moon className="w-3.5 h-3.5 text-indigo-400" />
-                        ) : themeMode === 'sepia' ? (
-                          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
-                        ) : (
-                          <Sun className="w-3.5 h-3.5 text-amber-500" />
-                        )}
-                        <span>Tema</span>
-                      </span>
-                      <div className="inline-flex items-center p-0.5 rounded-lg bg-zinc-200/70 dark:bg-[#09090B] border border-zinc-300/50 dark:border-[#27272A] gap-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setThemeMode('light')}
-                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                            themeMode === 'light'
-                              ? 'bg-white text-zinc-900 shadow-2xs'
-                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-zinc-900 dark:hover:text-white'
-                          }`}
-                          title="Modo Claro"
-                        >
-                          <Sun className="w-3 h-3 text-amber-500" />
-                          <span>Claro</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setThemeMode('sepia')}
-                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                            themeMode === 'sepia'
-                              ? 'bg-[#EAE0C8] text-[#2C221E] shadow-2xs font-extrabold'
-                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-amber-800'
-                          }`}
-                          title="Modo Sepia"
-                        >
-                          <BookOpen className="w-3 h-3 text-amber-700" />
-                          <span>Sepia</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setThemeMode('dark')}
-                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                            themeMode === 'dark'
-                              ? 'bg-[#18181F] text-white border border-[#27272A] shadow-2xs'
-                              : 'text-zinc-500 dark:text-[#A1A1AA] hover:text-white'
-                          }`}
-                          title="Modo AMOLED"
-                        >
-                          <Moon className="w-3 h-3 text-indigo-400" />
-                          <span>AMOLED</span>
-                        </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* 5. Clean Footer with Version & Sign Out */}
-                  <div className="border-t border-zinc-200/80 dark:border-[#27272A] mt-2 pt-2 flex items-center justify-between gap-2">
+                  {/* 5. Clean Docked Footer with Version & Sign Out (Always visible) */}
+                  <div className="shrink-0 border-t border-zinc-200/80 dark:border-[#27272A] bg-zinc-50/90 dark:bg-[#18181F]/90 backdrop-blur-xs px-3 py-2 flex items-center justify-between gap-2">
                     {onOpenVersionModal ? (
                       <button
                         type="button"
@@ -2090,11 +2083,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold relative z-10">Calendario</span>
           </button>
 
-          {/* 5. Menú (Abre/Cierra Bottom Sheet ergonómico de una sola mano) */}
+          {/* 5. Menú (En móvil abre la página de Menú anterior MobileMenuTab) */}
           <button
             type="button"
             onClick={() => handleSelectTab('menu')}
-            aria-label="Ir al Menú completo de la congregación"
+            aria-label="Abrir menú de navegación de la congregación"
             aria-current={activeTab === 'menu' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-colors duration-200 cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'menu'
@@ -2128,6 +2121,304 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
       </nav>
+
+      {/* =========================================================================
+          5. MENÚ HAMBURGUESA DESPLEGABLE (SLIDE-OVER DRAWER - SOLO ESCRITORIO)
+         ========================================================================= */}
+      <AnimatePresence>
+        {isHamburgerMenuOpen && (
+          <div className="hidden md:flex fixed inset-0 z-50">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsHamburgerMenuOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+              aria-hidden="true"
+            />
+
+            {/* Drawer Panel */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+              aria-label="Menú principal de navegación"
+              className="relative z-10 w-[88vw] max-w-[340px] sm:max-w-[360px] h-full bg-white dark:bg-[#0D0D12] border-r border-zinc-200 dark:border-[#27272A] shadow-2xl flex flex-col overflow-hidden"
+            >
+              {/* 1. Cabecera del Menú */}
+              <div className="shrink-0 p-4 border-b border-zinc-200/80 dark:border-[#27272A] bg-zinc-50/70 dark:bg-[#121218] space-y-3">
+                <div className="flex items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Logo variant="isotipo" className="w-9 h-9 object-contain shrink-0 shadow-xs rounded-xl" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-extrabold text-zinc-900 dark:text-white truncate tracking-tight">
+                        {displayCongregationName}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-indigo-600 dark:text-indigo-400 truncate">
+                        <ShieldCheck className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsHamburgerMenuOpen(false)}
+                    aria-label="Cerrar menú"
+                    className="w-8 h-8 rounded-xl bg-zinc-200/70 dark:bg-[#1E1E26] hover:bg-zinc-300/70 dark:hover:bg-[#272732] text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Buscador instantáneo dentro del menú */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={menuSearchQuery}
+                    onChange={(e) => setMenuSearchQuery(e.target.value)}
+                    placeholder="Filtrar sección o módulo..."
+                    className="w-full pl-8 pr-7 py-2 rounded-xl text-xs font-medium bg-white dark:bg-[#18181F] text-zinc-900 dark:text-white placeholder:text-zinc-400 border border-zinc-200 dark:border-[#27272A] focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  />
+                  {menuSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setMenuSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 2. Lista de Departamentos y Módulos con Scroll */}
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 space-y-3 [scrollbar-width:thin]">
+                {/* Accesos Rápidos Fijos */}
+                {!menuSearchQuery.trim() && (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTab('inicio')}
+                      className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        activeTab === 'inicio'
+                          ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                          : 'bg-zinc-50 dark:bg-[#16161D] hover:bg-zinc-100 dark:hover:bg-[#1E1E28] text-zinc-800 dark:text-zinc-100 border-zinc-200/80 dark:border-[#27272A]'
+                      }`}
+                    >
+                      <Compass className={`w-4 h-4 shrink-0 ${activeTab === 'inicio' ? 'text-white' : 'text-indigo-500'}`} />
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold leading-tight truncate">Mi Ministerio</span>
+                        <span className={`block text-[10px] truncate mt-0.5 ${activeTab === 'inicio' ? 'text-indigo-100' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                          Cronómetro y S-4
+                        </span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTab('calendario')}
+                      className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        activeTab === 'calendario'
+                          ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                          : 'bg-zinc-50 dark:bg-[#16161D] hover:bg-zinc-100 dark:hover:bg-[#1E1E28] text-zinc-800 dark:text-zinc-100 border-zinc-200/80 dark:border-[#27272A]'
+                      }`}
+                    >
+                      <Calendar className={`w-4 h-4 shrink-0 ${activeTab === 'calendario' ? 'text-white' : 'text-indigo-500'}`} />
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold leading-tight truncate">Calendario</span>
+                        <span className={`block text-[10px] truncate mt-0.5 ${activeTab === 'calendario' ? 'text-indigo-100' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                          Eventos del mes
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+
+                {/* Secciones por Departamento */}
+                {departments
+                  .map((dept) => {
+                    const q = menuSearchQuery.trim().toLowerCase();
+                    if (!q) return dept;
+                    const matchedItems = dept.items.filter(
+                      (item) =>
+                        item.label.toLowerCase().includes(q) ||
+                        item.description.toLowerCase().includes(q) ||
+                        dept.title.toLowerCase().includes(q)
+                    );
+                    return { ...dept, items: matchedItems };
+                  })
+                  .filter((dept) => dept.items.length > 0)
+                  .map((dept) => {
+                    const DeptIcon = dept.icon;
+                    const isCollapsed = !menuSearchQuery.trim() && !!collapsedDepts[dept.id];
+
+                    return (
+                      <div
+                        key={dept.id}
+                        className="rounded-2xl border border-zinc-200/80 dark:border-[#27272A] bg-zinc-50/50 dark:bg-[#121218]/60 overflow-hidden"
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCollapsedDepts((prev) => ({
+                              ...prev,
+                              [dept.id]: !prev[dept.id],
+                            }))
+                          }
+                          className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-zinc-100/80 dark:hover:bg-[#1A1A22] transition cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-6 h-6 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                              <DeptIcon className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-700 dark:text-zinc-200 truncate">
+                              {dept.title}
+                            </span>
+                          </div>
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0 ${
+                              isCollapsed ? '-rotate-90' : 'rotate-0'
+                            }`}
+                          />
+                        </button>
+
+                        {!isCollapsed && (
+                          <div className="px-2 pb-2 space-y-0.5">
+                            {dept.items.map((item) => {
+                              const ItemIcon = item.icon;
+                              const isActive = activeTab === item.id;
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => handleSelectTab(item.id)}
+                                  className={`w-full flex items-center justify-between gap-2.5 px-2.5 py-2 rounded-xl text-left transition cursor-pointer group ${
+                                    isActive
+                                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                                      : 'text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-[#1E1E28]'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div
+                                      className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                        isActive
+                                          ? 'bg-white/20 text-white'
+                                          : 'bg-zinc-200/70 dark:bg-[#22222E] text-zinc-600 dark:text-zinc-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                                      }`}
+                                    >
+                                      <ItemIcon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <span className="block text-xs font-semibold leading-tight truncate">
+                                        {item.label}
+                                      </span>
+                                      <span
+                                        className={`block text-[10px] truncate mt-0.5 ${
+                                          isActive
+                                            ? 'text-indigo-100'
+                                            : 'text-zinc-500 dark:text-zinc-400'
+                                        }`}
+                                      >
+                                        {item.description}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {item.badge !== undefined && (
+                                    <span
+                                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums font-bold shrink-0 ${
+                                        isActive
+                                          ? 'bg-white text-indigo-700'
+                                          : item.badgeColor || 'bg-indigo-600 text-white'
+                                      }`}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* 3. Pie del Menú Unificado (Perfil, Ajustes, Barra de iconos y Versión) */}
+              <div className="shrink-0 p-3 border-t border-zinc-200/80 dark:border-[#27272A] bg-zinc-50/80 dark:bg-[#121218] flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTab('perfil')}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                      activeTab === 'perfil'
+                        ? 'bg-indigo-600 text-white border-indigo-500'
+                        : 'bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#22222C] text-zinc-700 dark:text-zinc-200 border-zinc-200/80 dark:border-[#27272A]'
+                    }`}
+                    title="Mi Perfil y Contacto"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>Mi Perfil</span>
+                  </button>
+
+                  {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTab('ajustes')}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                        activeTab === 'ajustes'
+                          ? 'bg-indigo-600 text-white border-indigo-500'
+                          : 'bg-white dark:bg-[#18181F] hover:bg-zinc-100 dark:hover:bg-[#22222C] text-zinc-700 dark:text-zinc-200 border-zinc-200/80 dark:border-[#27272A]'
+                      }`}
+                      title="Ajustes de la Congregación"
+                    >
+                      <Settings className="w-3.5 h-3.5" />
+                      <span>Ajustes</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {onToggleSidebar && (
+                    <button
+                      type="button"
+                      onClick={onToggleSidebar}
+                      className="hidden md:inline-flex items-center justify-center w-8 h-8 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-200/70 dark:hover:bg-[#1E1E28] transition cursor-pointer"
+                      title={isSidebarVisible ? 'Ocultar barra compacta de iconos' : 'Mostrar barra compacta de iconos'}
+                    >
+                      {isSidebarVisible ? (
+                        <PanelLeftClose className="w-4 h-4" />
+                      ) : (
+                        <PanelLeftOpen className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+
+                  {onOpenVersionModal && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsHamburgerMenuOpen(false);
+                        onOpenVersionModal();
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-mono tabular-nums font-bold text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-200/60 dark:hover:bg-[#1E1E28] transition cursor-pointer"
+                      title="Ver historial de versiones"
+                    >
+                      <span>v{CURRENT_APP_VERSION.replace('-alpha.', 'α.')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
 
       <DesktopDownloadModal
         isOpen={desktopDownloadOpen}

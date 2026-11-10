@@ -808,17 +808,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         }
       }
 
-      // 4. Si el código es 'DEMO', activar el modo de prueba
+      // 4. Si el código es 'DEMO', activar el modo de prueba con la animación de entrada
       if (!finalRole && (codeToRedeem.toUpperCase() === 'DEMO' || codeToRedeem.toUpperCase() === 'DEMO-001' || codeToRedeem.toUpperCase() === 'INV-DEMO')) {
-        loadDemoData();
-        setActiveRole('coordinador');
-        setIdentifiedBrother('Carlos Mendoza (Demo)');
-        sessionStorage.setItem('kongre_demo_notice_shown', 'false');
+        setIsActivatingCode(false);
         setInviteCodeSuccess('¡Activado con éxito en modo de prueba!');
+        setIsStartingDemo(true);
         setTimeout(() => {
-          setIsActivatingCode(false);
+          loadDemoData();
+          setActiveRole('coordinador');
+          setIdentifiedBrother('Carlos Mendoza (Demo)');
+          sessionStorage.setItem('kongre_demo_notice_shown', 'false');
+          setIsStartingDemo(false);
           onEnterApp();
-        }, 600);
+        }, 1150);
         return;
       }
 
@@ -1297,7 +1299,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       sessionStorage.setItem('kongre_demo_notice_shown', 'false');
       setIsStartingDemo(false);
       onEnterApp();
-    }, 700);
+    }, 1150);
   };
 
   const handleEnterAsGuest = () => {

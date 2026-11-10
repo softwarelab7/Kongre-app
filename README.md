@@ -2,9 +2,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://www.kongre-app.com/logo/kongre_horizontal_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://www.kongre-app.com/logo/kongre_horizontal_positivo.svg">
-    <img src="https://www.kongre-app.com/logo/kongre_horizontal_positivo.svg" width="320" alt="Kongre — Gestor Teocrático Integral" />
+    <source media="(prefers-color-scheme: dark)" srcset="assets/kongre_horizontal_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/kongre_horizontal_light.png">
+    <img src="assets/kongre_horizontal_light.png" width="320" alt="Kongre — Gestor Teocrático Integral" />
   </picture>
 </p>
 

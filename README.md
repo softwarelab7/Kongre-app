@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.46-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.46" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.47-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.47" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,9 +44,19 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.46`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.47`)
 
-Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](DESKTOP_RUST.md).
+Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
+
+### 🛡️ Auditoría Integral de Seguridad, Respaldos Cifrados v2 y Transferencia P2P E2EE
+- **Revalidación Periódica de Sesiones de Rol y Protección en Servidor:** Verificación continua de tokens de sesión firmados contra el servidor al iniciar, cada 10 minutos y al volver a la aplicación, junto con defensas mejoradas contra abusos y orígenes CORS estrictos.
+- **PINs Personales de 6 Dígitos y Códigos de Invitación de 80 Bits:** Nuevo generador criptográfico de 6 dígitos con bloqueo de combinaciones obvias, soporte íntegro de passphrases con símbolos para el PIN de congregación y códigos de invitación de 16 caracteres.
+- **Respaldos Portables Cifrados (`kongre_v2`) y P2P / QR Cifrado E2EE:** Exportación `.kongre.json` protegida con frase de paso (`PBKDF2-SHA256` a `600.000` iteraciones + `AES-256-GCM`), recuperación completa tras cambio de navegador, cifrado centralizado de colecciones locales e intercambio P2P cifrado de extremo a extremo.
+- **CSP Unificada y Sanitización Reforzada:** Política de seguridad de contenidos unificada, escapado estricto en reportes pastorales impresos y bloqueo de fórmulas en importación CSV.
+
+### 🗺️ Cartografía Interactiva Offline de Territorios y Experiencia Móvil
+- **Mapas Offline y Editor Visual de Polígonos:** Consulta cartográfica de territorios con soporte sin conexión, editor interactivo de límites geográficos y mini-mapas en tarjetas S-13.
+- **Pulido Móvil y Modo Oscuro:** Secciones auto-colapsables en móvil, botón flotante de retorno superior y mejoras de legibilidad en Asistencia, Ministerio, Grupos de Servicio y Tablero del Salón.
 
 ### 🔒 Blindaje Criptográfico de Tokens a 600.000 PBKDF2 y Concurrencia Optimista
 - **Tokens de Autenticación a 600k PBKDF2:** Elevación de las iteraciones de derivación para los tokens de autenticación de PIN (`syncApi.ts`), garantizando paridad con el cifrado de datos AES-256-GCM y eliminando el camino más económico para ataques offline. Incluye derivación dual y migración transparente de verificadores en servidor.
@@ -162,9 +172,9 @@ Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Ofic
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.40-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.40-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.40_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.40_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.40_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.47-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.47-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.47_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.47_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.47_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para Linux está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

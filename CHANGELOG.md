@@ -6,6 +6,36 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.47] — 11 de Noviembre, 2026
+**Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, P2P E2EE y Pulido Móvil**
+
+- 🛡️ **Revalidación de Tokens de Rol (`verify_role_token`) y Hardening en `kongre-sync`:**
+  - Revalidación automática en cliente (`roleTokenRevalidation.ts`, `AuthContext.tsx`) de los tokens de sesión de rol firmados (`kgr_srt1`) contra la Edge Function al iniciar la app, cada 10 minutos y al recuperar el foco de la pestaña, degradando inmediatamente a rol `publico` si el servidor rechaza el token (caducado, manipulado, publicador dado de baja o rol modificado).
+  - Hardening de `kongre-sync` (`core.ts`, `index.ts`): eliminado el cubo global de 300 fallos por hora por congregación (`c:${id}`) que permitía un ataque de denegación de servicio (DoS) cruzado contra toda una congregación; endurecida la extracción de IP (`clientIp`) ignorando cabeceras falsificables (`x-real-ip`) y tomando el último salto de `x-forwarded-for` cuando no existe `cf-connecting-ip`; restringido el fallback CORS a los orígenes oficiales de producción (`DEFAULT_ALLOWED_ORIGINS`) en lugar de `*`.
+- 🔑 **PINs Personales de 6 Dígitos, Passphrases de Congregación y Códigos de Invitación de 80 Bits:**
+  - Generador CSPRNG sin sesgo de módulo (`generateSecurePublisherPin`) actualizado a 6 dígitos numéricos (`100000`–`999999`) y bloqueo de secuencias obvias (`isObviousNumericPin`: repetidos, correlativos o periódicos) tanto en el generador como en la edición manual (`PublisherPinsModal.tsx`, `RolesManagerTab.tsx`, `PersonalViewTab.tsx`).
+  - Preservación íntegra de passphrases con símbolos, espacios y minúsculas en el PIN Maestro y Público de congregación (`formatCongregationPinInput`, `countCongregationPinChars`) junto con generación sin sesgo (`generateSecureCongregationPin`).
+  - Códigos de invitación teocrática (`shareTokens.ts`) ampliados a 16 caracteres Crockford Base32 (~80 bits de entropía CSPRNG) y cifrado en reposo de `kongre_theocratic_invitations_v1` al hidratar datos desde la nube (`CongregationWelcomeLanding.tsx`, `JoinCongregationModal.tsx`).
+- 📦 **Respaldos Portables Cifrados (`kongre_v2`, `congregationBackup.ts`) y Transferencia P2P / QR Cifrada (`kgr_p2p_e2:`):**
+  - Exportación obligatoria cifrada con frase de paso (mín. 10 caracteres, indicador visual de fortaleza, `PBKDF2-SHA256` a `600.000` iteraciones + `AES-256-GCM` con `AAD`), eliminando la descarga de JSON estándar en claro.
+  - Recuperación completa ante pérdida del navegador: los campos cifrados en reposo ligados a la bóveda (`kgr_sec5` / `kgr_v4` para DPA, contactos, notas, PINs y secreto TOTP 2FA) se preparan de forma portable dentro del sobre cifrado e incluyen todas las colecciones (`hospitalityHosts`, `shepherdingVisits`, `auxPioneerRequests`, `accountLinkRequests`, `breakers`, `maintenanceSheets`, `branchReportsS1`, `congregationEvents`, `clmProgramas`, `invitations` y credenciales locales opcionales), re-cifrándose bajo la bóveda del nuevo equipo al restaurar.
+  - Sello de integridad completo (`kgr_seal_v2_`) que cubre informes, anfitriones, territorios, pastoreo y cuentas; verificación añadida también en la descarga P2P.
+  - Transferencia local P2P / QR cifrada E2EE (`kgr_p2p_e2:`): comprime (Deflate) y cifra antes de generar el QR, `.kongre.json` o `BroadcastChannel` mediante clave efímera CSPRNG o frase personalizada, y las transferencias P2P en la nube usan clave efímera de 128 bits en el fragmento `#k=` (nunca enviada al servidor).
+- 🗂️ **Cifrado en Reposo Centralizado de Colecciones (`sensitiveCollections.ts`, `secureStorage`):**
+  - Una sola tabla (`SENSITIVE_COLLECTIONS`) declara los campos sensibles de cada colección y todo acceso a esas claves pasa por `secureStorage` con `AES-256-GCM` (`kgr_sec5`): informes de servicio, anfitriones, solicitudes de precursor auxiliar, solicitudes de vinculación, territorios y ubicaciones de carritos (`cart_locations`).
+  - Guardia anti-regresión (`sensitive-collections-guard.test.ts`) que impide accesos directos con `localStorage` a colecciones protegidas.
+- 🧱 **CSP Unificada, Sanitización HTML/CSV e Higiene del Proyecto:**
+  - Fuente única de verdad para la `Content-Security-Policy` entre `vite-security-headers.ts` y `vercel.json` verificada automáticamente en `scripts/verify-production.ts`.
+  - Escapado HTML estricto (`escapeHtml`) en la impresión de reportes pastorales (`shepherdingEngine.ts`) y sanitización reforzada contra inyección de fórmulas en importación CSV (`sanitizeImportedCsvText`), incluyendo celdas entrecomilladas y saltos de línea internos.
+- 🗺️ **Cartografía Interactiva Offline de Territorios y Editor de Polígonos (`TerritoryMapView.tsx`, `TerritoryPolygonEditorModal.tsx`):**
+  - Nuevo sistema de mapas interactivos para territorios con caché de teselas offline, dibujo y edición de polígonos geográficos, mini-mapas integrados en tarjetas de territorio (`TerritoryCardMap.tsx`, `DigitalTerritoryModal.tsx`) y utilidades geométricas (`TerritoryMapUtils.ts`).
+- 📱 **Pulido de Interfaz Móvil, Consola Oscura y Navegación:**
+  - Cabeceras de sección auto-colapsables en dispositivos móviles, mejoras de espaciado y legibilidad en `AsistenciaTab`, `GruposServicioTab`, `EquidadDashboardTab`, `MobileMenuTab` y `TableroSalonModal`, botón flotante `ScrollToTopButton` y rediseño visual oscuro en la pantalla de bienvenida y consola.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.46] — 9 de Noviembre, 2026
 **Criptografía V2 Estricta, Concurrencia Optimista CAS Obligatoria, Blindaje de Cuentas y Carga Ultra-Rápida (170 kB)**
 
@@ -26,10 +56,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Exigencia estricta de `expected_version` en el cliente. En caso de sobrescritura forzada intencional, se obtiene previamente el metadato del servidor para garantizar el flujo de CAS.
 - 🖥️ **Sincronización Total de Versión en Web y Desktop (Tauri v2):**
   - Alineación de la versión oficial a `v0.1.0-alpha.46` en `package.json`, `Cargo.toml` y `tauri.conf.json`.
-
----
-
-## 📜 Versiones Anteriores
 
 ### [v0.1.0-alpha.45] — 5 de Noviembre, 2026
 **Blindaje Criptográfico de Tokens a 600.000 Iteraciones PBKDF2, Concurrencia Optimista (Anti-Conflictos de Guardado), Soporte de Passphrases y Sanitización Estricta**

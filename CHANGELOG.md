@@ -6,6 +6,21 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.48] — 11 de Noviembre, 2026
+**Corrección del Actualizador de Escritorio (CSP `<meta>` + Fallback Nativo Rust) y Enlaces de Descarga por Tag**
+
+- 🐞 **Desbloqueo del Anuncio de Actualización en Escritorio (`vite-security-headers.ts`, `security-headers-sync.test.ts`):**
+  - Corregida la `Content-Security-Policy` en etiqueta `<meta>` inyectada en `dist/index.html` durante la compilación para incluir los dominios de GitHub Releases (`api.github.com`, `github.com`, `objects.githubusercontent.com`, `release-assets.githubusercontent.com`) en compilaciones Tauri, evitando que WebKitGTK en Linux bloqueara silenciosamente la comprobación de nuevas versiones (`checkForDesktopUpdate`).
+- 🔄 **Respaldo Nativo IPC Rust para Actualizaciones (`desktopUpdateService.ts`, `DesktopUpdateModal.tsx`):**
+  - Añadido fallback automático a `tauri-plugin-updater` (`check()`) cuando la consulta REST a la API de GitHub falla o sufre rate-limit, reutilizando el mapeo de paquetes `.rpm`/`.deb`/`.AppImage` por plataforma y apertura segura de enlaces externos (`openSafeExternalUrl`).
+- 🌐 **Alineación CSP Completa (`vercel.json`, `tauri.conf.json`, `vite-security-headers.ts`) y Descargas Exactas:**
+  - Incorporado `wss://` para Realtime de Supabase y orígenes IP de respaldo cartográfico (`get.geojs.io`, `ipapi.co`) verificados en pruebas de sincronización CSP.
+  - Fijados los enlaces directos de `DesktopCompatibilityBanner.tsx` y `DesktopDownloadModal.tsx` a `/releases/download/v<versión>` para evitar errores 404 al publicarse releases posteriores.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.47] — 11 de Noviembre, 2026
 **Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, P2P E2EE y Pulido Móvil**
 
@@ -31,10 +46,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Nuevo sistema de mapas interactivos para territorios con caché de teselas offline, dibujo y edición de polígonos geográficos, mini-mapas integrados en tarjetas de territorio (`TerritoryCardMap.tsx`, `DigitalTerritoryModal.tsx`) y utilidades geométricas (`TerritoryMapUtils.ts`).
 - 📱 **Pulido de Interfaz Móvil, Consola Oscura y Navegación:**
   - Cabeceras de sección auto-colapsables en dispositivos móviles, mejoras de espaciado y legibilidad en `AsistenciaTab`, `GruposServicioTab`, `EquidadDashboardTab`, `MobileMenuTab` y `TableroSalonModal`, botón flotante `ScrollToTopButton` y rediseño visual oscuro en la pantalla de bienvenida y consola.
-
----
-
-## 📜 Versiones Anteriores
 
 ### [v0.1.0-alpha.46] — 9 de Noviembre, 2026
 **Criptografía V2 Estricta, Concurrencia Optimista CAS Obligatoria, Blindaje de Cuentas y Carga Ultra-Rápida (170 kB)**

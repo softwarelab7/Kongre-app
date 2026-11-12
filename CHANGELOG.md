@@ -6,6 +6,18 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.49] — 11 de Noviembre, 2026
+**Validación en Vivo del Actualizador Automático en Linux y Sincronización Multiplataforma**
+
+- 🔄 **Canal Oficial de Actualización Verificado (`latest.json` + GitHub Releases):**
+  - Compilación y firma oficial de paquetes Linux (`.rpm`, `.deb`, `.AppImage` y firmas `.sig`) para validar en vivo la notificación automática de actualizaciones desde `v0.1.0-alpha.48` tanto mediante actualización en 1 clic (`AppImage`) como mediante descarga guiada de paquete nativo.
+- 🖥️ **Sincronización Multiplataforma:**
+  - Versión alineada a `v0.1.0-alpha.49` en Web PWA y Desktop Rust/Tauri v2 (`package.json`, `Cargo.toml`, `tauri.conf.json`).
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.48] — 11 de Noviembre, 2026
 **Corrección del Actualizador de Escritorio (CSP `<meta>` + Fallback Nativo Rust) y Enlaces de Descarga por Tag**
 
@@ -16,10 +28,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🌐 **Alineación CSP Completa (`vercel.json`, `tauri.conf.json`, `vite-security-headers.ts`) y Descargas Exactas:**
   - Incorporado `wss://` para Realtime de Supabase y orígenes IP de respaldo cartográfico (`get.geojs.io`, `ipapi.co`) verificados en pruebas de sincronización CSP.
   - Fijados los enlaces directos de `DesktopCompatibilityBanner.tsx` y `DesktopDownloadModal.tsx` a `/releases/download/v<versión>` para evitar errores 404 al publicarse releases posteriores.
-
----
-
-## 📜 Versiones Anteriores
 
 ### [v0.1.0-alpha.47] — 11 de Noviembre, 2026
 **Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, P2P E2EE y Pulido Móvil**

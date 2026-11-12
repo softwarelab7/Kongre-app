@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.48-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.48" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.49-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.49" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,11 +44,11 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.48`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.49`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
 
-### 🔄 Actualizador Nativo de Escritorio y Estabilidad Multiplataforma (`v0.1.0-alpha.48`)
+### 🔄 Actualizador Nativo de Escritorio y Estabilidad Multiplataforma (`v0.1.0-alpha.48` – `v0.1.0-alpha.49`)
 - **Desbloqueo del Aviso de Actualización en PC / Linux:** Corrección de la política de seguridad local (`<meta>` CSP) en compilaciones de escritorio y respaldo nativo automático mediante el actualizador interno de Tauri para detectar y anunciar nuevas versiones de forma confiable.
 - **Enlaces de Descarga Estables:** Enlaces directos fijados por etiqueta exacta de versión para `.rpm`, `.deb` y `.AppImage`.
 
@@ -176,9 +176,9 @@ Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Ofic
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.48-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.48-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.48_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.48_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.48_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.49-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.49-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.49_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.49_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.49_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para Linux está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

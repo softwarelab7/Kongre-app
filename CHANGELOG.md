@@ -6,54 +6,70 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0-alpha.49] — 11 de Noviembre, 2026
-**Validación en Vivo del Actualizador Automático en Linux y Sincronización Multiplataforma**
+### [v0.1.0-alpha.50] — 13 de Noviembre, 2026
+**Nuevo Diseño «Instrumento Teocrático Sobrio», Sobres Departamentales, Protección Anti-Rollback y «Cronómetro y Plataforma»**
 
-- 🔄 **Canal Oficial de Actualización Verificado (`latest.json` + GitHub Releases):**
-  - Compilación y firma oficial de paquetes Linux (`.rpm`, `.deb`, `.AppImage` y firmas `.sig`) para validar en vivo la notificación automática de actualizaciones desde `v0.1.0-alpha.48` tanto mediante actualización en 1 clic (`AppImage`) como mediante descarga guiada de paquete nativo.
-- 🖥️ **Sincronización Multiplataforma:**
-  - Versión alineada a `v0.1.0-alpha.49` en Web PWA y Desktop Rust/Tauri v2 (`package.json`, `Cargo.toml`, `tauri.conf.json`).
+- 🎨 **Nuevo Lenguaje Visual «Instrumento Teocrático Sobrio» y Accesibilidad:**
+  - Sustitución integral de efectos de vidrio y desenfoques heredados por hojas visuales limpias, sobrias y de alto contraste con paridad completa en los **4 temas** (**Claro**, **Oscuro**, **Sepia** y **Cabina A/V**) y alineación numérica tabular en cronogramas, reportes y contabilidad.
+  - Cierre uniforme mediante la tecla `Escape` en todos los diálogos, controles accesibles por teclado, respeto a la preferencia de movimiento reducido del sistema operativo y diseño adaptable mejorado en pantallas móviles.
+- 🔐 **Seguridad Cero Conocimiento Fase 3 y Protección Anti-Rollback:**
+  - **Sobres Departamentales y Contexto:** Compartimentación criptográfica por departamento para roles autorizados, validación estricta del contexto descifrado entre niveles y congregaciones, filtro de calidad de contraseñas y PIN Maestro generado de 16 dígitos por defecto.
+  - **Cifrado Reforzado de Credenciales Locales y Anti-Rollback:** Protección autenticada `AES-256-GCM` de credenciales en almacenamiento local ligada a la bóveda del navegador, marcador de revisión contra devolución de estados antiguos en la nube con diálogo guiado de recuperación, confirmación firmada de asignaciones estudiantiles y bloqueo de consultas externas de ubicación salvo autorización explícita.
+- ⏱️ **«Cronómetro y Plataforma», Enfoque en Escenario y Programas VMC 2026:**
+  - Renombrado oficial a **Cronómetro y Plataforma**, consolidando **Consola Presidencia** y **Pantalla Orador** (modos *Monitor Puro* y *Atril + Escaleta* con sincronización multipantalla).
+  - Simplificación del temporizador retirando distractores secundarios para priorizar la lectura clara en plataforma y actualización de cronogramas semanales Vida y Ministerio 2026, canciones y lecciones.
+- ⚡ **Arranque Optimizado y Estabilidad Linux Desktop:**
+  - Reorganización modular interna y optimización de precarga para acelerar la apertura inicial en web y PWA.
+  - Priorización del paquete `.rpm` versionado en Fedora/RHEL, instrucción directa de reinstalación/actualización para escritorio Linux y exposición exclusiva de instaladores Linux oficiales (`.rpm`, `.deb`, `.AppImage`) para equipos de PC y cabina.
 
 ---
 
 ## 📜 Versiones Anteriores
 
-### [v0.1.0-alpha.48] — 11 de Noviembre, 2026
-**Corrección del Actualizador de Escritorio (CSP `<meta>` + Fallback Nativo Rust) y Enlaces de Descarga por Tag**
+### [v0.1.0-alpha.49.1] — 12 de Noviembre, 2026
+**Consola de Plataforma para PC, Accesos Rápidos en Inicio, Lectura NFC y Mapas Offline**
 
-- 🐞 **Desbloqueo del Anuncio de Actualización en Escritorio (`vite-security-headers.ts`, `security-headers-sync.test.ts`):**
-  - Corregida la `Content-Security-Policy` en etiqueta `<meta>` inyectada en `dist/index.html` durante la compilación para incluir los dominios de GitHub Releases (`api.github.com`, `github.com`, `objects.githubusercontent.com`, `release-assets.githubusercontent.com`) en compilaciones Tauri, evitando que WebKitGTK en Linux bloqueara silenciosamente la comprobación de nuevas versiones (`checkForDesktopUpdate`).
-- 🔄 **Respaldo Nativo IPC Rust para Actualizaciones (`desktopUpdateService.ts`, `DesktopUpdateModal.tsx`):**
-  - Añadido fallback automático a `tauri-plugin-updater` (`check()`) cuando la consulta REST a la API de GitHub falla o sufre rate-limit, reutilizando el mapeo de paquetes `.rpm`/`.deb`/`.AppImage` por plataforma y apertura segura de enlaces externos (`openSafeExternalUrl`).
-- 🌐 **Alineación CSP Completa (`vercel.json`, `tauri.conf.json`, `vite-security-headers.ts`) y Descargas Exactas:**
-  - Incorporado `wss://` para Realtime de Supabase y orígenes IP de respaldo cartográfico (`get.geojs.io`, `ipapi.co`) verificados en pruebas de sincronización CSP.
-  - Fijados los enlaces directos de `DesktopCompatibilityBanner.tsx` y `DesktopDownloadModal.tsx` a `/releases/download/v<versión>` para evitar errores 404 al publicarse releases posteriores.
+- 🖥️ **Accesos Directos en Inicio Exclusivos para PC:**
+  - Nuevos botones directos en la vista de Inicio para abrir la consola de plataforma y TV en Salón desde computadoras de escritorio.
+- ⏱️ **Consola Profesional en PC:**
+  - Disposiciones adaptadas para pantalla en plataforma, semáforo visual de tiempo, modo Zen sin distracciones, ajustes finos de duración, campana acústica, aviso visual de cabina y sincronización multipantalla en vivo.
+- 📲 **Lectura y Registro de Etiquetas NFC:**
+  - Soporte Web NFC para abrir tarjetas personales de territorio **S-13** o el registro de asistencia **S-88** al acercar un dispositivo móvil compatible a una etiqueta registrada.
+- 🗺️ **Mapas Offline en Tarjetas de Territorio y Exportación CSV:**
+  - Descarga de mapas de territorios activos al dispositivo para consultar límites sin conexión a internet y exportación a CSV en *Grupos de Servicio* respetando el filtro activo.
+
+### [v0.1.0-alpha.49] — 11 de Noviembre, 2026
+**Validación en Vivo del Actualizador Automático en Linux y Sincronización Multiplataforma**
+
+- 🔄 **Canal Oficial de Actualización Verificado:**
+  - Compilación y firma oficial de paquetes Linux (`.rpm`, `.deb`, `.AppImage`) para validar de extremo a extremo la notificación automática e instalación en 1 clic (`AppImage`) y actualización guiada de paquetes nativos.
+- 🖥️ **Sincronización de Versión Web y Escritorio:**
+  - Alineación oficial a `v0.1.0-alpha.49` en Web PWA y aplicación nativa de escritorio para Linux.
+
+### [v0.1.0-alpha.48] — 11 de Noviembre, 2026
+**Corrección del Actualizador de Escritorio Linux y Enlaces de Descarga por Versión**
+
+- 🐞 **Desbloqueo del Aviso de Actualización en Escritorio:**
+  - Ajuste de las políticas de seguridad locales en la compilación de escritorio para permitir la detección confiable de nuevas versiones desde GitHub Releases y la sincronización en tiempo real.
+- 🔄 **Respaldo Nativo del Actualizador:**
+  - Verificación automática mediante el actualizador nativo interno cuando la consulta directa falla, manteniendo enlaces exactos por etiqueta de versión para `.rpm`, `.deb` y `.AppImage`.
 
 ### [v0.1.0-alpha.47] — 11 de Noviembre, 2026
-**Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, P2P E2EE y Pulido Móvil**
+**Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, Transferencia P2P E2EE y Pulido Móvil**
 
-- 🛡️ **Revalidación de Tokens de Rol (`verify_role_token`) y Hardening en `kongre-sync`:**
-  - Revalidación automática en cliente (`roleTokenRevalidation.ts`, `AuthContext.tsx`) de los tokens de sesión de rol firmados (`kgr_srt1`) contra la Edge Function al iniciar la app, cada 10 minutos y al recuperar el foco de la pestaña, degradando inmediatamente a rol `publico` si el servidor rechaza el token (caducado, manipulado, publicador dado de baja o rol modificado).
-  - Hardening de `kongre-sync` (`core.ts`, `index.ts`): eliminado el cubo global de 300 fallos por hora por congregación (`c:${id}`) que permitía un ataque de denegación de servicio (DoS) cruzado contra toda una congregación; endurecida la extracción de IP (`clientIp`) ignorando cabeceras falsificables (`x-real-ip`) y tomando el último salto de `x-forwarded-for` cuando no existe `cf-connecting-ip`; restringido el fallback CORS a los orígenes oficiales de producción (`DEFAULT_ALLOWED_ORIGINS`) en lugar de `*`.
-- 🔑 **PINs Personales de 6 Dígitos, Passphrases de Congregación y Códigos de Invitación de 80 Bits:**
-  - Generador CSPRNG sin sesgo de módulo (`generateSecurePublisherPin`) actualizado a 6 dígitos numéricos (`100000`–`999999`) y bloqueo de secuencias obvias (`isObviousNumericPin`: repetidos, correlativos o periódicos) tanto en el generador como en la edición manual (`PublisherPinsModal.tsx`, `RolesManagerTab.tsx`, `PersonalViewTab.tsx`).
-  - Preservación íntegra de passphrases con símbolos, espacios y minúsculas en el PIN Maestro y Público de congregación (`formatCongregationPinInput`, `countCongregationPinChars`) junto con generación sin sesgo (`generateSecureCongregationPin`).
-  - Códigos de invitación teocrática (`shareTokens.ts`) ampliados a 16 caracteres Crockford Base32 (~80 bits de entropía CSPRNG) y cifrado en reposo de `kongre_theocratic_invitations_v1` al hidratar datos desde la nube (`CongregationWelcomeLanding.tsx`, `JoinCongregationModal.tsx`).
-- 📦 **Respaldos Portables Cifrados (`kongre_v2`, `congregationBackup.ts`) y Transferencia P2P / QR Cifrada (`kgr_p2p_e2:`):**
-  - Exportación obligatoria cifrada con frase de paso (mín. 10 caracteres, indicador visual de fortaleza, `PBKDF2-SHA256` a `600.000` iteraciones + `AES-256-GCM` con `AAD`), eliminando la descarga de JSON estándar en claro.
-  - Recuperación completa ante pérdida del navegador: los campos cifrados en reposo ligados a la bóveda (`kgr_sec5` / `kgr_v4` para DPA, contactos, notas, PINs y secreto TOTP 2FA) se preparan de forma portable dentro del sobre cifrado e incluyen todas las colecciones (`hospitalityHosts`, `shepherdingVisits`, `auxPioneerRequests`, `accountLinkRequests`, `breakers`, `maintenanceSheets`, `branchReportsS1`, `congregationEvents`, `clmProgramas`, `invitations` y credenciales locales opcionales), re-cifrándose bajo la bóveda del nuevo equipo al restaurar.
-  - Sello de integridad completo (`kgr_seal_v2_`) que cubre informes, anfitriones, territorios, pastoreo y cuentas; verificación añadida también en la descarga P2P.
-  - Transferencia local P2P / QR cifrada E2EE (`kgr_p2p_e2:`): comprime (Deflate) y cifra antes de generar el QR, `.kongre.json` o `BroadcastChannel` mediante clave efímera CSPRNG o frase personalizada, y las transferencias P2P en la nube usan clave efímera de 128 bits en el fragmento `#k=` (nunca enviada al servidor).
-- 🗂️ **Cifrado en Reposo Centralizado de Colecciones (`sensitiveCollections.ts`, `secureStorage`):**
-  - Una sola tabla (`SENSITIVE_COLLECTIONS`) declara los campos sensibles de cada colección y todo acceso a esas claves pasa por `secureStorage` con `AES-256-GCM` (`kgr_sec5`): informes de servicio, anfitriones, solicitudes de precursor auxiliar, solicitudes de vinculación, territorios y ubicaciones de carritos (`cart_locations`).
-  - Guardia anti-regresión (`sensitive-collections-guard.test.ts`) que impide accesos directos con `localStorage` a colecciones protegidas.
-- 🧱 **CSP Unificada, Sanitización HTML/CSV e Higiene del Proyecto:**
-  - Fuente única de verdad para la `Content-Security-Policy` entre `vite-security-headers.ts` y `vercel.json` verificada automáticamente en `scripts/verify-production.ts`.
-  - Escapado HTML estricto (`escapeHtml`) en la impresión de reportes pastorales (`shepherdingEngine.ts`) y sanitización reforzada contra inyección de fórmulas en importación CSV (`sanitizeImportedCsvText`), incluyendo celdas entrecomilladas y saltos de línea internos.
-- 🗺️ **Cartografía Interactiva Offline de Territorios y Editor de Polígonos (`TerritoryMapView.tsx`, `TerritoryPolygonEditorModal.tsx`):**
-  - Nuevo sistema de mapas interactivos para territorios con caché de teselas offline, dibujo y edición de polígonos geográficos, mini-mapas integrados en tarjetas de territorio (`TerritoryCardMap.tsx`, `DigitalTerritoryModal.tsx`) y utilidades geométricas (`TerritoryMapUtils.ts`).
-- 📱 **Pulido de Interfaz Móvil, Consola Oscura y Navegación:**
-  - Cabeceras de sección auto-colapsables en dispositivos móviles, mejoras de espaciado y legibilidad en `AsistenciaTab`, `GruposServicioTab`, `EquidadDashboardTab`, `MobileMenuTab` y `TableroSalonModal`, botón flotante `ScrollToTopButton` y rediseño visual oscuro en la pantalla de bienvenida y consola.
+- 🛡️ **Revalidación Continua de Sesiones de Rol y Protección en la Nube:**
+  - Revalidación automática de sesiones activas al iniciar, cada 10 minutos y al regresar a la aplicación, degradando de forma segura ante revocación o cambio de privilegios, junto con refuerzo contra intentos abusivos en el servidor.
+- 🔑 **PINs Personales de 6 Dígitos, Passphrases Íntegras y Códigos de Invitación de 80 Bits:**
+  - Generador criptográfico de PINs personales de 6 dígitos con bloqueo de secuencias obvias o repetidas, preservación íntegra de símbolos y espacios en passphrases de congregación y códigos de invitación extendidos de 16 caracteres cifrados en reposo.
+- 📦 **Respaldos Portables Cifrados (`.kongre.json`) y Transferencia P2P / QR Cifrada de Extremo a Extremo:**
+  - Exportación obligatoriamente cifrada con frase de paso (mínimo 10 caracteres, indicador de fortaleza y cifrado `AES-256-GCM`) incluyendo recuperación completa de datos sensibles y credenciales al cambiar de dispositivo o navegador.
+  - Sello de integridad completo en respaldos y transferencias, además de intercambio local sin internet comprimido y cifrado por QR, archivo o canal local, y enlace seguro en transferencias en la nube.
+- 🗂️ **Cifrado en Reposo Unificado y Sanitización de Reportes/CSV:**
+  - Protección centralizada en almacenamiento local para informes de servicio, anfitriones de hospitalidad, solicitudes, territorios y ubicaciones de carritos; escapado estricto al imprimir reportes pastorales y defensa contra fórmulas al importar CSV.
+- 🗺️ **Cartografía Interactiva Offline de Territorios y Editor Visual de Polígonos:**
+  - Caché cartográfica sin conexión, dibujo y edición de límites geográficos en mapa y mini-mapas integrados en tarjetas **S-13**.
+- 📱 **Pulido de Interfaz Móvil y Navegación:**
+  - Cabeceras auto-colapsables en móvil, botón flotante de retorno rápido superior y mejoras de legibilidad y contraste en modo oscuro en Asistencia, Ministerio, Grupos de Servicio y Tablero del Salón.
 
 ### [v0.1.0-alpha.46] — 9 de Noviembre, 2026
 **Criptografía V2 Estricta, Concurrencia Optimista CAS Obligatoria, Blindaje de Cuentas y Carga Ultra-Rápida (170 kB)**

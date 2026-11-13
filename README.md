@@ -10,7 +10,7 @@
 
 <p align="center">
   <strong>Plataforma integral, moderna y segura para la administración, asignación y coordinación teocrática de congregaciones.</strong><br>
-  <em>Disponible como Progressive Web App (PWA) Offline-First y aplicación nativa ultraligera para PC (Windows, macOS y Linux con Rust y Tauri v2).</em>
+  <em>Disponible como Progressive Web App (PWA) Offline-First para todo dispositivo y aplicación nativa ultraligera para Linux (Rust + Tauri v2).</em>
 </p>
 
 <p align="center">
@@ -19,13 +19,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.49-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.49" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.50-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.50" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
-  <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
-  <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-5.8%2B-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
-  <img src="https://img.shields.io/badge/TailwindCSS-v4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/SO-Linux%20Nativo%20%7C%20PWA%20Multiplataforma-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
   <img src="https://img.shields.io/badge/2FA-TOTP%20RFC%206238-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA TOTP RFC 6238" />
   <img src="https://img.shields.io/badge/PWA-Offline--First%20Ready-5a0fc8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Offline Ready" />
@@ -40,148 +36,83 @@
 > *«Pero que todas las cosas se hagan de forma digna y ordenada.»*  
 > — **1 Corintios 14:40**
 
-La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de última generación con la velocidad y seguridad de una **aplicación nativa de escritorio compilada con Rust (Tauri v2)**, permitiendo operar tanto con sincronización en la nube como de forma 100% desconectada (Offline-First).
+La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de última generación con la velocidad y seguridad de una **aplicación nativa de escritorio para Linux compilada con Rust (Tauri v2)**, permitiendo operar tanto con sincronización en la nube como de forma 100% desconectada (Offline-First).
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.49`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.50`)
 
-Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
+Para consultar el registro cronológico completo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
 
-### 🔄 Actualizador Nativo de Escritorio y Estabilidad Multiplataforma (`v0.1.0-alpha.48` – `v0.1.0-alpha.49`)
-- **Desbloqueo del Aviso de Actualización en PC / Linux:** Corrección de la política de seguridad local (`<meta>` CSP) en compilaciones de escritorio y respaldo nativo automático mediante el actualizador interno de Tauri para detectar y anunciar nuevas versiones de forma confiable.
-- **Enlaces de Descarga Estables:** Enlaces directos fijados por etiqueta exacta de versión para `.rpm`, `.deb` y `.AppImage`.
+### 🎨 Sistema Visual «Instrumento Teocrático Sobrio», Paridad Sepia y Accesibilidad (`v0.1.0-alpha.50`)
+- **Diseño Sobrio de Alta Legibilidad:** Transición integral hacia hojas visuales limpias y uniformes en los **4 temas** (**Claro**, **Oscuro**, **Sepia** `#f4ecd8` y **Cabina A/V** `#000000`), pensadas para lectura prolongada sin fatiga visual y con alineación numérica precisa en cronogramas, cuentas e informes.
+- **Accesibilidad y Diseño Móvil Reforzado:** Cierre uniforme de diálogos con tecla `Escape`, navegación consistente por teclado, respeto a preferencias de movimiento reducido, adaptación fluida a pantallas móviles verticales y eliminación total de diálogos nativos del navegador.
 
-### 🛡️ Auditoría Integral de Seguridad, Respaldos Cifrados v2 y Transferencia P2P E2EE (`v0.1.0-alpha.47`)
-- **Revalidación Periódica de Sesiones de Rol y Protección en Servidor:** Verificación continua de tokens de sesión firmados contra el servidor al iniciar, cada 10 minutos y al volver a la aplicación, junto con defensas mejoradas contra abusos y orígenes CORS estrictos.
-- **PINs Personales de 6 Dígitos y Códigos de Invitación de 80 Bits:** Nuevo generador criptográfico de 6 dígitos con bloqueo de combinaciones obvias, soporte íntegro de passphrases con símbolos para el PIN de congregación y códigos de invitación de 16 caracteres.
-- **Respaldos Portables Cifrados (`kongre_v2`) y P2P / QR Cifrado E2EE:** Exportación `.kongre.json` protegida con frase de paso (`PBKDF2-SHA256` a `600.000` iteraciones + `AES-256-GCM`), recuperación completa tras cambio de navegador, cifrado centralizado de colecciones locales e intercambio P2P cifrado de extremo a extremo.
-- **CSP Unificada y Sanitización Reforzada:** Política de seguridad de contenidos unificada, escapado estricto en reportes pastorales impresos y bloqueo de fórmulas en importación CSV.
+### ⚡ Arquitectura Optimizada y Mayor Fluidez de Arranque
+- **Modularización Completa y Arranque Más Rápido:** Reorganización interna integral de la aplicación en módulos ligeros bajo demanda para que la pantalla inicial cargue más rápido y con menor consumo de memoria tanto en móvil como en PC.
+- **Calidad Verificada:** Validación automatizada ampliada a **237 pruebas** continuas sobre criptografía, sincronización, documentos oficiales, mapas y accesibilidad.
 
-### 🗺️ Cartografía Interactiva Offline de Territorios y Experiencia Móvil
-- **Mapas Offline y Editor Visual de Polígonos:** Consulta cartográfica de territorios con soporte sin conexión, editor interactivo de límites geográficos y mini-mapas en tarjetas S-13.
-- **Pulido Móvil y Modo Oscuro:** Secciones auto-colapsables en móvil, botón flotante de retorno superior y mejoras de legibilidad en Asistencia, Ministerio, Grupos de Servicio y Tablero del Salón.
+### 🛡️ Seguridad Cero Conocimiento Fase 3: Sobres Departamentales, Anti-Rollback y Contexto
+- **Sobres Departamentales y Validación de Contexto:** Compartimentación cifrada por departamento acorde al rol asignado, verificación estricta de pertenencia de los datos descifrados y filtro de calidad de PINs con clave maestra de 16 dígitos por defecto.
+- **Protección de PINs en Reposo con AES-256-GCM:** Cifrado autenticado del almacenamiento local vinculado a la bóveda no extraíble del navegador, retirando formatos heredados.
+- **Protección Anti-Rollback y Privacidad GeoIP:** Detección automática ante devoluciones inesperadas de versiones antiguas en sincronización con diálogo guiado de recuperación, firma de confirmación en asignaciones estudiantiles y bloqueo de consultas externas de ubicación salvo autorización explícita.
 
-### 🔒 Blindaje Criptográfico de Tokens a 600.000 PBKDF2 y Concurrencia Optimista
-- **Tokens de Autenticación a 600k PBKDF2:** Elevación de las iteraciones de derivación para los tokens de autenticación de PIN (`syncApi.ts`), garantizando paridad con el cifrado de datos AES-256-GCM y eliminando el camino más económico para ataques offline. Incluye derivación dual y migración transparente de verificadores en servidor.
-- **Detección de Conflictos de Guardado (ETag / Versión):** Control de concurrencia optimista (`core.ts`, `supabaseSyncService.ts`) que rechaza sobrescrituras accidentales con HTTP `409 Conflict` cuando dos ancianos guardan simultáneamente desde dispositivos diferentes.
-- **Soporte de Passphrases de Alta Entropía:** Formateador de PIN de congregación ampliado hasta 24 caracteres alfanuméricos (`XXXX-XXXX-XXXX...`), habilitando claves de más de 60 bits de entropía.
-- **Sanitización Exhaustiva en Almacenamiento Local:** Confirmación de que todas las vías de persistencia en `localStorage` ejecuten `sanitizePublishersForLocalStorage`, suprimiendo credenciales en texto claro y cifrando datos sensibles (salud y contactos de emergencia).
-- **CSPRNG Seguro:** Reemplazo de generadores pseudoaleatorios por CSPRNG criptográficamente seguros (`crypto.getRandomValues`) en `publisherDeduplication.ts`.
+### ⏱️ «Cronómetro y Plataforma», Etiquetas NFC y Cartografía Offline (`v0.1.0-alpha.48` – `v0.1.0-alpha.50`)
+- **Cronómetro y Plataforma para PC y Cabina A/V:** Consola unificada (**Consola Presidencia** y **Pantalla Orador** con disposiciones *Monitor Puro* y *Atril + Escaleta*), accesos directos exclusivos en PC desde Inicio, semáforo de tiempo, modo Zen sin distracciones, aviso visual para plataforma y sincronización multipantalla en vivo, junto con programas semanales Vida y Ministerio actualizados.
+- **Lectura y Registro NFC + Mapas Offline:** Escaneo Web NFC en dispositivos compatibles para abrir tarjetas personales de territorio **S-13** o el registro de asistencia **S-88** al acercar una etiqueta registrada, descarga de mapas de territorios para consulta sin internet y exportación CSV en Grupos de Servicio.
+- **Actualizador Nativo de Escritorio para Linux:** Verificación confiable de nuevas versiones desde GitHub Releases y el actualizador nativo interno, prioridad de paquete `.rpm` versionado con comando directo de actualización en Fedora/RHEL y descargas fijadas por versión para `.rpm`, `.deb` y `.AppImage`.
 
-### 💎 Elevación Completa al Sistema de Diseño Linear + Apple (Bento & Glass)
-- **100% de la Interfaz Unificada:** Rediseño arquitectónico visual de todas las pantallas, pestañas de gestión, vistas de cockpit, editores y modales de la aplicación bajo los principios de `DESIGN.md`.
-- **Editor de Publicadores 100% Bento (10 Subsecciones):** Transformación integral de las 10 subsecciones de `PublisherEditor/sections/*` (`BasicInfoSection`, `ContactSection`, `EmergencyContactsSection`, `PrivilegesSection`, `AssignmentsSection`, `S21RecordsSection`, `MedicalDpaSection`, `SpecialConditionsSection`, `AccessCredentialsSection`, `AbsenceAndNotesSection`) a contenedores `.kg-card-bento`, `.kg-glass-surface`, `.kg-sheen-top`, insignias con halo `.kg-glow-badge` y bordes de cristal `rounded-3xl`.
-- **Consolidación del Panel Eléctrico en Mantenimiento:** Integración como submódulo y modal especializado (`ElectricalPanelModal`) dentro del módulo de Mantenimiento del Salón del Reino, optimizando el espacio en la barra superior global.
-- **Superficies Translúcidas de Cristal (`.kg-glass-surface` & `.kg-sheen-top`):** Tarjetas y modales con `backdrop-blur-md` / `backdrop-blur-xl`, reflejos sutiles en el borde superior (*specular sheen*) y elevación fluida sin sombras opacas excesivas.
-- **Jerarquía Bento Asimétrica (`.kg-card-bento`):** Cuadrículas asimétricas de alto impacto en vistas ejecutivas, métricas KPI con resplandor radial suave y microinteracciones de entrada de escala 0.98 a 1.
-- **Insignias Vivas (`.kg-glow-badge`):** Contenedores de iconos con halo difuso de acento que destacan el rol teocrático y el contexto de cada diálogo.
-- **Conmutadores Segmentados Estilo Apple:** Píldoras de selección en una sola pieza táctil para alternar semanas, filtros, roles y modos operativos sin pestañas toscas.
-- **Erradicación Total de Diálogos Nativos:** Cero uso de `window.alert()`, `confirm()` o `prompt()` nativos en favor de una experiencia inmersiva fluida en los 4 temas del sistema (Claro, Oscuro `#09090b`/`#121216`, Sepia `#f4ecd8` y Cabina A/V `#000000`).
-- **Verificación Rigurosa y Cero Regresiones:** 92 pruebas unitarias y E2E completamente aprobadas (`92 pass, 0 fail`) y verificación estricta de tipos de TypeScript sin errores (`tsc --noEmit`).
+### 🔐 Blindaje Criptográfico y Respaldos Portables (`v0.1.0-alpha.45` – `v0.1.0-alpha.47`)
+- **Tokens a 600.000 PBKDF2, Concurrencia Optimista y Passphrases:** Paridad criptográfica completa con `AES-256-GCM`, control atómico contra conflictos de guardado simultáneo con auto-reconciliación en la nube y soporte íntegro de passphrases de hasta 24 caracteres.
+- **Respaldos Portables Cifrados y P2P / QR Cifrado de Extremo a Extremo:** Exportación `.kongre.json` protegida con frase de paso y recuperación integral al cambiar de navegador o equipo, transferencia directa local P2P/QR cifrada sin internet, códigos de invitación de 80 bits y revalidación continua de sesiones de rol.
 
-### 🔐 Cifrado en Reposo Resiliente y Blindaje del Directorio de Publicadores
-- **Descifrado Transparente en Reposo (V4):** Desacoplamiento de la clave de reposo de tokens de sesión volátiles, garantizando el descifrado inmediato de campos confidenciales (teléfono, dirección, notas y directriz médica) desde almacenamiento local mediante sal de dispositivo y entropía IndexedDB no extraíble.
-- **Blindaje Visual Defensivo:** Erradicación de fugas de cadenas cifradas (`kgr_sec5:...`) en pantalla y contención estricta de desbordamientos horizontales en tarjetas Bento y vistas tabulares del directorio.
+### 🔐 Cifrado en Reposo Resiliente y Control Operativo
+- **Descifrado Transparente en Reposo:** Protección local en el dispositivo de teléfonos, direcciones, notas de secretaría, visitas de pastoreo, finanzas y directriz médica DPA mediante bóveda criptográfica no extraíble.
+- **Revocación Inmediata de Credenciales y Auditoría para Ancianos:** Invalidación en caliente de PINs comprometidos u olvidados con generación inmediata de nuevo PIN de 6 dígitos y registro de dispositivos vinculados.
+- **Centro de Control Offline y Visor PDF Interactivo:** Inspección en vivo de registros cacheados y cola pendiente de sincronización, además de visor PDF integrado con paginación, zoom, rotación y autoasignación equitativa de reuniones.
 
-### 🛡️ Revocación Inmediata de Credenciales y Auditoría para Ancianos
-- **Modal Teocrático de Revocación y Reemplazo Asistido:** Invalidación en caliente de PINs y credenciales comprometidas u olvidadas, con registro auditable y generación inmediata de un nuevo PIN numérico de 6 dígitos.
-- **Panel de Auditoría de Códigos y Hardware:** Visualización exhaustiva para ancianos de hardware vinculado (móvil, tablet, PC), navegadores, sistemas operativos y fecha/hora de canje para cada publicador, con historial de revocaciones.
-
-### 🌐 Centro de Control Offline y Respaldo en IndexedDB
-- **Dashboard Diagnóstico Offline:** Inspección en tiempo real de registros en caché (publicadores, semanas, informes S-4/S-21, territorios, eventos) y cola de mutaciones con forzado manual de sincronización.
-- **Anillo Reactivo en Cabecera:** Indicador visual de estado (Sincronizando / Desconectado / En línea) en el avatar con contador en vivo de cambios pendientes y sincronización en 1 clic.
-
-### 📄 Visor PDF Interactivo y Autoasignación Inteligente
-- **Navegación Fluida de Documentos PDF:** Integración de `react-pdf` con paginación, zoom multinivel, rotación y modo pantalla completa.
-- **Autoasignación Integral de Reuniones:** Asignación coordinada de Entre Semana (VMC) y Fin de Semana con filtro por hermanos cualificados y rotación equitativa.
-
-### 📖 Sincronización Bíblica y Programa CLM/VMC Actualizado
-- **Alineación con Jeremías 38 a 48:** Actualización de cronogramas semanales, lectura bíblica asignada, perlas escondidas y estudio bíblico de congregación.
-
-### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
-- **Cockpit Teocrático en Vivo:** Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula en tiempo real la experiencia operativa del sistema.
-- **Bento Grid Asimétrico con Iconografía Oficial:** Cuadrícula con ritmo visual diferenciado que integra los SVGs originales de la aplicación (`clm_vmc.svg`, `predicacion.svg`, `supervision.svg`, `discursos.svg`, `secretaria.svg`, `informes_servicio.svg`) y enlaces directos a la Guía de Usuario.
-- **Flujo Teocrático en 3 Pasos:** Secuencia clara de adopción: *1. Inicialización e Importación local*, *2. Asignación y Programación Inteligente*, *3. Coordinación y Consulta Segura por portal o PDF/WhatsApp*.
-- **Seguridad Cero Conocimiento y Principio Bíblico:** Bloque documental enfocado en el almacenamiento local cifrado (AES-256 + PBKDF2), cero telemetría y respeto a la confidencialidad ministerial.
-
-### 🔘 Botón Estándar `DemoModeButton` y Purga de Artificios Visuales
-- **Componente Unificado `DemoModeButton`:** Botón minimalista y serio en tonos slate neutros (`bg-slate-100 dark:bg-slate-800`), homogéneo en la web oficial, cabecera de PC, barra móvil, modal de acceso y panel interno.
-- **Purga Total de Estrellas (`Sparkles`):** Erradicación de iconos de estrellas en botones e insignias teocráticas en favor de iconografía teocrática formal (`Building2`, `CheckCircle2`, `Download`, `BookOpen`) o tipografía sobria.
-
-### 🖥️ Pantalla de Bienvenida 100% Zero-Scroll en Escritorio
-- **Contenedor a Pantalla Completa:** Optimización estructural (`lg:h-screen lg:max-h-screen lg:overflow-hidden`) con centrado automático `my-auto`, permitiendo visualizar las 4 vías de acceso simultáneamente en monitores sin necesidad de scroll vertical.
-- **Eliminación de Redundancias:** Retiro de botones duplicados en la tarjeta de inicio de sesión y banner lateral simplificado.
-
-### 🦀 Kongre App Nativa para Escritorio (Rust + Tauri v2)
-- **Rendimiento Excepcional:** Binario ultraligero que arranca en milisegundos y consume apenas ~15 MB de memoria RAM (frente a los ~150 MB de entornos tradicionales basados en Chromium/Electron).
-- **Paquetes Oficiales Multiplataforma:**
-  - **Windows 10 / 11:** Instalador `.exe` (NSIS) y paquete `.msi`.
-  - **macOS:** Binario Universal `.dmg` compatible con procesadores Apple Silicon (M1 a M4) e Intel.
-  - **Linux Fedora / RHEL:** Paquete nativo `.rpm` de 64 bits.
-  - **Linux Ubuntu / Debian:** Paquete nativo `.deb`.
-  - **Linux Universal:** Paquete portátil `.AppImage`.
-- **Detección Automática de SO en Bienvenida:** Banner interactivo que detecta el sistema operativo del usuario y ofrece la descarga directa del instalador correspondiente.
-
-### 🔐 Seguridad Cero Conocimiento (Fase 2) y Bóveda Criptográfica en Reposo
-- **Bóveda no extraíble `atRestVault`:** Almacenamiento seguro con clave criptográfica AES-256 no extraíble (`extractable: false`) en IndexedDB (`kongre_vault_db`).
-- **Token de Rol Firmado en Servidor (`kgr_srt1` HMAC-SHA256):** Validación en Edge Function de privilegios que impide la manipulación no autorizada en DevTools o variables locales.
-- **Protección de Datos Médicos DPA y Notas:** Cifrado AES-256-GCM con subclave por registro (`kgr_sec5:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
+### 🦀 Kongre App Nativa para Escritorio en Linux (Rust + Tauri v2)
+- **Rendimiento Ultraligero:** Binario nativo que arranca en milisegundos y consume apenas ~15 MB de memoria RAM en PCs de escritorio o cabina de sonido.
+- **Paquetes Oficiales para Linux:**
+  - **Fedora / RHEL / openSUSE:** Paquete nativo `.rpm` de 64 bits.
+  - **Ubuntu / Debian / Linux Mint:** Paquete nativo `.deb`.
+  - **Linux Universal:** Paquete portátil `.AppImage` con actualización automática.
+- **Windows y macOS vía PWA Dedicada:** Detección automática del sistema operativo para ofrecer instaladores Linux o instalación en 1 clic como App de Escritorio PWA sin advertencias ni certificados externos.
 
 ---
 
 ## 🏛️ Módulos y Capacidades del Sistema
 
-| Módulo | Icono Oficial | Descripción y Funcionalidades |
-| :--- | :---: | :--- |
-| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de asignaciones oficiales **S-89** en PDF (con vía dual: AcroForm oficial o generador vectorial nativo en 1 clic) y control de sustituciones en tiempo real. |
-| **Reunión Pública y Fin de Semana** | `discursos.svg` | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
-| **Territorios y Cartografía** | `predicacion.svg` | Cartografía interactiva con Leaflet y OpenStreetMap, polígonos de manzanas, asignaciones **S-13**, códigos QR para publicadores y registro de turnos en carritos públicos. |
-| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA, tarjetas **S-21** en PDF con generación nativa resiliente y deduplicación inteligente de registros. |
-| **Asistencia a las Reuniones (S-88)** | `secretaria.svg` | Registro numérico presencial vs. Zoom, cálculo automático de promedios mensuales y gráficas analíticas por año de servicio con Recharts. |
-| **Informes del Servicio del Campo** | `informes_servicio.svg` | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales. |
-| **Cuentas y Mantenimiento del Salón** | — | Libro de transacciones de congregación, arqueo de fondos, inventario físico de publicaciones y diagrama del panel de disyuntores eléctricos de cabina. |
-
----
-
-## 🛠️ Stack Tecnológico
-
-| Capa | Tecnologías |
+| Módulo | Capacidades Principales |
 | :--- | :--- |
-| **Frontend Web** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/) |
-| **Escritorio Nativo** | [Rust 2021](https://www.rust-lang.org/), [Tauri v2](https://v2.tauri.app/) (Edge WebView2 en Windows, WebKitGTK en Linux, WebKit nativo en macOS) |
-| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema y componentes **Linear + Apple Bento (`.kg-*`)** |
-| **Temas Visuales** | **Claro**, **Oscuro** (`#09090b`/`#121216`), **Sepia** (`#f4ecd8`) y modo especial de alto contraste para **Cabina A/V** (`#000000`) |
-| **Gráficos & Visualización** | [Recharts](https://recharts.org/) |
-| **Cartografía** | [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri World Imagery |
-| **Criptografía** | Web Crypto API nativa: AES-256-GCM, PBKDF2 (hasta 600.000 iteraciones), HMAC-SHA1 TOTP (RFC 6238), CSPRNG |
-| **Documentos & Exportación** | [jsPDF](https://github.com/parallax/jsPDF), [pdf-lib](https://pdf-lib.js.org/) y [html2canvas](https://html2canvas.hertzen.com/) |
-| **Iconografía** | [Lucide React](https://lucide.dev/) + SVGs vectoriales teocráticos institucionales |
-| **Almacenamiento Local** | IndexedDB (`kongre_vault_db`, `localforage`) y `localStorage` blindado |
-| **Nube & Sincronización** | [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Edge Functions seguras con Deno) |
+| **Reunión Vida y Ministerio** | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de asignaciones oficiales **S-89** en PDF (relleno de plantilla oficial o generador vectorial nativo en 1 clic), consola **Cronómetro y Plataforma** y control de sustituciones en tiempo real. |
+| **Reunión Pública y Fin de Semana** | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
+| **Territorios y Cartografía** | Cartografía interactiva con OpenStreetMap y soporte offline, polígonos y geocerca GPS en vivo, asignaciones **S-13**, códigos QR y etiquetas NFC para publicadores y registro de turnos en carritos públicos. |
+| **Directorio de Publicadores (S-21)** | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA, tarjetas **S-21** en PDF con generación nativa resiliente y deduplicación inteligente. |
+| **Asistencia a las Reuniones (S-88)** | Registro numérico presencial vs. Zoom (incluyendo acceso rápido NFC), cálculo automático de promedios mensuales y gráficas analíticas por año de servicio. |
+| **Informes del Servicio del Campo** | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales **S-1**. |
+| **Cuentas y Mantenimiento del Salón** | Libro de transacciones de congregación, arqueo e informes de auditoría, inventario físico de publicaciones, mantenimiento del Salón del Reino y diagrama del panel eléctrico de cabina. |
 
 ---
 
 ## 📥 Instalación y Acceso Oficial
 
-**Kongre** es una solución teocrática cerrada y privada. Para utilizarla, **no se requiere clonar código fuente ni compilar paquetes manualmente**. Todos los instaladores se distribuyen listos para usar como binarios precompilados y firmados, o a través de la aplicación web en producción.
-
----
+**Kongre** es un software teocrático de **código cerrado y uso privado**. Para utilizarlo, **no se requiere clonar código fuente ni compilar paquetes**. Todos los instaladores oficiales se distribuyen listos para usar como binarios precompilados, o directamente mediante la aplicación web en producción.
 
 ---
 
 ### Opción 1: Aplicación Nativa para Linux (PC y Cabina de Sonido)
 
-Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
+Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.50` estarán disponibles en Releases al publicarse la etiqueta `v0.1.0-alpha.50`)*:
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.49-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.49-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.49_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.49_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.49_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.50-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.50-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.50_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.50_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.50_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
-> **Consumo ultraligero:** La aplicación nativa para Linux está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
+> **Consumo ultraligero:** La aplicación nativa para Linux está compilada en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
 
 ---
 
@@ -191,9 +122,9 @@ Para **Windows** y **macOS**, la experiencia oficial y recomendada es la **Progr
 
 🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com)
 
-#### Cómo instalar como App Nativa en 1 Clic (Sin certificados de pago ni advertencias):
-* **🪟 Windows (Google Chrome / Microsoft Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), haz clic en el icono de instalación en la barra de direcciones `⊕` (o en los tres puntos `⋮` $\rightarrow$ **«Instalar Kongre»**). Se anclará al Menú Inicio y a la Barra de Tareas, abriendo en su propia ventana nativa independiente y sin advertencias de SmartScreen.
-* **🍎 macOS (Google Chrome / Safari / Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), ve a **Archivo** $\rightarrow$ **«Agregar al Dock»** (o en Chrome: `⋮` $\rightarrow$ **«Instalar Kongre»**). Funcionará como una app de escritorio nativa en el Dock sin restricciones de Gatekeeper.
+#### Cómo instalar como App Nativa en 1 Clic (Sin advertencias ni configuraciones avanzadas):
+* **🪟 Windows (Google Chrome / Microsoft Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), haz clic en el icono de instalación en la barra de direcciones `⊕` (o en el menú `⋮` $\rightarrow$ **«Instalar Kongre»**). Se anclará al Menú Inicio y a la Barra de Tareas, abriendo en su propia ventana independiente y sin advertencias de SmartScreen.
+* **🍎 macOS (Google Chrome / Safari / Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), ve a **Archivo** $\rightarrow$ **«Agregar al Dock»** (o en Chrome: `⋮` $\rightarrow$ **«Instalar Kongre»**). Funcionará como una aplicación de escritorio en el Dock sin restricciones de Gatekeeper.
 * **📱 Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca `⋮` $\rightarrow$ **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
 * **🍏 iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca el botón **Compartir** $\rightarrow$ **«Agregar al inicio»**.
 
@@ -203,8 +134,7 @@ Para **Windows** y **macOS**, la experiencia oficial y recomendada es la **Progr
 ---
 
 ### 🛡️ Naturaleza del Software y Uso Institucional
-- **Software Privativo y Confidencial:** Kongre no es un proyecto de código abierto abierto a contribuciones externas públicas; está reservado para la administración teocrática confidencial de las congregaciones.
-- **Equipo de Desarrollo Interno:** Los desarrolladores y administradores autorizados con acceso al repositorio privado pueden consultar la guía técnica de desarrollo en `DEVELOPMENT.md`.
+- **Software Privativo y Confidencial:** Kongre es una aplicación de código cerrado reservada para la administración teocrática confidencial de las congregaciones cristianas. Este repositorio público está destinado exclusivamente a la distribución de instaladores oficiales y notas de versión para usuarios finales.
 
 ---
 
@@ -212,17 +142,17 @@ Para **Windows** y **macOS**, la experiencia oficial y recomendada es la **Progr
 
 Kongre fue diseñado desde el primer día con los más estrictos estándares de confidencialidad y principios bíblicos de respeto a los datos teocráticos:
 
-1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos) se cifran en el propio dispositivo antes de cualquier transmisión.
+1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos, directrices médicas) se cifran en el propio dispositivo (`AES-256-GCM` + `PBKDF2 600.000` iteraciones) antes de cualquier transmisión.
 2. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o de actividad es vendido, monetizado ni compartido con terceros.
 3. **Autenticación en Dos Pasos (2FA) TOTP Offline:** Compatible con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para la validación.
 4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
 
-Las políticas legales completas están disponibles en:
-- [Términos y Condiciones](public/terms.html)
-- [Política de Privacidad y Protección de Datos](public/privacy.html)
+Las políticas legales completas están disponibles en el portal oficial:
+- [Términos y Condiciones](https://www.kongre-app.com/terms.html)
+- [Política de Privacidad y Protección de Datos](https://www.kongre-app.com/privacy.html)
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está destinado para el uso ordenado, interno y teocrático de las congregaciones cristianas. Todos los derechos reservados.
+Software de código cerrado destinado para el uso ordenado, interno y teocrático de las congregaciones cristianas. Todos los derechos reservados.

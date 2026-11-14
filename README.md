@@ -19,11 +19,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.50-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.50" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.51-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.51" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Linux%20Nativo%20%7C%20PWA%20Multiplataforma-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
-  <img src="https://img.shields.io/badge/2FA-TOTP%20RFC%206238-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA TOTP RFC 6238" />
+  <img src="https://img.shields.io/badge/Bloqueo%20Local-TOTP%20RFC%206238-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="Bloqueo Local TOTP RFC 6238" />
   <img src="https://img.shields.io/badge/PWA-Offline--First%20Ready-5a0fc8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Offline Ready" />
 </p>
 
@@ -40,9 +40,14 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.50`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.51`)
 
 Para consultar el registro cronológico completo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
+
+### 📷 Escáner QR de Territorios, Rediseño de Reuniones y Modo Demo Integral (`v0.1.0-alpha.51`)
+- **Escáner QR de Acceso Rápido y Notas en Territorios:** Nuevo lector QR en cámara en vivo o imagen para abrir al instante tarjetas **S-13** y tarjetas digitales móviles, con respuesta táctil háptica, apertura fluida animada y edición directa de observaciones sobre domicilios con etiquetas rápidas.
+- **Rediseño de Programa de Reuniones y Barra Sólida:** Cabecera integrada en dos niveles (**Autoasignar**, **WhatsApp**, **Opciones**), pestañas **Todo / Entre Semana / Fin de Semana**, accesos rápidos a **Plataforma** y **TV en Salón**, barra superior sólida sin superposiciones en los 4 temas y Modo Demo ampliado a 6 semanas completas con 18 publicadores.
+- **Endurecimiento Criptográfico y Calidad:** Sobres departamentales reforzados a **600.000 iteraciones PBKDF2** con entropía mínima real y sin clave maestra expuesta en el paquete público, generación estándar de PIN de congregación de **12 caracteres (~60 bits)**, saneamiento reforzado de importaciones CSV, bloqueo TOTP aclarado honestamente como bloqueo local en el dispositivo y optimización modular respaldada por **239 pruebas automatizadas**.
 
 ### 🎨 Sistema Visual «Instrumento Teocrático Sobrio», Paridad Sepia y Accesibilidad (`v0.1.0-alpha.50`)
 - **Diseño Sobrio de Alta Legibilidad:** Transición integral hacia hojas visuales limpias y uniformes en los **4 temas** (**Claro**, **Oscuro**, **Sepia** `#f4ecd8` y **Cabina A/V** `#000000`), pensadas para lectura prolongada sin fatiga visual y con alineación numérica precisa en cronogramas, cuentas e informes.
@@ -50,7 +55,7 @@ Para consultar el registro cronológico completo con todas las versiones y corre
 
 ### ⚡ Arquitectura Optimizada y Mayor Fluidez de Arranque
 - **Modularización Completa y Arranque Más Rápido:** Reorganización interna integral de la aplicación en módulos ligeros bajo demanda para que la pantalla inicial cargue más rápido y con menor consumo de memoria tanto en móvil como en PC.
-- **Calidad Verificada:** Validación automatizada ampliada a **237 pruebas** continuas sobre criptografía, sincronización, documentos oficiales, mapas y accesibilidad.
+- **Calidad Verificada:** Validación automatizada ampliada a **239 pruebas** continuas sobre criptografía, sincronización, documentos oficiales, mapas y accesibilidad.
 
 ### 🛡️ Seguridad Cero Conocimiento Fase 3: Sobres Departamentales, Anti-Rollback y Contexto
 - **Sobres Departamentales y Validación de Contexto:** Compartimentación cifrada por departamento acorde al rol asignado, verificación estricta de pertenencia de los datos descifrados y filtro de calidad de PINs con clave maestra de 16 dígitos por defecto.
@@ -103,13 +108,13 @@ Para consultar el registro cronológico completo con todas las versiones y corre
 
 ### Opción 1: Aplicación Nativa para Linux (PC y Cabina de Sonido)
 
-Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.50` estarán disponibles en Releases al publicarse la etiqueta `v0.1.0-alpha.50`)*:
+Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.51` estarán disponibles en Releases al publicarse la etiqueta `v0.1.0-alpha.51`)*:
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.50-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.50-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.50_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.50_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.50_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.51-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.51-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.51_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.51_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.51_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para Linux está compilada en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
@@ -144,7 +149,7 @@ Kongre fue diseñado desde el primer día con los más estrictos estándares de 
 
 1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos, directrices médicas) se cifran en el propio dispositivo (`AES-256-GCM` + `PBKDF2 600.000` iteraciones) antes de cualquier transmisión.
 2. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o de actividad es vendido, monetizado ni compartido con terceros.
-3. **Autenticación en Dos Pasos (2FA) TOTP Offline:** Compatible con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para la validación.
+3. **Bloqueo Local con Authenticator (TOTP RFC 6238):** Compatible localmente en el dispositivo con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para desbloquear la sesión.
 4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
 
 Las políticas legales completas están disponibles en el portal oficial:

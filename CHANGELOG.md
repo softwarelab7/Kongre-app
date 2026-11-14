@@ -6,6 +6,24 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.51] — 14 de Noviembre, 2026
+**Rediseño de Programa de Reuniones, Escáner QR de Territorios con Vibración Háptica, Modo Demo Ampliado y Endurecimiento de Seguridad**
+
+- 📷 **Escáner QR de Acceso Rápido, Animación de Apertura y Notas Editables en Territorios:**
+  - **Lector QR Integrado en «Territorios»:** Botones **«Escanear QR»** en la barra de acciones y junto al buscador para escanear tarjetas con cámara en vivo o imagen, abriendo al instante la **Ficha S-13** o la **Tarjeta Digital Móvil**.
+  - **Confirmación Háptica y Apertura Fluida:** Respuesta táctil inmediata por vibración al leer códigos válidos, transiciones respetando la preferencia de movimiento reducido y edición directa de observaciones sobre domicilios con etiquetas rápidas.
+- 📅 **Rediseño de «Programa de Reuniones» y Barra Superior Sólida:**
+  - Cabecera integrada en dos niveles (**Autoasignar**, **WhatsApp**, **Opciones**), pestañas **Todo**, **Entre Semana** y **Fin de Semana**, bloques destacados de **Lectura**, **Bosquejo** y **Cánticos**, interruptor para **Sala Auxiliar** y anillo de progreso.
+  - Accesos rápidos de escritorio para **Plataforma** y **TV en Salón**, barra superior sólida sin superposiciones en Claro/Oscuro/Sepia, corrección definitiva de sincronización continua y Modo Demo ampliado a 6 semanas completas con 18 publicadores.
+- 🔐 **Endurecimiento Criptográfico y Optimización Integral:**
+  - **Sobres Departamentales a 600.000 Iteraciones:** Derivación reforzada manteniendo compatibilidad automática con claves previas, sin exposición de la clave maestra en el paquete público y con requisito real de entropía mínima (≥ 40 bits) para secretos departamentales.
+  - **PIN de Congregación de 12 Caracteres (~60 bits) y Saneamiento Reforzado:** Generación estándar de 12 caracteres con soporte completo para claves previas de 8 caracteres y passphrases, saneamiento de importaciones CSV sin depender de expresiones regulares simples y TOTP presentado claramente como bloqueo local en el dispositivo.
+  - **Modularización y Calidad Verificada:** Reorganización interna completa de pantallas y utilidades para arranque ágil y mantenimiento limpio, validada con **239 pruebas automatizadas**.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.50] — 13 de Noviembre, 2026
 **Nuevo Diseño «Instrumento Teocrático Sobrio», Sobres Departamentales, Protección Anti-Rollback y «Cronómetro y Plataforma»**
 
@@ -23,8 +41,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Priorización del paquete `.rpm` versionado en Fedora/RHEL, instrucción directa de reinstalación/actualización para escritorio Linux y exposición exclusiva de instaladores Linux oficiales (`.rpm`, `.deb`, `.AppImage`) para equipos de PC y cabina.
 
 ---
-
-## 📜 Versiones Anteriores
 
 ### [v0.1.0-alpha.49.1] — 12 de Noviembre, 2026
 **Consola de Plataforma para PC, Accesos Rápidos en Inicio, Lectura NFC y Mapas Offline**

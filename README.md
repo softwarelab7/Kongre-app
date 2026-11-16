@@ -31,148 +31,91 @@
 
 ## 📖 Descripción General
 
-**Kongre** es un sistema teocrático integral diseñado para apoyar al cuerpo de ancianos, siervos ministeriales y publicadores en la organización ordenada, eficiente y confidencial de las actividades de congregación, bajo el principio bíblico:
+**Kongre** es un sistema teocrático integral diseñado para apoyar al cuerpo de ancianos, siervos ministeriales y publicadores en la organización ordenada, eficiente y confidencial de las actividades de la congregación, bajo el principio bíblico:
 
 > *«Pero que todas las cosas se hagan de forma digna y ordenada.»*  
 > — **1 Corintios 14:40**
 
-La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de última generación con la velocidad y seguridad de una **aplicación nativa de escritorio para Linux compilada con Rust (Tauri v2)**, permitiendo operar tanto con sincronización en la nube como de forma 100% desconectada (Offline-First).
+Combina una **Progressive Web App (PWA) 100 % Offline-First** para móviles, tabletas y ordenadores con una **aplicación nativa de escritorio para Linux** de arranque instantáneo y consumo mínimo (~15 MB de memoria RAM). Ofrece **4 temas visuales** (**Claro**, **Oscuro**, **Sepia** y **Cabina A/V**), navegación adaptada tanto para escritorio como para teléfono móvil y un **Modo Demo** interactivo para explorar todas sus funciones con datos de ejemplo.
 
----
-
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.55`)
-
-Para consultar el registro cronológico completo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
-
-### 🎨 Rediseño Integral Operativo, Consola de Cuenta/Ajustes, Zoom en Audio/Video y PDF Real (`v0.1.0-alpha.55`)
-- **Rediseño desde Cero de Módulos Operativos:** Renovación integral de **Deberes y Aseo** (con fechas legibles en español), **Mantenimiento**, **Panel Eléctrico**, **Visita del SC**, **Memorial y Asambleas**, **Panel de Equidad** en 3 vistas y **Formatos y PDF**.
-- **Consola de Ajustes, Roles y Mi Perfil:** Diseño en 2 columnas para **Roles y PINs**, **Ajustes** y **Mi Perfil**, con panel lateral fijo en escritorio, encabezado compacto y botón **Subir** rediseñado para móvil y PC.
-- **Audio y Video + Documento PDF Real:** Nuevo rol **Anfitrión de Zoom** en **Audio y Video** (`Entre Semana` / `Fin de Semana`), corrección en la visualización de **Documento PDF Real** y desplazamiento más estable en escritorio.
-
-### 📱 Actualización PWA Obligatoria, Web Push Móvil, Buscador Global y Plataforma/TV (`v0.1.0-alpha.54`)
-- **PWA, Push y Navegación Móvil:** Actualización obligatoria de la PWA y notificaciones Web Push en segundo plano en dispositivos móviles, buscador global sin distinción de tildes y botón **«Volver»** en móvil.
-- **Unificación Plataforma/TV y Territorios:** Integración de las vistas de **Plataforma** y **TV**, diseño sobrio en PINs/QR/Sincronización/Cartelera móvil, Territorios en Bogotá y GPS más preciso.
-
-### 🪪 Ficha del Publicador y S-21, Importador EPUB, QR Offline y Web Push (`v0.1.0-alpha.53`)
-- **Secretaría y Publicaciones:** Rediseño de **Ficha del Publicador** y tarjeta **S-21** en dos columnas, importador directo `.epub`, recolección **S-4** y llenado automático **S-1 / S-205b**.
-- **Confiabilidad Offline y Calidad Verificada:** Lector QR offline universal, notificaciones Web Push de extremo a extremo y validación continua mediante **251 pruebas automatizadas**.
-
-### 🗺️ Cartografía Avanzada, Auditoría Animada y Mejoras de Guía / Mi Ministerio / Modo Demo (`v0.1.0-alpha.52`)
-- **Territorios con Selector de Mapa, Zoom y Gráfico Circular:** Selector entre mapa **Callejero**, **Satélite** y **Terreno**, controles accesibles de zoom (`+` / `-`), transición suave al abrir mapas y gráfico circular de territorios asignados frente a disponibles.
-- **Auditoría de Reuniones, Guía a Ancho Completo y Mi Ministerio Limpio:** Vista de historial de auditoría para coordinadores con entrada gradual animada, progreso visual al sincronizar manualmente la cola offline, **Guía Oficial de Usuario** expandida al ancho completo en PC, página **Acerca de** renovada y vista principal de **Mi Ministerio** con **Historial S-4** integrado en **Mi Meta y Registro Mensual**.
-- **Correcciones en Modo Demo y Cronómetro:** Restauración íntegra del rol de Coordinador y directorio completo de publicadores al entrar al Modo Demo, y eliminación del botón «Manual» duplicado en el cronómetro de predicación.
-
-### 📷 Escáner QR de Territorios, Rediseño de Reuniones y Modo Demo Integral (`v0.1.0-alpha.51`)
-- **Escáner QR de Acceso Rápido y Notas en Territorios:** Nuevo lector QR en cámara en vivo o imagen para abrir al instante tarjetas **S-13** y tarjetas digitales móviles, con respuesta táctil háptica, apertura fluida animada y edición directa de observaciones sobre domicilios con etiquetas rápidas.
-- **Rediseño de Programa de Reuniones y Barra Sólida:** Cabecera integrada en dos niveles (**Autoasignar**, **WhatsApp**, **Opciones**), pestañas **Todo / Entre Semana / Fin de Semana**, accesos rápidos a **Plataforma** y **TV en Salón**, barra superior sólida sin superposiciones en los 4 temas y Modo Demo ampliado a 6 semanas completas con 18 publicadores.
-- **Endurecimiento Criptográfico y Calidad:** Sobres departamentales reforzados a **600.000 iteraciones PBKDF2** con entropía mínima real y sin clave maestra expuesta en el paquete público, generación estándar de PIN de congregación de **12 caracteres (~60 bits)**, saneamiento reforzado de importaciones CSV, bloqueo TOTP aclarado honestamente como bloqueo local en el dispositivo y optimización modular respaldada por **239 pruebas automatizadas**.
-
-### 🎨 Sistema Visual «Instrumento Teocrático Sobrio», Paridad Sepia y Accesibilidad (`v0.1.0-alpha.50`)
-- **Diseño Sobrio de Alta Legibilidad:** Transición integral hacia hojas visuales limpias y uniformes en los **4 temas** (**Claro**, **Oscuro**, **Sepia** `#f4ecd8` y **Cabina A/V** `#000000`), pensadas para lectura prolongada sin fatiga visual y con alineación numérica precisa en cronogramas, cuentas e informes.
-- **Accesibilidad y Diseño Móvil Reforzado:** Cierre uniforme de diálogos con tecla `Escape`, navegación consistente por teclado, respeto a preferencias de movimiento reducido, adaptación fluida a pantallas móviles verticales y eliminación total de diálogos nativos del navegador.
-
-### ⚡ Arquitectura Optimizada y Mayor Fluidez de Arranque
-- **Modularización Completa y Arranque Más Rápido:** Reorganización interna integral de la aplicación en módulos ligeros bajo demanda para que la pantalla inicial cargue más rápido y con menor consumo de memoria tanto en móvil como en PC.
-- **Calidad Verificada:** Validación automatizada ampliada a **239 pruebas** continuas sobre criptografía, sincronización, documentos oficiales, mapas y accesibilidad.
-
-### 🛡️ Seguridad Cero Conocimiento Fase 3: Sobres Departamentales, Anti-Rollback y Contexto
-- **Sobres Departamentales y Validación de Contexto:** Compartimentación cifrada por departamento acorde al rol asignado, verificación estricta de pertenencia de los datos descifrados y filtro de calidad de PINs con clave maestra de 16 dígitos por defecto.
-- **Protección de PINs en Reposo con AES-256-GCM:** Cifrado autenticado del almacenamiento local vinculado a la bóveda no extraíble del navegador, retirando formatos heredados.
-- **Protección Anti-Rollback y Privacidad GeoIP:** Detección automática ante devoluciones inesperadas de versiones antiguas en sincronización con diálogo guiado de recuperación, firma de confirmación en asignaciones estudiantiles y bloqueo de consultas externas de ubicación salvo autorización explícita.
-
-### ⏱️ «Cronómetro y Plataforma», Etiquetas NFC y Cartografía Offline (`v0.1.0-alpha.48` – `v0.1.0-alpha.50`)
-- **Cronómetro y Plataforma para PC y Cabina A/V:** Consola unificada (**Consola Presidencia** y **Pantalla Orador** con disposiciones *Monitor Puro* y *Atril + Escaleta*), accesos directos exclusivos en PC desde Inicio, semáforo de tiempo, modo Zen sin distracciones, aviso visual para plataforma y sincronización multipantalla en vivo, junto con programas semanales Vida y Ministerio actualizados.
-- **Lectura y Registro NFC + Mapas Offline:** Escaneo Web NFC en dispositivos compatibles para abrir tarjetas personales de territorio **S-13** o el registro de asistencia **S-88** al acercar una etiqueta registrada, descarga de mapas de territorios para consulta sin internet y exportación CSV en Grupos de Servicio.
-- **Actualizador Nativo de Escritorio para Linux:** Verificación confiable de nuevas versiones desde GitHub Releases y el actualizador nativo interno, prioridad de paquete `.rpm` versionado con comando directo de actualización en Fedora/RHEL y descargas fijadas por versión para `.rpm`, `.deb` y `.AppImage`.
-
-### 🔐 Blindaje Criptográfico y Respaldos Portables (`v0.1.0-alpha.45` – `v0.1.0-alpha.47`)
-- **Tokens a 600.000 PBKDF2, Concurrencia Optimista y Passphrases:** Paridad criptográfica completa con `AES-256-GCM`, control atómico contra conflictos de guardado simultáneo con auto-reconciliación en la nube y soporte íntegro de passphrases de hasta 24 caracteres.
-- **Respaldos Portables Cifrados y P2P / QR Cifrado de Extremo a Extremo:** Exportación `.kongre.json` protegida con frase de paso y recuperación integral al cambiar de navegador o equipo, transferencia directa local P2P/QR cifrada sin internet, códigos de invitación de 80 bits y revalidación continua de sesiones de rol.
-
-### 🔐 Cifrado en Reposo Resiliente y Control Operativo
-- **Descifrado Transparente en Reposo:** Protección local en el dispositivo de teléfonos, direcciones, notas de secretaría, visitas de pastoreo, finanzas y directriz médica DPA mediante bóveda criptográfica no extraíble.
-- **Revocación Inmediata de Credenciales y Auditoría para Ancianos:** Invalidación en caliente de PINs comprometidos u olvidados con generación inmediata de nuevo PIN de 6 dígitos y registro de dispositivos vinculados.
-- **Centro de Control Offline y Visor PDF Interactivo:** Inspección en vivo de registros cacheados y cola pendiente de sincronización, además de visor PDF integrado con paginación, zoom, rotación y autoasignación equitativa de reuniones.
-
-### 🦀 Kongre App Nativa para Escritorio en Linux (Rust + Tauri v2)
-- **Rendimiento Ultraligero:** Binario nativo que arranca en milisegundos y consume apenas ~15 MB de memoria RAM en PCs de escritorio o cabina de sonido.
-- **Paquetes Oficiales para Linux:**
-  - **Fedora / RHEL / openSUSE:** Paquete nativo `.rpm` de 64 bits.
-  - **Ubuntu / Debian / Linux Mint:** Paquete nativo `.deb`.
-  - **Linux Universal:** Paquete portátil `.AppImage` con actualización automática.
-- **Windows y macOS vía PWA Dedicada:** Detección automática del sistema operativo para ofrecer instaladores Linux o instalación en 1 clic como App de Escritorio PWA sin advertencias ni certificados externos.
+> [!NOTE]
+> Para consultar el historial detallado de versiones, mejoras y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## 🏛️ Módulos y Capacidades del Sistema
 
-| Módulo | Capacidades Principales |
-| :--- | :--- |
-| **Reunión Vida y Ministerio** | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de asignaciones oficiales **S-89** en PDF (relleno de plantilla oficial o generador vectorial nativo en 1 clic), consola **Cronómetro y Plataforma** y control de sustituciones en tiempo real. |
-| **Reunión Pública y Fin de Semana** | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
-| **Territorios y Cartografía** | Cartografía interactiva con OpenStreetMap y soporte offline, polígonos y geocerca GPS en vivo, asignaciones **S-13**, códigos QR y etiquetas NFC para publicadores y registro de turnos en carritos públicos. |
-| **Directorio de Publicadores (S-21)** | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA, tarjetas **S-21** en PDF con generación nativa resiliente y deduplicación inteligente. |
-| **Asistencia a las Reuniones (S-88)** | Registro numérico presencial vs. Zoom (incluyendo acceso rápido NFC), cálculo automático de promedios mensuales y gráficas analíticas por año de servicio. |
-| **Informes del Servicio del Campo** | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales **S-1**. |
-| **Cuentas y Mantenimiento del Salón** | Libro de transacciones de congregación, arqueo e informes de auditoría, inventario físico de publicaciones, mantenimiento del Salón del Reino y diagrama del panel eléctrico de cabina. |
+### 🗓️ Reuniones, Plataforma y Coordinación
+- **Reunión Vida y Ministerio:** Programación semanal completa, importación directa de cuadernos semanales (`.epub`), asignaciones estudiantiles, autoasignación equitativa según cualificaciones, gestión de sustituciones, historial y generación de tarjetas de asignación **S-89** en PDF.
+- **Reunión Pública y Visita del Superintendente de Circuito:** Agenda de discursos públicos (1–194), coordinación de oradores visitantes y hospedaje, turnos de presidente y lector de *La Atalaya*, y organización integral de la **Visita del SC**.
+- **Consola de Plataforma, TV y Cronómetro:** Consola de presidencia y pantalla para el orador o televisor del salón (*Monitor Puro*, *Atril + Escaleta* y *Modo Zen*), semáforo de tiempo, avisos discretos a plataforma y sincronización en vivo entre pantallas.
+- **Audio, Video, Zoom y Acomodadores:** Turnos semanales diferenciados entre **Entre Semana** y **Fin de Semana** para Audio, Video, Micrófonos, Plataforma, Acomodadores y **Anfitrión de Zoom**, junto con tablero de equidad en tres vistas.
+- **Conmemoración, Asambleas, Calendario y Cartelera:** Planificación anual de la **Conmemoración (Memorial)** y asambleas, calendario de congregación, cartelera mensual y tablero digital de anuncios.
+
+### 👥 Secretaría, Pastoreo y Servicio del Campo
+- **Directorio de Publicadores y Tarjetas S-21:** Ficha personal en dos columnas, grupos de servicio, seguimiento de precursores regulares y auxiliares, notas confidenciales de pastoreo, directriz médica **DPA**, control de ausencias e impresión de tarjetas **S-21** en PDF.
+- **Mi Ministerio e Informes del Servicio:** Cronómetro de predicación para uso personal del publicador, metas mensuales y registro **S-4**, recolección de informes de congregación y consolidación mensual para la sucursal (**S-1** y **S-205b**).
+- **Asistencia a las Reuniones (S-88):** Registro numérico presencial y por Zoom, acceso rápido mediante etiquetas **NFC**, promedios mensuales y gráficas anuales por año de servicio.
+- **Territorios, Cartografía y Predicación Pública:** Mapas interactivos (**Callejero**, **Satélite** y **Terreno**) con descarga para uso sin internet, geocerca GPS en vivo, trazado de manzanas, tarjetas **S-13** con notas de domicilio, tarjetas digitales móviles, escáner **QR**, etiquetas **NFC** y programación de turnos en carritos públicos.
+
+### 🏢 Salón del Reino, Finanzas y Formatos Oficiales
+- **Deberes, Aseo, Mantenimiento y Panel Eléctrico:** Rotación de grupos para limpieza y deberes del Salón del Reino, registro de mantenimiento preventivo o correctivo y diagrama del panel de disyuntores eléctricos de cabina.
+- **Cuentas e Inventario:** Libro de cuentas de congregación, arqueo e informes de auditoría e inventario físico de publicaciones.
+- **Centro de Formatos y Visor PDF Integrado:** Lector integrado de documentos PDF con paginación, zoom y rotación, además de llenado automático de formularios oficiales sin depender de programas externos.
+
+### 📱 Operación Offline, Multi-dispositivo y Respaldos
+- **Offline-First con Sincronización en la Nube:** Todos los módulos funcionan sin conexión a internet y sincronizan cambios al recuperar señal, incluyendo un panel de estado offline, protección contra conflictos o retrocesos de versión y notificaciones **Web Push** en segundo plano.
+- **Transferencia Local y Respaldos Portables:** Intercambio directo y cifrado entre dispositivos cercanos mediante código **QR** sin necesidad de internet, además de exportación e importación de copias de seguridad portables protegidas con frase de paso.
+- **Cuenta Personal, Roles y Preferencias:** Consola unificada para gestionar perfil, sesiones activas, bloqueo automático por inactividad y apariencia en escritorio o móvil.
+
+---
+
+## 🔐 Privacidad Teocrática y Seguridad Cero Conocimiento
+
+**Kongre** está diseñado desde su base para proteger la confidencialidad de la congregación:
+
+1. **Cifrado de Conocimiento Cero (`Zero-Knowledge`):** Los datos sensibles (teléfonos, direcciones, notas de pastoreo, fichas S-21, finanzas, directrices médicas DPA) se cifran en el dispositivo del usuario (`AES-256-GCM` + `PBKDF2 600.000` iteraciones) antes de enviarse a la nube, divididos en ámbitos cifrados por departamento.
+2. **Bóveda Local en Reposo:** Protección adicional de las credenciales y registros almacenados localmente en el dispositivo.
+3. **Control Granular de Roles y Credenciales:** Administración de permisos por responsabilidad teocrática, revocación inmediata de PINs comprometidos, historial de dispositivos vinculados y bloqueo local opcional compatible con **Microsoft Authenticator** y Google Authenticator (**TOTP RFC 6238**).
+4. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o congregacional es vendido ni compartido con terceros, y las consultas externas de ubicación permanecen desactivadas salvo autorización expresa. Cumple con Google OAuth *Limited Use Policy* en el inicio de sesión asistido.
+
+Las políticas legales completas están disponibles en el portal oficial:
+- [Términos y Condiciones](https://www.kongre-app.com/terms.html)
+- [Política de Privacidad y Protección de Datos](https://www.kongre-app.com/privacy.html)
 
 ---
 
 ## 📥 Instalación y Acceso Oficial
 
-**Kongre** es un software teocrático de **código cerrado y uso privado**. Para utilizarlo, **no se requiere clonar código fuente ni compilar paquetes**. Todos los instaladores oficiales se distribuyen listos para usar como binarios precompilados, o directamente mediante la aplicación web en producción.
-
----
+**Kongre** es un software teocrático de **código cerrado y uso privado**. Para utilizarlo, **no se requiere clonar código fuente ni compilar paquetes**. Todos los instaladores oficiales se distribuyen listos para usar o directamente desde la aplicación web en producción.
 
 ### Opción 1: Aplicación Nativa para Linux (PC y Cabina de Sonido)
 
-Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.55` se publican en Releases al etiquetar la versión `v0.1.0-alpha.55`)*:
+Descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
 
-| Sistema Operativo | Paquete Oficial | Método de Instalación |
+| Sistema Operativo | Paquete Oficial (`v0.1.0-alpha.55`) | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.55-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.55-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.55_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.55_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.55_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.55-1.x86_64.rpm` | `sudo dnf install ./Kongre-0.1.0-alpha.55-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.55_amd64.deb` | `sudo dpkg -i ./Kongre_0.1.0-alpha.55_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.55_amd64.AppImage` | `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
-> **Consumo ultraligero:** La aplicación nativa para Linux está compilada en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
-
----
+> **Consumo ultraligero:** La aplicación nativa para Linux consume apenas ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
 
 ### Opción 2: Aplicación Web y PWA de Escritorio (Windows, macOS, Móviles y Tablets)
 
-Para **Windows** y **macOS**, la experiencia oficial y recomendada es la **Progressive Web App (PWA)** desde el portal oficial:
-
 🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com)
 
-#### Cómo instalar como App Nativa en 1 Clic (Sin advertencias ni configuraciones avanzadas):
-* **🪟 Windows (Google Chrome / Microsoft Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), haz clic en el icono de instalación en la barra de direcciones `⊕` (o en el menú `⋮` $\rightarrow$ **«Instalar Kongre»**). Se anclará al Menú Inicio y a la Barra de Tareas, abriendo en su propia ventana independiente y sin advertencias de SmartScreen.
-* **🍎 macOS (Google Chrome / Safari / Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), ve a **Archivo** $\rightarrow$ **«Agregar al Dock»** (o en Chrome: `⋮` $\rightarrow$ **«Instalar Kongre»**). Funcionará como una aplicación de escritorio en el Dock sin restricciones de Gatekeeper.
-* **📱 Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca `⋮` $\rightarrow$ **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
-* **🍏 iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca el botón **Compartir** $\rightarrow$ **«Agregar al inicio»**.
+* **🪟 Windows (Google Chrome / Microsoft Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com) y haz clic en el icono de instalación `⊕` en la barra de direcciones (o en el menú `⋮` $\rightarrow$ **«Instalar Kongre»**). Se anclará al Menú Inicio y a la Barra de Tareas sin advertencias de SmartScreen.
+* **🍎 macOS (Safari / Google Chrome / Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com) y selecciona **Archivo** $\rightarrow$ **«Agregar al Dock»** (o en Chrome: `⋮` $\rightarrow$ **«Instalar Kongre»**).
+* **📱 Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com) y toca `⋮` $\rightarrow$ **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
+* **🍏 iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com) y toca el botón **Compartir** $\rightarrow$ **«Agregar al inicio»**.
 
 > [!NOTE]
-> La aplicación web cuenta con soporte **100% Offline-First**: una vez cargada por primera vez, todos los módulos operan normalmente sin necesidad de conexión activa a internet.
-
----
+> La aplicación web ofrece funcionamiento **100 % Offline-First**: una vez instalada o cargada, todos los módulos operan normalmente incluso sin conexión a internet.
 
 ### 🛡️ Naturaleza del Software y Uso Institucional
-- **Software Privativo y Confidencial:** Kongre es una aplicación de código cerrado reservada para la administración teocrática confidencial de las congregaciones cristianas. Este repositorio público está destinado exclusivamente a la distribución de instaladores oficiales y notas de versión para usuarios finales.
-
----
-
-## 🔒 Privacidad Teocrática y Seguridad Cero Conocimiento
-
-Kongre fue diseñado desde el primer día con los más estrictos estándares de confidencialidad y principios bíblicos de respeto a los datos teocráticos:
-
-1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos, directrices médicas) se cifran en el propio dispositivo (`AES-256-GCM` + `PBKDF2 600.000` iteraciones) antes de cualquier transmisión.
-2. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o de actividad es vendido, monetizado ni compartido con terceros.
-3. **Bloqueo Local con Authenticator (TOTP RFC 6238):** Compatible localmente en el dispositivo con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para desbloquear la sesión.
-4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
-
-Las políticas legales completas están disponibles en el portal oficial:
-- [Términos y Condiciones](https://www.kongre-app.com/terms.html)
-- [Política de Privacidad y Protección de Datos](https://www.kongre-app.com/privacy.html)
+- **Software Privativo y Confidencial:** Kongre es una aplicación de código cerrado reservada para la administración teocrática confidencial de las congregaciones cristianas. Este repositorio público está destinado exclusivamente a la distribución de instaladores oficiales, documentación para usuarios finales y registro de versiones en [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

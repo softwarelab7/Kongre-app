@@ -6,86 +6,186 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0-alpha.51] — 14 de Noviembre, 2026
-**Rediseño de Programa de Reuniones, Escáner QR de Territorios con Vibración Háptica, Modo Demo Ampliado y Endurecimiento de Seguridad**
+### [v0.1.0-alpha.55] — 15 de Noviembre, 2026
+**Anfitrión de Zoom en Audio/Video, Rediseño Integral desde Cero de Módulos Operativos y Administrativos, Consola en 2 Columnas y Correcciones de PDF Real y Scroll**
 
-- 📷 **Escáner QR de Acceso Rápido, Animación de Apertura y Notas Editables en Territorios:**
-  - **Lector QR Integrado en «Territorios»:** Botones **«Escanear QR»** en la barra de acciones y junto al buscador para escanear tarjetas con cámara en vivo o imagen, abriendo al instante la **Ficha S-13** o la **Tarjeta Digital Móvil**.
-  - **Confirmación Háptica y Apertura Fluida:** Respuesta táctil inmediata por vibración al leer códigos válidos, transiciones respetando la preferencia de movimiento reducido y edición directa de observaciones sobre domicilios con etiquetas rápidas.
-- 📅 **Rediseño de «Programa de Reuniones» y Barra Superior Sólida:**
-  - Cabecera integrada en dos niveles (**Autoasignar**, **WhatsApp**, **Opciones**), pestañas **Todo**, **Entre Semana** y **Fin de Semana**, bloques destacados de **Lectura**, **Bosquejo** y **Cánticos**, interruptor para **Sala Auxiliar** y anillo de progreso.
-  - Accesos rápidos de escritorio para **Plataforma** y **TV en Salón**, barra superior sólida sin superposiciones en Claro/Oscuro/Sepia, corrección definitiva de sincronización continua y Modo Demo ampliado a 6 semanas completas con 18 publicadores.
-- 🔐 **Endurecimiento Criptográfico y Optimización Integral:**
-  - **Sobres Departamentales a 600.000 Iteraciones:** Derivación reforzada manteniendo compatibilidad automática con claves previas, sin exposición de la clave maestra en el paquete público y con requisito real de entropía mínima (≥ 40 bits) para secretos departamentales.
-  - **PIN de Congregación de 12 Caracteres (~60 bits) y Saneamiento Reforzado:** Generación estándar de 12 caracteres con soporte completo para claves previas de 8 caracteres y passphrases, saneamiento de importaciones CSV sin depender de expresiones regulares simples y TOTP presentado claramente como bloqueo local en el dispositivo.
-  - **Modularización y Calidad Verificada:** Reorganización interna completa de pantallas y utilidades para arranque ágil y mantenimiento limpio, validada con **239 pruebas automatizadas**.
+- 🎥 **Anfitrión de Zoom en Audio y Video (`TasksAssignmentCard.tsx`, `publisherEditorConfig.ts`, `congregationHelpers.ts`):**
+  - Nueva habilitación independiente para **Entre Semana** y **Fin de Semana** en la ficha del publicador, sincronizada con el deber de cabina Zoom en **Deberes y Aseo**.
+- 🛠️ **Rediseño de «Deberes y Aseo», «Mantenimiento» y «Panel Eléctrico» (`CleaningTurnosSection.tsx`, `CleaningMatrixAndSections.tsx`, `MantenimientoTab.tsx`, `MaintenanceFichasSubView.tsx`, `PanelElectricoTab.tsx`):**
+  - Unificación de nombres a **Deberes y Aseo** y **Mantenimiento**, fechas legibles en español (día, mes y año), tarjetas de deberes con color e icono por función, KPIs interactivos y filtros compactos en una sola fila sin controles duplicados.
+- 📅 **Rediseño desde Cero de «Visita del SC», «Memorial y Asambleas» y «Panel de Equidad» (`VisitaHeaderAndSummary.tsx`, `VisitaProgramSubTabs.tsx`, `MemorialNavBar.tsx`, `MemorialHeaderAndDetails.tsx`, `EquidadDashboardTab.tsx`, `EquityHeaderAndKpis.tsx`, `EquitySummaryBreakdownPanel.tsx`):**
+  - Cabeceras hero unificadas, agenda de discursos y reuniones especiales en 2 columnas, fechas naturales en Memorial y tablero de Equidad organizado en 3 subvistas (`Resumen`, `Gráficas`, `Publicadores y Grupos`).
+- 🧩 **Consola en 2 Columnas para «Roles y PINs», «Ajustes» y «Mi Perfil» + Botón Subir (`RolesManagerTab.tsx`, `SettingsTab.tsx`, `UserProfileSettingsView.tsx`, `ProfileHeaderAndHub.tsx`, `ScrollToTopButton.tsx`):**
+  - Panel lateral fijo debajo de la barra superior (`lg:sticky`), cabecera limpia en **Mi Perfil** y nuevo botón flotante **Subir** con anillo de progreso optimizado para móvil (encima del dock) y PC.
+- 🐛 **Correcciones de «Documento PDF Real», Scroll y Barra Lateral (`ExportPdfTab.tsx`, `ReactPdfInteractivePreview.tsx`, `index.css`, `NavbarUnifiedDrawer.tsx`):**
+  - Resolución del worker de PDF.js con `?url` de Vite y `suspense={false}` en `react-pdf` v11 para eliminar el bucle de carga; exclusión de contenedores ocultos de impresión en `body:has(.fixed.inset-0)` para evitar bloqueos de scroll en escritorio; y ocultamiento del scrollbar en la barra lateral contraída.
 
 ---
 
 ## 📜 Versiones Anteriores
 
-### [v0.1.0-alpha.50] — 13 de Noviembre, 2026
-**Nuevo Diseño «Instrumento Teocrático Sobrio», Sobres Departamentales, Protección Anti-Rollback y «Cronómetro y Plataforma»**
+### [v0.1.0-alpha.54] — 15 de Noviembre, 2026
+**Actualización Obligatoria PWA y Push en Segundo Plano, Buscador Global Funcional, Rediseño Móvil de Cartelera, Directorio de PINs / QR / Sincronización, Territorios en Bogotá y Unificación Plataforma / TV**
 
-- 🎨 **Nuevo Lenguaje Visual «Instrumento Teocrático Sobrio» y Accesibilidad:**
-  - Sustitución integral de efectos de vidrio y desenfoques heredados por hojas visuales limpias, sobrias y de alto contraste con paridad completa en los **4 temas** (**Claro**, **Oscuro**, **Sepia** y **Cabina A/V**) y alineación numérica tabular en cronogramas, reportes y contabilidad.
-  - Cierre uniforme mediante la tecla `Escape` en todos los diálogos, controles accesibles por teclado, respeto a la preferencia de movimiento reducido del sistema operativo y diseño adaptable mejorado en pantallas móviles.
-- 🔐 **Seguridad Cero Conocimiento Fase 3 y Protección Anti-Rollback:**
-  - **Sobres Departamentales y Contexto:** Compartimentación criptográfica por departamento para roles autorizados, validación estricta del contexto descifrado entre niveles y congregaciones, filtro de calidad de contraseñas y PIN Maestro generado de 16 dígitos por defecto.
-  - **Cifrado Reforzado de Credenciales Locales y Anti-Rollback:** Protección autenticada `AES-256-GCM` de credenciales en almacenamiento local ligada a la bóveda del navegador, marcador de revisión contra devolución de estados antiguos en la nube con diálogo guiado de recuperación, confirmación firmada de asignaciones estudiantiles y bloqueo de consultas externas de ubicación salvo autorización explícita.
-- ⏱️ **«Cronómetro y Plataforma», Enfoque en Escenario y Programas VMC 2026:**
-  - Renombrado oficial a **Cronómetro y Plataforma**, consolidando **Consola Presidencia** y **Pantalla Orador** (modos *Monitor Puro* y *Atril + Escaleta* con sincronización multipantalla).
-  - Simplificación del temporizador retirando distractores secundarios para priorizar la lectura clara en plataforma y actualización de cronogramas semanales Vida y Ministerio 2026, canciones y lecciones.
-- ⚡ **Arranque Optimizado y Estabilidad Linux Desktop:**
-  - Reorganización modular interna y optimización de precarga para acelerar la apertura inicial en web y PWA.
-  - Priorización del paquete `.rpm` versionado en Fedora/RHEL, instrucción directa de reinstalación/actualización para escritorio Linux y exposición exclusiva de instaladores Linux oficiales (`.rpm`, `.deb`, `.AppImage`) para equipos de PC y cabina.
+- 🔄 **Actualización Obligatoria PWA y Service Worker Web Push Optimizado (`pwaUpdateService.ts`, `MandatoryPwaUpdateModal.tsx`, `vite.config.ts`, `public/push-sw.js`):**
+  - **Actualización Segura del Service Worker:** Detección automática de nuevas versiones y modal obligatorio para aplicar actualizaciones pendientes sin inconsistencias de caché, respaldado por `test/pwa-update.test.ts`.
+  - **Web Push Confiable en Segundo Plano Móvil:** Migración en `vite.config.ts` hacia estrategia `injectManifest` optimizada para priorizar eventos `push` y `notificationclick`, reducir sobrecarga de precaché inicial y mejorar la entrega cuando el navegador móvil aplica restricciones en segundo plano.
+- 🔍 **Buscador Global Funcional y Botón Volver Atrás Unificado (`useAppNavigation.ts`, `searchEngine.ts`, `navigationModules.ts`, `SearchHeaderFilters.tsx`):**
+  - **Navegación Directa de Resultados:** Corrección de la condición de carrera con `history.back()` que impedía abrir los módulos y tarjetas seleccionados desde el buscador global.
+  - **Búsqueda Sin Tildes y Volver desde el Logo en Móvil:** Normalización automática de acentos al filtrar resultados y transformación contextual del logo superior en botón «Volver atrás» al entrar en secciones desde móvil (retirando botones redundantes en vistas internas).
+- 🔐 **Rediseño de Directorio de PINs, Código QR y Sincronización (`PublisherPinsModal.tsx`, `QrCodeModal.tsx`, `OfflineDashboard.tsx`, `OfflineSyncQueueModal.tsx`):**
+  - Superficies sobrias `.kg-sheet` con paridad total en temas Claro, Oscuro y Sepia, divisores finos, tipografía `tabular-nums`, copia limpia orientada al usuario y navegación móvil consistente.
+- 📺 **Unificación de «Plataforma» y «TV» entre PC y Móvil (`Navbar.tsx`, `MobileMenuTab.tsx`, `QuickAccessGrid.tsx`, `TableroAnunciosTab.tsx`):**
+  - Nombres y colores coherentes en escritorio, menú móvil, buscador y Cartelera: **Plataforma** en verde esmeralda (reemplazando la etiqueta confusa *Cronómetro* en móvil) y **TV / TV en Salón** en azul celeste (`sky`).
+- 📱 **Rediseño Móvil de «Cartelera de Congregación», Mi Portal, Estudios Bíblicos y Módulos Pastorales (`TableroAnunciosTab.tsx`, `TableroCarteleraKhsView.tsx`, `TableroCarteleraShared.tsx`, `TableroDespachoMensualView.tsx`, `ServiceGroupCard.tsx`, `CarritosShiftsGrid.tsx`, `LiteraturaTab.tsx`, `CleaningDutiesTab.tsx`):**
+  - **Cartelera Sin Recortes en Móvil:** Barra de pestañas adaptativa (`Cartelera`, `Hojas`, `Avisos`) en cuadrícula 3 columnas sin desbordamiento horizontal, cuadrícula 2×2 para los 4 botones de exportación, selector semanal compacto sin píldoras apiladas, cabeceras con títulos completos legibles sin truncamiento (`...`), filas envolventes en Estudio Bíblico y Despacho Mensual, y eliminación de la barra superior redundante de sección en móvil para aprovechar mejor el espacio vertical.
+  - **Mi Portal, Estudios Bíblicos, Grupos, Exhibidores, Literatura y Servicios del Salón:** Secciones móviles alineadas con PC, opción para ocultar el banner de Portal/Asignaciones, tarjetas de Estudios Bíblicos renovadas, Exhibidores (antes *Carritos*) con códigos de color por día de la semana (`Lunes` a `Domingo`) y cabeceras KPI compactas.
+- 🗺️ **Territorios en Bogotá, Ubicación GPS Precisa y Pantalla Completa (`locationAndNominatim.ts`, `TerritoryMapView.tsx`, `TerritoryCardMap.tsx`, `useMapFullscreen.ts`):**
+  - **Modo Demo Localizado en Bogotá, Colombia:** Carga automática de datos de prueba en Bogotá (Suba, La Floresta, Pontevedra, Calle 100, Chapinero).
+  - **GPS, Geocodificación y Pantalla Completa:** Validación de precisión GPS con halo de incertidumbre, sesgo geográfico hacia Bogotá en Nominatim y botón dedicado de pantalla completa en mapas y tarjetas.
 
 ---
 
-### [v0.1.0-alpha.49.1] — 12 de Noviembre, 2026
-**Consola de Plataforma para PC, Accesos Rápidos en Inicio, Lectura NFC y Mapas Offline**
+### [v0.1.0-alpha.53] — 15 de Noviembre, 2026
+**Rediseño Integral de Ficha del Publicador (S-21, Asignaciones y Responsabilidades), Importador `.epub`, QR Offline y Web Push**
 
-- 🖥️ **Accesos Directos en Inicio Exclusivos para PC:**
-  - Nuevos botones directos en la vista de Inicio para abrir la consola de plataforma y TV en Salón desde computadoras de escritorio.
-- ⏱️ **Consola Profesional en PC:**
-  - Disposiciones adaptadas para pantalla en plataforma, semáforo visual de tiempo, modo Zen sin distracciones, ajustes finos de duración, campana acústica, aviso visual de cabina y sincronización multipantalla en vivo.
-- 📲 **Lectura y Registro de Etiquetas NFC:**
-  - Soporte Web NFC para abrir tarjetas personales de territorio **S-13** o el registro de asistencia **S-88** al acercar un dispositivo móvil compatible a una etiqueta registrada.
-- 🗺️ **Mapas Offline en Tarjetas de Territorio y Exportación CSV:**
-  - Descarga de mapas de territorios activos al dispositivo para consultar límites sin conexión a internet y exportación a CSV en *Grupos de Servicio* respetando el filtro activo.
+- 🗂️ **Rediseño desde Cero de S-21, Asignaciones y Ficha del Publicador (`S21RecordsSection.tsx`, `AssignmentsSection.tsx`, `TasksAssignmentCard.tsx`, `MaintenanceSheetsAssignmentCard.tsx`, `ResponsibilitiesSection.tsx`, `PublisherEditorNavigation.tsx`):**
+  - **Tarjeta S-21 en Dos Columnas:** Hoja anual de 12 meses limpia y legible junto a panel lateral con métricas de cobertura, gráfica de ritmo mensual en barras, casillas oficiales de designación, copia rápida del mes anterior y descarga en PDF oficial y CSV sanitizado.
+  - **Panel de Asignaciones Simétrico y con Color por Sección:** Rejilla alineada sin espacios muertos ni desorden visual, identidad cromática diferenciada por área (*Tesoros*, *Maestros*, *Vida Cristiana*, *Fin de Semana*, *Servicio del Campo*, *Tareas* y *Mantenimiento*), franja superior compacta para cobertura, folleto **S-38** y **Bosquejos (1–194)**, y sincronización directa con las fichas activas del módulo **Mantenimiento**.
+  - **Navegación y Responsabilidades Mejoradas:** Barra de pestañas en una sola fila con desplazamiento horizontal mediante rueda o flechas contextuales, y rediseño visual en **Departamentos y Responsabilidades de Congregación**.
+- 📖 **Importador `.epub`, Lector QR Offline, Recolección S-4 y Formularios S-1 / S-205b (`clmEpubImporter.ts`, `qrDecoder.ts`, `ServiceReportsCollectionView.tsx`, `s1AndVisitFillers.ts`):**
+  - **Importador Directo `.epub` y Reemplazos Reales:** Procesamiento directo de la guía de actividades en formato `.epub` (`OEBPS`) normalizando semanas, cánticos, lectura y lecciones, junto con cálculo real de rotación para reemplazos CLM.
+  - **Decodificador QR Universal Offline (`jsqr`):** Lectura de códigos QR desde cámara o imagen mediante buffer RGBA sin depender de `BarcodeDetector` del navegador.
+  - **Recolección Mensual S-4 y Llenado en Memoria S-1 / S-205b:** Resumen por grupo de predicación con recordatorios personalizados para WhatsApp y llenado automático en memoria de formularios oficiales **S-1** y **S-205b**.
+- 🔔 **Notificaciones Web Push Cifradas y Sincronización Remota (`webPush.ts`, `webPushSubscription.ts`, `useTimerRemoteSync.ts`, `mergeHelpers.ts`):**
+  - **Web Push End-to-End en `kongre-sync`:** Registro y entrega de notificaciones push cifradas (`aes128gcm`) firmadas con VAPID, migración SQL `web_push_subscriptions` y depuración automática de endpoints caducados (`410`).
+  - **Cronómetro Multi-Dispositivo y Fusión Segura:** Enlace por código de sala en el cronómetro de reuniones y combinación sin pérdidas de etiquetas NFC registradas e historial `change_history` de publicadores.
+- 🧩 **Selectores Modernizados y Suite Ampliada (`Select.tsx`, `new-integrations.test.ts`):**
+  - Unificación visual y accesibilidad del componente `Select` en toda la aplicación y respaldo con `248` pruebas pasando en `bun test`.
+
+---
+
+### [v0.1.0-alpha.52] — 14 de Noviembre, 2026
+**Cartografía Avanzada en Territorios, Auditoría de Reuniones Animada, Mejora en Guía de Usuario / Acerca de y Correcciones de Modo Demo y Cronómetro**
+
+- 🗺️ **Cartografía Mejorada, Controles de Zoom y Gráfico Circular en «Territorios» (`TerritoryMapView.tsx`, `TerritoryAllocationPieCard.tsx`, `leafletIconsAndTiles.ts`):**
+  - **Selector de Tipo de Mapa (Callejero, Satélite y Terreno):** Cambio rápido entre plano urbano, imágenes aéreas reales y relieve topográfico, con halos y trazos adaptativos para mejorar la visibilidad de los límites y guardado de preferencia local.
+  - **Controles de Zoom Personalizados (`+` / `-`) y Apertura Fluida:** Botones accesibles de acercamiento y alejamiento en el mapa Leaflet como alternativa al scroll del ratón, junto con una transición suave (`fade-in`) al abrir un territorio para ocultar la carga inicial de teselas.
+  - **Gráfico Circular de Distribución (Recharts):** Indicador donut compacto en la vista de territorios para visualizar en tiempo real el porcentaje de territorios asignados frente a los disponibles en la congregación.
+- 📋 **Log de Auditoría Administrativa con Animación Escalonada (`AuditLogModal.tsx`, `auditLogService.ts`):**
+  - **Registro de Cambios en Asignaciones:** Vista para coordinadores y responsables autorizados que detalla las modificaciones recientes en asignaciones de reuniones, incluyendo quién realizó el cambio, fecha/hora exacta, módulo e integridad verificada.
+  - **Entrada Gradual Fluida:** Animación progresiva al abrir la vista de auditoría para desplegar los registros gradualmente (con soporte `prefers-reduced-motion`).
+- 🔄 **Progreso en Sincronización Manual, Guía a Ancho Completo, Página «Acerca de» y «Mi Ministerio» Más Limpio (`OfflineSyncBanner.tsx`, `WebsiteGuideSection.tsx`, `KongreOfficialWebsite.tsx`, `MinistryNavHeader.tsx`, `MinistrySummaryPanel.tsx`, `AboutHeroSection.tsx`, `AboutFeaturesBentoSection.tsx`):**
+  - **Indicador de Progreso en Banner Offline:** Animación sutil de avance y estado al ejecutar una sincronización manual para brindar retroalimentación inmediata.
+  - **Guía de Usuario a Ancho Completo en PC y Página «Acerca de» Renovada:** La guía oficial ahora aprovecha todo el ancho de la pantalla en escritorio sin márgenes laterales restrictivos, junto con mejoras visuales y editoriales en la página institucional de Kongre.
+  - **Vista Principal de «Mi Ministerio» Más Directa e «Historial S-4» Integrado:** Se retiró el encabezado redundante **«Cronómetro y Mes Actual»** en la vista principal (móvil y escritorio) para dar prioridad inmediata al cronómetro, integrando el acceso **Historial S-4** directamente en el encabezado de **Mi Meta y Registro Mensual**.
+- 🛠️ **Correcciones de Modo Demo y Cronómetro de Ministerio (`settingsLifecycleActions.ts`, `authStorage.ts`, `useAuthSessionEffects.ts`, `RolesManagerTab.tsx`, `StopwatchExpandedConsole.tsx`):**
+  - **Publicadores y Roles Visibles al Instante en Modo Demo:** Inicialización íntegra del rol firmado de Coordinador, limpieza previa de residuos locales y protección de sesión demo al acceder desde la web oficial o el portal, evitando que *Publicadores* y *Roles y PINs* se degraden a rol público o queden restringidos al panel de seguridad.
+  - **Eliminación del Doble Botón «Manual» en el Cronómetro:** Traslado del selector de autoguardado al pie del cronómetro expandido (**Autoguardado: Activo / Local**) para dejar un único botón **Manual** en la cabecera y evitar el recorte de la insignia **EN CURSO** en móvil.
+
+### [v0.1.0-alpha.51] — 14 de Noviembre, 2026
+**Rediseño de Programa de Reuniones, Escáner QR de Territorios con Vibración Háptica, Modo Demo Ampliado, Endurecimiento E2EE y Modularización (<1.000 Líneas)**
+
+- 📷 **Escáner QR de Acceso Rápido, Animación de Apertura y Notas Editables en Territorios:**
+  - **Lector QR Integrado en «Territorios»:** Nuevos botones **«Escanear QR»** en la barra de acciones y junto al buscador para escanear tarjetas de territorio con la cámara en vivo o subiendo una imagen del código QR, abriendo al instante la **Ficha y Detalles S-13** o la **Tarjeta Digital Móvil**.
+  - **Confirmación Háptica (Vibración):** Respuesta táctil inmediata (`[40, 30, 60] ms`) al identificar un código QR válido y aviso táctil diferenciado cuando un código no coincide.
+  - **Animación de Entrada Fluida:** Apertura progresiva (`fade-in` + `slide-up` + `scale`) y entrada escalonada de secciones al abrir la vista de detalles del territorio o la tarjeta digital móvil, respetando `prefers-reduced-motion`.
+  - **Campo Editable «Notas y Observaciones sobre Domicilios»:** Edición directa de notas específicas sobre hogares desde la vista de detalles S-13 y desde la tarjeta digital móvil, con etiquetas rápidas de un toque (`+ Perro en patio`, `+ Timbre en portón`, `+ Visitar por la tarde`, `+ Acceso por caseta`).
+- 🧪 **Ampliación Integral de «Modo Demo» en Todos los Módulos:**
+  - **6 Semanas Completas y Publicadas:** 1 semana anterior, la semana actual y 4 semanas futuras con el 100 % de las partes asignadas en Sala Principal y Sala Auxiliar, discursos públicos, deberes y registros de asistencia **S-88**.
+  - **18 Publicadores con Historial Completo:** Tarjetas **S-21** de los años de servicio `2025-2026` y `2026-2027`, historial **S-38**, directrices **DPA**, grupos familiares y visitas de pastoreo.
+  - **Territorios, PPE, Literatura y Eventos:** 6 territorios con polígonos interactivos, manzanas y direcciones «No Visitar», 3 puntos de exhibidores PPE con 8 turnos, 9 salidas semanales al ministerio, inventario y cierres **S-14**, informes **S-4** y **S-1**, oradores visitantes/salientes, hospitalidad, visita del Superintendente de Circuito, Conmemoración, 2 Asambleas, panel eléctrico (12 pastillas), mantenimiento del Salón y registros de **Mi Ministerio** (cronómetro, 4 revisitas y 3 cursos bíblicos).
+- 🌐 **Renovación del Portal de Inicio y Guía de Usuario (Docs):**
+  - Nuevo diseño de portada con tarjeta interactiva de vista previa, animaciones y transiciones suaves al desplazarse (*scroll reveal*) y documentación paso a paso actualizada para los 12 módulos de la aplicación.
+- 📅 **Rediseño Completo del Menú «Programa de Reuniones» y Accesos Rápidos:**
+  - **Cabecera Integrada en Dos Niveles:** Navegador semanal protagonista junto a tres acciones contextuales (**Autoasignar**, **WhatsApp** y menú **Opciones**), pestañas **Todo**, **Entre Semana** y **Fin de Semana** con indicador deslizante, bloques destacados para **Lectura**, **Bosquejo** y **Cánticos**, interruptor moderno para **Sala Auxiliar** y anillo de progreso circular.
+  - **Simplificación de «Ministerio» y Barra Superior:** Accesos rápidos para **Plataforma** y **TV en Salón** integrados en la barra superior de escritorio y guardado manual en el cronómetro de ministerio.
+- 🐞 **Barra Superior Sólida y Corrección de Sincronización:**
+  - Eliminación del efecto translúcido en la barra superior en temas Claro, Oscuro y Sepia para evitar superposiciones al hacer scroll, y corrección definitiva del ciclo continuo de «Sincronizando...».
+- 🔐 **Endurecimiento Criptográfico y Calidad Arquitectónica (`compartments.ts`, `inputSanitizing.ts`, `congregationCredentials.ts`, `P3.8 <= 1.000 líneas`):**
+  - **Sobres Departamentales a 600.000 Iteraciones PBKDF2:** Subida de `ENVELOPE_KDF_ITERATIONS` a `600_000` (con almacenamiento por clave y retrocompatibilidad automática para claves previas de 100.000 iteraciones), eliminación de `wrappedKeys.master` en `payload_public` y exigencia de entropía mínima real (≥ 40 bits efectivos) para secretos departamentales.
+  - **PIN de Congregación Generado de 12 Caracteres (~60 bits) y Corrección `maxLength`:** Generación estándar en formato `XXXX-XXXX-XXXX` (conservando compatibilidad con PINs de 8 caracteres y passphrases existentes) y corrección de límites `maxLength` en los formularios de acceso y rotación.
+  - **Sanitización CSV con Parser DOM / Escáner con Estado y Bloqueo TOTP Honesto:** Sustitución del filtrado CSV por análisis DOM + escáner determinista con estado, aclaración explícita en interfaz y términos del TOTP como bloqueo local de la aplicación, limpieza de caché y script `export:clean-zip`.
+  - **Modularización Completa (< 1.000 Líneas) y TypeScript Estricto:** Descomposición por dominio en `PublishersTab`, `TableroAnunciosTab`, `RolesManagerTab`, `LocalP2PTransferModal`, `MantenimientoTab`, `VisitaSuperintendenteTab`, `SettingsTab` y `Navbar` (ningún archivo en `src/` supera las 1.000 líneas), activación de `noUnusedLocals`/`noUnusedParameters` y `239` pruebas pasando en `bun test`.
+
+### [v0.1.0-alpha.50] — 13 de Noviembre, 2026
+**Arquitectura Modular (<2.000 Líneas), Sistema Visual «Instrumento Teocrático Sobrio», Blindaje Anti-Rollback, Sobres Departamentales y «Cronómetro y Plataforma»**
+
+- 🔐 **Blindaje Criptográfico Integral, Sobres Departamentales y Anti-Rollback (`payloadContext.ts`, `secretQuality.ts`, `atRestPin.ts`, `compartments.ts`, `SyncRollbackModal.tsx`):**
+  - **Sobres Departamentales Conectados:** Integración completa de `departmentalEnvelope` en `AuthContext`, `CongregationContext` y la sincronización bidireccional (`syncBidirectional`), restringiendo secretos cortos o no autorizados según rol.
+  - **PINs en Reposo con AES-256-GCM (`kgr_v5` / `kgr_v5d`):** Cifrado autenticado del PIN de sesión y snapshots en `atRestPin.ts` usando la bóveda no extraíble en IndexedDB (promoción automática de `kgr_v5d` a `kgr_v5` y supresión del hash SHA-256 rápido en disco en favor de verificación salada en memoria), retirando el formato legado `kgr_v1:` y claves estáticas heredadas.
+  - **Validación de Contexto y Calidad de Credenciales:** Verificación `payloadContextMismatch` al descifrar blobs remotos contra cruce de congregaciones o intercambio entre columnas `master` y `public`; canonización uniforme de passphrases sin alterar mayúsculas ni espacios; filtro de calidad de PINs (`secretQuality.ts`) y PIN Maestro generado de 16 dígitos por defecto.
+  - **Protección Anti-Rollback y Privacidad:** Marcador monotónico por época y revisión (`syncRevision` + HWM local) con diálogo guiado de recuperación ante devoluciones de estado antiguo (`SyncRollbackModal.tsx`), firma de confirmación de asignaciones CLM (`assignmentSignature.ts`) y bloqueo de consultas GeoIP externas salvo opt-in explícito.
+- ⏱️ **«Cronómetro y Plataforma», Enfoque en Escenario y Programa VMC 2026 (`MeetingTimerModal.tsx`, `clmDefaultProgram.ts`, `organizedSync.ts`):**
+  - Renombrado oficial de *Modo Atril* a **Cronómetro y Plataforma**, integrando **Consola Presidencia** y **Pantalla Orador** (disposiciones *Monitor Puro* y *Atril + Escaleta* con sincronización multipantalla).
+  - Retiro del *Inspector de Estudio*, la pestaña *Notas* y el modo *Teleprompter* en el temporizador para mantener una plataforma limpia y enfocada, junto con la actualización de cronogramas semanales VMC, canciones y lecciones (`th`/`lmd`).
+- 🎨 **Rediseño «Instrumento Teocrático Sobrio», Paridad Sepia y Accesibilidad (`DESIGN.md`, `src/kongre-theme.css`, `src/index.css`):**
+  - Sustitución completa de superficies de cristal translúcido, `backdrop-blur`, tarjetas `rounded-3xl` y reflejos especulares heredados por hojas sobrias y legibles (`.kg-sheet`, `.kg-sheet-elevated`, `.kg-sheet-interactive`, `.kg-folio-tag`) con tokens dedicados en los 4 temas (**Claro**, **Oscuro**, **Sepia** `#f4ecd8` y **Cabina A/V** `#000000`) y alineación numérica `tabular-nums`.
+  - Cierre con `Escape` (`useEscapeKey`) en modales `role="dialog"`, eliminación de backdrops `<div onClick>`, soporte generalizado de `useReducedMotion()`, unidades `dvh` en vistas móviles/modales y escala unificada de `z-index` (`50 / 60 / 80 / 120`).
+- 🏗️ **Modularización Completa (<2.000 Líneas), Cero `any` y Preload Optimizado (`tsconfig.json`, `vite.config.ts`, `test/p3-fixes.test.ts`):**
+  - Descomposición de los 22 archivos monolíticos de código y estilos (`>= 2.000` líneas) en módulos especializados por dominio (`App.tsx`, `CongregationContext`, `AuthContext`, `ClmScheduleView`, `ScheduleTab`, `MinisterioPublicadorTab`, `DiscursosPublicosTab`, `MeetingTimerModal`, `PersonalViewTab`, `KongreOfficialWebsite`, etc.) respaldada por la guardia automática `P3.8`.
+  - TypeScript en modo estricto (`strict: true`, `allowJs: false`) cubriendo `src/`, `test/`, `supabase/functions/kongre-sync` y `scripts/` con **0 usos de `any`**, retiro completo del hook monolítico `useCongregation()` en favor de hooks de dominio memoizados y suite ampliada a **237 pruebas** ejecutadas con `bun test`.
+  - Filtrado de `modulePreload` en `vite.config.ts` para evitar precargar librerías pesadas diferidas (`pdfviewer`, `pdflib`, `jspdf`, `charts`, `calendar`, `maps`) en el arranque inicial, junto con optimización adicional de logos PNG.
+- 🖥️ **Actualizador de Escritorio Linux y Consistencia Multiplataforma (`desktopUpdateService.ts`, `DesktopUpdateModal.tsx`):**
+  - Priorización de paquetes RPM versionados (`Kongre-<versión>.rpm`), comando directo `dnf reinstall` con URL en Fedora/RHEL y exposición exclusiva de instaladores Linux oficiales (`.rpm`, `.deb`, `.AppImage`) en los assets de respaldo.
+  - Sincronización de versión a `v0.1.0-alpha.50` en `package.json`, `Cargo.toml`, `tauri.conf.json`, `versionLog.ts` y `alpha01.ts`.
+
+### [v0.1.0-alpha.49.1] — 12 de Noviembre, 2026
+**Modo Atril Profesional para PC, Accesos Rápidos en Inicio, Lectura NFC y Mapas Offline**
+
+- 🖥️ **Accesos Directos en Inicio Exclusivos para PC (`MinisterioPublicadorTab.tsx`, `PanoramaGeneralTab.tsx`, `ResumenInicioTab.tsx`):**
+  - Nuevos botones directos para consola de plataforma y TV en Salón en la vista de Inicio, visibles únicamente en pantallas de escritorio (`lg` y superiores).
+- ⏱️ **Consola Profesional en PC (`MeetingTimerModal.tsx`):**
+  - Modos de visualización en escritorio, semáforo visual de estado, modo Zen sin distracciones (`[H]`), controles de ajuste fino de tiempo, campana acústica (`[B]`), aviso visual de cabina y sincronización multipantalla en tiempo real mediante `BroadcastChannel`.
+- 📲 **Lectura y Registro de Etiquetas NFC (`nfcService.ts`, `NfcScannerModal.tsx`):**
+  - Soporte Web NFC para abrir al instante tarjetas personales de territorio **S-13** o el registro de asistencia **S-88** al acercar el dispositivo móvil a una etiqueta registrada.
+- 🗺️ **Mapas Offline en Tarjetas de Territorio y Exportación CSV (`DigitalTerritoryModal.tsx`, `ServiceGroupsView.tsx`):**
+  - Descarga de mapas de territorios activos a la caché local para consulta de límites sin conexión y exportación a CSV en *Grupos de Servicio* respetando el filtro de búsqueda activo.
 
 ### [v0.1.0-alpha.49] — 11 de Noviembre, 2026
 **Validación en Vivo del Actualizador Automático en Linux y Sincronización Multiplataforma**
 
-- 🔄 **Canal Oficial de Actualización Verificado:**
-  - Compilación y firma oficial de paquetes Linux (`.rpm`, `.deb`, `.AppImage`) para validar de extremo a extremo la notificación automática e instalación en 1 clic (`AppImage`) y actualización guiada de paquetes nativos.
-- 🖥️ **Sincronización de Versión Web y Escritorio:**
-  - Alineación oficial a `v0.1.0-alpha.49` en Web PWA y aplicación nativa de escritorio para Linux.
+- 🔄 **Canal Oficial de Actualización Verificado (`latest.json` + GitHub Releases):**
+  - Compilación y firma oficial de paquetes Linux (`.rpm`, `.deb`, `.AppImage` y firmas `.sig`) para validar en vivo la notificación automática de actualizaciones desde `v0.1.0-alpha.48` tanto mediante actualización en 1 clic (`AppImage`) como mediante descarga guiada de paquete nativo.
+- 🖥️ **Sincronización Multiplataforma:**
+  - Versión alineada a `v0.1.0-alpha.49` en Web PWA y Desktop Rust/Tauri v2 (`package.json`, `Cargo.toml`, `tauri.conf.json`).
 
 ### [v0.1.0-alpha.48] — 11 de Noviembre, 2026
-**Corrección del Actualizador de Escritorio Linux y Enlaces de Descarga por Versión**
+**Corrección del Actualizador de Escritorio (CSP `<meta>` + Fallback Nativo Rust) y Enlaces de Descarga por Tag**
 
-- 🐞 **Desbloqueo del Aviso de Actualización en Escritorio:**
-  - Ajuste de las políticas de seguridad locales en la compilación de escritorio para permitir la detección confiable de nuevas versiones desde GitHub Releases y la sincronización en tiempo real.
-- 🔄 **Respaldo Nativo del Actualizador:**
-  - Verificación automática mediante el actualizador nativo interno cuando la consulta directa falla, manteniendo enlaces exactos por etiqueta de versión para `.rpm`, `.deb` y `.AppImage`.
+- 🐞 **Desbloqueo del Anuncio de Actualización en Escritorio (`vite-security-headers.ts`, `security-headers-sync.test.ts`):**
+  - Corregida la `Content-Security-Policy` en etiqueta `<meta>` inyectada en `dist/index.html` durante la compilación para incluir los dominios de GitHub Releases (`api.github.com`, `github.com`, `objects.githubusercontent.com`, `release-assets.githubusercontent.com`) en compilaciones Tauri, evitando que WebKitGTK en Linux bloqueara silenciosamente la comprobación de nuevas versiones (`checkForDesktopUpdate`).
+- 🔄 **Respaldo Nativo IPC Rust para Actualizaciones (`desktopUpdateService.ts`, `DesktopUpdateModal.tsx`):**
+  - Añadido fallback automático a `tauri-plugin-updater` (`check()`) cuando la consulta REST a la API de GitHub falla o sufre rate-limit, reutilizando el mapeo de paquetes `.rpm`/`.deb`/`.AppImage` por plataforma y apertura segura de enlaces externos (`openSafeExternalUrl`).
+- 🌐 **Alineación CSP Completa (`vercel.json`, `tauri.conf.json`, `vite-security-headers.ts`) y Descargas Exactas:**
+  - Incorporado `wss://` para Realtime de Supabase y orígenes IP de respaldo cartográfico (`get.geojs.io`, `ipapi.co`) verificados en pruebas de sincronización CSP.
+  - Fijados los enlaces directos de `DesktopCompatibilityBanner.tsx` y `DesktopDownloadModal.tsx` a `/releases/download/v<versión>` para evitar errores 404 al publicarse releases posteriores.
 
 ### [v0.1.0-alpha.47] — 11 de Noviembre, 2026
-**Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, Transferencia P2P E2EE y Pulido Móvil**
+**Auditoría Integral de Seguridad, Cartografía Offline de Territorios, Respaldos Cifrados v2, P2P E2EE y Pulido Móvil**
 
-- 🛡️ **Revalidación Continua de Sesiones de Rol y Protección en la Nube:**
-  - Revalidación automática de sesiones activas al iniciar, cada 10 minutos y al regresar a la aplicación, degradando de forma segura ante revocación o cambio de privilegios, junto con refuerzo contra intentos abusivos en el servidor.
-- 🔑 **PINs Personales de 6 Dígitos, Passphrases Íntegras y Códigos de Invitación de 80 Bits:**
-  - Generador criptográfico de PINs personales de 6 dígitos con bloqueo de secuencias obvias o repetidas, preservación íntegra de símbolos y espacios en passphrases de congregación y códigos de invitación extendidos de 16 caracteres cifrados en reposo.
-- 📦 **Respaldos Portables Cifrados (`.kongre.json`) y Transferencia P2P / QR Cifrada de Extremo a Extremo:**
-  - Exportación obligatoriamente cifrada con frase de paso (mínimo 10 caracteres, indicador de fortaleza y cifrado `AES-256-GCM`) incluyendo recuperación completa de datos sensibles y credenciales al cambiar de dispositivo o navegador.
-  - Sello de integridad completo en respaldos y transferencias, además de intercambio local sin internet comprimido y cifrado por QR, archivo o canal local, y enlace seguro en transferencias en la nube.
-- 🗂️ **Cifrado en Reposo Unificado y Sanitización de Reportes/CSV:**
-  - Protección centralizada en almacenamiento local para informes de servicio, anfitriones de hospitalidad, solicitudes, territorios y ubicaciones de carritos; escapado estricto al imprimir reportes pastorales y defensa contra fórmulas al importar CSV.
-- 🗺️ **Cartografía Interactiva Offline de Territorios y Editor Visual de Polígonos:**
-  - Caché cartográfica sin conexión, dibujo y edición de límites geográficos en mapa y mini-mapas integrados en tarjetas **S-13**.
-- 📱 **Pulido de Interfaz Móvil y Navegación:**
-  - Cabeceras auto-colapsables en móvil, botón flotante de retorno rápido superior y mejoras de legibilidad y contraste en modo oscuro en Asistencia, Ministerio, Grupos de Servicio y Tablero del Salón.
+- 🛡️ **Revalidación de Tokens de Rol (`verify_role_token`) y Hardening en `kongre-sync`:**
+  - Revalidación automática en cliente (`roleTokenRevalidation.ts`, `AuthContext.tsx`) de los tokens de sesión de rol firmados (`kgr_srt1`) contra la Edge Function al iniciar la app, cada 10 minutos y al recuperar el foco de la pestaña, degradando inmediatamente a rol `publico` si el servidor rechaza el token (caducado, manipulado, publicador dado de baja o rol modificado).
+  - Hardening de `kongre-sync` (`core.ts`, `index.ts`): eliminado el cubo global de 300 fallos por hora por congregación (`c:${id}`) que permitía un ataque de denegación de servicio (DoS) cruzado contra toda una congregación; endurecida la extracción de IP (`clientIp`) ignorando cabeceras falsificables (`x-real-ip`) y tomando el último salto de `x-forwarded-for` cuando no existe `cf-connecting-ip`; restringido el fallback CORS a los orígenes oficiales de producción (`DEFAULT_ALLOWED_ORIGINS`) en lugar de `*`.
+- 🔑 **PINs Personales de 6 Dígitos, Passphrases de Congregación y Códigos de Invitación de 80 Bits:**
+  - Generador CSPRNG sin sesgo de módulo (`generateSecurePublisherPin`) actualizado a 6 dígitos numéricos (`100000`–`999999`) y bloqueo de secuencias obvias (`isObviousNumericPin`: repetidos, correlativos o periódicos) tanto en el generador como en la edición manual (`PublisherPinsModal.tsx`, `RolesManagerTab.tsx`, `PersonalViewTab.tsx`).
+  - Preservación íntegra de passphrases con símbolos, espacios y minúsculas en el PIN Maestro y Público de congregación (`formatCongregationPinInput`, `countCongregationPinChars`) junto con generación sin sesgo (`generateSecureCongregationPin`).
+  - Códigos de invitación teocrática (`shareTokens.ts`) ampliados a 16 caracteres Crockford Base32 (~80 bits de entropía CSPRNG) y cifrado en reposo de `kongre_theocratic_invitations_v1` al hidratar datos desde la nube (`CongregationWelcomeLanding.tsx`, `JoinCongregationModal.tsx`).
+- 📦 **Respaldos Portables Cifrados (`kongre_v2`, `congregationBackup.ts`) y Transferencia P2P / QR Cifrada (`kgr_p2p_e2:`):**
+  - Exportación obligatoria cifrada con frase de paso (mín. 10 caracteres, indicador visual de fortaleza, `PBKDF2-SHA256` a `600.000` iteraciones + `AES-256-GCM` con `AAD`), eliminando la descarga de JSON estándar en claro.
+  - Recuperación completa ante pérdida del navegador: los campos cifrados en reposo ligados a la bóveda (`kgr_sec5` / `kgr_v4` para DPA, contactos, notas, PINs y secreto TOTP 2FA) se preparan de forma portable dentro del sobre cifrado e incluyen todas las colecciones (`hospitalityHosts`, `shepherdingVisits`, `auxPioneerRequests`, `accountLinkRequests`, `breakers`, `maintenanceSheets`, `branchReportsS1`, `congregationEvents`, `clmProgramas`, `invitations` y credenciales locales opcionales), re-cifrándose bajo la bóveda del nuevo equipo al restaurar.
+  - Sello de integridad completo (`kgr_seal_v2_`) que cubre informes, anfitriones, territorios, pastoreo y cuentas; verificación añadida también en la descarga P2P.
+  - Transferencia local P2P / QR cifrada E2EE (`kgr_p2p_e2:`): comprime (Deflate) y cifra antes de generar el QR, `.kongre.json` o `BroadcastChannel` mediante clave efímera CSPRNG o frase personalizada, y las transferencias P2P en la nube usan clave efímera de 128 bits en el fragmento `#k=` (nunca enviada al servidor).
+- 🗂️ **Cifrado en Reposo Centralizado de Colecciones (`sensitiveCollections.ts`, `secureStorage`):**
+  - Una sola tabla (`SENSITIVE_COLLECTIONS`) declara los campos sensibles de cada colección y todo acceso a esas claves pasa por `secureStorage` con `AES-256-GCM` (`kgr_sec5`): informes de servicio, anfitriones, solicitudes de precursor auxiliar, solicitudes de vinculación, territorios y ubicaciones de carritos (`cart_locations`).
+  - Guardia anti-regresión (`sensitive-collections-guard.test.ts`) que impide accesos directos con `localStorage` a colecciones protegidas.
+- 🧱 **CSP Unificada, Sanitización HTML/CSV e Higiene del Proyecto:**
+  - Fuente única de verdad para la `Content-Security-Policy` entre `vite-security-headers.ts` y `vercel.json` verificada automáticamente en `scripts/verify-production.ts`.
+  - Escapado HTML estricto (`escapeHtml`) en la impresión de reportes pastorales (`shepherdingEngine.ts`) y sanitización reforzada contra inyección de fórmulas en importación CSV (`sanitizeImportedCsvText`), incluyendo celdas entrecomilladas y saltos de línea internos.
+- 🗺️ **Cartografía Interactiva Offline de Territorios y Editor de Polígonos (`TerritoryMapView.tsx`, `TerritoryPolygonEditorModal.tsx`):**
+  - Nuevo sistema de mapas interactivos para territorios con caché de teselas offline, dibujo y edición de polígonos geográficos, mini-mapas integrados en tarjetas de territorio (`TerritoryCardMap.tsx`, `DigitalTerritoryModal.tsx`) y utilidades geométricas (`TerritoryMapUtils.ts`).
+- 📱 **Pulido de Interfaz Móvil, Consola Oscura y Navegación:**
+  - Cabeceras de sección auto-colapsables en dispositivos móviles, mejoras de espaciado y legibilidad en `AsistenciaTab`, `GruposServicioTab`, `EquidadDashboardTab`, `MobileMenuTab` y `TableroSalonModal`, botón flotante `ScrollToTopButton` y rediseño visual oscuro en la pantalla de bienvenida y consola.
 
 ### [v0.1.0-alpha.46] — 9 de Noviembre, 2026
 **Criptografía V2 Estricta, Concurrencia Optimista CAS Obligatoria, Blindaje de Cuentas y Carga Ultra-Rápida (170 kB)**

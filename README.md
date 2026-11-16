@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.51-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.51" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.55-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.55" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Linux%20Nativo%20%7C%20PWA%20Multiplataforma-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
@@ -40,9 +40,27 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.51`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.55`)
 
 Para consultar el registro cronológico completo con todas las versiones y correcciones, revisa el [CHANGELOG.md](CHANGELOG.md).
+
+### 🎨 Rediseño Integral Operativo, Consola de Cuenta/Ajustes, Zoom en Audio/Video y PDF Real (`v0.1.0-alpha.55`)
+- **Rediseño desde Cero de Módulos Operativos:** Renovación integral de **Deberes y Aseo** (con fechas legibles en español), **Mantenimiento**, **Panel Eléctrico**, **Visita del SC**, **Memorial y Asambleas**, **Panel de Equidad** en 3 vistas y **Formatos y PDF**.
+- **Consola de Ajustes, Roles y Mi Perfil:** Diseño en 2 columnas para **Roles y PINs**, **Ajustes** y **Mi Perfil**, con panel lateral fijo en escritorio, encabezado compacto y botón **Subir** rediseñado para móvil y PC.
+- **Audio y Video + Documento PDF Real:** Nuevo rol **Anfitrión de Zoom** en **Audio y Video** (`Entre Semana` / `Fin de Semana`), corrección en la visualización de **Documento PDF Real** y desplazamiento más estable en escritorio.
+
+### 📱 Actualización PWA Obligatoria, Web Push Móvil, Buscador Global y Plataforma/TV (`v0.1.0-alpha.54`)
+- **PWA, Push y Navegación Móvil:** Actualización obligatoria de la PWA y notificaciones Web Push en segundo plano en dispositivos móviles, buscador global sin distinción de tildes y botón **«Volver»** en móvil.
+- **Unificación Plataforma/TV y Territorios:** Integración de las vistas de **Plataforma** y **TV**, diseño sobrio en PINs/QR/Sincronización/Cartelera móvil, Territorios en Bogotá y GPS más preciso.
+
+### 🪪 Ficha del Publicador y S-21, Importador EPUB, QR Offline y Web Push (`v0.1.0-alpha.53`)
+- **Secretaría y Publicaciones:** Rediseño de **Ficha del Publicador** y tarjeta **S-21** en dos columnas, importador directo `.epub`, recolección **S-4** y llenado automático **S-1 / S-205b**.
+- **Confiabilidad Offline y Calidad Verificada:** Lector QR offline universal, notificaciones Web Push de extremo a extremo y validación continua mediante **251 pruebas automatizadas**.
+
+### 🗺️ Cartografía Avanzada, Auditoría Animada y Mejoras de Guía / Mi Ministerio / Modo Demo (`v0.1.0-alpha.52`)
+- **Territorios con Selector de Mapa, Zoom y Gráfico Circular:** Selector entre mapa **Callejero**, **Satélite** y **Terreno**, controles accesibles de zoom (`+` / `-`), transición suave al abrir mapas y gráfico circular de territorios asignados frente a disponibles.
+- **Auditoría de Reuniones, Guía a Ancho Completo y Mi Ministerio Limpio:** Vista de historial de auditoría para coordinadores con entrada gradual animada, progreso visual al sincronizar manualmente la cola offline, **Guía Oficial de Usuario** expandida al ancho completo en PC, página **Acerca de** renovada y vista principal de **Mi Ministerio** con **Historial S-4** integrado en **Mi Meta y Registro Mensual**.
+- **Correcciones en Modo Demo y Cronómetro:** Restauración íntegra del rol de Coordinador y directorio completo de publicadores al entrar al Modo Demo, y eliminación del botón «Manual» duplicado en el cronómetro de predicación.
 
 ### 📷 Escáner QR de Territorios, Rediseño de Reuniones y Modo Demo Integral (`v0.1.0-alpha.51`)
 - **Escáner QR de Acceso Rápido y Notas en Territorios:** Nuevo lector QR en cámara en vivo o imagen para abrir al instante tarjetas **S-13** y tarjetas digitales móviles, con respuesta táctil háptica, apertura fluida animada y edición directa de observaciones sobre domicilios con etiquetas rápidas.
@@ -108,13 +126,13 @@ Para consultar el registro cronológico completo con todas las versiones y corre
 
 ### Opción 1: Aplicación Nativa para Linux (PC y Cabina de Sonido)
 
-Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.51` estarán disponibles en Releases al publicarse la etiqueta `v0.1.0-alpha.51`)*:
+Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)** *(los binarios de `v0.1.0-alpha.55` se publican en Releases al etiquetar la versión `v0.1.0-alpha.55`)*:
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.51-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.51-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.51_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.51_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.51_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.55-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.55-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.55_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.55_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.55_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para Linux está compilada en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

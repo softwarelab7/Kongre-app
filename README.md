@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.55-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.55" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.56-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.56" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Linux%20Nativo%20%7C%20PWA%20Multiplataforma-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
@@ -93,11 +93,11 @@ Las políticas legales completas están disponibles en el portal oficial:
 
 Descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
 
-| Sistema Operativo | Paquete Oficial (`v0.1.0-alpha.55`) | Método de Instalación |
+| Sistema Operativo | Paquete Oficial (`v0.1.0-alpha.56`) | Método de Instalación |
 | :--- | :--- | :--- |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.55-1.x86_64.rpm` | `sudo dnf install ./Kongre-0.1.0-alpha.55-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.55_amd64.deb` | `sudo dpkg -i ./Kongre_0.1.0-alpha.55_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.55_amd64.AppImage` | `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.56-1.x86_64.rpm` | `sudo dnf install ./Kongre-0.1.0-alpha.56-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.56_amd64.deb` | `sudo dpkg -i ./Kongre_0.1.0-alpha.56_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.56_amd64.AppImage` | `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para Linux consume apenas ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

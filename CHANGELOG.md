@@ -6,6 +6,22 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.56] — 16 de Noviembre, 2026
+**Rediseño Integral del Portal de Acceso, Paridad en 4 Temas y Mejoras de Experiencia Móvil/PC**
+
+- 🏛️ **Rediseño desde Cero del Portal de Acceso (`#portal`):**
+  - Interfaz completamente renovada bajo la estética sobria de Kongre con soporte uniforme en los temas **Claro**, **Oscuro**, **Sepia** y **Cabina A/V**.
+  - Nuevo resumen de áreas integradas (`VMC · S-89`, `S-13 · QR`, `AES-256`, `PWA · PC`), acceso rápido a **Explorar en Modo Demo**, consola de ingreso limpia (`Google`, `ID y PIN`, `Código de invitación o QR`), botón principal **Registrar nueva congregación** y restauración directa de copias cifradas de respaldo.
+- 📱 **Cabecera Integrada y Experiencia Unificada en Móvil, Tablet y PC:**
+  - Eliminación de la doble barra superior para aprovechar toda la pantalla sin desplazamiento vertical innecesario en escritorio.
+  - La consola de acceso aparece de inmediato al abrir desde móvil o tableta, con restauración de copias de respaldo disponible también desde teléfonos.
+- 🐛 **Logotipo y Distribución:**
+  - Animación de entrada más ágil en el logotipo superior para evitar cortes al abrir el portal y compilación continua más confiable de los paquetes nativos para Linux.
+
+---
+
+## 📜 Versiones Anteriores
+
 ### [v0.1.0-alpha.55] — 15 de Noviembre, 2026
 **Anfitrión de Zoom en Audio/Video, Rediseño Integral desde Cero de Módulos Operativos y Administrativos, Consola en 2 Columnas y Correcciones de PDF Real y Scroll**
 
@@ -19,10 +35,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Panel lateral fijo debajo de la barra superior (`lg:sticky`), cabecera limpia en **Mi Perfil** y nuevo botón flotante **Subir** con anillo de progreso optimizado para móvil (encima del dock) y PC.
 - 🐛 **Correcciones de «Documento PDF Real», Scroll y Barra Lateral (`ExportPdfTab.tsx`, `ReactPdfInteractivePreview.tsx`, `index.css`, `NavbarUnifiedDrawer.tsx`):**
   - Resolución del worker de PDF.js con `?url` de Vite y `suspense={false}` en `react-pdf` v11 para eliminar el bucle de carga; exclusión de contenedores ocultos de impresión en `body:has(.fixed.inset-0)` para evitar bloqueos de scroll en escritorio; y ocultamiento del scrollbar en la barra lateral contraída.
-
----
-
-## 📜 Versiones Anteriores
 
 ### [v0.1.0-alpha.54] — 15 de Noviembre, 2026
 **Actualización Obligatoria PWA y Push en Segundo Plano, Buscador Global Funcional, Rediseño Móvil de Cartelera, Directorio de PINs / QR / Sincronización, Territorios en Bogotá y Unificación Plataforma / TV**

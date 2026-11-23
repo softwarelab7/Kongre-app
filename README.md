@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.66-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.66" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.73-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.73" />
   <img src="https://img.shields.io/badge/Etapa-Alfa%20(pruebas%20antes%20de%20la%20beta)-orange?style=flat-square" alt="Etapa Alfa" />
   <img src="https://img.shields.io/badge/Desktop-Linux%20Nativo-orange?style=flat-square&logo=linux&logoColor=white" alt="Linux nativo" />
   <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
@@ -52,7 +52,7 @@ Combina una **Progressive Web App (PWA) Offline-First** para móviles, tabletas 
 - **Vincular hermano por código:** los ancianos escriben el código que les envía el hermano y Kongre crea su ficha con **el nombre con que se registró**; si ya tenía una ficha hecha a mano (sin cuenta), se vincula esa sin duplicarla, y si estuvo antes en la congregación, se recupera su ficha con todo su historial.
 - **Invitar a toda la congregación con QR:** un código QR por grupo de servicio; cada hermano elige su nombre y los ancianos aprueban en bloque.
 - **Lo que ve cada uno sale de su ficha:** nombramiento, privilegio y departamentos deciden sus pantallas e insignias; los cambios se aplican al momento. Qué hace cada rol lo ven solo ancianos y siervos ministeriales.
-- **Bajas ordenadas:** «Dar de baja» (traslado, dejó de asociarse…) desvincula la cuenta, cambia las llaves de la congregación, guarda la ficha con su historial y genera la **S-21** del traslado. La papelera nunca deja cuentas con acceso.
+- **Bajas ordenadas:** «Dar de baja» (traslado, ya no asiste a esta congregación…) quita el acceso de su cuenta, cambia las llaves de la congregación, pasa su ficha a **«Archivados»** con todo su historial y genera la **S-21** del traslado. Quien sale por su cuenta aparece en **«Desvinculados»**. La papelera nunca deja cuentas con acceso.
 
 ### 🗓️ Reuniones, Plataforma y Coordinación
 - **Reunión Vida y Ministerio:** programación semanal completa, importación de cuadernos (`.epub`), asignaciones estudiantiles, autoasignación equitativa según cualificaciones, sustituciones, historial y tarjetas **S-89** en PDF.
@@ -101,7 +101,7 @@ Las políticas legales completas están en el portal oficial:
 
 ### Opción 1: Aplicación Web y PWA (Windows, macOS, Android, iPhone y iPad)
 
-🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com) — siempre tiene la **última versión** (`v0.1.0-alpha.66`).
+🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com) — siempre tiene la **última versión** (`v0.1.0-alpha.73`).
 
 * **🪟 Windows (Chrome / Edge):** abre el portal y haz clic en el icono de instalación `⊕` de la barra de direcciones (o `⋮` → **«Instalar Kongre»**).
 * **🍎 macOS (Safari / Chrome / Edge):** **Archivo** → **«Agregar al Dock»** (o `⋮` → **«Instalar Kongre»**).
